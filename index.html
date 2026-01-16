@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+<title>模拟手机</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:flex;justify-content:center;padding:30px 0}
+.phone{width:390px;height:780px;background:#000;border-radius:42px;padding:6px}
+.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;position:relative;background-size:cover;background-position:center;background-repeat:no-repeat}
+
+/* 刘海 */
+.notch{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:130px;height:34px;background:#000;border-radius:18px;z-index:20}
+
+/* 状态栏 */
+.status-bar{height:44px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:600;position:absolute;top:0;left:0;right:0;z-index:10}
+.status-time{margin-left:18px}.status-right{display:flex;gap:6px}.status-right img{height:14px}
+
+/* 主屏 */
+.home{width:100%;height:100%;padding:60px 20px 80px}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.app-item{text-align:center;font-size:12px}
+.app-name{color:#000}
+.app{width:64px;height:64px;border-radius:14px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.app img{width:100%;height:100%;object-fit:cover}
+.wechat-app{background:#07c160;color:#fff;font-size:28px}
+
+/* 页面 */
+.page{width:100%;height:100%;display:none;flex-direction:column;background:#f2f2f2;padding-top:44px}
+
+/* Header */
+.header{height:44px;background:#ededed;display:flex;align-items:center;justify-content:center;position:relative;font-size:17px;font-weight:600}
+.header-left,.header-right{position:absolute;top:0;height:44px;display:flex;align-items:center;padding:0 14px;font-size:22px;cursor:pointer}
+.header-left{left:0}.header-right{right:0}
+
+/* 搜索 */
+.wechat-search{padding:8px 12px;background:#ededed}
+.wechat-search-box{height:36px;background:#e0e0e0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#888}
+
+/* 列表 */
+.list{flex:1;overflow:auto}
+.item{background:#fff;padding:14px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+
+/* Tabs */
+.tabs{height:60px;display:flex;border-top:1px solid #ddd;background:#fff}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#333}
+.tab-icon{font-size:22px;margin-bottom:2px}
+.tab.active{color:#07c160}
+
+/* 我 */
+.profile{background:#fff;padding:20px;display:flex;align-items:center}
+.avatar{width:60px;height:60px;border-radius:50%;background:#ccc;margin-right:14px;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.name{font-size:18px}
+.wxid{font-size:12px;color:#888;margin-top:4px}
+
+/* 设置 */
+.setting-item{background:#fff;padding:14px;border-bottom:1px solid #eee}
+.setting-item input{margin-top:10px;width:100%}
+
+/* 加号弹窗 */
+.plus-mask{position:absolute;inset:0;background:rgba(0,0,0,.25);display:none;pointer-events:none;z-index:50}
+.plus-mask.show{display:block;pointer-events:auto}
+.plus-panel{position:absolute;top:56px;right:12px;width:180px;background:#4a4a4a;border-radius:10px;overflow:hidden}
+.plus-item{padding:14px;color:#fff;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.15)}
+.plus-item:last-child{border-bottom:none}
+
+/* 轻微点击反馈 */
+.header-left:active,.header-right:active,.plus-item:active{opacity:.6}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="screen" id="screen">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <div id="time" class="status-time">00:00</div>
+      <div class="status-right">
+        <img src="https://img.heliar.top/file/1768515766612_IMG_3349.png" alt="net">
+        <img src="https://img.heliar.top/file/1768516105836_IMG_3350.png" alt="bat">
+      </div>
+    </div>
+
+    <!-- 主屏 -->
+    <div class="home" id="home">
+      <div class="apps">
+        <div class="app-item" onclick="openWeChat()">
+          <div class="app wechat-app" id="wechatIcon">💬</div>
+          <div class="app-name">Wechat</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wechat 页面（聊天/通讯录/发现/我）-->
+    <div class="page" id="wechat">
+      <div class="header">
+        <div class="header-left" onclick="backHome()">✩</div>
+        Wechat
+        <div class="header-right" id="plusBtn" onclick="openPlus()">＋</div>
+      </div>
+
+      <!-- 搜索栏（仅聊天 tab 显示） -->
+      <div class="wechat-search" id="wechatSearch">
+        <div class="wechat-search-box">🔍 搜索</div>
+      </div>
+
+      <!-- 可变内容区域 -->
+      <div class="list" id="wechatContent"></div>
+
+      <!-- 底部 tabs -->
+      <div class="tabs" id="wechatTabs">
+        <div class="tab active" data-tab="chat" onclick="switchTab('chat', this)"><div class="tab-icon">💬</div><div>微信</div></div>
+        <div class="tab" data-tab="contact" onclick="switchTab('contact', this)"><div class="tab-icon">👥</div><div>通讯录</div></div>
+        <div class="tab" data-tab="find" onclick="switchTab('find', this)"><div class="tab-icon">🧭</div><div>发现</div></div>
+        <div class="tab" data-tab="me" onclick="switchTab('me', this)"><div class="tab-icon">👤</div><div>我</div></div>
+      </div>
+    </div>
+
+    <!-- 设置页面（独立） -->
+    <div class="page" id="setting">
+      <div class="header">
+        <div class="header-left" onclick="backMe()">‹</div>
+        设置
+      </div>
+      <div class="list" id="settingList">
+        <div class="setting-item">修改微信昵称<input type="text" oninput="setNickname(this.value)"></div>
+        <div class="setting-item">修改微信号<input type="text" oninput="setWxId(this.value)"></div>
+        <div class="setting-item">修改头像<input type="file" accept="image/*" onchange="setAvatar(this)"></div>
+        <div class="setting-item">修改主屏幕壁纸<input type="file" accept="image/*" onchange="setWallpaper(this)"></div>
+        <div class="setting-item">修改微信图标<input type="file" accept="image/*" onchange="setWeChatIcon(this)"></div>
+      </div>
+    </div>
+
+    <!-- 加号弹窗 -->
+    <div class="plus-mask" id="plusMask" onclick="closePlus()">
+      <div class="plus-panel" onclick="event.stopPropagation()">
+        <div class="plus-item" onclick="startGroup()">💬 发起群聊</div>
+        <div class="plus-item" onclick="addFriend()">👤 添加朋友</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===== 时间 ===== */
+function updateTime(){
+  const n=new Date();
+  time.innerText = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+}
+updateTime();
+setInterval(updateTime,1000);
+
+/* ===== DOM refs ===== */
+const screen = document.getElementById('screen');
+const home = document.getElementById('home');
+const wechat = document.getElementById('wechat');
+const setting = document.getElementById('setting');
+const content = document.getElementById('wechatContent');
+const wechatSearch = document.getElementById('wechatSearch');
+const plusMask = document.getElementById('plusMask');
+const wechatTabs = document.getElementById('wechatTabs');
+
+let nickname = localStorage.getItem('nickname') || '把饭拼好给你';
+let wxId = localStorage.getItem('wxid') || 'Bubu120vO';
+let avatar = localStorage.getItem('avatar') || '';
+
+/* ===== 页面开关 ===== */
+function openWeChat(){
+  hideAllPages();
+  wechat.style.display = 'flex';
+  switchTab('chat', wechatTabs.querySelector('[data-tab="chat"]'));
+}
+function backHome(){
+  hideAllPages();
+  home.style.display = 'block';
+}
+function openSetting(){
+  hideAllPages();
+  setting.style.display = 'flex';
+}
+function backMe(){
+  hideAllPages();
+  wechat.style.display = 'flex';
+  switchTab('me', wechatTabs.querySelector('[data-tab="me"]'));
+}
+function hideAllPages(){
+  // 保证所有 page 隐藏（不破坏 wallpaper）
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  home.style.display='none';
+}
+
+/* ===== Tabs 切换逻辑（修复点） ===== */
+function switchTab(name, el){
+  // set active class
+  wechatTabs.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el && el.classList) el.classList.add('active');
+
+  // control search bar and content
+  if(name === 'chat'){
+    wechatSearch.style.display = 'block';
+    // 初始聊天列表为空（按你要求）
+    content.innerHTML = `
+      <!-- 聊天列表初始为空（保留位置） -->
+      <div style="padding:18px;color:#888;text-align:center">目前无聊天</div>
+    `;
+  } else {
+    wechatSearch.style.display = 'none';
+    if(name === 'contact'){
+      // 简单模拟通讯录列表（可扩展）
+      content.innerHTML = `
+        <div class="item">联系人 A <span style="color:#999">›</span></div>
+        <div class="item">联系人 B <span style="color:#999">›</span></div>
+      `;
+    } else if(name === 'find'){
+      content.innerHTML = `
+        <div class="item">发现 - 功能入口1<span>›</span></div>
+        <div class="item">发现 - 功能入口2<span>›</span></div>
+      `;
+    } else if(name === 'me'){
+      renderMe();
+    } else {
+      content.innerHTML = `<div class="item">${name} 页面</div>`;
+    }
+  }
+}
+
+/* ===== 我 页呈现 ===== */
+function renderMe(){
+  content.innerHTML = `
+    <div class="profile">
+      <div class="avatar">${avatar?`<img src="${avatar}" alt="avatar">`:''}</div>
+      <div>
+        <div class="name">${nickname}</div>
+        <div class="wxid">微信号：${wxId}</div>
+      </div>
+    </div>
+    <div class="item">朋友圈<span>›</span></div>
+    <div class="item">表情<span>›</span></div>
+    <div class="item" onclick="openSetting()">设置<span>›</span></div>
+  `;
+}
+
+/* ===== 设置、头像、壁纸等功能（保持原有功能） ===== */
+function setNickname(v){ nickname = v; localStorage.setItem('nickname', v); renderMe(); }
+function setWxId(v){ wxId = v; localStorage.setItem('wxid', v); renderMe(); }
+function setAvatar(input){
+  const r = new FileReader();
+  r.onload = e => { avatar = e.target.result; localStorage.setItem('avatar', avatar); renderMe(); };
+  if(input.files && input.files[0]) r.readAsDataURL(input.files[0]);
+}
+function setWallpaper(input){
+  const r = new FileReader();
+  r.onload = e => { screen.style.backgroundImage = `url(${e.target.result})`; localStorage.setItem('wallpaper', e.target.result); };
+  if(input.files && input.files[0]) r.readAsDataURL(input.files[0]);
+}
+function setWeChatIcon(input){
+  const r = new FileReader();
+  r.onload = e => {
+    const icon = document.getElementById('wechatIcon');
+    icon.innerHTML = `<img src="${e.target.result}" alt="icon">`;
+    localStorage.setItem('wechatIcon', e.target.result);
+  };
+  if(input.files && input.files[0]) r.readAsDataURL(input.files[0]);
+}
+
+/* ===== 加号弹窗（不会堵住其它点击） ===== */
+function openPlus(){ plusMask.classList.add('show'); }
+function closePlus(){ plusMask.classList.remove('show'); }
+
+/* 弹窗行为示例（可扩展） */
+function startGroup(){ closePlus(); alert('发起群聊（示例）'); }
+function addFriend(){ closePlus(); alert('添加朋友（示例）'); }
+
+/* ===== 初始化：恢复 wallpaper / icon / home 显示 ===== */
+if(localStorage.getItem('wallpaper')) screen.style.backgroundImage = `url(${localStorage.getItem('wallpaper')})`;
+if(localStorage.getItem('wechatIcon')) document.getElementById('wechatIcon').innerHTML = `<img src="${localStorage.getItem('wechatIcon')}" alt="icon">`;
+
+/* show home by default */
+hideAllPages();
+home.style.display = 'block';
+</script>
+</body>
+</html>
