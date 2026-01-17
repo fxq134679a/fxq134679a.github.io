@@ -28,7 +28,53 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 .pet-box img{width:100%;height:100%;object-fit:contain;display:block}
 
 /* 屏幕 */
-.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;position:relative;background-size:cover;background-position:center;background-repeat:no-repeat}
+.screen{
+  width:100%;
+  height:100%;
+  border-radius:36px;
+  overflow:hidden;
+  position:relative;
+  background: #fff; /* 默认背景色 */
+}
+
+/* 主屏 - 修改壁纸容器 */
+.home{
+  width:100%;
+  height:100%;
+  position:relative;
+  overflow:hidden;
+}
+
+/* 壁纸层 - 独立容器，覆盖整个屏幕 */
+.wallpaper-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+/* 应用网格容器 - 在壁纸之上 */
+.apps-container {
+  position: relative;
+  z-index: 2;
+  width:100%;
+  height:100%;
+  padding:60px 20px 80px;
+  display:flex;
+  flex-direction:column;
+}
+
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.app-item{text-align:center;font-size:12px;cursor:pointer}
+.app-name{color:#fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);} /* 白色文字，添加阴影提高可读性 */
+.app{width:64px;height:64px;border-radius:14px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.app img{width:100%;height:100%;object-fit:cover}
+.wechat-app{background:#07c160;color:#fff;font-size:28px}
 
 /* 刘海 */
 .notch{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:130px;height:34px;background:#000;border-radius:18px;z-index:20}
@@ -37,17 +83,15 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 .status-bar{height:44px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:600;position:absolute;top:0;left:0;right:0;z-index:10}
 .status-time{margin-left:18px}.status-right{display:flex;gap:6px}.status-right img{height:14px}
 
-/* 主屏 */
-.home{width:100%;height:100%;padding:60px 20px 80px}
-.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.app-item{text-align:center;font-size:12px;cursor:pointer}
-.app-name{color:#000}
-.app{width:64px;height:64px;border-radius:14px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.app img{width:100%;height:100%;object-fit:cover}
-.wechat-app{background:#07c160;color:#fff;font-size:28px}
-
 /* 页面 */
-.page{width:100%;height:100%;display:none;flex-direction:column;background:transparent;padding-top:44px}
+.page{
+  width:100%;
+  height:100%;
+  display:none;
+  flex-direction:column;
+  background:#fff; /* 所有页面默认白色背景 */
+  padding-top:44px
+}
 
 /* Header */
 .header{height:44px;background:#ededed;display:flex;align-items:center;justify-content:center;position:relative;font-size:17px;font-weight:600;padding-top:env(safe-area-inset-top,8px)}
@@ -121,7 +165,13 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 .plus-item:last-child{border-bottom:none}
 
 /* 聊天窗口样式 */
-.chat-window{display:none;flex-direction:column;height:100%;position:relative;background:transparent}
+.chat-window{
+  display:none;
+  flex-direction:column;
+  height:100%;
+  position:relative;
+  background:#f5f5f5; /* 聊天窗口有独立背景色 */
+}
 .chat-header{height:56px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #eee;position:relative;padding-top:env(safe-area-inset-top,10px);background:linear-gradient(transparent,#fff)}
 .chat-header .left{position:absolute;left:10px;top:0;bottom:0;display:flex;align-items:center;cursor:pointer}
 .chat-header .right{position:absolute;right:10px;top:0;bottom:0;display:flex;align-items:center;cursor:pointer}
@@ -171,17 +221,23 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       </div>
     </div>
 
-    <!-- 主屏 -->
+    <!-- 主屏 - 壁纸仅在这里显示 -->
     <div class="home page" id="home">
-      <div class="apps">
-        <div class="app-item" onclick="openWeChat()">
-          <div class="app wechat-app" id="wechatIcon"><img src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
-          <div class="app-name">Wechat</div>
-        </div>
+      <!-- 壁纸层 -->
+      <div class="wallpaper-layer" id="wallpaperLayer"></div>
+      
+      <!-- 应用网格容器 -->
+      <div class="apps-container">
+        <div class="apps">
+          <div class="app-item" onclick="openWeChat()">
+            <div class="app wechat-app" id="wechatIcon"><img src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div class="app-name">Wechat</div>
+          </div>
 
-        <div class="app-item" onclick="openHomeSettings()">
-          <div class="app" id="homeSettingsIcon" style="background:#f0f0f0">⚙️</div>
-          <div class="app-name">设置</div>
+          <div class="app-item" onclick="openHomeSettings()">
+            <div class="app" id="homeSettingsIcon" style="background:#f0f0f0">⚙️</div>
+            <div class="app-name">设置</div>
+          </div>
         </div>
       </div>
     </div>
@@ -342,6 +398,7 @@ const toastEl = document.getElementById('toast');
 const petBox = document.getElementById('petBox');
 const wechatIconEl = document.getElementById('wechatIcon');
 const homeSettingsIconEl = document.getElementById('homeSettingsIcon');
+const wallpaperLayer = document.getElementById('wallpaperLayer'); // 新增：壁纸层
 
 /* API 控件 */
 const apiProxyInput = document.getElementById('apiProxy');
@@ -368,7 +425,13 @@ let chats = JSON.parse(localStorage.getItem('chats') || '[]'); // {id,contactId,
 let messages = JSON.parse(localStorage.getItem('messages') || '{}'); // { chatId: [{from,text,ts}] }
 
 /* 初始化画面资源 */
-if(localStorage.getItem('wallpaper')) screen.style.backgroundImage = `url(${localStorage.getItem('wallpaper')})`; else screen.style.backgroundImage = `url(${DEFAULT_WALLPAPER})`;
+// 修改：壁纸仅设置到wallpaperLayer层
+if(localStorage.getItem('wallpaper')) {
+  wallpaperLayer.style.backgroundImage = `url(${localStorage.getItem('wallpaper')})`;
+} else {
+  wallpaperLayer.style.backgroundImage = `url(${DEFAULT_WALLPAPER})`;
+}
+
 if(localStorage.getItem('wechatIcon')) wechatIconEl.innerHTML = `<img src="${localStorage.getItem('wechatIcon')}" alt="icon">`; else wechatIconEl.innerHTML = `<img src="${DEFAULT_WECHAT_ICON}" alt="icon">`;
 if(localStorage.getItem('homeSettingsIcon')) homeSettingsIconEl.innerHTML = `<img src="${localStorage.getItem('homeSettingsIcon')}" alt="home-settings">`;
 if(localStorage.getItem('petImage')) petBox.innerHTML = `<img src="${localStorage.getItem('petImage')}" alt="pet">`;
@@ -704,9 +767,9 @@ function renderMe(){
   `;
 }
 
-/* 新增的“朋友圈/表情”占位函数（保持不改其它功能） */
+/* 新增的"朋友圈/表情"占位函数（保持不改其它功能） */
 function openFriends(){
-  // 这里仅为示例：打开“朋友圈”可以实现你想要的交互
+  // 这里仅为示例：打开"朋友圈"可以实现你想要的交互
   toast('朋友圈（示例）');
 }
 function openEmoticons(){
@@ -722,10 +785,14 @@ function setAvatar(input){
   r.onload = e => { avatar = e.target.result; localStorage.setItem('avatar', avatar); renderMe(); };
   r.readAsDataURL(input.files[0]);
 }
+// 修改：壁纸仅设置到wallpaperLayer层
 function setWallpaper(input){
   if(!input.files || !input.files[0]) return;
   const r = new FileReader();
-  r.onload = e => { screen.style.backgroundImage = `url(${e.target.result})`; localStorage.setItem('wallpaper', e.target.result); };
+  r.onload = e => { 
+    wallpaperLayer.style.backgroundImage = `url(${e.target.result})`; 
+    localStorage.setItem('wallpaper', e.target.result); 
+  };
   r.readAsDataURL(input.files[0]);
 }
 function setWeChatIcon(input){
