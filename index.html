@@ -90,7 +90,8 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   display:none;
   flex-direction:column;
   background:#fff; /* 所有页面默认白色背景 */
-  padding-top:44px
+  padding-top:44px;
+  position:relative; /* 为plus弹窗添加相对定位 */
 }
 
 /* Header - 通用样式 */
@@ -184,12 +185,44 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 .api-row label{flex:0 0 110px;color:#222}
 .api-row .field{flex:1;display:flex;align-items:center;gap:8px}
 
-/* plus popup */
-.plus-mask{position:absolute;inset:0;background:transparent;display:none;pointer-events:none;z-index:50}
-.plus-mask.show{display:block;pointer-events:auto}
-.plus-panel{position:absolute;top:56px;right:12px;width:180px;background:#4a4a4a;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
-.plus-item{padding:14px;color:#fff;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.12);cursor:pointer}
-.plus-item:last-child{border-bottom:none}
+/* plus popup - 修复：改为固定定位，确保在所有页面上都能正确显示 */
+.plus-mask{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:transparent;
+  display:none;
+  pointer-events:none;
+  z-index:1000;
+}
+.plus-mask.show{
+  display:block;
+  pointer-events:auto;
+}
+.plus-panel{
+  position:absolute;
+  top:56px;
+  right:12px;
+  width:180px;
+  background:#4a4a4a;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,0.25);
+}
+.plus-item{
+  padding:14px;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  cursor:pointer;
+}
+.plus-item:last-child{
+  border-bottom:none;
+}
 
 /* 聊天窗口样式 */
 .chat-window{
@@ -421,7 +454,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   width: 100%;
   height: 100%;
   background: transparent;
-  z-index: 1000;
+  z-index: 2000;
   display: none;
 }
 
@@ -435,7 +468,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(242,182,198,0.3);
   overflow: hidden;
-  z-index: 1001;
+  z-index: 2001;
   min-width: 140px;
   animation: popupFadeIn 0.2s ease-out;
 }
@@ -472,7 +505,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.25);
-  z-index: 2000;
+  z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -710,7 +743,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.25);
-  z-index: 2000;
+  z-index: 4000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -887,7 +920,8 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       <div class="header">
         <div class="header-left" onclick="backHome()">✩</div>
         Wechat
-        <div class="header-right" id="plusBtn" onclick="openPlus()">＋</div>
+        <!-- 这是正确的加号按钮 -->
+        <div class="header-right" onclick="openPlus()">＋</div>
       </div>
 
       <div class="wechat-search" id="wechatSearch">
@@ -902,6 +936,14 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
         <div class="tab" data-tab="find" onclick="switchTab('find', this)"><div class="tab-icon">🧭</div><div>发现</div></div>
         <div class="tab" data-tab="me" onclick="switchTab('me', this)"><div class="tab-icon">👤</div><div>我</div></div>
       </div>
+      
+      <!-- plus mask 放在每个页面内部，确保正确显示 -->
+      <div class="plus-mask" id="wechatPlusMask" onclick="closePlus()">
+        <div class="plus-panel" onclick="event.stopPropagation()">
+          <div class="plus-item" onclick="startGroup()">💬 发起群聊</div>
+          <div class="plus-item" onclick="addFriend()">👤 添加朋友</div>
+        </div>
+      </div>
     </div>
 
     <!-- 聊天窗口（新） -->
@@ -909,7 +951,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       <div class="chat-header">
         <div class="left" onclick="closeChat()">‹</div>
         <div class="title" id="chatTitle">对话</div>
-        <div class="right" onclick="openRoleSetting()">⋯</div>
+        <div class="right" onclick="openRoleSetting()">⋯</div> <!-- 这个是角色设置按钮 -->
       </div>
 
       <div class="chat-body" id="chatBody"></div>
@@ -919,7 +961,15 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
         <div class="btn-circle" id="micBtn" onclick="triggerAIReply()"><img id="micImg" src="https://img.heliar.top/file/1768546088581_IMG_3422.png" alt="mic"></div>
         <div class="input-box"><input id="chatInput" placeholder="输入消息，回车发送" onkeydown="if(event.key==='Enter'){ sendChatMessage(); }"></div>
         <div class="btn-circle" id="emojiBtn"><img id="emojiImg" src="https://img.heliar.top/file/1768546261329_IMG_3423.png" alt="emoji"></div>
-        <div class="btn-circle" id="plusChatBtn"><img id="plusChatImg" src="https://img.heliar.top/file/1768546259205_IMG_3424.png" alt="plus"></div>
+        <div class="btn-circle" onclick="openPlus()"><img id="plusChatImg" src="https://img.heliar.top/file/1768546259205_IMG_3424.png" alt="plus"></div>
+      </div>
+      
+      <!-- plus mask 也放在聊天窗口内部 -->
+      <div class="plus-mask" id="chatPlusMask" onclick="closePlus()">
+        <div class="plus-panel" onclick="event.stopPropagation()">
+          <div class="plus-item" onclick="startGroup()">💬 发起群聊</div>
+          <div class="plus-item" onclick="addFriend()">👤 添加朋友</div>
+        </div>
       </div>
     </div>
 
@@ -1068,14 +1118,6 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       </div>
     </div>
 
-    <!-- plus mask -->
-    <div class="plus-mask" id="plusMask" onclick="closePlus()">
-      <div class="plus-panel" onclick="event.stopPropagation()">
-        <div class="plus-item" onclick="startGroup()">💬 发起群聊</div>
-        <div class="plus-item" onclick="addFriend()">👤 添加朋友</div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -1155,7 +1197,6 @@ const wechat = document.getElementById('wechat');
 const chatWindow = document.getElementById('chatWindow');
 const content = document.getElementById('wechatContent');
 const wechatTabs = document.getElementById('wechatTabs');
-const plusMask = document.getElementById('plusMask');
 const toastEl = document.getElementById('toast');
 const petBox = document.getElementById('petBox');
 const wechatIconEl = document.getElementById('wechatIcon');
@@ -1456,9 +1497,39 @@ function backToChat(){
   renderMessages(currentChatId);
 }
 
-/* plus popup */
-function openPlus(){ plusMask.classList.add('show'); }
-function closePlus(){ plusMask.classList.remove('show'); }
+/* plus popup - 修复：使用当前页面内的plus mask */
+function openPlus(){ 
+  // 获取当前显示的页面
+  const currentPage = document.querySelector('.page[style*="display: flex"]') || 
+                      document.querySelector('.page[style*="display:flex"]');
+  
+  if (currentPage) {
+    // 在当前页面内查找plus mask
+    const plusMask = currentPage.querySelector('.plus-mask');
+    if (plusMask) {
+      plusMask.classList.add('show');
+      return;
+    }
+  }
+  
+  // 如果在聊天窗口
+  if (chatWindow.style.display === 'flex') {
+    const chatPlusMask = document.getElementById('chatPlusMask');
+    if (chatPlusMask) chatPlusMask.classList.add('show');
+  }
+  // 如果在wechat页面
+  else if (wechat.style.display === 'flex') {
+    const wechatPlusMask = document.getElementById('wechatPlusMask');
+    if (wechatPlusMask) wechatPlusMask.classList.add('show');
+  }
+}
+
+function closePlus(){ 
+  // 关闭所有plus mask
+  document.querySelectorAll('.plus-mask').forEach(mask => {
+    mask.classList.remove('show');
+  });
+}
 
 /* startGroup left as-is */
 function startGroup(){ closePlus(); toast('发起群聊（示例）'); }
