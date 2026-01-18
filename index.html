@@ -75,6 +75,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 .app{width:64px;height:64px;border-radius:14px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .app img{width:100%;height:100%;object-fit:cover}
 .wechat-app{background:#07c160;color:#fff;font-size:28px}
+.worldbook-app{background:#ff9900;color:#fff;font-size:28px} /* 世界书图标背景色 */
 
 /* 刘海 */
 .notch{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:130px;height:34px;background:#000;border-radius:18px;z-index:20}
@@ -90,8 +91,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   display:none;
   flex-direction:column;
   background:#fff; /* 所有页面默认白色背景 */
-  padding-top:44px;
-  position:relative; /* 为plus弹窗添加相对定位 */
+  padding-top:44px
 }
 
 /* Header - 通用样式 */
@@ -114,6 +114,25 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   padding:0 12px;
   border-radius:6px;
   font-weight:600;
+}
+
+/* 世界书App页面标题栏样式 */
+.worldbook-header {
+  color: #f27a9b; /* 浅粉色字体 */
+}
+
+/* 世界书App右上角加号按钮 */
+.worldbook-plus-btn {
+  color: #f27a9b;
+  font-size: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background: #ffe6ef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(242,122,155,0.2);
 }
 
 /* 搜索 */
@@ -185,44 +204,12 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 .api-row label{flex:0 0 110px;color:#222}
 .api-row .field{flex:1;display:flex;align-items:center;gap:8px}
 
-/* plus popup - 修复：改为固定定位，确保在所有页面上都能正确显示 */
-.plus-mask{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:transparent;
-  display:none;
-  pointer-events:none;
-  z-index:1000;
-}
-.plus-mask.show{
-  display:block;
-  pointer-events:auto;
-}
-.plus-panel{
-  position:absolute;
-  top:56px;
-  right:12px;
-  width:180px;
-  background:#4a4a4a;
-  border-radius:10px;
-  overflow:hidden;
-  box-shadow:0 6px 18px rgba(0,0,0,0.25);
-}
-.plus-item{
-  padding:14px;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  border-bottom:1px solid rgba(255,255,255,.12);
-  cursor:pointer;
-}
-.plus-item:last-child{
-  border-bottom:none;
-}
+/* plus popup */
+.plus-mask{position:absolute;inset:0;background:transparent;display:none;pointer-events:none;z-index:50}
+.plus-mask.show{display:block;pointer-events:auto}
+.plus-panel{position:absolute;top:56px;right:12px;width:180px;background:#4a4a4a;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
+.plus-item{padding:14px;color:#fff;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.12);cursor:pointer}
+.plus-item:last-child{border-bottom:none}
 
 /* 聊天窗口样式 */
 .chat-window{
@@ -263,10 +250,9 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   border-radius:12px;
   font-size:14px;
   line-height:1.3;
-  position:relative; /* 为双击事件添加相对定位 */
+  position:relative; /* 为长按事件添加相对定位 */
   user-select:text; /* 允许文本选择 */
   -webkit-user-select:text;
-  cursor:default; /* 默认光标 */
 }
 /* 默认气泡样式（未自定义时） */
 .msg-left .msg-bubble{background:#fff;border:1px solid #eee;border-top-left-radius:6px}
@@ -454,7 +440,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   width: 100%;
   height: 100%;
   background: transparent;
-  z-index: 2000;
+  z-index: 1000;
   display: none;
 }
 
@@ -468,7 +454,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(242,182,198,0.3);
   overflow: hidden;
-  z-index: 2001;
+  z-index: 1001;
   min-width: 140px;
   animation: popupFadeIn 0.2s ease-out;
 }
@@ -505,7 +491,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.25);
-  z-index: 3000;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -648,224 +634,433 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   cursor: pointer;
 }
 
-/* 双击反馈效果 */
-.msg-bubble.double-click-feedback {
-  animation: doubleClickFeedback 0.3s ease;
-}
-
-@keyframes doubleClickFeedback {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.98); }
-  100% { transform: scale(1); }
-}
-
-/* 新增：世界书App页面样式 */
-.world-book-header {
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-  color: #f27a9b; /* 浅粉色字体 */
-}
-
-.world-book-add-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
-  background: #f6c1d0; /* 粉色圆形按钮 */
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.world-book-add-btn:hover {
-  transform: scale(1.1);
+/* 世界书App页面样式 */
+.worldbook-page {
+  display: none;
+  flex-direction: column;
 }
 
 /* 世界书条目样式 */
-.world-book-list {
+.worldbook-list {
   flex: 1;
-  overflow-y: auto;
+  overflow: auto;
   padding: 12px;
 }
 
-.world-book-item {
-  background: #fff;
-  border: 1px solid #f2b6c6; /* 浅粉色边框 */
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 12px;
+.worldbook-item {
+  background: #ffe8f0;
+  border: 1px solid #ffd9e8;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(255, 182, 193, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.world-book-item:hover {
-  box-shadow: 0 2px 8px rgba(242,182,198,0.15);
+.worldbook-item:hover {
   transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
 }
 
-.world-book-item-title {
+.worldbook-title {
   font-size: 16px;
   font-weight: 600;
-  color: #f27a9b; /* 深粉色 */
-  margin-bottom: 6px;
+  color: #f27a9b;
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.world-book-item-preview {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.4;
-  height: 36px; /* 固定2行高度 */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.world-book-item-time {
-  font-size: 11px;
+.worldbook-arrow {
   color: #999;
-  margin-top: 8px;
-  text-align: right;
+  font-size: 18px;
+  margin-left: 10px;
+  flex-shrink: 0;
 }
 
-/* 世界书弹窗样式 */
-.world-book-mask {
+.worldbook-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 14px;
+}
+
+/* 世界书编辑弹窗样式 */
+.worldbook-edit-mask {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.25);
-  z-index: 4000;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
   display: none;
 }
 
-.world-book-mask.show {
+.worldbook-edit-mask.show {
   display: flex;
 }
 
-.world-book-popup {
-  background: #ffe6ef; /* 果冻质感背景 */
-  border: 2px solid #f2b6c6; /* 边框颜色 */
-  border-radius: 16px; /* 圆角16px */
-  padding: 24px;
+.worldbook-edit-popup {
+  background: #ffe6ef;
+  border: 1px solid #f2b6c6;
+  border-radius: 16px;
+  padding: 20px;
   width: 320px;
   max-width: 90%;
-  box-shadow: 0 2px 8px rgba(242,182,198,0.3); /* 轻微粉色阴影 */
+  box-shadow: 0 2px 8px rgba(242,182,198,0.3);
   animation: popupFadeIn 0.2s ease-out;
 }
 
-.world-book-popup-title {
+.worldbook-edit-title {
   font-size: 16px;
-  color: #f27a9b; /* 浅粉色标题 */
+  color: #f27a9b;
   margin-bottom: 16px;
   text-align: center;
   font-weight: 600;
 }
 
-.world-book-form-group {
+.worldbook-form-row {
   margin-bottom: 16px;
 }
 
-.world-book-form-label {
-  display: block;
+.worldbook-form-label {
   font-size: 14px;
-  color: #f27a9b; /* 深粉色标签 */
+  color: #f27a9b;
   margin-bottom: 6px;
+  display: block;
   font-weight: 500;
 }
 
-.world-book-form-input {
+.worldbook-form-input {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #f2b6c6; /* 粉色边框 */
-  background: #fff;
-  font-size: 14px;
-  color: #333;
-  box-sizing: border-box;
-}
-
-.world-book-form-input:focus {
-  outline: none;
-  border-color: #f27a9b;
-}
-
-.world-book-form-textarea {
-  width: 100%;
-  height: 150px; /* 固定高度 */
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #f2b6c6;
   background: #fff;
   font-size: 14px;
   color: #333;
-  resize: none; /* 禁止拉伸 */
   box-sizing: border-box;
-  line-height: 1.4;
 }
 
-.world-book-form-textarea:focus {
-  outline: none;
-  border-color: #f27a9b;
+.worldbook-form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #f2b6c6;
+  background: #fff;
+  font-size: 14px;
+  color: #333;
+  box-sizing: border-box;
+  resize: none;
+  height: 150px;
 }
 
-.world-book-popup-buttons {
+.worldbook-edit-buttons {
   display: flex;
   justify-content: center;
-  gap: 12px;
   margin-top: 20px;
 }
 
-.world-book-popup-btn {
+.worldbook-edit-btn {
   padding: 10px 24px;
   border-radius: 8px;
   border: none;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
 }
 
-.world-book-popup-btn.ok {
-  background: #f6c1d0; /* 粉色按钮 */
+.worldbook-edit-btn.ok {
+  background: #f6c1d0;
+  color: #fff;
+  flex: 1;
+}
+
+.worldbook-edit-btn.ok:hover {
+  opacity: 0.9;
+}
+
+/* ===== 新增：绑定世界书相关样式 ===== */
+/* 绑定世界书按钮样式 */
+.bind-worldbook-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #f2b6c6;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+/* 世界书选择弹窗 */
+.worldbook-select-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.25);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+
+.worldbook-select-mask.show {
+  display: flex;
+}
+
+.worldbook-select-popup {
+  background: #ffe6ef;
+  border: 1px solid #f2b6c6;
+  border-radius: 16px;
+  padding: 20px;
+  width: 340px;
+  max-width: 90%;
+  max-height: 70vh;
+  box-shadow: 0 2px 8px rgba(242,182,198,0.3);
+  animation: popupFadeIn 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.worldbook-select-title {
+  font-size: 16px;
+  color: #f27a9b;
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.worldbook-select-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid #ffd9e8;
+}
+
+.worldbook-select-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #ffe6ef;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.worldbook-select-item:hover {
+  background: #fff8fa;
+}
+
+.worldbook-select-item:last-child {
+  border-bottom: none;
+}
+
+/* 果冻感可爱复选框 */
+.jelly-checkbox {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.jelly-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.jelly-checkbox .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border: 2px solid #ffb6c1;
+  border-radius: 7px; /* 圆润的边缘 */
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性动画 */
+  box-shadow: 0 2px 4px rgba(255, 182, 193, 0.2);
+  overflow: hidden;
+}
+
+/* 果冻感的选中状态 */
+.jelly-checkbox input:checked ~ .checkmark {
+  background: linear-gradient(135deg, #ffb6c1, #ff8fa3); /* 淡粉色渐变 */
+  border-color: #ff8fa3;
+  transform: scale(1.05); /* 轻微放大效果 */
+  box-shadow: 0 4px 8px rgba(255, 143, 163, 0.3);
+}
+
+/* 对勾动画 */
+.jelly-checkbox .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  animation: checkmarkAppear 0.3s ease-out;
+}
+
+@keyframes checkmarkAppear {
+  0% { transform: rotate(45deg) scale(0); }
+  70% { transform: rotate(45deg) scale(1.2); }
+  100% { transform: rotate(45deg) scale(1); }
+}
+
+.jelly-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* 世界书选择项标题 */
+.worldbook-select-title-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f27a9b;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 世界书选择按钮区域 */
+.worldbook-select-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.worldbook-select-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex: 1;
+}
+
+.worldbook-select-btn.ok {
+  background: #f6c1d0;
   color: #fff;
 }
 
-.world-book-popup-btn.cancel {
+.worldbook-select-btn.cancel {
   background: rgba(242,122,155,0.1);
   color: #f27a9b;
 }
 
-.world-book-popup-btn:hover {
+.worldbook-select-btn:hover {
   opacity: 0.9;
 }
 
-/* 世界书空状态 */
-.world-book-empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: #ccc;
+/* 已绑定世界书列表样式 */
+.bound-worldbooks-list {
+  margin-top: 10px;
+  background: #fff8fa;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px dashed #ffd9e8;
 }
 
-.world-book-empty-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  opacity: 0.5;
+.bound-worldbook-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  border: 1px solid #ffe6ef;
 }
 
-.world-book-empty-text {
+.bound-worldbook-item:last-child {
+  margin-bottom: 0;
+}
+
+.bound-worldbook-title {
+  font-size: 13px;
+  color: #f27a9b;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.remove-bound-btn {
+  background: transparent;
+  border: none;
+  color: #ff6b8b;
+  font-size: 18px;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.remove-bound-btn:hover {
+  background: rgba(255, 107, 139, 0.1);
+}
+
+/* 绑定世界书区域标题 */
+.worldbook-binding-title {
   font-size: 14px;
+  color: #f27a9b;
+  margin-bottom: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.worldbook-binding-title span {
+  font-size: 11px;
   color: #999;
+  font-weight: normal;
+}
+
+/* 新增：消息发送动画 */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-slide-in {
+  animation: messageSlideIn 0.3s ease-out forwards;
 }
 </style>
 </head>
@@ -903,7 +1098,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 
           <!-- 新增：世界书图标 -->
           <div class="app-item" onclick="openWorldBook()">
-            <div class="app" id="worldBookIcon" style="background:#ffcc00">📖</div>
+            <div class="app worldbook-app" id="worldbookIcon">📚</div>
             <div class="app-name">世界书</div>
           </div>
 
@@ -920,8 +1115,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       <div class="header">
         <div class="header-left" onclick="backHome()">✩</div>
         Wechat
-        <!-- 这是正确的加号按钮 -->
-        <div class="header-right" onclick="openPlus()">＋</div>
+        <div class="header-right" id="plusBtn" onclick="openPlus()">＋</div>
       </div>
 
       <div class="wechat-search" id="wechatSearch">
@@ -936,14 +1130,6 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
         <div class="tab" data-tab="find" onclick="switchTab('find', this)"><div class="tab-icon">🧭</div><div>发现</div></div>
         <div class="tab" data-tab="me" onclick="switchTab('me', this)"><div class="tab-icon">👤</div><div>我</div></div>
       </div>
-      
-      <!-- plus mask 放在每个页面内部，确保正确显示 -->
-      <div class="plus-mask" id="wechatPlusMask" onclick="closePlus()">
-        <div class="plus-panel" onclick="event.stopPropagation()">
-          <div class="plus-item" onclick="startGroup()">💬 发起群聊</div>
-          <div class="plus-item" onclick="addFriend()">👤 添加朋友</div>
-        </div>
-      </div>
     </div>
 
     <!-- 聊天窗口（新） -->
@@ -951,7 +1137,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       <div class="chat-header">
         <div class="left" onclick="closeChat()">‹</div>
         <div class="title" id="chatTitle">对话</div>
-        <div class="right" onclick="openRoleSetting()">⋯</div> <!-- 这个是角色设置按钮 -->
+        <div class="right" onclick="openRoleSetting()">⋯</div>
       </div>
 
       <div class="chat-body" id="chatBody"></div>
@@ -961,15 +1147,7 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
         <div class="btn-circle" id="micBtn" onclick="triggerAIReply()"><img id="micImg" src="https://img.heliar.top/file/1768546088581_IMG_3422.png" alt="mic"></div>
         <div class="input-box"><input id="chatInput" placeholder="输入消息，回车发送" onkeydown="if(event.key==='Enter'){ sendChatMessage(); }"></div>
         <div class="btn-circle" id="emojiBtn"><img id="emojiImg" src="https://img.heliar.top/file/1768546261329_IMG_3423.png" alt="emoji"></div>
-        <div class="btn-circle" onclick="openPlus()"><img id="plusChatImg" src="https://img.heliar.top/file/1768546259205_IMG_3424.png" alt="plus"></div>
-      </div>
-      
-      <!-- plus mask 也放在聊天窗口内部 -->
-      <div class="plus-mask" id="chatPlusMask" onclick="closePlus()">
-        <div class="plus-panel" onclick="event.stopPropagation()">
-          <div class="plus-item" onclick="startGroup()">💬 发起群聊</div>
-          <div class="plus-item" onclick="addFriend()">👤 添加朋友</div>
-        </div>
+        <div class="btn-circle" id="plusChatBtn"><img id="plusChatImg" src="https://img.heliar.top/file/1768546259205_IMG_3424.png" alt="plus"></div>
       </div>
     </div>
 
@@ -995,12 +1173,19 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
           </div>
         </div>
 
-        <!-- 基本信息 -->
+        <!-- 角色信息模块 -->
         <div class="role-setting-section">
-          <div class="role-setting-title">基本信息</div>
+          <div class="role-setting-title">角色信息</div>
           <input type="text" class="role-setting-input" id="roleNameInput" placeholder="好友姓名">
           <input type="text" class="role-setting-input" id="roleRemarkInput" placeholder="备注（选填）">
-          <textarea class="role-setting-textarea" id="roleDescInput" placeholder="信息（填写角色相关详情）"></textarea>
+          <textarea class="role-setting-textarea" id="roleDescInput" placeholder="角色设定（填写角色相关详情）"></textarea>
+        </div>
+
+        <!-- 新增：用户信息模块 -->
+        <div class="role-setting-section">
+          <div class="role-setting-title">用户信息</div>
+          <div class="bubble-desc">在此设置当前角色眼中的"你"（用户）的个人设定、背景、昵称等信息</div>
+          <textarea class="role-setting-textarea" id="userInfoInput" placeholder="输入用户（我）的个人设定、背景、昵称等信息，仅对当前角色生效"></textarea>
         </div>
 
         <!-- 聊天页壁纸设置 -->
@@ -1022,19 +1207,18 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
           <div class="bubble-desc">输入CSS代码（例：background:#cfe8ff;border-radius:16px;）</div>
           <textarea class="role-setting-textarea" id="userBubbleCssInput" placeholder="设置自己聊天气泡样式"></textarea>
         </div>
-      </div>
-    </div>
 
-    <!-- 新增：世界书App页面 -->
-    <div class="page" id="worldBookPage">
-      <div class="header world-book-header">
-        <div class="header-left" onclick="backHome()">‹</div>
-        世界书
-        <div class="header-right world-book-add-btn" onclick="openWorldBookPopup()">＋</div>
-      </div>
-
-      <div class="world-book-list" id="worldBookList">
-        <!-- 世界书条目将在这里动态生成 -->
+        <!-- 新增：绑定世界书设置 -->
+        <div class="role-setting-section">
+          <div class="role-setting-title">世界书绑定</div>
+          <div class="worldbook-binding-title">
+            <span>为当前角色绑定世界书，聊天时AI会参考世界书内容</span>
+          </div>
+          <button class="bind-worldbook-btn" onclick="openWorldBookBinding()">绑定世界书</button>
+          <div class="bound-worldbooks-list" id="boundWorldbooksList">
+            <!-- 已绑定的世界书会动态插入到这里 -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1099,7 +1283,9 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
             <div class="field" style="align-items:center">
               <input id="apiTemp" type="range" min="0" max="2" step="0.01" value="0.8" style="flex:1">
               <div class="temp-value" id="apiTempVal">0.80</div>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -1118,28 +1304,26 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       </div>
     </div>
 
-  </div>
-</div>
+    <!-- 世界书App页面 -->
+    <div class="page worldbook-page" id="worldbookPage">
+      <div class="header">
+        <div class="header-left" onclick="backHome()">✩</div>
+        <div class="title worldbook-header">世界书</div>
+        <div class="header-right worldbook-plus-btn" onclick="openWorldBookEditor()">＋</div>
+      </div>
+      <div class="worldbook-list" id="worldbookList">
+        <!-- 世界书条目会动态插入到这里 -->
+      </div>
+    </div>
 
-<!-- 新增：世界书弹窗 -->
-<div class="world-book-mask" id="worldBookMask" onclick="closeWorldBookPopup()">
-  <div class="world-book-popup" onclick="event.stopPropagation()">
-    <div class="world-book-popup-title" id="worldBookPopupTitle">新建世界书</div>
-    
-    <div class="world-book-form-group">
-      <label class="world-book-form-label">世界书名</label>
-      <input type="text" class="world-book-form-input" id="worldBookTitleInput" placeholder="请输入书名">
+    <!-- plus mask -->
+    <div class="plus-mask" id="plusMask" onclick="closePlus()">
+      <div class="plus-panel" onclick="event.stopPropagation()">
+        <div class="plus-item" onclick="startGroup()">💬 发起群聊</div>
+        <div class="plus-item" onclick="addFriend()">👤 添加朋友</div>
+      </div>
     </div>
-    
-    <div class="world-book-form-group">
-      <label class="world-book-form-label">内容</label>
-      <textarea class="world-book-form-textarea" id="worldBookContentInput" placeholder="请输入内容..."></textarea>
-    </div>
-    
-    <div class="world-book-popup-buttons">
-      <button class="world-book-popup-btn cancel" onclick="closeWorldBookPopup()">取消</button>
-      <button class="world-book-popup-btn ok" onclick="saveWorldBook()">OK</button>
-    </div>
+
   </div>
 </div>
 
@@ -1176,6 +1360,38 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
   </div>
 </div>
 
+<!-- 新增：世界书编辑弹窗 -->
+<div class="worldbook-edit-mask" id="worldbookEditMask" onclick="closeWorldBookEditor()">
+  <div class="worldbook-edit-popup" onclick="event.stopPropagation()">
+    <div class="worldbook-edit-title" id="worldbookEditTitle">新建世界书</div>
+    <div class="worldbook-form-row">
+      <label class="worldbook-form-label">世界书名</label>
+      <input type="text" class="worldbook-form-input" id="worldbookNameInput" placeholder="输入世界书名">
+    </div>
+    <div class="worldbook-form-row">
+      <label class="worldbook-form-label">内容</label>
+      <textarea class="worldbook-form-textarea" id="worldbookContentInput" placeholder="输入世界书内容"></textarea>
+    </div>
+    <div class="worldbook-edit-buttons">
+      <button class="worldbook-edit-btn ok" onclick="saveWorldBook()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增：世界书选择弹窗 -->
+<div class="worldbook-select-mask" id="worldbookSelectMask" onclick="closeWorldBookBinding()">
+  <div class="worldbook-select-popup" onclick="event.stopPropagation()">
+    <div class="worldbook-select-title">选择世界书</div>
+    <div class="worldbook-select-list" id="worldbookSelectList">
+      <!-- 世界书选项会动态插入到这里 -->
+    </div>
+    <div class="worldbook-select-buttons">
+      <button class="worldbook-select-btn cancel" onclick="closeWorldBookBinding()">取消</button>
+      <button class="worldbook-select-btn ok" onclick="confirmWorldBookBinding()">确定</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ---------- 默认资源 ---------- */
 const DEFAULT_WALLPAPER = 'https://img.heliar.top/file/1768536593797_IMG_3117.jpeg';
@@ -1197,20 +1413,21 @@ const wechat = document.getElementById('wechat');
 const chatWindow = document.getElementById('chatWindow');
 const content = document.getElementById('wechatContent');
 const wechatTabs = document.getElementById('wechatTabs');
+const plusMask = document.getElementById('plusMask');
 const toastEl = document.getElementById('toast');
 const petBox = document.getElementById('petBox');
 const wechatIconEl = document.getElementById('wechatIcon');
-const worldBookIconEl = document.getElementById('worldBookIcon'); // 新增：世界书图标
+const worldbookIconEl = document.getElementById('worldbookIcon'); // 新增：世界书图标元素
 const homeSettingsIconEl = document.getElementById('homeSettingsIcon');
 const wallpaperLayer = document.getElementById('wallpaperLayer'); // 新增：壁纸层
 
 /* 世界书相关DOM */
-const worldBookPage = document.getElementById('worldBookPage');
-const worldBookList = document.getElementById('worldBookList');
-const worldBookMask = document.getElementById('worldBookMask');
-const worldBookPopupTitle = document.getElementById('worldBookPopupTitle');
-const worldBookTitleInput = document.getElementById('worldBookTitleInput');
-const worldBookContentInput = document.getElementById('worldBookContentInput');
+const worldbookPage = document.getElementById('worldbookPage');
+const worldbookList = document.getElementById('worldbookList');
+const worldbookEditMask = document.getElementById('worldbookEditMask');
+const worldbookEditTitle = document.getElementById('worldbookEditTitle');
+const worldbookNameInput = document.getElementById('worldbookNameInput');
+const worldbookContentInput = document.getElementById('worldbookContentInput');
 
 /* 角色专属设置相关DOM - 新增输入项 */
 const roleSettingPage = document.getElementById('roleSettingPage');
@@ -1219,10 +1436,16 @@ const roleAvatarPreview = document.getElementById('roleAvatarPreview');
 const roleAvatarImg = document.getElementById('roleAvatarImg');
 const roleNameInput = document.getElementById('roleNameInput'); // 好友姓名
 const roleRemarkInput = document.getElementById('roleRemarkInput'); // 备注
-const roleDescInput = document.getElementById('roleDescInput'); // 信息
+const roleDescInput = document.getElementById('roleDescInput'); // 角色设定
+const userInfoInput = document.getElementById('userInfoInput'); // 新增：用户信息
 const roleBubbleCssInput = document.getElementById('roleBubbleCssInput'); // 角色气泡
 const userBubbleCssInput = document.getElementById('userBubbleCssInput'); // 用户气泡
 const roleBgInput = document.getElementById('roleBgInput'); // 聊天壁纸
+const boundWorldbooksList = document.getElementById('boundWorldbooksList'); // 已绑定世界书列表
+
+/* 世界书选择弹窗相关DOM */
+const worldbookSelectMask = document.getElementById('worldbookSelectMask');
+const worldbookSelectList = document.getElementById('worldbookSelectList');
 
 /* API 控件 */
 const apiProxyInput = document.getElementById('apiProxy');
@@ -1248,33 +1471,34 @@ const multiSelectToolbar = document.getElementById('multiSelectToolbar');
 const selectedCount = document.getElementById('selectedCount');
 const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
 
-/* 本地存储数据结构 - 新增用户气泡配置 */
+/* 本地存储数据结构 - 新增用户气泡配置和绑定世界书 */
 let nickname = localStorage.getItem('nickname') || DEFAULT_NICKNAME;
 let wxId = localStorage.getItem('wxid') || 'Bubu120vO';
 let avatar = localStorage.getItem('avatar') || '';
-// 角色专属配置（按chatId存储）- 新增userBubbleCss字段
+// 角色专属配置（按chatId存储）- 新增userInfo字段
 let roleConfigs = JSON.parse(localStorage.getItem('roleConfigs') || '{}');
+// 世界书数据
+let worldbooks = JSON.parse(localStorage.getItem('worldbooks') || '[]');
 
 let contacts = JSON.parse(localStorage.getItem('contacts') || '[]'); // {id,name,avatar,note,info}
 let chats = JSON.parse(localStorage.getItem('chats') || '[]'); // {id,contactId,nameDisplay,avatar,preview,timeLabel,ts}
 let messages = JSON.parse(localStorage.getItem('messages') || '{}'); // { chatId: [{from,text,ts}] }
-
-/* 新增：世界书数据 */
-let worldBooks = JSON.parse(localStorage.getItem('worldBooks') || '[]'); // [{id, title, content, createdAt, updatedAt}]
 
 /* 新增：双击消息功能相关变量 */
 let currentSelectedMessage = null; // 当前选中的消息索引和聊天ID
 let isMultiSelectMode = false; // 是否处于多选模式
 let selectedMessages = new Set(); // 多选模式下选中的消息索引
 
-/* 新增：世界书编辑状态变量 */
-let currentEditingWorldBookId = null; // 当前正在编辑的世界书ID
+/* 世界书编辑相关变量 */
+let editingWorldBookId = null; // 当前编辑的世界书ID，null表示新建
 
-/* 双击检测相关变量 */
-let lastClickTime = 0;
-let clickCount = 0;
-let clickTimer = null;
-const DOUBLE_CLICK_INTERVAL = 300; // 双击间隔300毫秒
+/* 世界书绑定相关变量 */
+let worldbookBindingSelections = new Set(); // 当前选择的世界书ID集合
+let currentBindingChatId = null; // 当前正在绑定的聊天ID
+
+/* 新增：AI回复拆分相关变量 */
+let isAIReplying = false; // AI是否正在回复中
+let aiReplyQueue = []; // AI回复消息队列
 
 /* 初始化画面资源 */
 // 修改：壁纸仅设置到wallpaperLayer层
@@ -1285,7 +1509,14 @@ if(localStorage.getItem('wallpaper')) {
 }
 
 if(localStorage.getItem('wechatIcon')) wechatIconEl.innerHTML = `<img src="${localStorage.getItem('wechatIcon')}" alt="icon">`; else wechatIconEl.innerHTML = `<img src="${DEFAULT_WECHAT_ICON}" alt="icon">`;
-if(localStorage.getItem('worldBookIcon')) worldBookIconEl.innerHTML = `<img src="${localStorage.getItem('worldBookIcon')}" alt="world-book">`;
+
+// 初始化世界书图标
+if(localStorage.getItem('worldbookIcon')) {
+  worldbookIconEl.innerHTML = `<img src="${localStorage.getItem('worldbookIcon')}" alt="世界书图标">`;
+} else {
+  worldbookIconEl.innerHTML = `📚`; // 默认显示书表情
+}
+
 if(localStorage.getItem('homeSettingsIcon')) homeSettingsIconEl.innerHTML = `<img src="${localStorage.getItem('homeSettingsIcon')}" alt="home-settings">`;
 if(localStorage.getItem('petImage')) petBox.innerHTML = `<img src="${localStorage.getItem('petImage')}" alt="pet">`;
 
@@ -1301,7 +1532,8 @@ applyChatIcons();
 function hideAllPages(){ 
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   chatWindow.style.display='none'; 
-  roleSettingPage.style.display='none'; 
+  roleSettingPage.style.display='none';
+  worldbookPage.style.display='none';
 }
 
 // 添加初始化显示主屏幕的函数
@@ -1316,140 +1548,335 @@ function openHomeSettings(){ hideAllPages(); document.getElementById('homeSettin
 function openSetting(){ hideAllPages(); document.getElementById('setting').style.display='flex'; document.getElementById('nickInput').value = nickname; document.getElementById('wxidInput').value = wxId; }
 function backMe(){ hideAllPages(); wechat.style.display='flex'; switchTab('me', wechatTabs.querySelector('[data-tab="me"]')); }
 
-/* 新增：打开世界书App */
+/* 打开世界书App */
 function openWorldBook() {
   hideAllPages();
-  worldBookPage.style.display = 'flex';
+  worldbookPage.style.display = 'flex';
   renderWorldBookList();
 }
 
-/* 新增：打开世界书弹窗 */
-function openWorldBookPopup(bookId = null) {
-  currentEditingWorldBookId = bookId;
-  
-  if (bookId) {
-    // 编辑模式
-    const book = worldBooks.find(b => b.id === bookId);
-    if (book) {
-      worldBookPopupTitle.textContent = '编辑世界书';
-      worldBookTitleInput.value = book.title;
-      worldBookContentInput.value = book.content;
-    }
-  } else {
-    // 新建模式
-    worldBookPopupTitle.textContent = '新建世界书';
-    worldBookTitleInput.value = '';
-    worldBookContentInput.value = '';
+/* 渲染世界书列表 */
+function renderWorldBookList() {
+  if (!worldbooks || worldbooks.length === 0) {
+    worldbookList.innerHTML = '<div class="worldbook-empty">暂无世界书，点击右上角"+"创建</div>';
+    return;
   }
   
-  worldBookMask.classList.add('show');
-}
-
-/* 新增：关闭世界书弹窗 */
-function closeWorldBookPopup() {
-  worldBookMask.classList.remove('show');
-  currentEditingWorldBookId = null;
-  worldBookTitleInput.value = '';
-  worldBookContentInput.value = '';
-}
-
-/* 新增：保存世界书 */
-function saveWorldBook() {
-  const title = worldBookTitleInput.value.trim();
-  const content = worldBookContentInput.value.trim();
+  // 按时间倒序排列
+  worldbooks.sort((a, b) => b.timestamp - a.timestamp);
   
-  if (!title) {
+  const fragment = document.createDocumentFragment();
+  
+  worldbooks.forEach((book, index) => {
+    const item = document.createElement('div');
+    item.className = 'worldbook-item';
+    item.dataset.id = book.id;
+    
+    const title = document.createElement('div');
+    title.className = 'worldbook-title';
+    title.innerText = book.name || '未命名世界书';
+    
+    const arrow = document.createElement('div');
+    arrow.className = 'worldbook-arrow';
+    arrow.innerHTML = '›';
+    
+    item.appendChild(title);
+    item.appendChild(arrow);
+    
+    // 点击条目编辑
+    item.addEventListener('click', () => editWorldBook(book.id));
+    
+    fragment.appendChild(item);
+  });
+  
+  worldbookList.innerHTML = '';
+  worldbookList.appendChild(fragment);
+}
+
+/* 打开世界书编辑器（新建） */
+function openWorldBookEditor() {
+  editingWorldBookId = null;
+  worldbookEditTitle.innerText = '新建世界书';
+  worldbookNameInput.value = '';
+  worldbookContentInput.value = '';
+  worldbookEditMask.classList.add('show');
+}
+
+/* 编辑世界书 */
+function editWorldBook(id) {
+  const book = worldbooks.find(b => b.id === id);
+  if (!book) return;
+  
+  editingWorldBookId = id;
+  worldbookEditTitle.innerText = '编辑世界书';
+  worldbookNameInput.value = book.name || '';
+  worldbookContentInput.value = book.content || '';
+  worldbookEditMask.classList.add('show');
+}
+
+/* 关闭世界书编辑器 */
+function closeWorldBookEditor() {
+  worldbookEditMask.classList.remove('show');
+  editingWorldBookId = null;
+}
+
+/* 保存世界书 */
+function saveWorldBook() {
+  const name = worldbookNameInput.value.trim();
+  const content = worldbookContentInput.value.trim();
+  
+  if (!name) {
     toast('请输入世界书名', 1500);
     return;
   }
   
-  if (!content) {
-    toast('请输入内容', 1500);
-    return;
-  }
-  
-  const now = Date.now();
-  
-  if (currentEditingWorldBookId) {
-    // 更新现有世界书
-    const index = worldBooks.findIndex(b => b.id === currentEditingWorldBookId);
+  if (editingWorldBookId) {
+    // 编辑现有世界书
+    const index = worldbooks.findIndex(b => b.id === editingWorldBookId);
     if (index !== -1) {
-      worldBooks[index].title = title;
-      worldBooks[index].content = content;
-      worldBooks[index].updatedAt = now;
+      worldbooks[index].name = name;
+      worldbooks[index].content = content;
+      worldbooks[index].timestamp = Date.now();
     }
   } else {
     // 新建世界书
     const newBook = {
-      id: 'wb_' + now + '_' + Math.random().toString(36).substr(2, 9),
-      title: title,
+      id: 'wb_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+      name: name,
       content: content,
-      createdAt: now,
-      updatedAt: now
+      timestamp: Date.now()
     };
-    worldBooks.unshift(newBook); // 添加到开头
+    worldbooks.push(newBook);
   }
   
   // 保存到本地存储
-  localStorage.setItem('worldBooks', JSON.stringify(worldBooks));
-  
-  // 关闭弹窗
-  closeWorldBookPopup();
+  localStorage.setItem('worldbooks', JSON.stringify(worldbooks));
   
   // 重新渲染列表
   renderWorldBookList();
   
-  // 显示成功提示
-  toast(currentEditingWorldBookId ? '世界书已更新' : '世界书已创建', 1500, true);
+  // 关闭编辑器
+  closeWorldBookEditor();
+  
+  // 显示提示
+  toast(editingWorldBookId ? '世界书已更新' : '世界书已创建', 1500, true);
 }
 
-/* 新增：渲染世界书列表 */
-function renderWorldBookList() {
-  if (!worldBooks || worldBooks.length === 0) {
-    worldBookList.innerHTML = `
-      <div class="world-book-empty">
-        <div class="world-book-empty-icon">📖</div>
-        <div class="world-book-empty-text">暂无世界书记录</div>
-        <div class="world-book-empty-text">点击右上角➕按钮创建</div>
-      </div>
-    `;
+/* ===== 新增：世界书绑定功能 ===== */
+/* 打开世界书绑定界面 */
+function openWorldBookBinding() {
+  const currentChatId = chatWindow.dataset.openChatId;
+  if (!currentChatId) {
+    toast('请先打开聊天窗口', 1500);
     return;
   }
   
-  // 按更新时间倒序排序
-  const sortedBooks = [...worldBooks].sort((a, b) => b.updatedAt - a.updatedAt);
+  currentBindingChatId = currentChatId;
   
-  const listHTML = sortedBooks.map(book => {
-    const date = new Date(book.updatedAt);
-    const timeStr = date.toLocaleDateString('zh-CN', { 
-      year: 'numeric', 
-      month: '2-digit', 
-      day: '2-digit' 
-    }) + ' ' + date.toLocaleTimeString('zh-CN', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-    
-    // 内容预览（前100个字符）
-    const preview = book.content.length > 100 
-      ? book.content.substring(0, 100) + '...' 
-      : book.content;
-    
-    return `
-      <div class="world-book-item" onclick="editWorldBook('${book.id}')">
-        <div class="world-book-item-title">${escapeHtml(book.title)}</div>
-        <div class="world-book-item-preview">${escapeHtml(preview)}</div>
-        <div class="world-book-item-time">${timeStr}</div>
-      </div>
-    `;
-  }).join('');
+  // 获取当前角色已绑定的世界书ID
+  const config = roleConfigs[currentChatId] || {};
+  const boundIds = config.boundWorldbookIds || [];
+  worldbookBindingSelections = new Set(boundIds);
   
-  worldBookList.innerHTML = listHTML;
+  // 渲染世界书选择列表
+  renderWorldBookSelectionList();
+  
+  // 显示弹窗
+  worldbookSelectMask.classList.add('show');
 }
 
-/* 新增：编辑世界书 */
-function editWorldBook(bookId) {
-  openWorldBookPopup(bookId);
+/* 渲染世界书选择列表 */
+function renderWorldBookSelectionList() {
+  if (!worldbooks || worldbooks.length === 0) {
+    worldbookSelectList.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:14px;">暂无世界书，请先在世界书App中创建</div>';
+    return;
+  }
+  
+  // 按时间倒序排列
+  worldbooks.sort((a, b) => b.timestamp - a.timestamp);
+  
+  const fragment = document.createDocumentFragment();
+  
+  worldbooks.forEach((book, index) => {
+    const item = document.createElement('div');
+    item.className = 'worldbook-select-item';
+    item.dataset.id = book.id;
+    
+    // 果冻感复选框
+    const checkbox = document.createElement('div');
+    checkbox.className = 'jelly-checkbox';
+    checkbox.innerHTML = `
+      <input type="checkbox" id="wb_${book.id}" ${worldbookBindingSelections.has(book.id) ? 'checked' : ''}>
+      <span class="checkmark"></span>
+    `;
+    
+    const title = document.createElement('div');
+    title.className = 'worldbook-select-title-text';
+    title.innerText = book.name || '未命名世界书';
+    title.title = book.content ? (book.content.length > 50 ? book.content.substring(0, 50) + '...' : book.content) : '无内容';
+    
+    item.appendChild(checkbox);
+    item.appendChild(title);
+    
+    // 点击整行也可以切换选择状态
+    item.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      const checkboxInput = item.querySelector('input[type="checkbox"]');
+      checkboxInput.checked = !checkboxInput.checked;
+      checkboxInput.dispatchEvent(new Event('change'));
+    });
+    
+    // 复选框变化事件
+    const checkboxInput = checkbox.querySelector('input');
+    checkboxInput.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        worldbookBindingSelections.add(book.id);
+      } else {
+        worldbookBindingSelections.delete(book.id);
+      }
+    });
+    
+    fragment.appendChild(item);
+  });
+  
+  worldbookSelectList.innerHTML = '';
+  worldbookSelectList.appendChild(fragment);
+}
+
+/* 确认世界书绑定 */
+function confirmWorldBookBinding() {
+  if (!currentBindingChatId) return;
+  
+  const config = roleConfigs[currentBindingChatId] || {};
+  config.boundWorldbookIds = Array.from(worldbookBindingSelections);
+  roleConfigs[currentBindingChatId] = config;
+  
+  // 更新UI显示已绑定的世界书
+  renderBoundWorldbooksList(currentBindingChatId);
+  
+  // 关闭弹窗
+  closeWorldBookBinding();
+  
+  toast('世界书绑定已更新', 1500, true);
+}
+
+/* 关闭世界书绑定弹窗 */
+function closeWorldBookBinding() {
+  worldbookSelectMask.classList.remove('show');
+  worldbookBindingSelections.clear();
+  currentBindingChatId = null;
+}
+
+/* 渲染已绑定世界书列表 */
+function renderBoundWorldbooksList(chatId) {
+  const config = roleConfigs[chatId] || {};
+  const boundIds = config.boundWorldbookIds || [];
+  
+  if (boundIds.length === 0) {
+    boundWorldbooksList.innerHTML = '<div style="padding:10px;text-align:center;color:#999;font-size:12px;">未绑定任何世界书</div>';
+    return;
+  }
+  
+  const fragment = document.createDocumentFragment();
+  
+  boundIds.forEach((bookId, index) => {
+    const book = worldbooks.find(b => b.id === bookId);
+    if (!book) return;
+    
+    const item = document.createElement('div');
+    item.className = 'bound-worldbook-item';
+    item.dataset.id = book.id;
+    
+    const title = document.createElement('div');
+    title.className = 'bound-worldbook-title';
+    title.innerText = book.name || '未命名世界书';
+    title.title = book.content ? (book.content.length > 30 ? book.content.substring(0, 30) + '...' : book.content) : '无内容';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-bound-btn';
+    removeBtn.innerHTML = '×';
+    removeBtn.title = '解除绑定';
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeBoundWorldbook(chatId, bookId);
+    });
+    
+    item.appendChild(title);
+    item.appendChild(removeBtn);
+    
+    fragment.appendChild(item);
+  });
+  
+  boundWorldbooksList.innerHTML = '';
+  boundWorldbooksList.appendChild(fragment);
+}
+
+/* 移除已绑定的世界书 */
+function removeBoundWorldbook(chatId, bookId) {
+  const config = roleConfigs[chatId] || {};
+  const boundIds = config.boundWorldbookIds || [];
+  const index = boundIds.indexOf(bookId);
+  
+  if (index !== -1) {
+    boundIds.splice(index, 1);
+    config.boundWorldbookIds = boundIds;
+    roleConfigs[chatId] = config;
+    
+    // 更新UI
+    renderBoundWorldbooksList(chatId);
+    
+    toast('已解除世界书绑定', 1500, true);
+  }
+}
+
+/* ===== 新增：AI回复时加入角色信息、用户信息和世界书内容 ===== */
+/* 获取角色绑定的世界书内容 */
+function getBoundWorldbookContent(chatId) {
+  const config = roleConfigs[chatId] || {};
+  const boundIds = config.boundWorldbookIds || [];
+  
+  if (boundIds.length === 0) {
+    return '';
+  }
+  
+  let content = '\n【世界书上下文】\n';
+  
+  boundIds.forEach((bookId, index) => {
+    const book = worldbooks.find(b => b.id === bookId);
+    if (book) {
+      content += `\n《${book.name || '未命名世界书'}》:\n${book.content}\n`;
+    }
+  });
+  
+  return content;
+}
+
+/* 获取角色的完整上下文信息 */
+function getRoleContextInfo(chatId) {
+  const config = roleConfigs[chatId] || {};
+  
+  let systemPrompt = '';
+  
+  // 1. 添加角色信息
+  if (config.name || config.desc) {
+    systemPrompt += '【角色信息】\n';
+    if (config.name) systemPrompt += `姓名：${config.name}\n`;
+    if (config.desc) systemPrompt += `角色设定：${config.desc}\n`;
+  }
+  
+  // 2. 添加用户信息（当前角色眼中的"你"）
+  if (config.userInfo) {
+    systemPrompt += '\n【用户信息】\n';
+    systemPrompt += `${config.userInfo}\n`;
+  }
+  
+  // 3. 添加绑定的世界书内容
+  const worldbookContent = getBoundWorldbookContent(chatId);
+  if (worldbookContent) {
+    systemPrompt += worldbookContent;
+  }
+  
+  return systemPrompt;
 }
 
 /* 角色专属设置页面控制 - 修复页面跳转逻辑 */
@@ -1467,6 +1894,7 @@ function openRoleSetting(){
   roleNameInput.value = config.name || contact?.name || chat?.nameDisplay || '';
   roleRemarkInput.value = config.remark || contact?.note || '';
   roleDescInput.value = config.desc || contact?.info || '';
+  userInfoInput.value = config.userInfo || ''; // 新增：用户信息
   roleBubbleCssInput.value = config.bubbleCss || '';
   userBubbleCssInput.value = config.userBubbleCss || '';
   
@@ -1481,6 +1909,9 @@ function openRoleSetting(){
     roleAvatarImg.src = '';
     roleAvatarPreview.style.display = 'none';
   }
+  
+  // 渲染已绑定的世界书列表
+  renderBoundWorldbooksList(currentChatId);
   
   // 显示角色设置页（确保手机外壳在背景）
   hideAllPages();
@@ -1497,39 +1928,9 @@ function backToChat(){
   renderMessages(currentChatId);
 }
 
-/* plus popup - 修复：使用当前页面内的plus mask */
-function openPlus(){ 
-  // 获取当前显示的页面
-  const currentPage = document.querySelector('.page[style*="display: flex"]') || 
-                      document.querySelector('.page[style*="display:flex"]');
-  
-  if (currentPage) {
-    // 在当前页面内查找plus mask
-    const plusMask = currentPage.querySelector('.plus-mask');
-    if (plusMask) {
-      plusMask.classList.add('show');
-      return;
-    }
-  }
-  
-  // 如果在聊天窗口
-  if (chatWindow.style.display === 'flex') {
-    const chatPlusMask = document.getElementById('chatPlusMask');
-    if (chatPlusMask) chatPlusMask.classList.add('show');
-  }
-  // 如果在wechat页面
-  else if (wechat.style.display === 'flex') {
-    const wechatPlusMask = document.getElementById('wechatPlusMask');
-    if (wechatPlusMask) wechatPlusMask.classList.add('show');
-  }
-}
-
-function closePlus(){ 
-  // 关闭所有plus mask
-  document.querySelectorAll('.plus-mask').forEach(mask => {
-    mask.classList.remove('show');
-  });
-}
+/* plus popup */
+function openPlus(){ plusMask.classList.add('show'); }
+function closePlus(){ plusMask.classList.remove('show'); }
 
 /* startGroup left as-is */
 function startGroup(){ closePlus(); toast('发起群聊（示例）'); }
@@ -1722,6 +2123,47 @@ function renderChatList(){
   content.appendChild(wrapper);
 }
 
+/* 新增：更新聊天预览的函数 */
+function updateChatPreview(chatId) {
+  const chat = chats.find(c => c.id === chatId);
+  if (!chat) return;
+  
+  const msgList = messages[chatId] || [];
+  
+  // 过滤掉已撤回的消息
+  const validMessages = msgList.filter(msg => !msg.recalled);
+  
+  if (validMessages.length > 0) {
+    // 取最后一条有效消息
+    const lastMsg = validMessages[validMessages.length - 1];
+    chat.preview = lastMsg.text || '';
+    
+    // 更新时间标签
+    const msgDate = new Date(lastMsg.ts);
+    const now = new Date();
+    const isToday = now.toDateString() === msgDate.toDateString();
+    chat.timeLabel = isToday 
+      ? msgDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+      : msgDate.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+    
+    // 更新时间戳用于排序
+    chat.ts = lastMsg.ts;
+  } else {
+    // 如果没有有效消息，显示默认值
+    chat.preview = '暂无消息';
+    chat.timeLabel = '';
+    chat.ts = 0;
+  }
+  
+  // 保存到本地存储
+  localStorage.setItem('chats', JSON.stringify(chats));
+  
+  // 重新渲染聊天列表
+  if (document.querySelector('.tab.active')?.getAttribute('data-tab') === 'chat') {
+    renderChatList();
+  }
+}
+
 /* ---------- 打开聊天窗口 - 备注优先显示标题 ---------- */
 function openChat(chatId){
   const chat = chats.find(x=>x.id===chatId);
@@ -1850,80 +2292,13 @@ function renderMessages(chatId) {
   }
 }
 
-/* 新增：为消息气泡设置双击事件 */
+/* 修改：为消息气泡设置双击事件（替代原来的长按事件） */
 function setupMessageDoubleClick(bubble, chatId, msgIndex, msgData) {
-  // 清除之前的长按事件监听器
-  bubble.onmousedown = null;
-  bubble.onmouseup = null;
-  bubble.onmouseleave = null;
-  bubble.ontouchstart = null;
-  bubble.ontouchend = null;
-  bubble.ontouchmove = null;
-  
-  // 添加双击事件监听器（桌面端）
   bubble.addEventListener('dblclick', function(e) {
-    // 如果处于多选模式，不触发双击
+    // 如果处于多选模式，不触发操作菜单
     if (isMultiSelectMode) return;
     
-    e.stopPropagation();
     showMsgActionPopup(e, chatId, msgIndex, msgData);
-    
-    // 添加双击反馈动画
-    bubble.classList.add('double-click-feedback');
-    setTimeout(() => {
-      bubble.classList.remove('double-click-feedback');
-    }, 300);
-  });
-  
-  // 添加触摸双击事件监听器（移动端）
-  bubble.addEventListener('touchstart', function(e) {
-    // 如果处于多选模式，不触发双击
-    if (isMultiSelectMode) return;
-    
-    const currentTime = new Date().getTime();
-    const timeSinceLastClick = currentTime - lastClickTime;
-    
-    // 清除之前的计时器
-    if (clickTimer) {
-      clearTimeout(clickTimer);
-    }
-    
-    // 如果两次点击时间间隔很短，认为是双击
-    if (timeSinceLastClick > 0 && timeSinceLastClick < DOUBLE_CLICK_INTERVAL) {
-      e.preventDefault();
-      e.stopPropagation();
-      showMsgActionPopup(e.touches[0], chatId, msgIndex, msgData);
-      
-      // 添加双击反馈动画
-      bubble.classList.add('double-click-feedback');
-      setTimeout(() => {
-        bubble.classList.remove('double-click-feedback');
-      }, 300);
-      
-      // 重置点击计数
-      clickCount = 0;
-      lastClickTime = 0;
-    } else {
-      // 第一次点击，设置计时器
-      clickCount = 1;
-      lastClickTime = currentTime;
-      
-      clickTimer = setTimeout(() => {
-        // 如果超时，重置计数
-        clickCount = 0;
-        lastClickTime = 0;
-      }, DOUBLE_CLICK_INTERVAL);
-    }
-  });
-  
-  // 防止触摸滚动时触发双击
-  bubble.addEventListener('touchmove', function() {
-    // 如果有计时器，清除它
-    if (clickTimer) {
-      clearTimeout(clickTimer);
-      clickCount = 0;
-      lastClickTime = 0;
-    }
   });
 }
 
@@ -1956,6 +2331,7 @@ function showMsgActionPopup(e, chatId, msgIndex, msgData) {
   // 设置弹窗位置并显示
   msgActionPopup.style.left = left + 'px';
   msgActionPopup.style.top = top + 'px';
+  msgActionPopup.classList.add('show');
   msgActionMask.classList.add('show');
   
   // 隐藏撤回选项如果消息不是自己的或者超过2分钟
@@ -1972,10 +2348,11 @@ function showMsgActionPopup(e, chatId, msgIndex, msgData) {
 
 /* 新增：关闭消息操作弹窗 */
 function closeMsgActionPopup() {
+  msgActionPopup.classList.remove('show');
   msgActionMask.classList.remove('show');
 }
 
-/* 新增：删除消息 - 修改：删除后更新聊天预览 */
+/* 新增：删除消息 */
 function deleteMessage() {
   if (!currentSelectedMessage) return;
   
@@ -1986,11 +2363,12 @@ function deleteMessage() {
     messages[chatId].splice(msgIndex, 1);
     localStorage.setItem('messages', JSON.stringify(messages));
     
+    // 重新渲染消息
+    renderMessages(chatId);
+    
     // 更新聊天预览
     updateChatPreview(chatId);
     
-    // 重新渲染消息
-    renderMessages(chatId);
     toast('消息已删除', 1500, true);
   }
   
@@ -2036,6 +2414,10 @@ function saveEditedMessage() {
     
     // 重新渲染消息
     renderMessages(chatId);
+    
+    // 更新聊天预览
+    updateChatPreview(chatId);
+    
     toast('消息已修改', 1500, true);
   }
   
@@ -2072,6 +2454,10 @@ function recallMessage() {
     
     // 重新渲染消息
     renderMessages(chatId);
+    
+    // 更新聊天预览
+    updateChatPreview(chatId);
+    
     toast('消息已撤回', 1500, true);
   }
   
@@ -2104,8 +2490,6 @@ function setupMultiSelectModeEvents(chatId) {
   bubbles.forEach((bubble, index) => {
     // 移除之前的事件监听器
     bubble.onclick = null;
-    bubble.ondblclick = null;
-    bubble.ontouchstart = null;
     
     bubble.onclick = function(e) {
       if (!isMultiSelectMode) return;
@@ -2134,7 +2518,7 @@ function updateSelectedCount() {
   deleteSelectedBtn.disabled = count === 0;
 }
 
-/* 新增：删除选中的多条消息 - 修改：删除后更新聊天预览 */
+/* 新增：删除选中的多条消息 */
 function deleteSelectedMessages() {
   if (selectedMessages.size === 0) return;
   
@@ -2153,52 +2537,16 @@ function deleteSelectedMessages() {
   // 保存更新
   localStorage.setItem('messages', JSON.stringify(messages));
   
-  // 更新聊天预览
-  updateChatPreview(chatId);
-  
   // 退出多选模式
   exitMultiSelectMode();
   
   // 重新渲染消息
   renderMessages(chatId);
   
+  // 更新聊天预览
+  updateChatPreview(chatId);
+  
   toast(`已删除${indicesToDelete.length}条消息`, 1500, true);
-}
-
-/* 新增：更新聊天预览的函数 - 新增函数 */
-function updateChatPreview(chatId) {
-  const chatIdx = chats.findIndex(c => c.id === chatId);
-  if (chatIdx === -1) return;
-  
-  const chatMessages = messages[chatId] || [];
-  
-  // 获取最新一条非输入中的消息
-  const lastMsg = chatMessages.filter(msg => msg.text !== 'TYPING_INDICATOR').pop();
-  
-  if (lastMsg) {
-    // 如果有消息，更新预览和时间
-    chats[chatIdx].preview = lastMsg.text;
-    
-    const msgDate = new Date(lastMsg.ts);
-    const now = new Date();
-    const isToday = now.toDateString() === msgDate.toDateString();
-    chats[chatIdx].timeLabel = isToday
-      ? msgDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-      : msgDate.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
-    
-    chats[chatIdx].ts = lastMsg.ts;
-  } else {
-    // 如果没有消息了，显示"暂无消息"
-    chats[chatIdx].preview = '暂无消息';
-    chats[chatIdx].timeLabel = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-    chats[chatIdx].ts = Date.now();
-  }
-  
-  // 保存更新
-  localStorage.setItem('chats', JSON.stringify(chats));
-  
-  // 重新渲染聊天列表
-  renderChatList();
 }
 
 /* 新增：退出多选模式 */
@@ -2225,6 +2573,196 @@ function exitMultiSelectMode() {
   }
 }
 
+/* ===== 新增：消息拆分功能 ===== */
+/* 智能拆分AI回复为多条消息 */
+function splitAIReply(aiReply) {
+  if (!aiReply || aiReply.trim() === '') return [];
+  
+  const trimmedReply = aiReply.trim();
+  const messages = [];
+  
+  // 首先按双换行符拆分（自然段落）
+  const paragraphs = trimmedReply.split(/\n\n+/);
+  
+  paragraphs.forEach(paragraph => {
+    if (!paragraph.trim()) return;
+    
+    // 如果段落较短（小于100字），直接作为一条消息
+    if (paragraph.length < 100) {
+      messages.push(paragraph.trim());
+      return;
+    }
+    
+    // 对于较长的段落，进一步按单换行符拆分
+    const lines = paragraph.split('\n');
+    let currentChunk = '';
+    
+    lines.forEach((line, index) => {
+      line = line.trim();
+      if (!line) return;
+      
+      // 如果当前行很长（超过80字），尝试按标点拆分
+      if (line.length > 80) {
+        // 按中文标点拆分：。！？；，、
+        const sentenceRegex = /[。！？；]+|[，、]+(?![^」）》】〕〗〉〕】〕〗〕】〕〗〕】〕〗])/g;
+        const sentences = line.split(sentenceRegex);
+        let currentSentence = '';
+        
+        sentences.forEach((sentence, i) => {
+          sentence = sentence.trim();
+          if (!sentence) return;
+          
+          // 如果当前句子较短，且与前面的句子合并后不超过100字，则合并
+          if (currentSentence.length + sentence.length + 1 < 100) {
+            currentSentence = currentSentence ? currentSentence + sentence + '。' : sentence + '。';
+          } else {
+            // 保存当前句子并开始新的
+            if (currentSentence) {
+              messages.push(currentSentence);
+            }
+            currentSentence = sentence + '。';
+          }
+        });
+        
+        // 保存最后一个句子
+        if (currentSentence) {
+          messages.push(currentSentence);
+        }
+      } else {
+        // 如果当前行较短，尝试与之前的行合并
+        if (currentChunk.length + line.length + 1 < 100) {
+          currentChunk = currentChunk ? currentChunk + '\n' + line : line;
+        } else {
+          // 保存当前块并开始新的
+          if (currentChunk) {
+            messages.push(currentChunk);
+          }
+          currentChunk = line;
+        }
+      }
+    });
+    
+    // 保存最后一个块
+    if (currentChunk) {
+      messages.push(currentChunk);
+    }
+  });
+  
+  // 确保每条消息都不为空
+  return messages.filter(msg => msg && msg.trim() !== '');
+}
+
+/* 发送拆分后的AI消息 */
+function sendSplitAIMessages(chatId, messageParts) {
+  if (!messageParts || messageParts.length === 0) return;
+  
+  isAIReplying = true;
+  aiReplyQueue = [...messageParts];
+  sendNextAIMessage(chatId, 0);
+}
+
+/* 发送下一条AI消息 */
+function sendNextAIMessage(chatId, index) {
+  if (index >= aiReplyQueue.length || !isAIReplying) {
+    // 所有消息发送完成
+    isAIReplying = false;
+    aiReplyQueue = [];
+    
+    // 更新聊天列表排序
+    const chatIdx = chats.findIndex(c => c.id === chatId);
+    if (chatIdx !== -1) {
+      const chatObj = chats.splice(chatIdx, 1)[0];
+      chats.unshift(chatObj);
+      localStorage.setItem('chats', JSON.stringify(chats));
+    }
+    
+    // 刷新聊天列表
+    if (document.querySelector('.tab.active')?.getAttribute('data-tab') === 'chat') {
+      renderChatList();
+    }
+    
+    return;
+  }
+  
+  const messageText = aiReplyQueue[index];
+  
+  // 创建消息对象
+  const msg = { 
+    from: 'them', 
+    text: messageText, 
+    ts: Date.now() + index * 10 // 添加微小的时间偏移，确保顺序正确
+  };
+  
+  // 添加到消息数组
+  messages[chatId].push(msg);
+  localStorage.setItem('messages', JSON.stringify(messages));
+  
+  // 更新聊天预览（只更新最后一条消息）
+  updateChatPreview(chatId);
+  
+  // 渲染新消息 - 应用角色气泡样式
+  const config = roleConfigs[chatId] || {};
+  const chat = chats.find(c => c.id === chatId);
+  const contact = contacts.find(con => con.id === chat?.contactId);
+  const friendAvatar = config.avatar || chat?.avatar || contact?.avatar || '';
+  
+  const row = document.createElement('div'); 
+  row.className = 'msg-row msg-left message-slide-in';
+  
+  // 好友头像
+  const avatarEl = document.createElement('div');
+  avatarEl.className = 'msg-avatar';
+  avatarEl.innerHTML = friendAvatar ? `<img src="${friendAvatar}" alt="好友头像">` : `<div style="width:100%;height:100%;background:#eee;display:flex;align-items:center;justify-content:center;color:#666">${(config.remark || config.name || chat?.nameDisplay || contact?.name || 'U').charAt(0)}</div>`;
+  
+  // 好友气泡
+  const bubble = document.createElement('div'); 
+  bubble.className = 'msg-bubble'; 
+  bubble.innerText = messageText;
+  bubble.style.cssText = config.bubbleCss 
+    ? config.bubbleCss 
+    : 'background:#fff;border:1px solid #eee;border-top-left-radius:6px;';
+  
+  // 为气泡添加双击事件监听
+  bubble.dataset.msgIndex = messages[chatId].length - 1;
+  setupMessageDoubleClick(bubble, chatId, messages[chatId].length - 1, msg);
+  
+  row.appendChild(avatarEl);
+  row.appendChild(bubble);
+  chatBody.appendChild(row);
+  
+  // 滚动到底部
+  chatBody.scrollTop = chatBody.scrollHeight;
+  
+  // 计算下一条消息的发送延迟
+  // 根据消息长度和类型计算延迟，模拟真人打字速度
+  const delay = calculateMessageDelay(messageText, index);
+  
+  // 发送下一条消息
+  setTimeout(() => {
+    sendNextAIMessage(chatId, index + 1);
+  }, delay);
+}
+
+/* 计算消息发送延迟 */
+function calculateMessageDelay(messageText, messageIndex) {
+  // 基础延迟：第一条消息稍快，后续消息逐渐增加间隔
+  let baseDelay = 800 + (messageIndex * 200);
+  
+  // 根据消息长度调整延迟
+  const length = messageText.length;
+  if (length < 20) {
+    baseDelay += 300; // 短消息较快
+  } else if (length < 50) {
+    baseDelay += 500; // 中等长度消息
+  } else {
+    baseDelay += 800; // 长消息较慢
+  }
+  
+  // 添加随机性，使间隔更自然
+  const randomFactor = 0.8 + Math.random() * 0.4; // 0.8到1.2之间的随机数
+  return Math.floor(baseDelay * randomFactor);
+}
+
 /* 发送消息并保存（本地）- 新增预览同步+时间更新逻辑 */
 function sendChatMessage(){
   const text = chatInput.value.trim();
@@ -2236,21 +2774,12 @@ function sendChatMessage(){
   messages[chatId].push(msg);
   localStorage.setItem('messages', JSON.stringify(messages));
 
-  // 更新聊天 preview/time & move to top
+  // 更新聊天预览和时间
+  updateChatPreview(chatId);
+  
+  // 更新聊天列表排序（移到顶部）
   const idx = chats.findIndex(c=>c.id===chatId);
   if(idx !== -1){
-    // 1. 同步消息到聊天预览
-    chats[idx].preview = text;
-    // 2. 生成最后一条消息的时间（和时间戳格式一致）
-    const msgDate = new Date(msg.ts);
-    const now = new Date();
-    const isToday = now.toDateString() === msgDate.toDateString();
-    chats[idx].timeLabel = isToday 
-      ? msgDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-      : msgDate.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
-    // 3. 更新时间戳（用于排序）
-    chats[idx].ts = Date.now();
-    // 4. 移到聊天列表顶部
     const chatObj = chats.splice(idx,1)[0];
     chats.unshift(chatObj);
     localStorage.setItem('chats', JSON.stringify(chats));
@@ -2289,11 +2818,17 @@ function sendChatMessage(){
   if(document.querySelector('.tab.active')?.getAttribute('data-tab') === 'chat') renderChatList();
 }
 
-/* ---------- AI回复功能（语音按钮触发）- 已添加动态效果 ---------- */
+/* ---------- AI回复功能（语音按钮触发）- 已添加动态效果和完整上下文信息 - 修改版 ---------- */
 async function triggerAIReply() {
   const chatId = chatWindow.dataset.openChatId;
   if (!chatId) {
     toast('请先打开聊天窗口', 1500);
+    return;
+  }
+
+  // 检查AI是否正在回复中
+  if (isAIReplying) {
+    toast('AI正在回复中，请稍候...', 1500);
     return;
   }
 
@@ -2326,7 +2861,18 @@ async function triggerAIReply() {
         content: msg.text
       }));
 
-    // 5. 调用AI接口
+    // 5. 获取当前角色的完整上下文信息（角色信息 + 用户信息 + 世界书内容）
+    const systemPrompt = getRoleContextInfo(chatId);
+    
+    // 如果有系统提示词，添加到消息开头
+    if (systemPrompt) {
+      contextMsgs.unshift({
+        role: 'system',
+        content: systemPrompt
+      });
+    }
+
+    // 6. 调用AI接口
     const apiUrl = (proxy.endsWith('/') ? proxy.slice(0, -1) : proxy) + '/chat/completions';
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -2345,46 +2891,51 @@ async function triggerAIReply() {
     const data = await response.json();
     const aiReply = data.choices?.[0]?.message?.content?.trim() || '抱歉，未能获取回复';
 
-    // 6. 移除输入中状态消息
+    // 7. 移除输入中状态消息
     const typingIndex = messages[chatId].findIndex(msg => msg.text === 'TYPING_INDICATOR');
     if (typingIndex !== -1) {
       messages[chatId].splice(typingIndex, 1);
     }
     
-    // 7. 插入实际回复消息
-    const finalMsg = { from: 'them', text: aiReply, ts: Date.now() };
-    messages[chatId].push(finalMsg);
-    localStorage.setItem('messages', JSON.stringify(messages));
-
     // 8. 恢复顶部状态提示为原名称
     chatTitle.innerText = originalTitle;
     chatTitle.classList.remove('typing-indicator');
 
-    // 9. 更新聊天列表预览和时间
-    const chatIdx = chats.findIndex(c => c.id === chatId);
-    if (chatIdx !== -1) {
-      chats[chatIdx].preview = aiReply;
-      const msgDate = new Date(finalMsg.ts);
-      const now = new Date();
-      const isToday = now.toDateString() === msgDate.toDateString();
-      chats[chatIdx].timeLabel = isToday
-        ? msgDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-        : msgDate.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
-      chats[chatIdx].ts = Date.now();
-      // 移到列表顶部
-      const chatObj = chats.splice(chatIdx, 1)[0];
-      chats.unshift(chatObj);
-      localStorage.setItem('chats', JSON.stringify(chats));
+    // 9. 拆分AI回复为多条消息
+    const messageParts = splitAIReply(aiReply);
+    
+    if (messageParts.length === 0) {
+      // 如果没有有效消息，插入一条默认回复
+      const defaultMsg = { from: 'them', text: '（AI回复为空）', ts: Date.now() };
+      messages[chatId].push(defaultMsg);
+      localStorage.setItem('messages', JSON.stringify(messages));
+      
+      // 更新聊天预览
+      updateChatPreview(chatId);
+      
+      // 重新渲染消息
+      renderMessages(chatId);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      
+      // 更新聊天列表排序
+      const chatIdx = chats.findIndex(c => c.id === chatId);
+      if (chatIdx !== -1) {
+        const chatObj = chats.splice(chatIdx, 1)[0];
+        chats.unshift(chatObj);
+        localStorage.setItem('chats', JSON.stringify(chats));
+      }
+      
+      // 刷新聊天列表
+      if (document.querySelector('.tab.active')?.getAttribute('data-tab') === 'chat') {
+        renderChatList();
+      }
+      
+      toast('AI回复为空', 1500);
+      return;
     }
-
-    // 10. 重新渲染消息并滚动到底部
-    renderMessages(chatId);
-    chatBody.scrollTop = chatBody.scrollHeight;
-
-    // 11. 刷新聊天列表
-    if (document.querySelector('.tab.active')?.getAttribute('data-tab') === 'chat') {
-      renderChatList();
-    }
+    
+    // 10. 发送拆分后的多条消息
+    sendSplitAIMessages(chatId, messageParts);
 
   } catch (error) {
     // 异常处理：移除输入中状态消息并恢复顶部标题
@@ -2404,7 +2955,7 @@ async function triggerAIReply() {
   }
 }
 
-/* ---------- 角色专属设置功能 - 点击OK后立即弹窗并完整保存 */
+/* ---------- 角色专属设置功能 - 点击OK后立即弹窗并完整保存 ---------- */
 // 预览角色头像
 function previewRoleAvatar(){
   const input = document.getElementById('roleAvatarInput');
@@ -2442,7 +2993,7 @@ function setRoleChatBg(){
   reader.readAsDataURL(file);
 }
 
-// 保存角色设置 - 点击OK后立即弹窗+完整保存+同步标题
+// 保存角色设置 - 点击OK后立即弹窗+完整保存+同步标题（包含用户信息和世界书绑定）
 function saveRoleSetting(){
   const currentChatId = chatWindow.dataset.openChatId;
   if(!currentChatId) {
@@ -2457,22 +3008,26 @@ function saveRoleSetting(){
   const name = roleNameInput.value.trim();
   const remark = roleRemarkInput.value.trim();
   const desc = roleDescInput.value.trim();
+  const userInfo = userInfoInput.value.trim(); // 新增：用户信息
   const roleBubbleCss = roleBubbleCssInput.value.trim();
   const userBubbleCss = userBubbleCssInput.value.trim();
   const avatar = roleAvatarImg.src || '';
   const chatBg = roleConfigs[currentChatId]?.chatBg || '';
+  const boundWorldbookIds = roleConfigs[currentChatId]?.boundWorldbookIds || [];
   
-  // 3. 完整更新角色配置（包含所有项）
+  // 3. 完整更新角色配置（包含所有项）- 每个角色独立保存
   if(!roleConfigs[currentChatId]) roleConfigs[currentChatId] = {};
   roleConfigs[currentChatId].name = name;
   roleConfigs[currentChatId].remark = remark;
   roleConfigs[currentChatId].desc = desc;
+  roleConfigs[currentChatId].userInfo = userInfo; // 新增：用户信息
   roleConfigs[currentChatId].bubbleCss = roleBubbleCss;
   roleConfigs[currentChatId].userBubbleCss = userBubbleCss;
   roleConfigs[currentChatId].avatar = avatar;
   roleConfigs[currentChatId].chatBg = chatBg;
+  roleConfigs[currentChatId].boundWorldbookIds = boundWorldbookIds; // 保存绑定的世界书ID
   
-  // 4. 同步更新contacts数据
+  // 4. 同步更新contacts数据（可选，用于显示在通讯录）
   const chat = chats.find(c=>c.id===currentChatId);
   if(chat?.contactId) {
     const contactIdx = contacts.findIndex(con=>con.id === chat.contactId);
@@ -2485,7 +3040,7 @@ function saveRoleSetting(){
     }
   }
   
-  // 5. 持久化存储所有配置
+  // 5. 持久化存储所有配置 - 每个角色的数据完全独立
   localStorage.setItem('roleConfigs', JSON.stringify(roleConfigs));
   
   // 6. 备注优先同步聊天标题栏
@@ -2522,6 +3077,10 @@ function insertNewChat(contact){
   messages[chatObj.id] = messages[chatObj.id] || [];
   messages[chatObj.id].push({from:'them', text:'添加好友成功', ts: Date.now()});
   localStorage.setItem('messages', JSON.stringify(messages));
+  
+  // 更新聊天预览
+  updateChatPreview(chatObj.id);
+  
   // render and highlight first item
   renderChatList();
   const first = document.querySelector('.chat-item');
@@ -2627,13 +3186,13 @@ function setWeChatIcon(input){
   r.onload = e => { wechatIconEl.innerHTML = `<img src="${e.target.result}" alt="icon">`; localStorage.setItem('wechatIcon', e.target.result); };
   r.readAsDataURL(input.files[0]);
 }
-/* 新增：修改世界书图标 */
+/* 新增：设置世界书图标 */
 function setWorldBookIcon(input){
   if(!input.files || !input.files[0]) return;
   const r = new FileReader();
   r.onload = e => { 
-    worldBookIconEl.innerHTML = `<img src="${e.target.result}" alt="world-book">`; 
-    localStorage.setItem('worldBookIcon', e.target.result); 
+    worldbookIconEl.innerHTML = `<img src="${e.target.result}" alt="世界书图标">`; 
+    localStorage.setItem('worldbookIcon', e.target.result); 
   };
   r.readAsDataURL(input.files[0]);
 }
