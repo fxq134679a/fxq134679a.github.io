@@ -25,6 +25,7 @@ body.fullscreen-mode {
   padding:0;
   justify-content:flex-start;
   align-items:flex-start;
+  overflow:hidden;
 }
 
 .phone{
@@ -77,12 +78,35 @@ body.fullscreen-mode {
 
 /* 全屏模式下调整状态栏，确保内容不会被刘海遮挡 */
 .phone.fullscreen .status-bar {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: max(env(safe-area-inset-top), 8px);
+  background: #ffe6ef; /* 全屏模式下状态栏背景为淡粉色 */
+  position: fixed; /* 固定定位，覆盖整个顶部 */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(0,0,0,0.1); /* 添加轻微分割线 */
 }
 
 /* 全屏模式下调整页面顶部间距 */
 .phone.fullscreen .page {
-  padding-top: calc(44px + env(safe-area-inset-top, 0px));
+  padding-top: calc(44px + max(env(safe-area-inset-top), 8px));
+}
+
+/* 全屏模式下的主屏页面 - 确保内容从顶部开始 */
+.phone.fullscreen .home.page {
+  padding-top: 0;
+}
+
+/* 全屏模式下的壁纸层 - 覆盖整个屏幕 */
+.phone.fullscreen .wallpaper-layer {
+  top: 0;
+  height: 100vh;
+}
+
+/* 全屏模式下的应用网格容器 */
+.phone.fullscreen .apps-container {
+  padding-top: calc(44px + max(env(safe-area-inset-top), 8px));
 }
 
 /* 桌宠容器（屏幕外上方） */
@@ -1686,6 +1710,27 @@ function toggleFullscreen() {
       renderMessages(currentChatId);
       chatBody.scrollTop = chatBody.scrollHeight;
     }, 300);
+  }
+  
+  // 调整状态栏显示
+  adjustStatusBarForFullscreen();
+}
+
+/* 调整状态栏以适应全屏模式 */
+function adjustStatusBarForFullscreen() {
+  const statusBar = document.querySelector('.status-bar');
+  if (isFullscreen) {
+    // 全屏模式下，确保状态栏覆盖整个顶部
+    statusBar.style.background = '#ffe6ef';
+    statusBar.style.position = 'fixed';
+    statusBar.style.top = '0';
+    statusBar.style.left = '0';
+    statusBar.style.right = '0';
+    statusBar.style.zIndex = '1000';
+  } else {
+    // 非全屏模式，恢复原有样式
+    statusBar.style.background = '';
+    statusBar.style.position = 'absolute';
   }
 }
 
