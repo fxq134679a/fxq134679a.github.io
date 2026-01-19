@@ -8,19 +8,23 @@
 /* reset + 全局 */
 *{margin:0;padding:0;box-sizing:border-box}
 body{
-  background:#000; /* 全屏时背景为黑色 */
+  background:#e5e5e5; /* 默认背景色，确保手机外框可见 */
   font-family:-apple-system,BlinkMacSystemFont;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:0;
+  padding:30px 0;
   margin:0;
   height:100vh;
-  overflow:hidden;
+  overflow:auto;
   transition: background 0.3s ease;
 }
+/* 全屏模式下的body样式 */
 body.fullscreen-mode {
   background:#000;
+  padding:0;
+  justify-content:flex-start;
+  align-items:flex-start;
 }
 
 .phone{
@@ -1171,14 +1175,6 @@ body.fullscreen-mode {
 
 .switch.on:active::before {
   transform: translateX(16px);
-}
-
-/* 全屏模式下body样式调整 */
-body.fullscreen-mode {
-  background: #000;
-  padding: 0;
-  justify-content: flex-start;
-  align-items: flex-start;
 }
 
 /* 全屏模式下的状态栏安全区域适配 */
