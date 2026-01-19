@@ -7,10 +7,78 @@
 <style>
 /* reset + 全局 */
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:flex;justify-content:center;padding:30px 0}
+body{
+  background:#000; /* 全屏时背景为黑色 */
+  font-family:-apple-system,BlinkMacSystemFont;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:0;
+  margin:0;
+  height:100vh;
+  overflow:hidden;
+  transition: background 0.3s ease;
+}
+body.fullscreen-mode {
+  background:#000;
+}
+
 .phone{
-  width:390px;height:780px;background:#000;border-radius:42px;padding:6px;position:relative;
+  width:390px;
+  height:780px;
+  background:#000;
+  border-radius:42px;
+  padding:6px;
+  position:relative;
   overflow:visible; /* 允许桌宠超出可见，防止被裁切 */
+  transition: all 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3); /* 手机阴影效果 */
+}
+
+/* 全屏模式：手机外壳消失，屏幕内容铺满整个浏览器窗口 */
+.phone.fullscreen {
+  width:100vw;
+  height:100vh;
+  border-radius:0;
+  padding:0;
+  box-shadow: none;
+  background:#fff;
+}
+
+/* 屏幕 */
+.screen{
+  width:100%;
+  height:100%;
+  border-radius:36px;
+  overflow:hidden;
+  position:relative;
+  background: #fff; /* 默认背景色 */
+  transition: border-radius 0.3s ease;
+}
+
+/* 全屏模式下去除屏幕圆角 */
+.phone.fullscreen .screen {
+  border-radius:0;
+}
+
+/* 全屏模式下隐藏刘海 */
+.phone.fullscreen .notch {
+  display: none;
+}
+
+/* 全屏模式下隐藏桌宠（可选，因为可能会遮挡内容） */
+.phone.fullscreen .pet-container {
+  display: none;
+}
+
+/* 全屏模式下调整状态栏，确保内容不会被刘海遮挡 */
+.phone.fullscreen .status-bar {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* 全屏模式下调整页面顶部间距 */
+.phone.fullscreen .page {
+  padding-top: calc(44px + env(safe-area-inset-top, 0px));
 }
 
 /* 桌宠容器（屏幕外上方） */
@@ -26,16 +94,6 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 }
 .pet-box{width:100%;height:100%;overflow:visible;display:flex;align-items:center;justify-content:center;background:transparent}
 .pet-box img{width:100%;height:100%;object-fit:contain;display:block}
-
-/* 屏幕 */
-.screen{
-  width:100%;
-  height:100%;
-  border-radius:36px;
-  overflow:hidden;
-  position:relative;
-  background: #fff; /* 默认背景色 */
-}
 
 /* 主屏 - 修改壁纸容器 */
 .home{
@@ -1062,10 +1120,85 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
 .message-slide-in {
   animation: messageSlideIn 0.3s ease-out forwards;
 }
+
+/* ===== 新增：全屏开关样式 ===== */
+/* 苹果原生样式开关按钮 */
+.switch-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.switch {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  background-color: #e5e5ea; /* 系统默认灰色背景 */
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+/* 开关开启状态 - 粉色背景 */
+.switch.on {
+  background-color: #ff2d55; /* 苹果风格的粉色 */
+}
+
+.switch.on::before {
+  transform: translateX(20px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+/* 触摸效果 */
+.switch:active::before {
+  width: 35px;
+}
+
+.switch.on:active::before {
+  transform: translateX(16px);
+}
+
+/* 全屏模式下body样式调整 */
+body.fullscreen-mode {
+  background: #000;
+  padding: 0;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* 全屏模式下的状态栏安全区域适配 */
+@media (orientation: portrait) {
+  .phone.fullscreen .status-bar {
+    padding-top: max(env(safe-area-inset-top), 8px);
+  }
+  
+  .phone.fullscreen .header {
+    padding-top: max(env(safe-area-inset-top), 8px);
+  }
+  
+  .phone.fullscreen .chat-header {
+    padding-top: max(env(safe-area-inset-top), 10px);
+  }
+}
 </style>
 </head>
 <body>
-<div class="phone">
+<div class="phone" id="phone">
 
   <!-- 桌宠 -->
   <div class="pet-container" id="petContainer" aria-hidden="true">
@@ -1231,6 +1364,14 @@ body{background:#e5e5e5;font-family:-apple-system,BlinkMacSystemFont;display:fle
       </div>
 
       <div class="list home-settings-list" id="homeSettingsList">
+        <!-- 新增：全屏显示开关 -->
+        <div class="home-settings-row switch-container" onclick="toggleFullscreen()">
+          <label>全屏显示</label>
+          <div class="switch" id="fullscreenSwitch">
+            <input type="checkbox" hidden id="fullscreenToggle">
+          </div>
+        </div>
+
         <div class="home-settings-row">
           <label>修改主屏幕壁纸</label>
           <input type="file" accept="image/*" onchange="setWallpaper(this)">
@@ -1403,6 +1544,13 @@ const ICON_MIC = 'https://img.heliar.top/file/1768546088581_IMG_3422.png';
 const ICON_EMOJI = 'https://img.heliar.top/file/1768546261329_IMG_3423.png';
 const ICON_PLUSCHAT = 'https://img.heliar.top/file/1768546259205_IMG_3424.png';
 
+/* ---------- 新增：全屏功能相关变量 ---------- */
+let isFullscreen = localStorage.getItem('fullscreen') === 'true';
+const phone = document.getElementById('phone');
+const screenEl = document.getElementById('screen');
+const fullscreenSwitch = document.getElementById('fullscreenSwitch');
+const body = document.body;
+
 /* ---------- 基础与引用 ---------- */
 function updateTime(){ const n=new Date(); time.innerText = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0'); }
 updateTime(); setInterval(updateTime,1000);
@@ -1500,6 +1648,51 @@ let currentBindingChatId = null; // 当前正在绑定的聊天ID
 let isAIReplying = false; // AI是否正在回复中
 let aiReplyQueue = []; // AI回复消息队列
 
+/* ===== 新增：全屏功能初始化 ===== */
+function initFullscreen() {
+  // 从localStorage加载全屏状态
+  if (isFullscreen) {
+    phone.classList.add('fullscreen');
+    body.classList.add('fullscreen-mode');
+    fullscreenSwitch.classList.add('on');
+  } else {
+    phone.classList.remove('fullscreen');
+    body.classList.remove('fullscreen-mode');
+    fullscreenSwitch.classList.remove('on');
+  }
+}
+
+/* ===== 新增：切换全屏功能 ===== */
+function toggleFullscreen() {
+  isFullscreen = !isFullscreen;
+  
+  // 更新UI状态
+  if (isFullscreen) {
+    phone.classList.add('fullscreen');
+    body.classList.add('fullscreen-mode');
+    fullscreenSwitch.classList.add('on');
+  } else {
+    phone.classList.remove('fullscreen');
+    body.classList.remove('fullscreen-mode');
+    fullscreenSwitch.classList.remove('on');
+  }
+  
+  // 保存状态到localStorage
+  localStorage.setItem('fullscreen', isFullscreen);
+  
+  // 显示提示
+  toast(isFullscreen ? '已开启全屏显示' : '已关闭全屏显示', 1500, true);
+  
+  // 如果是聊天窗口，需要重新调整消息气泡的位置
+  const currentChatId = chatWindow.dataset.openChatId;
+  if (currentChatId) {
+    setTimeout(() => {
+      renderMessages(currentChatId);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }, 300);
+  }
+}
+
 /* 初始化画面资源 */
 // 修改：壁纸仅设置到wallpaperLayer层
 if(localStorage.getItem('wallpaper')) {
@@ -1519,6 +1712,9 @@ if(localStorage.getItem('worldbookIcon')) {
 
 if(localStorage.getItem('homeSettingsIcon')) homeSettingsIconEl.innerHTML = `<img src="${localStorage.getItem('homeSettingsIcon')}" alt="home-settings">`;
 if(localStorage.getItem('petImage')) petBox.innerHTML = `<img src="${localStorage.getItem('petImage')}" alt="pet">`;
+
+// 初始化全屏状态
+initFullscreen();
 
 /* 应用聊天工具栏图标（你的三张图床） */
 function applyChatIcons(){
