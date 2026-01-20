@@ -25,7 +25,6 @@ body.fullscreen-mode {
   padding:0;
   justify-content:flex-start;
   align-items:flex-start;
-  overflow:hidden;
 }
 
 .phone{
@@ -78,35 +77,12 @@ body.fullscreen-mode {
 
 /* 全屏模式下调整状态栏，确保内容不会被刘海遮挡 */
 .phone.fullscreen .status-bar {
-  padding-top: max(env(safe-area-inset-top), 8px);
-  background: #ffe6ef; /* 全屏模式下状态栏背景为淡粉色 */
-  position: fixed; /* 固定定位，覆盖整个顶部 */
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  border-bottom: 1px solid rgba(0,0,0,0.1); /* 添加轻微分割线 */
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 /* 全屏模式下调整页面顶部间距 */
 .phone.fullscreen .page {
-  padding-top: calc(44px + max(env(safe-area-inset-top), 8px));
-}
-
-/* 全屏模式下的主屏页面 - 确保内容从顶部开始 */
-.phone.fullscreen .home.page {
-  padding-top: 0;
-}
-
-/* 全屏模式下的壁纸层 - 覆盖整个屏幕 */
-.phone.fullscreen .wallpaper-layer {
-  top: 0;
-  height: 100vh;
-}
-
-/* 全屏模式下的应用网格容器 */
-.phone.fullscreen .apps-container {
-  padding-top: calc(44px + max(env(safe-area-inset-top), 8px));
+  padding-top: calc(44px + env(safe-area-inset-top, 0px));
 }
 
 /* 桌宠容器（屏幕外上方） */
@@ -297,21 +273,89 @@ body.fullscreen-mode {
 .plus-item{padding:14px;color:#fff;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.12);cursor:pointer}
 .plus-item:last-child{border-bottom:none}
 
-/* 聊天窗口样式 */
+/* ========== 修改：聊天窗口样式 ========== */
 .chat-window{
   display:none;
   flex-direction:column;
   height:100%;
   position:relative;
   background:#f5f5f5; /* 聊天窗口有独立背景色 */
+  /* 确保背景壁纸能覆盖整个聊天界面 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-.chat-header{height:56px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #eee;position:relative;padding-top:env(safe-area-inset-top,10px);background:linear-gradient(transparent,#fff)}
-.chat-header .left{position:absolute;left:10px;top:0;bottom:0;display:flex;align-items:center;cursor:pointer}
-.chat-header .right{position:absolute;right:10px;top:0;bottom:0;display:flex;align-items:center;cursor:pointer}
-.chat-header .title{font-size:17px;font-weight:600}
+
+/* ========== 修改：聊天顶部导航栏 - 改为黑色 ========== */
+.chat-header{
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  padding-top:env(safe-area-inset-top,10px);
+  background: transparent !important; /* 保持透明背景 */
+  border-bottom: none !important;
+  /* 文字阴影调整为黑色系，增强可读性 */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+
+/* 左侧返回按钮样式（改成黑色） */
+.chat-header .left{
+  position:absolute;
+  left:10px;
+  top:0;
+  bottom:0;
+  display:flex;
+  align-items:center;
+  cursor:pointer;
+  color: #333333; /* 黑色文字 */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  font-size: 24px;
+  font-weight: bold;
+  padding: 0 12px;
+}
+
+/* 右侧更多选项按钮样式（改成黑色） */
+.chat-header .right{
+  position:absolute;
+  right:10px;
+  top:0;
+  bottom:0;
+  display:flex;
+  align-items:center;
+  cursor:pointer;
+  color: #333333; /* 黑色文字 */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  font-size: 24px;
+  padding: 0 12px;
+}
+
+/* 聊天标题样式（改成黑色） */
+.chat-header .title{
+  font-size:17px;
+  font-weight:600;
+  color: #333333; /* 黑色文字 */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* ========== 修改结束 ========== */
 
 /* 聊天区域 - 新增头像样式 */
-.chat-body{flex:1;padding:12px;overflow:auto;/* 聊天背景可自定义 */}
+.chat-body{
+  flex:1;
+  padding:12px;
+  overflow:auto;
+  /* 聊天背景可自定义，但确保不覆盖顶栏区域 */
+  background: transparent;
+  /* 添加半透明渐变遮罩，确保消息在复杂背景上可读 */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 20px, transparent calc(100% - 20px), rgba(0,0,0,0.05) 100%);
+}
+
 .msg-row{display:flex;margin-bottom:8px;align-items:flex-end;/* 对齐气泡底部 */}
 /* 消息头像样式：正方形、比气泡大 - 修改：稍微缩小头像 */
 .msg-avatar{
@@ -352,20 +396,128 @@ body.fullscreen-mode {
   border:1px dashed #ddd !important;
 }
 
-/* 底部输入区 - 恢复原本样式 */
-.chat-input-bar{height:64px;padding:10px;display:flex;align-items:center;gap:8px;border-top:1px solid #eee;background:#fafafa;padding-bottom:calc(env(safe-area-inset-bottom,10px));position:relative}
+/* ========== 修改：底部输入区 - 淡粉色果冻质感玻璃拟态风格 ========== */
+.chat-input-bar{
+  height:64px;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border-top:1px solid rgba(255,182,198,0.3); /* 浅粉色边框 */
+  background: linear-gradient(135deg, 
+    rgba(255,230,239,0.85) 0%, 
+    rgba(255,218,230,0.9) 100%); /* 淡粉色渐变背景 */
+  padding-bottom:calc(env(safe-area-inset-bottom,10px));
+  position:relative;
+  /* 玻璃拟态效果 */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  /* 柔和的内阴影 */
+  box-shadow: 
+    inset 0 1px 2px rgba(255,255,255,0.8),
+    inset 0 -1px 1px rgba(255,182,198,0.2),
+    0 4px 20px rgba(255,182,198,0.15);
+}
+
+/* 果冻质感圆形按钮 */
 .btn-circle{
   width:40px;
   height:40px;
   border-radius:20px;/* 保持原有圆角 */
-  display:flex;align-items:center;justify-content:center;
-  background:#fff;/* 恢复原本白色背景 */
-  border:1px solid #eee;/* 恢复原本浅灰色边框 */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  /* 果冻质感背景 */
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.9) 0%, 
+    rgba(255,245,248,0.95) 100%);
+  border:1px solid rgba(255,182,198,0.4);/* 浅粉色半透明边框 */
   cursor:pointer;
+  /* 玻璃拟态效果 */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* 果冻感阴影 */
+  box-shadow: 
+    0 2px 8px rgba(255,182,198,0.2),
+    inset 0 1px 1px rgba(255,255,255,0.8),
+    inset 0 -1px 1px rgba(255,182,198,0.1);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性动画 */
 }
-.btn-circle img{width:20px;height:20px;display:block;/* 去掉颜色加深滤镜，恢复原本图标颜色 */}
-.input-box{flex:1;height:40px;border-radius:20px;background:#fff;border:1px solid #eee;display:flex;align-items:center;padding:0 12px}
-.input-box input{border:0;outline:none;width:100%;font-size:15px}
+
+/* 按钮悬停和点击效果 */
+.btn-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 4px 12px rgba(255,182,198,0.3),
+    inset 0 1px 2px rgba(255,255,255,0.9),
+    inset 0 -1px 1px rgba(255,182,198,0.2);
+}
+
+.btn-circle:active {
+  transform: scale(0.95);
+  box-shadow: 
+    0 1px 4px rgba(255,182,198,0.2),
+    inset 0 2px 3px rgba(255,182,198,0.1);
+}
+
+/* 按钮内的图标样式（修改后） */
+.btn-circle img{
+  width: 70%; /* 填满按钮宽度 */
+  height: 70%; /* 填满按钮高度 */
+  display:block;
+  object-fit: contain; /* 保持图标原比例，不压缩/拉伸 */
+  filter: drop-shadow(0 1px 1px rgba(255,182,198,0.3)); /* 轻微粉色阴影 */
+}
+
+/* 果冻质感输入框 */
+.input-box{
+  flex:1;
+  height:40px;
+  border-radius:20px;
+  /* 果冻质感背景 */
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.95) 0%, 
+    rgba(255,250,252,0.98) 100%);
+  border:1px solid rgba(255,182,198,0.4);/* 浅粉色半透明边框 */
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  /* 玻璃拟态效果 */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* 果冻感阴影 */
+  box-shadow: 
+    inset 0 1px 3px rgba(255,182,198,0.15),
+    0 1px 2px rgba(255,255,255,0.8),
+    0 1px 4px rgba(255,182,198,0.1);
+  transition: all 0.2s ease;
+}
+
+/* 输入框聚焦效果 */
+.input-box:focus-within {
+  border-color: rgba(255,182,198,0.7);
+  box-shadow: 
+    inset 0 1px 3px rgba(255,182,198,0.25),
+    0 2px 8px rgba(255,182,198,0.2),
+    inset 0 0 0 1px rgba(255,182,198,0.1);
+}
+
+.input-box input{
+  border:0;
+  outline:none;
+  width:100%;
+  font-size:15px;
+  background:transparent;
+  color:#666;
+  font-family:-apple-system,BlinkMacSystemFont;
+}
+
+.input-box input::placeholder {
+  color: #c9a8b3; /* 浅粉色占位符 */
+  opacity: 0.8;
+}
+
+/* ========== 修改结束 ========== */
 
 /* toast - 淡粉色保存成功弹窗（固定样式） */
 .toast{
@@ -473,42 +625,8 @@ body.fullscreen-mode {
   line-height: 1;
 }
 
-/* 新增：三个跳动的圆点动画样式 */
-.typing-dots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 18px;
-}
-
-.typing-dots span {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #666;
-  margin: 0 2px;
-  animation: dotBounce 1.4s infinite ease-in-out both;
-}
-
-.typing-dots span:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.typing-dots span:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes dotBounce {
-  0%, 80%, 100% { 
-    transform: scale(0);
-    opacity: 0.5;
-  } 
-  40% { 
-    transform: scale(1);
-    opacity: 1;
-  }
-}
+/* ===== 删除：三个跳动的圆点动画样式 ===== */
+/* 这些样式已被删除，不再需要 */
 
 /* 新增：顶部输入中状态样式 */
 .typing-indicator {
@@ -1245,7 +1363,7 @@ body.fullscreen-mode {
       <div class="apps-container">
         <div class="apps">
           <div class="app-item" onclick="openWeChat()">
-            <div class="app wechat-app" id="wechatIcon"><img src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+            <div class="app wechat-app" id="wechatIcon"><img src="" alt="" style="width:100%;height:100%;object-fit:cover;display=block"></div>
             <div class="app-name">Wechat</div>
           </div>
 
@@ -1296,11 +1414,11 @@ body.fullscreen-mode {
       <div class="chat-body" id="chatBody"></div>
 
       <div class="chat-input-bar">
-        <!-- 使用你提供的三个图床 -->
-        <div class="btn-circle" id="micBtn" onclick="triggerAIReply()"><img id="micImg" src="https://img.heliar.top/file/1768546088581_IMG_3422.png" alt="mic"></div>
+        <!-- 使用新的三个图标 -->
+        <div class="btn-circle" id="micBtn" onclick="triggerAIReply()"><img id="micImg" src="https://img.heliar.top/file/1768945744096_IMG_3615.png" alt="mic"></div>
         <div class="input-box"><input id="chatInput" placeholder="输入消息，回车发送" onkeydown="if(event.key==='Enter'){ sendChatMessage(); }"></div>
-        <div class="btn-circle" id="emojiBtn"><img id="emojiImg" src="https://img.heliar.top/file/1768546261329_IMG_3423.png" alt="emoji"></div>
-        <div class="btn-circle" id="plusChatBtn"><img id="plusChatImg" src="https://img.heliar.top/file/1768546259205_IMG_3424.png" alt="plus"></div>
+        <div class="btn-circle" id="emojiBtn"><img id="emojiImg" src="https://img.heliar.top/file/1768945741833_IMG_3617.png" alt="emoji"></div>
+        <div class="btn-circle" id="plusChatBtn"><img id="plusChatImg" src="https://img.heliar.top/file/1768945744740_IMG_3616.png" alt="plus"></div>
       </div>
     </div>
 
@@ -1559,10 +1677,10 @@ const DEFAULT_WALLPAPER = 'https://img.heliar.top/file/1768536593797_IMG_3117.jp
 const DEFAULT_WECHAT_ICON = 'https://img.heliar.top/file/1768536596905_IMG_2757.jpeg';
 const DEFAULT_NICKNAME = 'user';
 
-/* 三个图床（你要求使用的） */
-const ICON_MIC = 'https://img.heliar.top/file/1768546088581_IMG_3422.png';
-const ICON_EMOJI = 'https://img.heliar.top/file/1768546261329_IMG_3423.png';
-const ICON_PLUSCHAT = 'https://img.heliar.top/file/1768546259205_IMG_3424.png';
+/* 更新：使用新的三个图标URL */
+const ICON_MIC = 'https://img.heliar.top/file/1768945744096_IMG_3615.png';
+const ICON_EMOJI = 'https://img.heliar.top/file/1768945741833_IMG_3617.png';
+const ICON_PLUSCHAT = 'https://img.heliar.top/file/1768945744740_IMG_3616.png';
 
 /* ---------- 新增：全屏功能相关变量 ---------- */
 let isFullscreen = localStorage.getItem('fullscreen') === 'true';
@@ -1666,7 +1784,6 @@ let currentBindingChatId = null; // 当前正在绑定的聊天ID
 
 /* 新增：AI回复拆分相关变量 */
 let isAIReplying = false; // AI是否正在回复中
-let aiReplyQueue = []; // AI回复消息队列
 
 /* ===== 新增：全屏功能初始化 ===== */
 function initFullscreen() {
@@ -1711,27 +1828,6 @@ function toggleFullscreen() {
       chatBody.scrollTop = chatBody.scrollHeight;
     }, 300);
   }
-  
-  // 调整状态栏显示
-  adjustStatusBarForFullscreen();
-}
-
-/* 调整状态栏以适应全屏模式 */
-function adjustStatusBarForFullscreen() {
-  const statusBar = document.querySelector('.status-bar');
-  if (isFullscreen) {
-    // 全屏模式下，确保状态栏覆盖整个顶部
-    statusBar.style.background = '#ffe6ef';
-    statusBar.style.position = 'fixed';
-    statusBar.style.top = '0';
-    statusBar.style.left = '0';
-    statusBar.style.right = '0';
-    statusBar.style.zIndex = '1000';
-  } else {
-    // 非全屏模式，恢复原有样式
-    statusBar.style.background = '';
-    statusBar.style.position = 'absolute';
-  }
 }
 
 /* 初始化画面资源 */
@@ -1757,7 +1853,7 @@ if(localStorage.getItem('petImage')) petBox.innerHTML = `<img src="${localStorag
 // 初始化全屏状态
 initFullscreen();
 
-/* 应用聊天工具栏图标（你的三张图床） */
+/* 应用聊天工具栏图标（更新为新的三个图标） */
 function applyChatIcons(){
   if(micImg) micImg.src = ICON_MIC;
   if(emojiImg) emojiImg.src = ICON_EMOJI;
@@ -2418,14 +2514,15 @@ function openChat(chatId){
   chatTitle.innerText = displayTitle;
   chatTitle.classList.remove('typing-indicator'); // 确保移除输入中样式
   
-  // 应用角色聊天背景
+  // 应用角色聊天背景到整个聊天窗口（实现全屏覆盖）
   if(config.chatBg) {
-    chatBody.style.backgroundImage = `url(${config.chatBg})`;
-    chatBody.style.backgroundSize = 'cover';
-    chatBody.style.backgroundPosition = 'center';
+    chatWindow.style.backgroundImage = `url(${config.chatBg})`;
+    chatWindow.style.backgroundSize = 'cover';
+    chatWindow.style.backgroundPosition = 'center';
+    chatWindow.style.backgroundRepeat = 'no-repeat';
   } else {
-    chatBody.style.backgroundImage = 'none';
-    chatBody.style.background = '#f5f5f5';
+    chatWindow.style.backgroundImage = 'none';
+    chatWindow.style.background = '#f5f5f5';
   }
   
   renderMessages(chatId);
@@ -2473,7 +2570,7 @@ function renderMessages(chatId) {
     }
     lastTime = currTime;
 
-    // 渲染消息气泡（原有逻辑不变）
+    // 渲染消息气泡（修改：不再检查TYPING_INDICATOR）
     const row = document.createElement('div');
     row.className = 'msg-row ' + (m.from === 'me' ? 'msg-right' : 'msg-left');
     
@@ -2488,15 +2585,8 @@ function renderMessages(chatId) {
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
     
-    // 检查是否为输入中状态（动态圆点动画）
-    if (m.text === 'TYPING_INDICATOR') {
-      const typingDots = document.createElement('div');
-      typingDots.className = 'typing-dots';
-      typingDots.innerHTML = '<span></span><span></span><span></span>';
-      bubble.appendChild(typingDots);
-    } else {
-      bubble.innerText = m.text;
-    }
+    // 直接显示文本内容（不再有TYPING_INDICATOR检查）
+    bubble.innerText = m.text;
     
     bubble.style.cssText = m.from === 'me'
       ? (config.userBubbleCss || 'background:#cfe8ff;border-radius:12px;')
@@ -2810,7 +2900,7 @@ function exitMultiSelectMode() {
   }
 }
 
-/* ===== 新增：消息拆分功能 ===== */
+/* ===== 修改：消息拆分功能 ===== */
 /* 智能拆分AI回复为多条消息 */
 function splitAIReply(aiReply) {
   if (!aiReply || aiReply.trim() === '') return [];
@@ -2824,8 +2914,8 @@ function splitAIReply(aiReply) {
   paragraphs.forEach(paragraph => {
     if (!paragraph.trim()) return;
     
-    // 如果段落较短（小于100字），直接作为一条消息
-    if (paragraph.length < 100) {
+    // 如果段落较短（小于80字），直接作为一条消息
+    if (paragraph.length < 80) {
       messages.push(paragraph.trim());
       return;
     }
@@ -2838,10 +2928,10 @@ function splitAIReply(aiReply) {
       line = line.trim();
       if (!line) return;
       
-      // 如果当前行很长（超过80字），尝试按标点拆分
-      if (line.length > 80) {
+      // 如果当前行很长（超过60字），尝试按标点拆分
+      if (line.length > 60) {
         // 按中文标点拆分：。！？；，、
-        const sentenceRegex = /[。！？；]+|[，、]+(?![^」）》】〕〗〉〕】〕〗〕】〕〗〕】〕〗])/g;
+        const sentenceRegex = /[。！？；]+|[，、]+(?![^」）》】〕〗〉〕】〕〗〕】〕〗])/g;
         const sentences = line.split(sentenceRegex);
         let currentSentence = '';
         
@@ -2849,8 +2939,8 @@ function splitAIReply(aiReply) {
           sentence = sentence.trim();
           if (!sentence) return;
           
-          // 如果当前句子较短，且与前面的句子合并后不超过100字，则合并
-          if (currentSentence.length + sentence.length + 1 < 100) {
+          // 如果当前句子较短，且与前面的句子合并后不超过80字，则合并
+          if (currentSentence.length + sentence.length + 1 < 80) {
             currentSentence = currentSentence ? currentSentence + sentence + '。' : sentence + '。';
           } else {
             // 保存当前句子并开始新的
@@ -2867,7 +2957,7 @@ function splitAIReply(aiReply) {
         }
       } else {
         // 如果当前行较短，尝试与之前的行合并
-        if (currentChunk.length + line.length + 1 < 100) {
+        if (currentChunk.length + line.length + 1 < 80) {
           currentChunk = currentChunk ? currentChunk + '\n' + line : line;
         } else {
           // 保存当前块并开始新的
@@ -2885,119 +2975,136 @@ function splitAIReply(aiReply) {
     }
   });
   
-  // 确保每条消息都不为空
-  return messages.filter(msg => msg && msg.trim() !== '');
-}
-
-/* 发送拆分后的AI消息 */
-function sendSplitAIMessages(chatId, messageParts) {
-  if (!messageParts || messageParts.length === 0) return;
+  // 确保每条消息都不为空，并限制总条数在2-10条之间
+  const validMessages = messages.filter(msg => msg && msg.trim() !== '');
   
-  isAIReplying = true;
-  aiReplyQueue = [...messageParts];
-  sendNextAIMessage(chatId, 0);
-}
-
-/* 发送下一条AI消息 */
-function sendNextAIMessage(chatId, index) {
-  if (index >= aiReplyQueue.length || !isAIReplying) {
-    // 所有消息发送完成
-    isAIReplying = false;
-    aiReplyQueue = [];
-    
-    // 更新聊天列表排序
-    const chatIdx = chats.findIndex(c => c.id === chatId);
-    if (chatIdx !== -1) {
-      const chatObj = chats.splice(chatIdx, 1)[0];
-      chats.unshift(chatObj);
-      localStorage.setItem('chats', JSON.stringify(chats));
-    }
-    
-    // 刷新聊天列表
-    if (document.querySelector('.tab.active')?.getAttribute('data-tab') === 'chat') {
-      renderChatList();
-    }
-    
-    return;
+  // 如果消息超过10条，合并最后几条
+  if (validMessages.length > 10) {
+    const mergedMessages = validMessages.slice(0, 8);
+    const remainingMessages = validMessages.slice(8).join('\n');
+    mergedMessages.push(remainingMessages);
+    return mergedMessages;
   }
   
-  const messageText = aiReplyQueue[index];
+  // 如果消息少于2条，尝试进一步拆分第一条消息
+  if (validMessages.length === 1 && validMessages[0].length > 100) {
+    const longMessage = validMessages[0];
+    // 尝试按句号、感叹号、问号拆分
+    const sentences = longMessage.split(/(?<=[。！？])/g);
+    if (sentences.length >= 2) {
+      const result = [];
+      let current = '';
+      sentences.forEach(sentence => {
+        if (sentence.trim()) {
+          if (current.length + sentence.length < 100) {
+            current += sentence;
+          } else {
+            if (current) result.push(current);
+            current = sentence;
+          }
+        }
+      });
+      if (current) result.push(current);
+      
+      // 确保最少2条，最多10条
+      if (result.length < 2) {
+        // 如果仍然只有1条，按字符数平分
+        const mid = Math.ceil(longMessage.length / 2);
+        const firstPart = longMessage.substring(0, mid);
+        const lastDot = firstPart.lastIndexOf('。');
+        const lastExcl = firstPart.lastIndexOf('！');
+        const lastQ = firstPart.lastIndexOf('？');
+        const splitIndex = Math.max(lastDot, lastExcl, lastQ);
+        
+        if (splitIndex > 0) {
+          return [longMessage.substring(0, splitIndex + 1), longMessage.substring(splitIndex + 1)];
+        } else {
+          return [firstPart, longMessage.substring(mid)];
+        }
+      }
+      return result.slice(0, 10);
+    }
+  }
   
-  // 创建消息对象
-  const msg = { 
-    from: 'them', 
-    text: messageText, 
-    ts: Date.now() + index * 10 // 添加微小的时间偏移，确保顺序正确
-  };
+  return validMessages;
+}
+
+/* 修改：一次性发送所有AI消息（同时渲染所有气泡） */
+function sendAllAIMessages(chatId, messageParts) {
+  if (!messageParts || messageParts.length === 0) return;
   
-  // 添加到消息数组
-  messages[chatId].push(msg);
+  const now = Date.now();
+  
+  // 添加所有消息到数据存储
+  messageParts.forEach((part, index) => {
+    const msg = { 
+      from: 'them', 
+      text: part, 
+      ts: now + index * 10 // 微小的时间差，确保顺序
+    };
+    messages[chatId].push(msg);
+  });
+  
+  // 保存到本地存储
   localStorage.setItem('messages', JSON.stringify(messages));
   
-  // 更新聊天预览（只更新最后一条消息）
+  // 更新聊天预览（取最后一条消息）
   updateChatPreview(chatId);
   
-  // 渲染新消息 - 应用角色气泡样式
+  // 获取配置信息
   const config = roleConfigs[chatId] || {};
   const chat = chats.find(c => c.id === chatId);
   const contact = contacts.find(con => con.id === chat?.contactId);
   const friendAvatar = config.avatar || chat?.avatar || contact?.avatar || '';
   
-  const row = document.createElement('div'); 
-  row.className = 'msg-row msg-left message-slide-in';
+  // 获取消息列表长度
+  const totalMessages = messages[chatId].length;
+  const newMessageCount = messageParts.length;
   
-  // 好友头像
-  const avatarEl = document.createElement('div');
-  avatarEl.className = 'msg-avatar';
-  avatarEl.innerHTML = friendAvatar ? `<img src="${friendAvatar}" alt="好友头像">` : `<div style="width:100%;height:100%;background:#eee;display:flex;align-items:center;justify-content:center;color:#666">${(config.remark || config.name || chat?.nameDisplay || contact?.name || 'U').charAt(0)}</div>`;
-  
-  // 好友气泡
-  const bubble = document.createElement('div'); 
-  bubble.className = 'msg-bubble'; 
-  bubble.innerText = messageText;
-  bubble.style.cssText = config.bubbleCss 
-    ? config.bubbleCss 
-    : 'background:#fff;border:1px solid #eee;border-top-left-radius:6px;';
-  
-  // 为气泡添加双击事件监听
-  bubble.dataset.msgIndex = messages[chatId].length - 1;
-  setupMessageDoubleClick(bubble, chatId, messages[chatId].length - 1, msg);
-  
-  row.appendChild(avatarEl);
-  row.appendChild(bubble);
-  chatBody.appendChild(row);
+  // 创建所有消息气泡并一次性添加到Fragment
+  for (let i = totalMessages - newMessageCount; i < totalMessages; i++) {
+    const m = messages[chatId][i];
+    
+    const row = document.createElement('div');
+    row.className = 'msg-row msg-left message-slide-in';
+    
+    // 好友头像
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'msg-avatar';
+    avatarEl.innerHTML = friendAvatar ? `<img src="${friendAvatar}" alt="好友头像">` : `<div style="width:100%;height:100%;background:#eee;display:flex;align-items:center;justify-content:center;color:#666">${(config.remark || config.name || chat?.nameDisplay || contact?.name || 'U').charAt(0)}</div>`;
+    
+    // 好友气泡
+    const bubble = document.createElement('div'); 
+    bubble.className = 'msg-bubble'; 
+    bubble.innerText = m.text;
+    bubble.style.cssText = config.bubbleCss 
+      ? config.bubbleCss 
+      : 'background:#fff;border:1px solid #eee;border-top-left-radius:6px;';
+    
+    // 为气泡添加双击事件监听
+    bubble.dataset.msgIndex = i;
+    setupMessageDoubleClick(bubble, chatId, i, m);
+    
+    row.appendChild(avatarEl);
+    row.appendChild(bubble);
+    chatBody.appendChild(row);
+  }
   
   // 滚动到底部
   chatBody.scrollTop = chatBody.scrollHeight;
   
-  // 计算下一条消息的发送延迟
-  // 根据消息长度和类型计算延迟，模拟真人打字速度
-  const delay = calculateMessageDelay(messageText, index);
-  
-  // 发送下一条消息
-  setTimeout(() => {
-    sendNextAIMessage(chatId, index + 1);
-  }, delay);
-}
-
-/* 计算消息发送延迟 */
-function calculateMessageDelay(messageText, messageIndex) {
-  // 基础延迟：第一条消息稍快，后续消息逐渐增加间隔
-  let baseDelay = 800 + (messageIndex * 200);
-  
-  // 根据消息长度调整延迟
-  const length = messageText.length;
-  if (length < 20) {
-    baseDelay += 300; // 短消息较快
-  } else if (length < 50) {
-    baseDelay += 500; // 中等长度消息
-  } else {
-    baseDelay += 800; // 长消息较慢
+  // 更新聊天列表排序（将当前聊天置顶）
+  const chatIdx = chats.findIndex(c => c.id === chatId);
+  if (chatIdx !== -1) {
+    const chatObj = chats.splice(chatIdx, 1)[0];
+    chats.unshift(chatObj);
+    localStorage.setItem('chats', JSON.stringify(chats));
   }
   
-  // 添加随机性，使间隔更自然
-  const randomFactor = 0.8 + Math.random() * 0.4; // 0.8到1.2之间的随机数
-  return Math.floor(baseDelay * randomFactor);
+  // 刷新聊天列表
+  if (document.querySelector('.tab.active')?.getAttribute('data-tab') === 'chat') {
+    renderChatList();
+  }
 }
 
 /* 发送消息并保存（本地）- 新增预览同步+时间更新逻辑 */
@@ -3069,36 +3176,33 @@ async function triggerAIReply() {
     return;
   }
 
+  isAIReplying = true;
+
   // 1. 检查API配置是否完整
   const proxy = localStorage.getItem('api_proxy') || '';
   const key = localStorage.getItem('api_key') || '';
   const model = localStorage.getItem('api_model') || '';
   if (!proxy || !key || !model) {
     toast('请先在设置中配置API参数', 2000);
+    isAIReplying = false;
     return;
   }
 
-  // 2. 设置顶部状态提示为"对方正在输入中..."
+  // 2. 设置顶部状态提示为"对方正在输入中..."（仅标题栏提示，没有气泡）
   const originalTitle = chatTitle.innerText;
   chatTitle.innerText = '对方正在输入中...';
   chatTitle.classList.add('typing-indicator');
 
-  // 3. 插入输入中状态消息（动态圆点动画）
-  const loadingMsg = { from: 'them', text: 'TYPING_INDICATOR', ts: Date.now() };
-  messages[chatId].push(loadingMsg);
-  renderMessages(chatId);
-  chatBody.scrollTop = chatBody.scrollHeight;
-
   try {
-    // 4. 构建上下文消息（排除输入中状态消息和已撤回消息）
+    // 3. 构建上下文消息（排除已撤回消息）
     const contextMsgs = messages[chatId]
-      .filter(msg => msg.text !== 'TYPING_INDICATOR' && !msg.recalled) // 排除输入中状态和已撤回消息
+      .filter(msg => !msg.recalled) // 排除已撤回消息
       .map(msg => ({
         role: msg.from === 'me' ? 'user' : 'assistant',
         content: msg.text
       }));
 
-    // 5. 获取当前角色的完整上下文信息（角色信息 + 用户信息 + 世界书内容）
+    // 4. 获取当前角色的完整上下文信息（角色信息 + 用户信息 + 世界书内容）
     const systemPrompt = getRoleContextInfo(chatId);
     
     // 如果有系统提示词，添加到消息开头
@@ -3109,7 +3213,7 @@ async function triggerAIReply() {
       });
     }
 
-    // 6. 调用AI接口
+    // 5. 调用AI接口
     const apiUrl = (proxy.endsWith('/') ? proxy.slice(0, -1) : proxy) + '/chat/completions';
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -3128,17 +3232,11 @@ async function triggerAIReply() {
     const data = await response.json();
     const aiReply = data.choices?.[0]?.message?.content?.trim() || '抱歉，未能获取回复';
 
-    // 7. 移除输入中状态消息
-    const typingIndex = messages[chatId].findIndex(msg => msg.text === 'TYPING_INDICATOR');
-    if (typingIndex !== -1) {
-      messages[chatId].splice(typingIndex, 1);
-    }
-    
-    // 8. 恢复顶部状态提示为原名称
+    // 6. 恢复顶部状态提示为原名称
     chatTitle.innerText = originalTitle;
     chatTitle.classList.remove('typing-indicator');
 
-    // 9. 拆分AI回复为多条消息
+    // 7. 拆分AI回复为多条消息
     const messageParts = splitAIReply(aiReply);
     
     if (messageParts.length === 0) {
@@ -3168,27 +3266,22 @@ async function triggerAIReply() {
       }
       
       toast('AI回复为空', 1500);
+      isAIReplying = false;
       return;
     }
     
-    // 10. 发送拆分后的多条消息
-    sendSplitAIMessages(chatId, messageParts);
+    // 8. 一次性发送所有拆分后的消息（同时渲染所有气泡）
+    sendAllAIMessages(chatId, messageParts);
+    
+    isAIReplying = false;
 
   } catch (error) {
-    // 异常处理：移除输入中状态消息并恢复顶部标题
-    const typingIndex = messages[chatId].findIndex(msg => msg.text === 'TYPING_INDICATOR');
-    if (typingIndex !== -1) {
-      messages[chatId].splice(typingIndex, 1);
-    }
-    
-    // 恢复顶部状态提示为原名称
+    // 异常处理：恢复顶部标题
     chatTitle.innerText = originalTitle;
     chatTitle.classList.remove('typing-indicator');
     
-    // 重新渲染消息
-    renderMessages(chatId);
-    
     toast(`回复失败: ${error.message}`, 2000);
+    isAIReplying = false;
   }
 }
 
@@ -3218,10 +3311,11 @@ function setRoleChatBg(){
     const currentChatId = chatWindow.dataset.openChatId;
     if(!currentChatId) return;
     
-    // 临时应用背景
-    chatBody.style.backgroundImage = `url(${e.target.result})`;
-    chatBody.style.backgroundSize = 'cover';
-    chatBody.style.backgroundPosition = 'center';
+    // 临时应用背景到整个聊天窗口（实现全屏覆盖）
+    chatWindow.style.backgroundImage = `url(${e.target.result})`;
+    chatWindow.style.backgroundSize = 'cover';
+    chatWindow.style.backgroundPosition = 'center';
+    chatWindow.style.backgroundRepeat = 'no-repeat';
     
     // 存储到临时配置
     if(!roleConfigs[currentChatId]) roleConfigs[currentChatId] = {};
