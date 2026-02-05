@@ -8,249 +8,492 @@
     <title>iOS Home Screen</title>
     <style>
         /* --- 全局重置与基础样式 --- */
-        :root { 
-            --theme-pink-bg-light: #FFF0F5; 
-            --theme-pink-bg-med: rgba(229, 138, 171, 0.15);
-            --theme-pink-text: #E58AAB; 
-            --chat-bg-color: #FFF8FA; 
-            --success-green: #4CAF50;
+        :root {
+             --theme-pink-bg-light: #FFF0F5;
+             --theme-pink-bg-med: rgba(229, 138, 171, 0.15);
+             --theme-pink-bg-soft: #FFF8FA;
+            --theme-pink-text: #E58AAB;
+            --theme-pink-title: #f5b3c9; /* 新的标题颜色 */
+            --theme-pink-btn: #F5B3C9; 
+            --wb-plus-btn: #FDCEDF; /* 世界书加号颜色 */
+             --chat-bg-color: #FFF8FA;
+             --success-green: #4CAF50;
             --error-red: #F44336;
             --wallet-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%);
             --wallet-card-shadow: 0 10px 20px rgba(255, 154, 158, 0.3);
         }
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; 
-        }
-
-        body { 
-            width: 100vw; 
-            height: 100vh; 
-            overflow: hidden; 
-            background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat; 
-            position: relative; 
-            transition: background-image 0.3s ease-in-out;
+        * {
+             box-sizing: border-box;
+             margin: 0;
+             padding: 0;
+             user-select: none;
+             -webkit-tap-highlight-color: transparent;
+             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+         }
+        body {
+             width: 100vw;
+             height: 100vh;
+             overflow: hidden;
+             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+             position: relative;
+             transition: background-image 0.3s ease-in-out;
             z-index: -2;
         }
-
-        #home-screen { 
-            width: 100%; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 0 0 env(safe-area-inset-bottom, 20px) 0; 
-            transition: opacity 0.3s ease, transform 0.3s ease; 
-        }
+        #home-screen {
+             width: 100%;
+             height: 100%;
+             display: flex;
+             flex-direction: column;
+             padding: 0 0 env(safe-area-inset-bottom, 20px) 0;
+             transition: opacity 0.3s ease, transform 0.3s ease;
+         }
         body.settings-active #home-screen,
         body.chat-active #home-screen,
-        body.wallet-active #home-screen { 
-            opacity: 0; 
-            transform: scale(0.95); 
-            pointer-events: none; 
-        }
+        body.wallet-active #home-screen,
+        body.worldbook-active #home-screen { /* Added worldbook-active */
+             opacity: 0;
+             transform: scale(0.95);
+             pointer-events: none;
+         }
 
         /* --- 时间区域 --- */
-        #time-section { 
-            height: 25%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding-top: env(safe-area-inset-top, 20px); 
-            flex-shrink: 0; 
-        }
+        #time-section {
+             height: 25%;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             padding-top: env(safe-area-inset-top, 20px);
+             flex-shrink: 0;
+         }
         #time-container {
             text-align: center;
             cursor: pointer;
             transition: transform 0.2s;
             background-size: cover;
             background-position: center;
-            border-radius: 25px; 
-        }
+            border-radius: 25px;
+         }
         #time-container:active {
             transform: scale(0.98);
         }
-        #clock-time { 
-            font-size: 5.2rem; 
-            font-weight: 300; 
-            color: white; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        #clock-time {
+             font-size: 5.2rem;
+             font-weight: 300;
+             color: white;
+             text-shadow: 0 2px 10px rgba(0,0,0,0.1);
             line-height: 1.1;
         }
         #clock-date {
-            font-size: 0.95rem; 
-            color: white;
+            font-size: 0.95rem;
+             color: white;
             font-weight: 500;
             margin-top: 2px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
         /* --- 网格区域 --- */
-        #grid-area { 
-            flex: 1; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            grid-template-rows: 1fr 1fr; 
-            padding: 0 15px 10px 15px; 
-            gap: 15px; 
-            width: 100%; 
-            max-width: 600px; 
-            margin: 0 auto; 
-        }
-        .grid-quadrant { 
-            width: 100%; 
-            height: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            position: relative; 
-        }
-
-        .widget-base { 
-            width: 100%; 
-            aspect-ratio: 1/1; 
-            border-radius: 22px; 
-            overflow: hidden; 
-            position: relative; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
-            transition: transform 0.1s ease-in-out; 
-            cursor: pointer; 
-            background-color: rgba(255,255,255,0.2); 
-            backdrop-filter: blur(10px); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            background-size: cover; 
-            background-position: center;
-        }
-        .widget-base:active { 
-            transform: scale(0.95); 
-        }
-        .add-hint { 
-            color: rgba(255,255,255,0.8); 
-            font-size: 30px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2); 
-            pointer-events: none; 
-        }
+        #grid-area {
+             flex: 1;
+             display: grid;
+             grid-template-columns: 1fr 1fr;
+             grid-template-rows: 1fr 1fr;
+             padding: 0 15px 10px 15px;
+             gap: 15px;
+             width: 100%;
+             max-width: 600px;
+             margin: 0 auto;
+         }
+        .grid-quadrant {
+             width: 100%;
+             height: 100%;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             position: relative;
+         }
         
-        #custom-image-quadrant #custom-image-display { 
-            max-width: 100%; 
-            max-height: 100%; 
-            object-fit: contain; 
-            cursor: pointer; 
-            display: none;
-        }
-
-        .app-group-2x2 { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            grid-template-rows: 1fr 1fr; 
-            gap: 12px; 
-            width: 100%; 
-            aspect-ratio: 1/1; 
-        }
-        .app-item { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-        }
-        .app-icon { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 16px; 
-            margin-bottom: 5px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 28px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            position: relative; 
-            transition: transform 0.1s, filter 0.1s; 
-            background-size: cover; 
-            background-position: center; 
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        .app-name { 
-            font-size: 11px; 
-            color: white; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4); 
-            white-space: nowrap; 
-        }
-        
-        /* 底栏样式 */
-        #dock-area { 
-            height: 95px; 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 0 15px 10px 15px; 
-            flex-shrink: 0; 
-        }
-        .dock-container { 
+        /* --- 优化的聊天小组件样式 (Quadrant 1) --- */
+        #chat-dual-container {
             width: 100%;
-            max-width: 350px;
-            height: 100%; 
-            background: rgba(255, 255, 255, 0.2); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); 
-            border-radius: 30px; 
-            display: flex; 
-            justify-content: space-evenly; 
-            align-items: center; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-            border: 1px solid rgba(255,255,255,0.15); 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px; 
+            padding: 5px;
         }
-        .dock-icon { 
-            width: 60px; 
-            height: 60px; 
-            font-size: 28px; 
-            margin: 0; 
-        }
-        #dock-area .app-item .app-icon { 
-            margin-bottom: 0; 
-        }
+        .chat-row { display: flex; align-items: center; width: 100%; }
+        .chat-row.left { justify-content: flex-start; }
+        .chat-row.right { flex-direction: row-reverse; }
 
-        /* --- Chat App 页面样式 --- */
+        .avatar-container {
+            position: relative; flex-shrink: 0; cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin: 0 8px; 
+        }
+        .avatar-container:active { transform: scale(0.9); }
+        .avatar-ring {
+            width: 48px; height: 48px; border-radius: 50%; padding: 2px;
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%, #a18cd1 100%);
+            box-shadow: 0 4px 10px rgba(255, 154, 158, 0.3);
+        }
+        .avatar-img-circle {
+            width: 100%; height: 100%; border-radius: 50%;
+            background-color: #fff; background-size: cover; background-position: center;
+            border: 2px solid #fff; display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        
+        .chat-bubble-input {
+            height: 36px; border-radius: 18px; padding: 0 14px; font-size: 13px; outline: none;
+            transition: all 0.3s ease; min-width: 60px; max-width: 140px; width: 80px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); color: #444;
+        }
+        .chat-bubble-input.left-bubble { border-bottom-left-radius: 4px; }
+        .chat-bubble-input.right-bubble { border-bottom-right-radius: 4px; text-align: right; }
+        .chat-bubble-input:focus { box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: rgba(255, 255, 255, 0.9); max-width: 150px; }
+
+        /* --- 图片小组件 (Quadrant 4) --- */
+        .photo-widget-container {
+            width: 100%; aspect-ratio: 1 / 1; border-radius: 26px; 
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            position: relative; overflow: hidden; cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .photo-widget-container:active { transform: scale(0.96); }
+        .photo-widget-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .photo-widget-placeholder {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.1); pointer-events: none;
+        }
+        .photo-widget-icon { font-size: 36px; margin-bottom: 5px; opacity: 0.8; }
+        .photo-widget-text { font-size: 13px; font-weight: 500; opacity: 0.9; }
+
+        /* --- App Group Styles --- */
+        .app-group-2x2 {
+             display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+             gap: 12px; width: 100%; aspect-ratio: 1/1;
+         }
+        .app-item { display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        .app-icon {
+             width: 60px; height: 60px; border-radius: 16px; margin-bottom: 5px;
+             display: flex; justify-content: center; align-items: center; font-size: 28px;
+             box-shadow: 0 4px 8px rgba(0,0,0,0.1); position: relative;
+             transition: transform 0.1s, filter 0.1s;
+             background-size: cover; background-position: center; background-color: rgba(255, 255, 255, 0.2);
+        }
+        .app-name { font-size: 11px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.4); white-space: nowrap; }
+                
+        /* 底栏样式 */
+        #dock-area {
+             height: 95px; width: 100%; display: flex; justify-content: center; align-items: center;
+             padding: 0 15px 10px 15px; flex-shrink: 0;
+         }
+        .dock-container {
+             width: 100%; max-width: 350px; height: 100%;
+             background: rgba(255, 255, 255, 0.2);
+             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+             border-radius: 30px; display: flex; justify-content: space-evenly; align-items: center;
+             box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.15);
+         }
+        .dock-icon { width: 60px; height: 60px; font-size: 28px; margin: 0; }
+        #dock-area .app-item .app-icon { margin-bottom: 0; }
+
+        /* --- Chat App 首页样式 --- */
         #chat-app-page {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: var(--chat-bg-color); 
-            z-index: 500;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--chat-bg-color); z-index: 500;
             display: flex; flex-direction: column;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        body.chat-active #chat-app-page {
-            transform: translateY(0);
-        }
-
+        body.chat-active #chat-app-page { transform: translateY(0); }
+        
         .chat-app-header {
             padding: calc(env(safe-area-inset-top, 20px) + 10px) 20px 15px;
             background: #fff;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #eee;
-            flex-shrink: 0;
-            height: 65px;
-            z-index: 10;
-            transition: all 0.2s;
+            border-bottom: none;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(229, 138, 171, 0.15);
+            flex-shrink: 0; height: 70px; z-index: 10; transition: all 0.2s;
         }
+        
         .chat-app-header.hidden { display: none; }
         .chat-header-title { font-size: 18px; font-weight: 600; color: #333; transition: color 0.3s ease; }
         .back-icon-img { width: 30px; height: 30px; object-fit: contain; cursor: pointer; opacity: 1; pointer-events: auto; }
         .back-icon-img.hidden { opacity: 0; pointer-events: none; }
         .header-right-icon { width: 26px; height: 26px; object-fit: contain; cursor: pointer; transition: opacity 0.3s ease; }
-
-        .chat-app-content { flex: 1; overflow-y: auto; position: relative; padding-bottom: 100px; }
+        
+        .chat-app-content { flex: 1; overflow-y: auto; position: relative; padding-bottom: 100px; padding-top: 5px; scroll-behavior: smooth; }
         .me-mode { padding-top: 0; background-color: var(--chat-bg-color); overflow-y: hidden; display: flex; flex-direction: column; justify-content: flex-end; height: 100vh; }
         .chat-tab-content { display: none; min-height: 100%; }
         .chat-tab-content.active { display: block; }
+
+        /* --- 角色聊天页面 (Chat Conversation View) - 仿微信布局 --- */
+        #chat-conversation-view {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #F8F8F8; 
+            z-index: 600;
+            display: flex; flex-direction: column;
+            transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+            background-size: cover; background-position: center;
+        }
+        #chat-conversation-view.active { transform: translateX(0); }
+
+        /* 1. 顶部导航栏 (角色聊天) */
+        .chat-conv-header {
+            padding: calc(env(safe-area-inset-top, 20px) + 5px) 15px 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: space-between;
+            border-radius: 0 0 35px 35px;
+            box-shadow: 0 5px 25px rgba(229, 138, 171, 0.15);
+            flex-shrink: 0; z-index: 20; height: 80px;
+        }
+        .chat-conv-back-btn { width: 32px; height: 32px; object-fit: contain; cursor: pointer; }
+        
+        .chat-conv-title-container {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; padding: 0 10px;
+        }
+        .chat-conv-title {
+            font-size: 17px; font-weight: 600; color: var(--theme-pink-text); 
+            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
+        }
+        .chat-conv-signature {
+            font-size: 11px; color: var(--theme-pink-text); opacity: 0.8;
+            margin-top: 2px; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .chat-conv-right-icon { 
+            width: 28px; height: 28px; cursor: pointer; object-fit: contain; 
+        }
+
+        /* 聊天内容区 */
+        .chat-conv-messages {
+            flex: 1; overflow-y: auto; padding: 20px 15px;
+            display: flex; flex-direction: column; gap: 18px;
+            /* 背景由父容器决定 */
+        }
+        .msg-bubble-row { display: flex; align-items: flex-end; width: 100%; gap: 8px; }
+        .msg-bubble-row.me { justify-content: flex-end; }
+        
+        /* 默认正方形头像 (8px圆角) */
+        .msg-bubble-avatar {
+            width: 38px; height: 38px; border-radius: 8px; object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;
+        }
+        
+        .msg-bubble-content {
+            max-width: 70%; padding: 12px 16px; font-size: 15px; line-height: 1.5;
+            position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            word-wrap: break-word;
+        }
+        /* 对方气泡 */
+        .msg-bubble-row.them .msg-bubble-content {
+            background: #FFFFFF; color: #333;
+            border-radius: 18px 18px 18px 4px;
+        }
+        /* 我方气泡 */
+        .msg-bubble-row.me .msg-bubble-content {
+            background: var(--theme-pink-text); color: white;
+            border-radius: 18px 18px 4px 18px;
+        }
+        .msg-time-stamp {
+            font-size: 11px; color: #ccc; text-align: center; margin: 5px 0;
+        }
+
+        /* 2. 底部输入栏 (角色聊天) */
+        .chat-conv-footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)) 12px;
+            display: flex; align-items: center; gap: 10px;
+            border-radius: 35px 35px 0 0;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.04);
+            flex-shrink: 0; z-index: 20;
+        }
+        
+        .chat-conv-btn {
+            width: 42px; height: 42px; border-radius: 50%;
+            background-color: var(--theme-pink-btn);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; border: none; outline: none;
+            box-shadow: 0 3px 8px rgba(229, 138, 171, 0.3);
+            transition: transform 0.1s; flex-shrink: 0;
+        }
+        .chat-conv-btn:active { transform: scale(0.92); }
+        .chat-conv-btn img {
+            filter: brightness(0) invert(1); 
+            pointer-events: none;
+        }
+
+        .chat-conv-input-wrapper { flex: 1; height: 42px; position: relative; }
+        .chat-conv-input {
+            width: 100%; height: 100%;
+            border-radius: 25px;
+            background-color: #F5F5F7; border: none; outline: none;
+            padding: 0 20px; font-size: 16px; color: #333;
+            transition: background-color 0.2s;
+        }
+        /* 修复：输入框聚焦不变色 (保持原色或白色) */
+        .chat-conv-input:focus { background-color: #F5F5F7; border: 1px solid rgba(229, 138, 171, 0.3); }
+
+        /* --- 角色设置页面 (Role Settings Page) --- */
+        #role-settings-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--theme-pink-bg-light);
+            z-index: 700;
+            display: flex; flex-direction: column; align-items: center;
+            transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+            overflow-y: auto; padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 40px;
+        }
+        #role-settings-page.active { transform: translateX(0); }
+        
+        .role-setting-close-area { width: 100%; display: flex; justify-content: flex-start; margin-bottom: 10px; flex-shrink: 0; }
+        .role-setting-back-btn { width: 30px; height: 30px; cursor: pointer; object-fit: contain; }
+        
+        .settings-section-card {
+            width: 100%; max-width: 500px;
+            background: white; border-radius: 20px;
+            padding: 20px; box-shadow: 0 4px 15px rgba(245, 179, 201, 0.2);
+            margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .settings-card-title {
+            font-size: 15px; font-weight: 600; color: var(--theme-pink-text);
+            width: 100%; text-align: left; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px;
+        }
+
+        .role-avatar-edit-wrapper { 
+            position: relative; width: 70px; height: 70px; margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(229, 138, 171, 0.2); border-radius: 50%;
+        }
+        .role-avatar-edit { 
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover; 
+            border: 3px solid white; cursor: pointer;
+        }
+        .avatar-edit-hint {
+            position: absolute; bottom: -2px; right: -2px; background: var(--theme-pink-btn); color: white;
+            width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 12px; border: 2px solid white; pointer-events: none;
+        }
+
+        .role-alias-edit {
+            font-size: 18px; font-weight: 600; color: #333; border: none; background: transparent;
+            text-align: center; margin-bottom: 5px; border-bottom: 2px solid transparent;
+            padding: 5px; outline: none; width: 80%; transition: border-color 0.2s;
+        }
+        .role-alias-edit:focus { border-bottom-color: var(--theme-pink-btn); }
+
+        .role-signature-edit {
+             font-size: 13px; color: var(--theme-pink-text); border: none; background: transparent;
+             text-align: center; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0;
+             padding: 4px; outline: none; width: 90%;
+        }
+        .role-signature-edit:focus { border-bottom-color: var(--theme-pink-btn); }
+        
+        /* 统一的输入框样式 */
+        .role-persona-input, .role-css-input {
+            width: 100%; height: 80px;
+            border: 1px solid #eee; border-radius: 12px;
+            padding: 10px; font-size: 14px; line-height: 1.4; outline: none; resize: none;
+            background-color: #FAFAFA; color: #444; font-family: inherit; margin-bottom: 10px;
+        }
+        .role-persona-input:focus, .role-css-input:focus { background-color: white; border-color: var(--theme-pink-btn); }
+        
+        .role-css-input {
+            height: 120px; font-family: monospace; font-size: 12px; /* 保持CSS输入框的代码字体，但颜色改为浅色 */
+        }
+        .role-css-input::placeholder { color: #999; }
+
+        .role-bg-upload-area {
+            width: 100%; margin-top: 15px; display: flex; align-items: center; justify-content: space-between;
+            padding: 10px; background: #f9f9f9; border-radius: 10px;
+        }
+        .role-bg-preview {
+            width: 40px; height: 60px; border-radius: 6px; background-color: #eee;
+            background-size: cover; background-position: center; border: 1px solid #ddd;
+        }
+        .role-bg-btn {
+            font-size: 13px; padding: 6px 12px; border-radius: 15px; border: none;
+            background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); cursor: pointer;
+        }
+
+        .user-avatar-row { display: flex; align-items: center; width: 100%; margin-bottom: 15px; gap: 15px; }
+        .user-avatar-edit-wrapper { 
+            position: relative; width: 60px; height: 60px; flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; cursor: pointer;
+        }
+        .user-name-input {
+            flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 10px;
+            font-size: 15px; outline: none; background: #FAFAFA;
+        }
+        .user-name-input:focus { background: white; border-color: var(--theme-pink-btn); }
+
+        .role-save-btn {
+            width: 100%; max-width: 300px; padding: 15px;
+            background-color: var(--theme-pink-btn);
+            color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: 600;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(245, 179, 201, 0.4);
+            transition: transform 0.1s; margin-top: 10px;
+        }
+        .role-save-btn:active { transform: scale(0.96); }
+
+        .role-delete-btn {
+            font-size: 14px; color: #F44336; margin-top: 20px; background: transparent; border: none;
+            text-decoration: underline; cursor: pointer; padding: 10px; font-weight: 500;
+        }
+
+
+        /* --- Chat List (Tab 0) & Contact List (Tab 1) Styles --- */
+        .chat-list-container { width: 100%; }
+        .chat-list-item { display: flex; align-items: center; padding: 12px 20px; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: background-color 0.2s; margin-bottom: 1px; }
+        .chat-list-item:active { background-color: #f0f0f0; }
+        .chat-list-avatar { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; margin-right: 15px; background-color: #eee; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .chat-list-info { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+        .chat-list-name { font-size: 16px; color: #111; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-list-msg { font-size: 13px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* 通讯录专用样式 */
+        .contact-list-container { width: 100%; padding-bottom: 80px; padding-right: 25px; /* Leave space for index bar */ }
+        .contact-section-title {
+            padding: 8px 20px; font-size: 13px; font-weight: 600; color: #999;
+            background-color: #f7f7f7; position: sticky; top: 0; z-index: 5;
+            scroll-margin-top: 70px;
+        }
+        .contact-item {
+            display: flex; align-items: center; padding: 10px 20px; background: white;
+            border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: background 0.2s;
+        }
+        .contact-item:active { background-color: #f0f0f0; }
+        .contact-avatar { width: 42px; height: 42px; border-radius: 10px; margin-right: 15px; object-fit: cover; background: #eee; }
+        .contact-name { font-size: 16px; font-weight: 500; color: #333; margin-bottom: 0; }
+        .contact-signature { font-size: 12px; color: #E58AAB; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%; margin-top: 2px; }
+        .contact-signature:empty { display: none; margin-top: 0; }
+        .pinned-tag { display: none; margin-left: auto; font-size: 12px; color: orange; }
+        .contact-item.pinned .pinned-tag { display: block; }
+        
+        /* 字母索引条 */
+        .alpha-index-bar {
+            position: fixed; right: 5px; top: 120px; bottom: 100px;
+            width: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 20; color: #aaa; font-size: 10px; font-weight: 600;
+        }
+        .alpha-index-item {
+            flex: 1; width: 100%; display: flex; justify-content: center; align-items: center;
+            border-radius: 50%; cursor: pointer; transition: color 0.2s;
+        }
+        .alpha-index-item:active { color: var(--theme-pink-text); background-color: rgba(0,0,0,0.03); }
+        
+        .chat-placeholder-text { color: #E58AAB; text-align: center; padding-top: 50%; font-size: 16px; font-weight: 500; width: 100%; }
 
         /* --- Me Page 重构样式 --- */
         .me-page-container { width: 100%; display: flex; flex-direction: column; height: auto; max-height: 100vh; }
@@ -303,119 +546,80 @@
 
         /* --- Wallet App Style --- */
         #wallet-app-page {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: #FDF6F9;
-            z-index: 550;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #FDF6F9; z-index: 550;
             display: flex; flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
         body.wallet-active #wallet-app-page { transform: translateY(0); }
         
         .wallet-header {
             padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
             display: flex; align-items: center; justify-content: space-between;
-            background-color: transparent;
-            flex-shrink: 0;
+            background-color: transparent; flex-shrink: 0;
         }
-        .wallet-user-area {
-            display: flex; align-items: center;
-        }
+        .wallet-user-area { display: flex; align-items: center; }
         .wallet-avatar {
             width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
             margin-right: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border: 2px solid white; cursor: pointer;
         }
-        .wallet-nickname {
-            font-size: 16px; font-weight: 600; color: #333; cursor: pointer;
-        }
+        .wallet-nickname { font-size: 16px; font-weight: 600; color: #333; cursor: pointer; }
         .wallet-close-btn {
             font-size: 14px; font-weight: 600; color: #999;
             background: rgba(255,255,255,0.5); padding: 8px 16px; border-radius: 20px;
             cursor: pointer; backdrop-filter: blur(5px);
         }
-
         .wallet-content {
             flex: 1; padding: 10px 20px 30px; overflow-y: auto;
             display: flex; flex-direction: column; gap: 20px;
         }
-        
-        /* 核心余额卡片 */
         .wallet-balance-card {
-            background: var(--wallet-gradient);
-            border-radius: 24px;
-            padding: 30px 25px;
-            color: white;
-            box-shadow: var(--wallet-card-shadow);
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: var(--wallet-gradient); border-radius: 24px; padding: 30px 25px;
+            color: white; box-shadow: var(--wallet-card-shadow); position: relative;
+            overflow: hidden; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
             min-height: 180px;
         }
         .wallet-balance-card::after {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-            pointer-events: none;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%); pointer-events: none;
         }
         .wallet-balance-label { font-size: 14px; opacity: 0.9; margin-bottom: 10px; font-weight: 500; }
         .wallet-balance-amount { font-size: 42px; font-weight: 700; letter-spacing: 0.5px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        /* 收支统计行 */
-        .wallet-stats-row {
-            display: flex; gap: 15px;
-        }
+        .wallet-stats-row { display: flex; gap: 15px; }
         .wallet-stat-box {
-            flex: 1; background: white; border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            display: flex; flex-direction: column;
+            flex: 1; background: white; border-radius: 20px; padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column;
         }
         .wallet-stat-label { font-size: 13px; color: #888; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
         .wallet-stat-label.in::before { content: '↓'; color: var(--success-green); font-weight: bold; }
         .wallet-stat-label.out::before { content: '↑'; color: var(--error-red); font-weight: bold; }
         .wallet-stat-val { font-size: 18px; font-weight: 600; color: #333; }
-        
-        /* 操作按钮 */
         .wallet-actions { display: flex; gap: 15px; }
         .wallet-btn {
             flex: 1; padding: 15px; border-radius: 18px; border: none;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            transition: transform 0.1s;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.1s;
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
         .wallet-btn:active { transform: scale(0.98); }
         .wallet-btn.income { background-color: rgba(76, 175, 80, 0.1); color: var(--success-green); }
         .wallet-btn.expense { background-color: rgba(244, 67, 54, 0.1); color: var(--error-red); }
-        
-        /* 明细列表 */
         .wallet-list-container {
-            flex: 1; background: white; border-radius: 24px;
-            padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-            min-height: 200px; display: flex; flex-direction: column;
+            flex: 1; background: white; border-radius: 24px; padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02); min-height: 200px; display: flex; flex-direction: column;
         }
         .wallet-list-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f9f9f9;
         }
         .wallet-list-title { font-size: 16px; font-weight: 600; color: #333; }
-        .wallet-month-badge {
-            background: #f0f0f0; padding: 4px 10px; border-radius: 12px;
-            font-size: 12px; color: #666;
-        }
-        
+        .wallet-month-badge { background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #666; }
         .wallet-items-scroll { flex: 1; overflow-y: auto; }
-        .wallet-item {
-            display: flex; align-items: center; padding: 12px 0;
-            border-bottom: 1px solid #f9f9f9;
-        }
+        .wallet-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
         .wallet-item:last-child { border-bottom: none; }
         .wallet-item-icon {
-            width: 40px; height: 40px; border-radius: 12px;
-            background: #FDF6F9; display: flex; justify-content: center; align-items: center;
-            font-size: 20px; margin-right: 12px;
+            width: 40px; height: 40px; border-radius: 12px; background: #FDF6F9;
+            display: flex; justify-content: center; align-items: center; font-size: 20px; margin-right: 12px;
         }
         .wallet-item-info { flex: 1; }
         .wallet-item-cat { font-size: 15px; color: #333; font-weight: 500; margin-bottom: 4px; }
@@ -435,47 +639,23 @@
         }
         #wallet-add-modal.active { opacity: 1; pointer-events: auto; }
         .wallet-add-card {
-            background: white; width: 85%; max-width: 320px;
-            border-radius: 24px; padding: 25px;
+            background: white; width: 85%; max-width: 320px; border-radius: 24px; padding: 25px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #wallet-add-modal.active .wallet-add-card { transform: scale(1); }
         .wallet-modal-title { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 20px; color: #333; }
         .wallet-input-group { margin-bottom: 15px; }
-        .wallet-input {
-            width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #eee;
-            background: #f9f9f9; font-size: 16px; outline: none;
-        }
+        .wallet-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #eee; background: #f9f9f9; font-size: 16px; outline: none; }
         .wallet-input:focus { background: white; border-color: var(--theme-pink-text); }
-        .wallet-type-select {
-            display: flex; gap: 10px; margin-bottom: 20px;
-        }
+        .wallet-type-select { display: flex; gap: 10px; margin-bottom: 20px; }
         .wallet-type-btn {
-            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #eee;
-            background: #fff; color: #666; font-size: 14px; cursor: pointer;
-            transition: all 0.2s;
+            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #eee; background: #fff; color: #666; font-size: 14px; cursor: pointer; transition: all 0.2s;
         }
         .wallet-type-btn.active.in { background: rgba(76, 175, 80, 0.1); border-color: var(--success-green); color: var(--success-green); font-weight: 600; }
         .wallet-type-btn.active.out { background: rgba(244, 67, 54, 0.1); border-color: var(--error-red); color: var(--error-red); font-weight: 600; }
-        .wallet-confirm-btn {
-            width: 100%; padding: 14px; background: var(--theme-pink-text); color: white;
-            border: none; border-radius: 15px; font-size: 16px; font-weight: 600; cursor: pointer;
-        }
-        .wallet-cancel-btn {
-            width: 100%; padding: 10px; background: transparent; color: #999;
-            border: none; margin-top: 10px; cursor: pointer; font-size: 14px;
-        }
-
-        /* 聊天列表样式 (复用) */
-        .chat-list-container { width: 100%; }
-        .chat-list-item { display: flex; align-items: center; padding: 12px 20px; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: background-color 0.2s; margin-bottom: 1px; }
-        .chat-list-item:active { background-color: #f0f0f0; }
-        .chat-list-avatar { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; margin-right: 15px; background-color: #eee; flex-shrink: 0; }
-        .chat-list-info { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
-        .chat-list-name { font-size: 16px; color: #111; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chat-list-msg { font-size: 13px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chat-placeholder-text { color: #E58AAB; text-align: center; padding-top: 50%; font-size: 16px; font-weight: 500; }
+        .wallet-confirm-btn { width: 100%; padding: 14px; background: var(--theme-pink-text); color: white; border: none; border-radius: 15px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .wallet-cancel-btn { width: 100%; padding: 10px; background: transparent; color: #999; border: none; margin-top: 10px; cursor: pointer; font-size: 14px; }
 
         /* --- 添加好友弹窗样式 --- */
         #add-friend-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 600; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(5px); }
@@ -492,8 +672,21 @@
         .add-friend-input { width: 100%; padding: 12px 15px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 12px; margin-bottom: 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
         .add-friend-input:focus { border-color: var(--theme-pink-text); background-color: white; }
 
+        /* --- 删除好友弹窗 --- */
+        #delete-confirm-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 800; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        #delete-confirm-modal.active { opacity: 1; pointer-events: auto; }
+        .delete-card { background: white; width: 80%; max-width: 280px; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(0.9); transition: transform 0.2s; }
+        #delete-confirm-modal.active .delete-card { transform: scale(1); }
+        .delete-card-title { font-size: 16px; font-weight: 500; color: #333; margin-bottom: 25px; }
+        .delete-card-actions { display: flex; justify-content: space-around; gap: 10px; }
+        .delete-card-btn { flex: 1; padding: 10px 0; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-cancel { background: #f0f0f0; color: #666; }
+        .btn-confirm-delete { background: #ffebee; color: #F44336; }
+
+
         /* --- 纯平面长椭圆底栏 (Chat App) --- */
-        .chat-bottom-bar-container { position: fixed; bottom: calc(env(safe-area-inset-bottom, 20px) + 15px); left: 50%; transform: translateX(-50%); width: 90%; max-width: 380px; height: 64px; background-color: #FFFFFF; border-radius: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.03); display: flex; justify-content: space-evenly; align-items: center; z-index: 501; }
+        .chat-bottom-bar-container { position: fixed; bottom: calc(env(safe-area-inset-bottom, 20px) + 15px); left: 50%; transform: translateX(-50%); width: 90%; max-width: 380px; height: 64px; background-color: #FFFFFF; border-radius: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.03); display: flex; justify-content: space-evenly; align-items: center; 
+        z-index: 501; }
         .chat-nav-item { flex: 1; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0.5; transition: opacity 0.2s ease; }
         .chat-nav-item.active { opacity: 1; }
         .chat-nav-icon { width: 28px; height: 28px; object-fit: contain; pointer-events: none; }
@@ -534,12 +727,12 @@
         .app-icon-input { display: flex; gap: 8px; }
         .app-icon-input input { flex: 1; min-width: 0; padding: 6px 8px; font-size: 12px; }
         .app-icon-input button { padding: 6px 12px; width: auto; font-size: 12px; background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); border: none; }
-        
+
         #toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background-color: rgba(255, 230, 240, 0.98); color: #E58AAB; padding: 15px 25px; border-radius: 20px; font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; max-width: 80%; }
         #toast-notification.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         .file-input-hidden { display: none; }
-        
-        /* AI Chat UI */
+
+        /* AI Chat UI (保留功能，但使用新页面交互) */
         #ai-chat-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #ai-chat-modal.active { opacity: 1; pointer-events: all; }
         #ai-chat-container { width: 90%; max-width: 500px; height: 80%; background-color: white; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -554,6 +747,189 @@
         .chat-input-area { padding: 12px 15px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #f0f0f0; display: flex; gap: 10px; background-color: white; }
         .chat-input-area input { flex: 1; padding: 10px 15px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 20px; font-size: 14px; outline: none; }
         .chat-input-area button { padding: 0 18px; background-color: var(--theme-pink-text); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; }
+
+        /* --- World Book App Styles (MODIFIED) --- */
+        #worldbook-app-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--theme-pink-bg-soft);
+            z-index: 550;
+            display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        body.worldbook-active #worldbook-app-page { transform: translateY(0); }
+        
+        .wb-header {
+            padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: white; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-radius: 0 0 25px 25px; z-index: 10;
+        }
+        /* New class for the back button image */
+        .wb-back-btn-img {
+            width: 30px; height: 30px; object-fit: contain; cursor: pointer;
+        }
+        .wb-title { font-size: 18px; font-weight: 600; color: var(--theme-pink-title); letter-spacing: 0.5px; }
+        .wb-header-actions { display: flex; align-items: center; gap: 15px; }
+        .wb-action-icon { width: 24px; height: 24px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+        .wb-action-icon:hover { opacity: 1; }
+        .wb-add-btn { font-size: 28px; color: var(--wb-plus-btn); cursor: pointer; line-height: 1; font-weight: 300; }
+        
+        .wb-content {
+            flex: 1; padding: 20px; overflow-y: auto;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 20px; align-content: start;
+        }
+        .wb-book-item {
+            display: flex; flex-direction: column; align-items: center; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .wb-book-item:active { transform: scale(0.95); }
+        
+        .wb-book-cover {
+            width: 90px; height: 120px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #EAEAEA 100%); /* Default background */
+            border-radius: 4px 8px 8px 4px;
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.1), inset 4px 0 10px rgba(0,0,0,0.05);
+            display: flex; justify-content: center; align-items: center; padding: 10px;
+            position: relative; overflow: hidden; border: 1px solid rgba(0,0,0,0.08);
+            transition: background 0.3s;
+        }
+        .wb-book-cover::before {
+            content: ''; position: absolute; left: 4px; top: 0; width: 2px; height: 100%;
+            background: rgba(0,0,0,0.05); box-shadow: 2px 0 0 rgba(0,0,0,0.05);
+        }
+        .wb-book-name { font-size: 13px; font-weight: 600; color: #555; text-align: center; word-break: break-all; line-height: 1.4; }
+
+        /* World Book Add Modal (MODIFIED) */
+        #worldbook-add-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 600; backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #worldbook-add-modal.active { opacity: 1; pointer-events: auto; }
+        .wb-modal-card {
+            background: var(--theme-pink-bg-soft);
+            width: 90%; max-width: 380px;
+            border-radius: 20px; padding: 25px;
+            box-shadow: 0 8px 30px rgba(229, 138, 171, 0.25);
+            max-height: 85vh; display: flex; flex-direction: column;
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #worldbook-add-modal.active .wb-modal-card { transform: scale(1); }
+        .wb-modal-header { font-size: 17px; font-weight: 600; color: var(--theme-pink-text); text-align: center; margin-bottom: 20px; flex-shrink: 0; }
+        
+        .wb-modal-scroll-area { flex: 1; overflow-y: auto; margin: -10px -10px 15px; padding: 10px 10px 0; }
+        
+        .wb-input-label { font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 600; padding-left: 5px; }
+        .wb-main-input { width: 100%; padding: 12px; border: 1px solid #FADBE6; background: #fff; border-radius: 12px; outline: none; font-size: 15px; margin-bottom: 15px; }
+        .wb-main-input:focus { border-color: var(--theme-pink-btn); box-shadow: 0 0 0 2px rgba(245, 179, 201, 0.3); }
+
+        .wb-entry-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #FADBE6;
+        }
+        .wb-entry-input {
+            width: 100%; border: none; background: #f9f9f9;
+            border-radius: 8px; padding: 10px; font-size: 14px;
+            outline: none; transition: all 0.2s;
+        }
+        .wb-entry-input.val { min-height: 120px; resize: vertical; line-height: 1.5; }
+        .wb-entry-input:focus { background: white; border-color: var(--theme-pink-btn); box-shadow: 0 0 0 2px rgba(245, 179, 201, 0.3); }
+        
+        .wb-plus-row-btn {
+            width: 100%; padding: 10px; margin-top: 15px; border: 2px dashed #FDCEDF; background: transparent;
+            color: var(--theme-pink-btn); border-radius: 12px; cursor: pointer; font-size: 22px; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .wb-plus-row-btn:active { background: rgba(253, 206, 223, 0.3); }
+        
+        .wb-modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px; flex-shrink: 0; }
+        .wb-action-btn { padding: 10px 25px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; }
+        .wb-btn-cancel { background: transparent; color: #aaa; }
+        .wb-btn-ok { background: var(--theme-pink-btn); color: white; box-shadow: 0 4px 10px rgba(245, 179, 201, 0.4); }
+
+        /* World Book Detail View Modal (MODIFIED) */
+        #worldbook-detail-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--theme-pink-bg-soft); z-index: 650;
+            display: flex; flex-direction: column;
+            transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        #worldbook-detail-modal.active { transform: translateX(0); }
+        .wb-detail-header {
+             padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
+             display: flex; align-items: center; gap: 15px; background: white;
+             box-shadow: 0 2px 10px rgba(0,0,0,0.05); flex-shrink: 0;
+        }
+        .wb-detail-back { font-size: 24px; color: #333; cursor: pointer; }
+        .wb-detail-title { flex: 1; font-size: 18px; font-weight: 600; color: var(--theme-pink-text); }
+        .wb-delete-book-btn {
+            background-color: var(--theme-pink-btn); color: white;
+            padding: 6px 16px; border-radius: 15px; border: none; font-size: 14px;
+            font-weight: 500; cursor: pointer; transition: opacity 0.2s; white-space: nowrap;
+        }
+        .wb-delete-book-btn:active { opacity: 0.8; }
+        
+        .wb-detail-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .wb-detail-item {
+            margin-bottom: 15px; background: white; border-radius: 12px;
+            padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            display: flex; flex-direction: column;
+        }
+        .wb-detail-item-content { flex: 1; }
+        .wb-detail-key { font-size: 13px; color: #999; font-weight: 500; margin-bottom: 6px; }
+        .wb-detail-val { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+
+        /* New styles for editing entries */
+        .wb-detail-item-actions { display: flex; gap: 10px; align-self: flex-end; margin-top: 15px; }
+        .wb-detail-item-actions button {
+            background: #f0f0f0; border: none; border-radius: 8px; padding: 5px 12px;
+            font-size: 12px; color: #666; cursor: pointer;
+        }
+        .wb-detail-item-actions button.save { background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); }
+        .wb-detail-item .edit-form textarea { min-height: 80px; }
+
+
+        /* World Book Color Settings Page (NEW) */
+        #worldbook-color-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--theme-pink-bg-light); z-index: 700;
+            display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        #worldbook-color-page.active { transform: translateY(0); }
+        .wb-color-header {
+            padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: white; flex-shrink: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .wb-color-title { font-size: 18px; font-weight: 600; color: var(--theme-pink-text); }
+        .wb-color-save-btn {
+            background-color: var(--theme-pink-btn); color: white; border: none; border-radius: 15px;
+            padding: 8px 20px; font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .wb-color-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .wb-color-item {
+            background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .wb-color-item-name { font-size: 15px; color: #333; flex: 1; }
+        .wb-color-input {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            width: 40px; height: 40px; background: none; border: none;
+            cursor: pointer; padding: 0; border-radius: 8px;
+        }
+        .wb-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .wb-color-input::-webkit-color-swatch { border: 1px solid #ddd; border-radius: 8px; }
+        .wb-color-input::-moz-color-swatch { border: 1px solid #ddd; border-radius: 8px; }
+
     </style>
 </head>
 <body>
@@ -566,19 +942,34 @@
         </div>
     </div>
     <div id="grid-area">
-        <div class="grid-quadrant" id="custom-image-quadrant">
-            <div class="widget-base">
-                <img id="custom-image-display" src="" alt="Custom Image">
-                <div class="add-hint" id="custom-image-hint">+</div>
+        <div class="grid-quadrant" id="avatar-quadrant-1">
+            <div id="chat-dual-container">
+                <div class="chat-row left">
+                    <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-1')">
+                        <div class="avatar-ring">
+                            <div class="avatar-img-circle" id="chat-avatar-1" style="background-image: url('https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');"></div>
+                        </div>
+                    </div>
+                    <input type="text" class="chat-bubble-input left-bubble" value="Say Hi~" oninput="adjustInputWidth(this)">
+                </div>
+                <div class="chat-row right">
+                    <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-2')">
+                        <div class="avatar-ring">
+                            <div class="avatar-img-circle" id="chat-avatar-2" style="background-image: url('https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png');"></div>
+                        </div>
+                    </div>
+                    <input type="text" class="chat-bubble-input right-bubble" value="Hello!" oninput="adjustInputWidth(this)">
+                </div>
             </div>
         </div>
+
         <div class="grid-quadrant">
             <div class="app-group-2x2">
                 <div class="app-item" onclick="openChatApp()">
                     <div class="app-icon" id="icon-app1">☁️</div>
                     <span class="app-name" data-app-name="Chat">Chat</span>
                 </div>
-                <div class="app-item"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
+                <div class="app-item" onclick="openWorldBookApp()"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
                 <div class="app-item"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="提醒">提醒</span></div>
                 <div class="app-item"><div class="app-icon" id="icon-app4">📸</div><span class="app-name" data-app-name="相册">相册</span></div>
             </div>
@@ -588,12 +979,18 @@
                 <div class="app-item"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
                 <div class="app-item"><div class="app-icon" id="icon-app6">🎮</div><span class="app-name" data-app-name="pxx">pxx</span></div>
                 <div class="app-item"><div class="app-icon" id="icon-app7">📅</div><span class="app-name" data-app-name="日历">日历</span></div>
-                <!-- Wallet App Icon with OnClick -->
                 <div class="app-item" onclick="openWalletApp()"><div class="app-icon" id="icon-app8">💰</div><span class="app-name" data-app-name="Wallet">Wallet</span></div>
             </div>
         </div>
-        <div class="grid-quadrant">
-            <div class="widget-base" id="widget-square"></div>
+
+        <div class="grid-quadrant" id="photo-widget-quadrant">
+            <div class="photo-widget-container" onclick="triggerPhotoWidgetUpload()">
+                <div id="photo-widget-placeholder" class="photo-widget-placeholder">
+                    <div class="photo-widget-icon">📷</div>
+                    <div class="photo-widget-text">Add Photo</div>
+                </div>
+                <img id="photo-widget-img" class="photo-widget-img" src="">
+            </div>
         </div>
     </div>
     <div id="dock-area">
@@ -621,13 +1018,19 @@
             </div>
         </div>
         <div id="chat-tab-1" class="chat-tab-content">
-            <div class="chat-placeholder-text">通讯录为空</div>
+            <div class="contact-list-container" id="contact-list-container">
+                 <!-- 动态生成通讯录 -->
+                <div class="chat-placeholder-text">通讯录为空</div>
+            </div>
+            <!-- 字母索引条 -->
+            <div class="alpha-index-bar" id="alpha-index-bar">
+                <!-- A-Z -->
+            </div>
         </div>
         <div id="chat-tab-2" class="chat-tab-content">
             <div class="chat-placeholder-text">朋友圈暂无动态</div>
         </div>
         
-        <!-- Me (个人主页) 标签 -->
         <div id="chat-tab-3" class="chat-tab-content">
             <div class="me-page-container">
                 <div class="me-cover-area" id="profile-cover">
@@ -639,7 +1042,6 @@
                         <img src="https://img.heliar.top/file/1770083061419_设置_setting-two.png" class="me-setting-icon" onclick="openMeSettings()">
                     </div>
                 </div>
-
                 <div class="me-content-area">
                     <div class="me-floating-header">
                         <div class="me-avatar-box">
@@ -650,7 +1052,6 @@
                             <div class="me-qq-id" id="profile-qq-id" onclick="editQQID(event)">QQ: 20261314520</div>
                         </div>
                     </div>
-
                     <div class="me-info-list">
                         <div class="me-list-item" onclick="editSignature()">
                             <img class="me-list-icon" src="https://img.heliar.top/file/1770081937488_人员_people.png">
@@ -660,9 +1061,7 @@
                         <div class="me-list-item">
                             <img id="me-member-icon-main" class="me-list-icon" src="https://img.heliar.top/file/1770081928967_vip_vip-one.png">
                             <div class="me-list-text">
-                                <div id="me-member-icon-container" class="me-member-icons-row">
-                                    <!-- 动态生成的8个图标将放在这里 -->
-                                </div>
+                                <div id="me-member-icon-container" class="me-member-icons-row"></div>
                             </div>
                             <div class="me-list-arrow">＞</div>
                         </div>
@@ -676,7 +1075,6 @@
             </div>
         </div>
     </div>
-
     <div class="chat-bottom-bar-container">
         <div class="chat-nav-item active" onclick="switchChatTab(0, 'Chat')">
             <img src="https://img.heliar.top/file/1770068139630_信息_message_3.png" class="chat-nav-icon">
@@ -691,7 +1089,98 @@
             <img src="https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png" class="chat-nav-icon">
         </div>
     </div>
+
+    <!-- 角色聊天专属页面 (Overlay) -->
+    <div id="chat-conversation-view">
+        <div class="chat-conv-header">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="chat-conv-back-btn" onclick="closeChatConversation()">
+            <div class="chat-conv-title-container">
+                <div class="chat-conv-title" id="chat-conv-title">角色名称</div>
+                <div class="chat-conv-signature" id="chat-conv-signature"></div>
+            </div>
+            <!-- 修改后的右上角更多图标 -->
+            <img class="chat-conv-right-icon" src="https://img.heliar.top/file/1770241189848_更多_more.png" onclick="openRoleSettings()">
+        </div>
+        <div class="chat-conv-messages" id="chat-conv-messages">
+            <!-- 动态生成消息 -->
+        </div>
+        <div class="chat-conv-footer">
+            <!-- 图标1：开关/语音 -->
+            <button class="chat-conv-btn">
+                <img src="https://img.heliar.top/file/1770239041392_开关_power.png" style="width: 24px; height: 24px; object-fit: contain;">
+            </button>
+            
+            <!-- 输入框 -->
+            <div class="chat-conv-input-wrapper">
+                <input type="text" class="chat-conv-input" id="chat-conv-input" placeholder="输入消息...">
+            </div>
+            
+            <!-- 修复：图标2：更多/加号 (填补空缺，确保发送是第三个图片) -->
+            <button class="chat-conv-btn" style="margin-right: 0;">
+                <img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;">
+            </button>
+            
+             <!-- 图标3：发送按钮 -->
+            <button class="chat-conv-btn send" onclick="sendConversationMessage()">
+                <img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;">
+            </button>
+        </div>
+    </div>
 </div>
+
+<!-- 角色设置页面 (新设计) -->
+<div id="role-settings-page">
+    <div class="role-setting-close-area">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="role-setting-back-btn" onclick="closeRoleSettings()">
+    </div>
+    
+    <!-- 角色设置卡片 -->
+    <div class="settings-section-card">
+        <div class="settings-card-title">角色设置 (Role)</div>
+        <div class="role-avatar-edit-wrapper" onclick="triggerRoleAvatarEdit()">
+            <img id="role-setting-avatar" class="role-avatar-edit" src="">
+            <div class="avatar-edit-hint">✎</div>
+        </div>
+        <input type="text" id="role-setting-alias" class="role-alias-edit" placeholder="备注名">
+        <input type="text" id="role-setting-signature" class="role-signature-edit" placeholder="角色签名...">
+        
+        <textarea id="role-setting-persona" class="role-persona-input" placeholder="输入角色人设 (Persona)..."></textarea>
+        
+        <div class="role-bg-upload-area">
+            <span style="font-size:13px; color:#555;">聊天背景</span>
+            <div id="role-bg-preview" class="role-bg-preview"></div>
+            <button class="role-bg-btn" onclick="triggerRoleBgUpload()">上传</button>
+        </div>
+    </div>
+
+    <!-- 用户设置卡片 -->
+    <div class="settings-section-card">
+        <div class="settings-card-title">用户设置 (User)</div>
+        <div class="user-avatar-row">
+            <div class="user-avatar-edit-wrapper" onclick="triggerRoleUserAvatarEdit()">
+                <img id="role-user-avatar" class="role-avatar-edit" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png">
+                <div class="avatar-edit-hint">✎</div>
+            </div>
+            <input type="text" id="role-user-name" class="user-name-input" placeholder="您的名字">
+        </div>
+        <textarea id="role-user-persona" class="role-persona-input" placeholder="输入您的人设 (User Persona)..."></textarea>
+    </div>
+    
+    <!-- 新增：自定义 CSS 样式 -->
+    <div class="settings-section-card">
+        <div class="settings-card-title">自定义样式 (CSS)</div>
+        <!-- 样式修改：浅色背景 -->
+        <textarea id="role-setting-css" class="role-css-input" placeholder="/* 在这里输入CSS代码修改气泡样式 */
+.msg-bubble-row.them .msg-bubble-content {
+  border-radius: 20px 20px 20px 0;
+  background: #fff;
+}"></textarea>
+    </div>
+    
+    <button class="role-save-btn" onclick="saveRoleSettings()">保存设置</button>
+    <button class="role-delete-btn" onclick="confirmDeleteFriend()">删除好友</button>
+</div>
+
 
 <!-- Wallet App 页面 -->
 <div id="wallet-app-page">
@@ -704,13 +1193,11 @@
     </div>
     
     <div class="wallet-content">
-        <!-- 核心余额卡片 -->
         <div class="wallet-balance-card">
             <div class="wallet-balance-label">总余额 (CNY)</div>
             <div class="wallet-balance-amount" id="wallet-total-balance">0.00</div>
         </div>
         
-        <!-- 收入/支出统计 -->
         <div class="wallet-stats-row">
             <div class="wallet-stat-box">
                 <div class="wallet-stat-label in">本月收入</div>
@@ -721,8 +1208,6 @@
                 <div class="wallet-stat-val" id="wallet-month-expense">0.00</div>
             </div>
         </div>
-
-        <!-- 记账按钮 -->
         <div class="wallet-actions">
             <button class="wallet-btn income" onclick="openWalletModal('income')">
                 <span>+</span> 记收入
@@ -731,20 +1216,83 @@
                 <span>-</span> 记支出
             </button>
         </div>
-
-        <!-- 明细列表 -->
         <div class="wallet-list-container">
             <div class="wallet-list-header">
                 <div class="wallet-list-title">本月明细</div>
                 <div class="wallet-month-badge" id="wallet-current-month">2月</div>
             </div>
             <div class="wallet-items-scroll" id="wallet-transaction-list">
-                <!-- 动态生成列表项 -->
                 <div class="wallet-empty">本月暂无收支记录</div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- World Book App Page (MODIFIED) -->
+<div id="worldbook-app-page">
+    <div class="wb-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="wb-back-btn-img" onclick="closeWorldBookApp()">
+        <div class="wb-title">世界书>៸៸៸< </div>
+        <div class="wb-header-actions">
+             <img src="https://img.heliar.top/file/1770251413162_颜色滤镜_color-filter.png" class="wb-action-icon" onclick="openWorldBookColorSettings()">
+            <div class="wb-add-btn" onclick="openWorldBookAddModal()">+</div>
+        </div>
+    </div>
+    <div class="wb-content" id="worldbook-list">
+        <!-- JS 动态生成世界书列表 -->
+    </div>
+</div>
+
+<!-- World Book Add Modal (MODIFIED) -->
+<div id="worldbook-add-modal">
+    <div class="wb-modal-card">
+        <div class="wb-modal-header">添加世界书</div>
+        <div class="wb-modal-scroll-area">
+            <div class="wb-input-label">世界书名</div>
+            <input type="text" id="wb-title-input" class="wb-main-input" placeholder="输入世界书名称...">
+            
+            <div id="wb-dynamic-entries">
+                <!-- 动态词条行 -->
+                <div class="wb-entry-row wb-dynamic-row">
+                    <input type="text" class="wb-entry-input key" placeholder="名称（可选）">
+                    <textarea class="wb-entry-input val" placeholder="世界书内容"></textarea>
+                </div>
+            </div>
+            
+            <button class="wb-plus-row-btn" onclick="addWorldBookEntryRow()">+</button>
+        </div>
+        
+        <div class="wb-modal-actions">
+            <button class="wb-action-btn wb-btn-cancel" onclick="closeWorldBookAddModal()">取消</button>
+            <button class="wb-action-btn wb-btn-ok" onclick="saveWorldBook()">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- World Book Detail Modal (MODIFIED) -->
+<div id="worldbook-detail-modal">
+    <div class="wb-detail-header">
+        <div class="wb-detail-back" onclick="closeWorldBookDetail()">＜</div>
+        <div class="wb-detail-title" id="wb-detail-title-text">Title</div>
+        <button class="wb-delete-book-btn" onclick="deleteCurrentWorldBook()">删除</button>
+    </div>
+    <div class="wb-detail-content" id="wb-detail-content-area">
+        <!-- 动态渲染内容 -->
+    </div>
+</div>
+
+<!-- World Book Color Settings Page (NEW) -->
+<div id="worldbook-color-page">
+    <div class="wb-color-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="wb-back-btn-img" onclick="closeWorldBookColorSettings()">
+        <div class="wb-color-title">设置封面颜色</div>
+        <button class="wb-color-save-btn" onclick="saveWorldBookColors()">OK</button>
+    </div>
+    <div class="wb-color-content" id="wb-color-list">
+        <!-- JS will populate this -->
+    </div>
+</div>
+
 
 <!-- Wallet 记账弹窗 -->
 <div id="wallet-add-modal">
@@ -755,14 +1303,12 @@
             <button class="wallet-type-btn active in" id="w-btn-in" onclick="setWalletType('income')">收入</button>
             <button class="wallet-type-btn" id="w-btn-out" onclick="setWalletType('expense')">支出</button>
         </div>
-
         <div class="wallet-input-group">
             <input type="number" id="wallet-amount-input" class="wallet-input" placeholder="0.00" step="0.01">
         </div>
         <div class="wallet-input-group">
             <input type="text" id="wallet-desc-input" class="wallet-input" placeholder="备注 (如: 餐饮, 工资)">
         </div>
-
         <button class="wallet-confirm-btn" onclick="saveTransaction()">确认</button>
         <button class="wallet-cancel-btn" onclick="closeWalletModal()">取消</button>
     </div>
@@ -771,7 +1317,7 @@
 <!-- 添加好友弹窗 -->
 <div id="add-friend-modal">
     <div class="add-friend-card">
-        <div class="add-friend-close" onclick="closeAddFriendModal()">×</div>
+        <div class="add-friend-close" onclick="closeAddFriendModal()">✕</div>
         <img src="https://img.heliar.top/file/1770069003752_保存_save.png" class="add-friend-save" onclick="saveNewFriend()">
         
         <div class="add-friend-avatar-upload" onclick="triggerAvatarUpload()">
@@ -781,6 +1327,17 @@
         <input type="text" class="add-friend-url-input" id="new-friend-avatar-url" placeholder="或粘贴图片链接" oninput="handleAvatarUrlInput(this)">
         <input type="text" class="add-friend-input" id="new-friend-name" placeholder="姓名">
         <input type="text" class="add-friend-input" id="new-friend-alias" placeholder="备注 (可选)">
+    </div>
+</div>
+
+<!-- 删除好友确认弹窗 -->
+<div id="delete-confirm-modal">
+    <div class="delete-card">
+        <div class="delete-card-title">确定删除该好友吗π_π</div>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+            <button class="delete-card-btn btn-confirm-delete" onclick="executeDeleteFriend()">确定</button>
+        </div>
     </div>
 </div>
 
@@ -894,7 +1451,6 @@
 
 <div id="toast-notification"></div>
 
-<!-- New: Full Screen Me Page Settings Modal -->
 <div id="me-settings-modal">
     <div class="me-settings-header-bar">
         <button class="me-settings-close-btn" onclick="closeMeSettings()">关闭</button>
@@ -903,7 +1459,6 @@
     </div>
     
     <div class="me-settings-scroll-content">
-        <!-- 基础信息 -->
         <div class="me-settings-group">
             <h3>基础信息</h3>
             <div class="me-settings-row">
@@ -920,10 +1475,8 @@
                 </div>
                 <input type="text" id="me-settings-cover-url" class="me-settings-input" placeholder="背景图 URL">
             </div>
-            <!-- VIP图标设置已删除 -->
         </div>
 
-        <!-- 8个会员图标设置 -->
         <div class="me-settings-group">
             <h3>会员图标列表 (8个)</h3>
             <div class="me-settings-row">
@@ -986,13 +1539,14 @@
     </div>
 </div>
 
-
-<!-- 隐藏的文件输入框 -->
 <input type="file" id="input-wallpaper" class="file-input-hidden" accept="image/*" onchange="handleWallpaperUpload(event)">
 <input type="file" id="input-app-icon" class="file-input-hidden" accept="image/*" onchange="handleIconUpload(event)">
 <input type="file" id="input-time-bg" class="file-input-hidden" accept="image/*" onchange="handleTimeBgUpload(event)">
 <input type="file" id="input-friend-avatar" class="file-input-hidden" accept="image/*" onchange="handleFriendAvatarUpload(event)">
 <input type="file" id="input-profile-avatar" class="file-input-hidden" accept="image/*" onchange="handleProfileAvatarUpload(event)">
+<input type="file" id="input-photo-widget" class="file-input-hidden" accept="image/*" onchange="handlePhotoWidgetUpload(event)">
+<input type="file" id="input-role-user-avatar" class="file-input-hidden" accept="image/*" onchange="handleRoleUserAvatarUpload(event)">
+<input type="file" id="input-role-chat-bg" class="file-input-hidden" accept="image/*" onchange="handleRoleChatBgUpload(event)">
 
 <script>
     'use strict';
@@ -1016,40 +1570,41 @@
     const widgetSquarePreview = document.getElementById('widget-square-preview');
     const customImagePreview = document.getElementById('custom-image-preview');
 
-    // Me设置弹窗的DOM元素
     const meSettingsModal = document.getElementById('me-settings-modal');
     const meSettingsAvatarUrl = document.getElementById('me-settings-avatar-url');
     const meSettingsCoverUrl = document.getElementById('me-settings-cover-url');
     const meSettingsAvatarPreview = document.getElementById('me-settings-avatar-preview');
     const meSettingsCoverPreview = document.getElementById('me-settings-cover-preview');
     
-    const ALL_SETTINGS_KEY = 'appSettings_v12'; 
-    const CHAT_DATA_KEY = 'chatData_v1_contacts';
+    const ALL_SETTINGS_KEY = 'appSettings_v15';
+    const CHAT_DATA_KEY = 'chatData_v2_contacts';
     const USER_PROFILE_KEY = 'userProfile_v4'; 
     const WALLET_DATA_KEY = 'walletData_v1';
+    const WORLDBOOK_DATA_KEY = 'worldbookData_v2'; // Updated World Book Key for new structure
 
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
     let currentWalletType = 'income';
+    let currentChatContactId = null; 
+    let tempRoleBgUrl = ""; 
+    let currentWorldBookId = null; // for Detail view
 
     // --- Chat App Logic ---
     window.openChatApp = () => {
         body.classList.add('chat-active');
         switchChatTab(0, 'Chat');
-        renderChatList(); 
-    };
-
+        renderChatList();
+     };
     window.closeChatApp = () => {
         body.classList.remove('chat-active');
+        closeChatConversation();
     };
-
     window.switchChatTab = (index, title) => {
         const titleEl = document.getElementById('chat-page-title');
         const rightIcon = document.getElementById('chat-header-right-icon');
         const headerEl = document.getElementById('chat-app-header-el');
         const backBtn = document.getElementById('chat-back-btn');
         const contentArea = document.getElementById('chat-content-area');
-
         const contents = document.querySelectorAll('.chat-tab-content');
         contents.forEach((el, i) => {
             if (i === index) el.classList.add('active');
@@ -1067,99 +1622,325 @@
         contentArea.classList.remove('me-mode');
         titleEl.innerText = title;
 
+        // 修改： Chat、通讯录、朋友圈标题颜色统一为 #f5b3c9
+        if (index === 0 || index === 1 || index === 2) {
+            titleEl.style.color = "#f5b3c9"; 
+        } else {
+            titleEl.style.color = "#333";
+        }
+
         if (index === 0) {
-            titleEl.style.color = "#FFC0CB";
             rightIcon.style.opacity = "1";
             rightIcon.style.pointerEvents = "auto";
-        } else if (index === 1 || index === 2) {
-            titleEl.style.color = "#333";
+        } else if (index === 1) {
+             rightIcon.style.opacity = "0";
+             rightIcon.style.pointerEvents = "none";
+             backBtn.classList.add('hidden');
+             renderContactList(); 
+        } else if (index === 2) {
             rightIcon.style.opacity = "0";
             rightIcon.style.pointerEvents = "none";
             backBtn.classList.add('hidden');
         } else if (index === 3) {
             headerEl.classList.add('hidden');
             contentArea.classList.add('me-mode');
-            loadUserProfile(); 
+            loadUserProfile();
+         }
+    };
+
+    // --- World Book App Logic (MODIFIED & NEW) ---
+    window.openWorldBookApp = () => {
+        body.classList.add('worldbook-active');
+        renderWorldBooks();
+    };
+    window.closeWorldBookApp = () => {
+        body.classList.remove('worldbook-active');
+        closeWorldBookDetail(); // Ensure detail view is closed
+        closeWorldBookColorSettings(); // Ensure color settings is closed
+    };
+    
+    // 打开添加弹窗
+    window.openWorldBookAddModal = () => {
+        document.getElementById('wb-title-input').value = "";
+        const dynamicContainer = document.getElementById('wb-dynamic-entries');
+        dynamicContainer.innerHTML = ''; 
+        addWorldBookEntryRow(); // 默认添加一行
+        document.getElementById('worldbook-add-modal').classList.add('active');
+    };
+    window.closeWorldBookAddModal = () => {
+        document.getElementById('worldbook-add-modal').classList.remove('active');
+    };
+    
+    // 动态添加输入行
+    window.addWorldBookEntryRow = () => {
+        const container = document.getElementById('wb-dynamic-entries');
+        const row = document.createElement('div');
+        row.className = 'wb-entry-row wb-dynamic-row';
+        row.innerHTML = `
+            <input type="text" class="wb-entry-input key" placeholder="名称（可选）">
+            <textarea class="wb-entry-input val" placeholder="世界书内容"></textarea>
+        `;
+        container.appendChild(row);
+    };
+
+    // 保存世界书
+    window.saveWorldBook = () => {
+        const title = document.getElementById('wb-title-input').value.trim();
+        if(!title) { showToast("请输入世界书名"); return; }
+        
+        const rows = document.querySelectorAll('.wb-dynamic-row');
+        const entries = [];
+        let hasContent = false;
+        rows.forEach(row => {
+            const key = row.querySelector('.key').value.trim();
+            const val = row.querySelector('.val').value.trim();
+            if(val) {
+                entries.push({ key: key, content: val });
+                hasContent = true;
+            }
+        });
+
+        if (!hasContent) { showToast("请至少输入一条世界书内容"); return; }
+
+        const newBook = {
+            id: Date.now(),
+            title: title,
+            entries: entries,
+            coverColor: '#EAEAEA' // Default color
+        };
+
+        let books = [];
+        try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {}
+        books.push(newBook);
+        localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
+        
+        showToast("世界书已保存");
+        closeWorldBookAddModal();
+        renderWorldBooks();
+    };
+
+    // 渲染世界书列表
+    window.renderWorldBooks = () => {
+        const container = document.getElementById('worldbook-list');
+        container.innerHTML = '';
+        let books = [];
+        try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) { books = []; }
+        
+        books.sort((a,b) => b.id - a.id).forEach(book => {
+            const item = document.createElement('div');
+            item.className = 'wb-book-item';
+            item.onclick = () => viewWorldBook(book.id);
+            item.innerHTML = `
+                <div class="wb-book-cover">
+                    <div class="wb-book-name">${escapeHtml(book.title)}</div>
+                </div>
+            `;
+            const coverEl = item.querySelector('.wb-book-cover');
+            if (book.coverColor) {
+                coverEl.style.background = book.coverColor;
+            }
+            container.appendChild(item);
+        });
+    };
+
+    // 查看世界书详情
+    window.viewWorldBook = (id) => {
+        currentWorldBookId = id;
+        renderWorldBookDetailView();
+        document.getElementById('worldbook-detail-modal').classList.add('active');
+    };
+    
+    // 渲染详情页内容 (抽取为独立函数)
+    function renderWorldBookDetailView() {
+        if (!currentWorldBookId) return;
+        let books = [];
+        try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {}
+        const book = books.find(b => b.id === currentWorldBookId);
+        if(!book) { closeWorldBookDetail(); return; }
+
+        document.getElementById('wb-detail-title-text').innerText = book.title;
+        const contentArea = document.getElementById('wb-detail-content-area');
+        contentArea.innerHTML = '';
+
+        book.entries.forEach((entry, index) => {
+            const div = document.createElement('div');
+            div.className = 'wb-detail-item';
+            div.id = `wb-entry-item-${index}`;
+            div.innerHTML = `
+                <div class="wb-detail-item-content">
+                    ${entry.key ? `<div class="wb-detail-key">${escapeHtml(entry.key)}</div>` : ''}
+                    <div class="wb-detail-val">${escapeHtml(entry.content)}</div>
+                </div>
+                <div class="wb-detail-item-actions">
+                    <button onclick="editWorldBookEntry(${index})">修改</button>
+                    <button onclick="deleteWorldBookEntry(${index})">删除</button>
+                </div>
+            `;
+            contentArea.appendChild(div);
+        });
+    }
+
+    // 修改条目
+    window.editWorldBookEntry = (index) => {
+        const itemEl = document.getElementById(`wb-entry-item-${index}`);
+        if (!itemEl) return;
+        
+        const books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+        const book = books.find(b => b.id === currentWorldBookId);
+        if (!book || !book.entries[index]) return;
+
+        const entry = book.entries[index];
+        itemEl.innerHTML = `
+            <div class="edit-form">
+                <input type="text" class="wb-entry-input key" placeholder="名称（可选）" value="${escapeHtml(entry.key)}">
+                <textarea class="wb-entry-input val" placeholder="世界书内容">${escapeHtml(entry.content)}</textarea>
+            </div>
+            <div class="wb-detail-item-actions">
+                <button class="save" onclick="saveWorldBookEntry(${index})">保存</button>
+                <button onclick="renderWorldBookDetailView()">取消</button>
+            </div>
+        `;
+    };
+
+    // 保存条目修改
+    window.saveWorldBookEntry = (index) => {
+        const itemEl = document.getElementById(`wb-entry-item-${index}`);
+        const newKey = itemEl.querySelector('.key').value.trim();
+        const newVal = itemEl.querySelector('.val').value.trim();
+
+        if (!newVal) { showToast("内容不能为空"); return; }
+        
+        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+        const bookIndex = books.findIndex(b => b.id === currentWorldBookId);
+        if (bookIndex !== -1 && books[bookIndex].entries[index]) {
+            books[bookIndex].entries[index] = { key: newKey, content: newVal };
+            localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
+            showToast("已保存");
+            renderWorldBookDetailView(); // 重新渲染整个详情页
         }
     };
+    
+    // 删除条目
+    window.deleteWorldBookEntry = (index) => {
+        if (!confirm("确定要删除这个条目吗？")) return;
+        
+        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+        const bookIndex = books.findIndex(b => b.id === currentWorldBookId);
+        if (bookIndex !== -1 && books[bookIndex].entries[index]) {
+            books[bookIndex].entries.splice(index, 1);
+            localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
+            showToast("已删除");
+            renderWorldBookDetailView();
+        }
+    };
+
+    window.closeWorldBookDetail = () => {
+        document.getElementById('worldbook-detail-modal').classList.remove('active');
+        currentWorldBookId = null;
+    };
+    
+    // 删除世界书
+    window.deleteCurrentWorldBook = () => {
+        if(!currentWorldBookId) return;
+        if(confirm("确定要删除这本世界书吗？此操作不可撤销。")) {
+             let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+             books = books.filter(b => b.id !== currentWorldBookId);
+             localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
+             closeWorldBookDetail();
+             renderWorldBooks();
+             showToast("世界书已删除");
+        }
+    };
+    
+    // 颜色设置
+    window.openWorldBookColorSettings = () => {
+        const page = document.getElementById('worldbook-color-page');
+        const container = document.getElementById('wb-color-list');
+        container.innerHTML = '';
+        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+        
+        if (books.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999;">还没有创建世界书哦</p>';
+        } else {
+            books.forEach(book => {
+                const item = document.createElement('div');
+                item.className = 'wb-color-item';
+                item.innerHTML = `
+                    <span class="wb-color-item-name">${escapeHtml(book.title)}</span>
+                    <input type="color" class="wb-color-input" data-book-id="${book.id}" value="${book.coverColor || '#EAEAEA'}">
+                `;
+                container.appendChild(item);
+            });
+        }
+        page.classList.add('active');
+    };
+    window.closeWorldBookColorSettings = () => {
+        document.getElementById('worldbook-color-page').classList.remove('active');
+    };
+    window.saveWorldBookColors = () => {
+        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+        const colorInputs = document.querySelectorAll('.wb-color-input');
+        
+        colorInputs.forEach(input => {
+            const bookId = parseInt(input.dataset.bookId);
+            const newColor = input.value;
+            const bookIndex = books.findIndex(b => b.id === bookId);
+            if (bookIndex !== -1) {
+                books[bookIndex].coverColor = newColor;
+            }
+        });
+        
+        localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
+        showToast("封面颜色已保存");
+        closeWorldBookColorSettings();
+        renderWorldBooks(); // Refresh the list view
+    };
+
 
     // --- Wallet App Logic ---
-    window.openWalletApp = () => {
-        body.classList.add('wallet-active');
-        loadWalletUI();
-    };
-
-    window.closeWalletApp = () => {
-        body.classList.remove('wallet-active');
-    };
-
+    window.openWalletApp = () => { body.classList.add('wallet-active'); loadWalletUI(); };
+    window.closeWalletApp = () => { body.classList.remove('wallet-active'); };
     function getWalletData() {
-        try {
-            const data = localStorage.getItem(WALLET_DATA_KEY);
-            return data ? JSON.parse(data) : { balance: 0.00, transactions: [] };
-        } catch (e) {
-            return { balance: 0.00, transactions: [] };
-        }
+        try { const data = localStorage.getItem(WALLET_DATA_KEY); return data ? JSON.parse(data) : { balance: 0.00, transactions: [] }; } catch (e) { return { balance: 0.00, transactions: [] }; }
     }
-
-    function saveWalletData(data) {
-        localStorage.setItem(WALLET_DATA_KEY, JSON.stringify(data));
-    }
-
+    function saveWalletData(data) { localStorage.setItem(WALLET_DATA_KEY, JSON.stringify(data)); }
     function loadWalletUI() {
-        // 同步用户信息
         const profile = getUserProfile();
         document.getElementById('wallet-avatar').src = profile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         document.getElementById('wallet-nickname').innerText = profile.nickname || 'User';
 
         const data = getWalletData();
-        
-        // 更新总余额
         document.getElementById('wallet-total-balance').innerText = parseFloat(data.balance).toFixed(2);
-
-        // 计算本月收支
+        
         const now = new Date();
         const currentMonthStr = `${now.getFullYear()}-${now.getMonth() + 1}`;
         document.getElementById('wallet-current-month').innerText = `${now.getMonth() + 1}月`;
-
-        let monthIncome = 0;
-        let monthExpense = 0;
-        let monthTransactions = [];
-
+        
+        let monthIncome = 0; let monthExpense = 0; let monthTransactions = [];
         data.transactions.forEach(t => {
             const tDate = new Date(t.timestamp);
             const tMonthStr = `${tDate.getFullYear()}-${tDate.getMonth() + 1}`;
-            
             if (tMonthStr === currentMonthStr) {
                 monthTransactions.push(t);
-                if (t.type === 'income') monthIncome += parseFloat(t.amount);
-                else monthExpense += parseFloat(t.amount);
+                if (t.type === 'income') monthIncome += parseFloat(t.amount); else monthExpense += parseFloat(t.amount);
             }
         });
-
         document.getElementById('wallet-month-income').innerText = monthIncome.toFixed(2);
         document.getElementById('wallet-month-expense').innerText = monthExpense.toFixed(2);
-
-        // 渲染列表
+        
         const listContainer = document.getElementById('wallet-transaction-list');
         listContainer.innerHTML = '';
-
         if (monthTransactions.length === 0) {
             listContainer.innerHTML = '<div class="wallet-empty">本月暂无收支记录</div>';
         } else {
-            // 按时间倒序
             monthTransactions.sort((a, b) => b.timestamp - a.timestamp);
-            
             monthTransactions.forEach(t => {
                 const item = document.createElement('div');
                 item.className = 'wallet-item';
                 const dateObj = new Date(t.timestamp);
                 const dateStr = `${dateObj.getMonth()+1}-${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
-                
-                // 简单图标逻辑
-                let icon = '💰';
-                if (t.type === 'income') icon = '🧧';
-                else if (t.desc.includes('餐饮') || t.desc.includes('吃')) icon = '🍔';
+                let icon = t.type === 'income' ? '🧧' : '💰';
+                if (t.desc.includes('餐饮') || t.desc.includes('吃')) icon = '🍔';
                 else if (t.desc.includes('交通') || t.desc.includes('车')) icon = '🚗';
                 else if (t.desc.includes('购物') || t.desc.includes('买')) icon = '🛍️';
 
@@ -1171,205 +1952,98 @@
                     </div>
                     <div class="wallet-item-amount ${t.type === 'income' ? 'in' : 'out'}">
                         ${t.type === 'income' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)}
-                    </div>
-                `;
+                    </div>`;
                 listContainer.appendChild(item);
             });
         }
     }
-
-    // 记账逻辑
-    window.openWalletModal = (type) => {
-        currentWalletType = type;
-        setWalletType(type);
-        document.getElementById('wallet-amount-input').value = '';
-        document.getElementById('wallet-desc-input').value = '';
-        document.getElementById('wallet-add-modal').classList.add('active');
-    };
-
-    window.closeWalletModal = () => {
-        document.getElementById('wallet-add-modal').classList.remove('active');
-    };
-
+    window.openWalletModal = (type) => { currentWalletType = type; setWalletType(type); document.getElementById('wallet-amount-input').value = ''; document.getElementById('wallet-desc-input').value = ''; document.getElementById('wallet-add-modal').classList.add('active'); };
+    window.closeWalletModal = () => { document.getElementById('wallet-add-modal').classList.remove('active'); };
     window.setWalletType = (type) => {
         currentWalletType = type;
-        const btnIn = document.getElementById('w-btn-in');
-        const btnOut = document.getElementById('w-btn-out');
-        if (type === 'income') {
-            btnIn.classList.add('active', 'in');
-            btnOut.className = 'wallet-type-btn';
-        } else {
-            btnOut.classList.add('active', 'out');
-            btnIn.className = 'wallet-type-btn';
-        }
+        const btnIn = document.getElementById('w-btn-in'); const btnOut = document.getElementById('w-btn-out');
+        if (type === 'income') { btnIn.classList.add('active', 'in'); btnOut.className = 'wallet-type-btn'; } else { btnOut.classList.add('active', 'out'); btnIn.className = 'wallet-type-btn'; }
     };
-
     window.saveTransaction = () => {
         const amountStr = document.getElementById('wallet-amount-input').value;
         const desc = document.getElementById('wallet-desc-input').value.trim();
         const amount = parseFloat(amountStr);
-
-        if (isNaN(amount) || amount <= 0) {
-            showToast('请输入有效金额');
-            return;
-        }
+        if (isNaN(amount) || amount <= 0) { showToast('请输入有效金额'); return; }
 
         const data = getWalletData();
-        const transaction = {
-            id: Date.now(),
-            type: currentWalletType,
-            amount: amount,
-            desc: desc,
-            timestamp: Date.now()
-        };
-
+        const transaction = { id: Date.now(), type: currentWalletType, amount: amount, desc: desc, timestamp: Date.now() };
         data.transactions.push(transaction);
-        
-        // 更新总余额
-        if (currentWalletType === 'income') {
-            data.balance = parseFloat(data.balance) + amount;
-        } else {
-            data.balance = parseFloat(data.balance) - amount;
-        }
-
-        saveWalletData(data);
-        closeWalletModal();
-        loadWalletUI();
-        showToast('记账成功');
+        if (currentWalletType === 'income') data.balance = parseFloat(data.balance) + amount;
+        else data.balance = parseFloat(data.balance) - amount;
+        saveWalletData(data); closeWalletModal(); loadWalletUI(); showToast('记账成功');
     };
-
 
     // --- Friend Adding & Chat List Logic ---
     window.openAddFriendModal = () => {
-        tempAvatarUrl = "";
-        document.getElementById('new-friend-name').value = "";
-        document.getElementById('new-friend-alias').value = "";
-        document.getElementById('new-friend-avatar-url').value = ""; 
-        document.getElementById('new-friend-avatar-preview').style.display = 'none';
-        document.getElementById('new-friend-avatar-preview').src = "";
-        document.getElementById('avatar-placeholder-icon').style.display = 'block';
-        
+        tempAvatarUrl = ""; document.getElementById('new-friend-name').value = ""; document.getElementById('new-friend-alias').value = ""; document.getElementById('new-friend-avatar-url').value = "";
+         document.getElementById('new-friend-avatar-preview').style.display = 'none'; document.getElementById('new-friend-avatar-preview').src = ""; document.getElementById('avatar-placeholder-icon').style.display = 'block';
         document.getElementById('add-friend-modal').classList.add('active');
     };
-
-    window.closeAddFriendModal = () => {
-        document.getElementById('add-friend-modal').classList.remove('active');
-    };
-
-    window.triggerAvatarUpload = () => {
-        document.getElementById('input-friend-avatar').click();
-    };
-
+    window.closeAddFriendModal = () => { document.getElementById('add-friend-modal').classList.remove('active'); };
+    window.triggerAvatarUpload = () => { document.getElementById('input-friend-avatar').click(); };
     window.handleAvatarUrlInput = (input) => {
         const url = input.value.trim();
-        if (url) {
-            tempAvatarUrl = url;
-            const imgEl = document.getElementById('new-friend-avatar-preview');
-            imgEl.src = url;
-            imgEl.style.display = 'block';
-            document.getElementById('avatar-placeholder-icon').style.display = 'none';
-        } else {
-            tempAvatarUrl = "";
-            document.getElementById('new-friend-avatar-preview').style.display = 'none';
-            document.getElementById('avatar-placeholder-icon').style.display = 'block';
-        }
+        if (url) { tempAvatarUrl = url; const imgEl = document.getElementById('new-friend-avatar-preview'); imgEl.src = url; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; }
+        else { tempAvatarUrl = ""; document.getElementById('new-friend-avatar-preview').style.display = 'none'; document.getElementById('avatar-placeholder-icon').style.display = 'block'; }
     };
-
     function compressImage(file, maxSize, callback) {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                let width = img.width;
-                let height = img.height;
-                
-                if (width > height) {
-                    if (width > maxSize) {
-                        height *= maxSize / width;
-                        width = maxSize;
-                    }
-                } else {
-                    if (height > maxSize) {
-                        width *= maxSize / height;
-                        height = maxSize;
-                    }
-                }
-                
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-                
+                const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                let width = img.width; let height = img.height;
+                if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
+                canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
                 callback(canvas.toDataURL('image/jpeg', 0.7));
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+            }; img.src = e.target.result;
+        }; reader.readAsDataURL(file);
     }
-
     window.handleFriendAvatarUpload = (event) => {
         compressImage(event.target.files[0], 200, (base64) => {
-            tempAvatarUrl = base64;
-            document.getElementById('new-friend-avatar-url').value = "";
-            
-            const imgEl = document.getElementById('new-friend-avatar-preview');
-            imgEl.src = tempAvatarUrl;
-            imgEl.style.display = 'block';
-            document.getElementById('avatar-placeholder-icon').style.display = 'none';
+            tempAvatarUrl = base64; document.getElementById('new-friend-avatar-url').value = "";
+            const imgEl = document.getElementById('new-friend-avatar-preview'); imgEl.src = tempAvatarUrl; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none';
         });
     };
-
     window.saveNewFriend = () => {
         const name = document.getElementById('new-friend-name').value.trim();
         const alias = document.getElementById('new-friend-alias').value.trim();
-        
         if (!name) { showToast("请输入姓名"); return; }
         if (!tempAvatarUrl) { showToast("请上传头像或输入URL"); return; }
-
-        let contacts = [];
-        try {
-            const storedContacts = localStorage.getItem(CHAT_DATA_KEY);
-            contacts = storedContacts ? JSON.parse(storedContacts) : [];
-        } catch (e) { contacts = []; }
         
+        let contacts = [];
+        try { const storedContacts = localStorage.getItem(CHAT_DATA_KEY); contacts = storedContacts ? JSON.parse(storedContacts) : []; } catch (e) { contacts = []; }
         if (contacts.length >= 200) { showToast("好友数量已达上限 (200)"); return; }
         const existingContact = contacts.find(contact => contact.name === name || (alias && contact.alias === alias));
         if (existingContact) { showToast("该好友已存在"); return; }
 
-        const newContact = {
-            id: Date.now(),
-            name: name,
-            alias: alias,
-            avatar: tempAvatarUrl,
-            lastMsg: "点击开始聊天",
-            timestamp: Date.now()
+        const newContact = { 
+            id: Date.now(), 
+            name: name, 
+            alias: alias, 
+            avatar: tempAvatarUrl, 
+            lastMsg: "点击开始聊天", 
+            timestamp: Date.now(),
+            signature: "", 
+            backgroundImage: "",
+            isPinned: false
         };
-
         contacts.unshift(newContact);
-        try {
-            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-            showToast("添加成功！");
-            closeAddFriendModal();
-            renderChatList();
-        } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); }
+        try { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); showToast("添加成功！"); closeAddFriendModal(); renderChatList(); renderContactList(); } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); }
     };
 
     window.renderChatList = () => {
         const container = document.getElementById('chat-list-container');
         let contacts = [];
-        try {
-            const storedContacts = localStorage.getItem(CHAT_DATA_KEY);
-            contacts = storedContacts ? JSON.parse(storedContacts) : [];
-        } catch (e) { contacts = []; }
+        try { const storedContacts = localStorage.getItem(CHAT_DATA_KEY); contacts = storedContacts ? JSON.parse(storedContacts) : []; } catch (e) { contacts = []; }
 
-        if (contacts.length === 0) {
-            container.innerHTML = '<div class="chat-placeholder-text">没有新信息</div>';
-            return;
-        }
-
+        if (contacts.length === 0) { container.innerHTML = '<div class="chat-placeholder-text">没有新信息</div>'; return; }
         container.innerHTML = '';
         contacts.sort((a, b) => b.timestamp - a.timestamp);
         
@@ -1377,71 +2051,427 @@
             const displayName = contact.alias ? contact.alias : contact.name;
             const item = document.createElement('div');
             item.className = 'chat-list-item';
-            item.onclick = () => openChatWindow(contact.id); 
-            
+            // Explicitly bind the click event to open the chat window
+            item.onclick = (e) => {
+                e.stopPropagation(); 
+                openChatWindow(contact.id);
+            };
             item.innerHTML = `
                 <img src="${contact.avatar}" class="chat-list-avatar" alt="avatar" onerror="this.src='https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'">
                 <div class="chat-list-info">
                     <div class="chat-list-name">${escapeHtml(displayName)}</div>
                     <div class="chat-list-msg">${escapeHtml(contact.lastMsg || '点击开始聊天')}</div>
-                </div>
-            `;
+                </div>`;
             container.appendChild(item);
         });
     };
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    
+    // --- Advanced Contact Sorting Logic (Pinyin Boundary) ---
+    function getSortLetter(str) {
+        if (!str) return '#';
+        const firstChar = str.charAt(0);
+        
+        if (/[a-zA-Z]/.test(firstChar)) {
+            return firstChar.toUpperCase();
+        }
+        
+        const zh = "阿芭擦搭蛾发噶哈击喀垃妈拿哦啪期然撒塌挖昔压匝";
+        const letters = "ABCDEFGHJKLMNOPQRSTWXYZ";
+        
+        if (firstChar.localeCompare('阿', 'zh-CN') < 0) return '#'; 
+        if (firstChar.localeCompare('匝', 'zh-CN') >= 0) return 'Z'; 
+        
+        for (let i = 0; i < zh.length - 1; i++) {
+            if (firstChar.localeCompare(zh[i], 'zh-CN') >= 0 && firstChar.localeCompare(zh[i+1], 'zh-CN') < 0) {
+                return letters[i];
+            }
+        }
+        
+        return '#';
     }
 
-    window.openChatWindow = (contactId) => { showToast("进入聊天 (功能开发中...)"); };
-
-    // --- Core Functions ---
-    const showToast = (message, duration = 2000) => { 
-        toast.innerHTML = message; 
-        toast.classList.add('show'); 
-        setTimeout(() => toast.classList.remove('show'), duration); 
+    window.renderContactList = () => {
+        const container = document.getElementById('contact-list-container');
+        const indexBar = document.getElementById('alpha-index-bar');
+        
+        let contacts = [];
+        try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e) { contacts = []; }
+        
+        if (contacts.length === 0) { 
+            container.innerHTML = '<div class="chat-placeholder-text">通讯录为空</div>'; 
+            indexBar.innerHTML = '';
+            return; 
+        }
+        container.innerHTML = '';
+        indexBar.innerHTML = '';
+        
+        const groups = { '🔝': [] };
+        const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        allLetters.forEach(l => groups[l] = []);
+        groups['#'] = [];
+        
+        contacts.forEach(c => {
+            if (c.isPinned) {
+                groups['🔝'].push(c);
+            } else {
+                const name = c.alias || c.name;
+                const letter = getSortLetter(name);
+                if (groups[letter]) {
+                    groups[letter].push(c);
+                } else {
+                    groups['#'].push(c);
+                }
+            }
+        });
+        
+        const activeLetters = []; 
+        
+        if (groups['🔝'].length > 0) {
+            groups['🔝'].sort((a, b) => (a.alias||a.name).localeCompare(b.alias||b.name, 'zh-CN'));
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'contact-section-title';
+            titleDiv.id = 'group-pinned';
+            titleDiv.innerText = '🔝';
+            container.appendChild(titleDiv);
+            activeLetters.push({ key: '🔝', id: 'group-pinned' });
+            
+            groups['🔝'].forEach(contact => container.appendChild(createContactItem(contact)));
+        }
+        
+        const sortKeys = [...allLetters, '#'];
+        sortKeys.forEach(key => {
+            const groupContacts = groups[key];
+            if (groupContacts && groupContacts.length > 0) {
+                groupContacts.sort((a, b) => (a.alias||a.name).localeCompare(b.alias||b.name, 'zh-CN'));
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'contact-section-title';
+                titleDiv.id = `group-${key}`;
+                titleDiv.innerText = key;
+                container.appendChild(titleDiv);
+                activeLetters.push({ key: key, id: `group-${key}` });
+                
+                groupContacts.forEach(contact => container.appendChild(createContactItem(contact)));
+            }
+        });
+        
+        allLetters.forEach(letter => {
+            const exists = activeLetters.find(x => x.key === letter);
+            const item = document.createElement('div');
+            item.className = 'alpha-index-item';
+            item.innerText = letter;
+            
+            if (exists) {
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    document.getElementById(exists.id).scrollIntoView({ behavior: 'smooth' });
+                };
+                item.style.color = '#555'; 
+            } else {
+                 item.style.color = '#eee'; 
+                 item.onclick = (e) => e.stopPropagation();
+            }
+            indexBar.appendChild(item);
+        });
     };
     
-    const updateClock = () => { 
-        const now = new Date(); 
-        clockTimeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`; 
+    function createContactItem(contact) {
+        const item = document.createElement('div');
+        item.className = 'contact-item';
+        if(contact.isPinned) item.classList.add('pinned');
+        const displayName = contact.alias || contact.name;
+        const signature = contact.signature ? escapeHtml(contact.signature) : '';
         
-        if (!customDateText) {
-            const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const date = String(now.getDate()).padStart(2, '0');
-            const day = days[now.getDay()];
-            clockDateEl.innerText = `${year}年${month}月${date}日 ${day}`;
-        } else {
-            clockDateEl.innerText = customDateText;
+        item.innerHTML = `
+            <img src="${contact.avatar}" class="contact-avatar">
+            <div class="chat-list-info">
+                <div class="contact-name">${escapeHtml(displayName)}</div>
+                <div class="contact-signature">${signature}</div>
+            </div>
+            <div class="pinned-tag">★</div>
+        `;
+        
+        item.onclick = () => {
+             currentChatContactId = contact.id;
+             openRoleSettings();
+        };
+        
+        let pressTimer;
+        item.addEventListener('touchstart', (e) => {
+            pressTimer = setTimeout(() => { toggleContactPin(contact.id); }, 600);
+        });
+        item.addEventListener('touchend', () => clearTimeout(pressTimer));
+        item.addEventListener('touchmove', () => clearTimeout(pressTimer));
+        return item;
+    }
+    
+    window.toggleContactPin = (id) => {
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const idx = contacts.findIndex(c => c.id === id);
+        if (idx !== -1) {
+            contacts[idx].isPinned = !contacts[idx].isPinned;
+            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+            renderContactList();
+            showToast(contacts[idx].isPinned ? "已置顶" : "已取消置顶");
         }
+    };
+
+    // --- Role Chat Conversation Logic ---
+    window.openChatWindow = (contactId) => {
+        currentChatContactId = contactId;
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contact = contacts.find(c => c.id === contactId);
+        
+        if (!contact) return;
+        
+        document.getElementById('chat-conv-title').innerText = contact.alias || contact.name;
+        document.getElementById('chat-conv-signature').innerText = contact.signature || '';
+        
+        const view = document.getElementById('chat-conversation-view');
+        if (contact.backgroundImage) {
+            view.style.backgroundImage = `url(${contact.backgroundImage})`;
+        } else {
+            view.style.backgroundImage = 'none';
+        }
+        
+        // --- 注入自定义 CSS ---
+        const styleId = 'custom-chat-style';
+        let styleTag = document.getElementById(styleId);
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = styleId;
+            document.head.appendChild(styleTag);
+        }
+        // 如果角色有自定义 CSS，则应用
+        if (contact.customCss) {
+            styleTag.innerHTML = contact.customCss;
+        } else {
+            styleTag.innerHTML = '';
+        }
+
+        view.classList.add('active'); 
+        renderConversationMessages();
+    };
+    
+    window.closeChatConversation = () => {
+        document.getElementById('chat-conversation-view').classList.remove('active');
+        currentChatContactId = null;
+        
+        // 清除自定义 CSS
+        const styleTag = document.getElementById('custom-chat-style');
+        if (styleTag) styleTag.innerHTML = '';
+        
+        renderChatList(); 
+    };
+
+    function getMessagesKey(contactId) { return `chat_msgs_${contactId}`; }
+
+    window.renderConversationMessages = () => {
+        if (!currentChatContactId) return;
+        const container = document.getElementById('chat-conv-messages');
+        const key = getMessagesKey(currentChatContactId);
+        let messages = [];
+        try { messages = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+        
+        container.innerHTML = '';
+        
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contact = contacts.find(c => c.id === currentChatContactId);
+        const themAvatar = contact ? contact.avatar : '';
+        const globalProfile = getUserProfile();
+        const meAvatar = (contact && contact.userAvatar) ? contact.userAvatar : (globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');
+
+        messages.forEach(msg => {
+            const row = document.createElement('div');
+            row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`;
+            const avatarHtml = `<img src="${msg.type === 'sent' ? meAvatar : themAvatar}" class="msg-bubble-avatar">`;
+            const contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`;
+            if (msg.type === 'sent') {
+                row.innerHTML = contentHtml + avatarHtml;
+            } else {
+                row.innerHTML = avatarHtml + contentHtml;
+            }
+            container.appendChild(row);
+        });
+        
+        container.scrollTop = container.scrollHeight;
+    };
+
+    window.sendConversationMessage = () => {
+        if (!currentChatContactId) return;
+        const input = document.getElementById('chat-conv-input');
+        const text = input.value.trim();
+        if (!text) return;
+        
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        const newMsg = { id: Date.now(), text: text, type: 'sent', timestamp: Date.now() };
+        messages.push(newMsg);
+        localStorage.setItem(key, JSON.stringify(messages));
+        
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contactIndex = contacts.findIndex(c => c.id === currentChatContactId);
+        if (contactIndex !== -1) {
+            contacts[contactIndex].lastMsg = text;
+            contacts[contactIndex].timestamp = Date.now();
+            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+        }
+
+        input.value = '';
+        renderConversationMessages();
+    };
+
+    // --- Role Settings Logic ---
+    window.openRoleSettings = () => {
+        if (!currentChatContactId) return;
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contact = contacts.find(c => c.id === currentChatContactId);
+        
+        if (!contact) return;
+        
+        document.getElementById('role-setting-avatar').src = contact.avatar || '';
+        document.getElementById('role-setting-alias').value = contact.alias || contact.name;
+        document.getElementById('role-setting-signature').value = contact.signature || '';
+        document.getElementById('role-setting-persona').value = contact.persona || '';
+        document.getElementById('role-setting-css').value = contact.customCss || ''; // 加载 CSS
+        
+        const bgPreview = document.getElementById('role-bg-preview');
+        tempRoleBgUrl = contact.backgroundImage || '';
+        if (tempRoleBgUrl) {
+            bgPreview.style.backgroundImage = `url(${tempRoleBgUrl})`;
+        } else {
+            bgPreview.style.backgroundImage = '';
+        }
+
+        const globalProfile = getUserProfile();
+        document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
+        document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || '';
+        document.getElementById('role-user-persona').value = contact.userPersona || '';
+
+        document.getElementById('role-settings-page').classList.add('active');
+    };
+    
+    window.closeRoleSettings = () => { document.getElementById('role-settings-page').classList.remove('active'); };
+    window.triggerRoleAvatarEdit = () => {
+        const currentUrl = document.getElementById('role-setting-avatar').src;
+        const newUrl = prompt("输入新头像的图片链接:", currentUrl);
+        if (newUrl && newUrl.trim()) { document.getElementById('role-setting-avatar').src = newUrl.trim(); }
+    };
+    window.triggerRoleBgUpload = () => { document.getElementById('input-role-chat-bg').click(); };
+    window.handleRoleChatBgUpload = (event) => {
+         const file = event.target.files[0]; if (!file) return;
+        compressImage(file, 600, (base64) => { tempRoleBgUrl = base64; document.getElementById('role-bg-preview').style.backgroundImage = `url(${base64})`; });
+    };
+    window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
+    window.handleRoleUserAvatarUpload = (event) => {
+        const file = event.target.files[0]; if (!file) return;
+        compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; });
+    };
+    
+    window.saveRoleSettings = () => {
+        if (!currentChatContactId) return;
+        const newAlias = document.getElementById('role-setting-alias').value.trim();
+        const newSignature = document.getElementById('role-setting-signature').value.trim();
+        const newAvatar = document.getElementById('role-setting-avatar').src;
+        const newPersona = document.getElementById('role-setting-persona').value.trim();
+        const newUserAvatar = document.getElementById('role-user-avatar').src;
+        const newUserName = document.getElementById('role-user-name').value.trim();
+        const newUserPersona = document.getElementById('role-user-persona').value.trim();
+        const newCss = document.getElementById('role-setting-css').value; // 保存 CSS
+
+        if (!newAlias) { showToast("备注名不能为空"); return; }
+        
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const idx = contacts.findIndex(c => c.id === currentChatContactId);
+        
+        if (idx !== -1) {
+            contacts[idx].alias = newAlias;
+            contacts[idx].signature = newSignature;
+            contacts[idx].avatar = newAvatar;
+            contacts[idx].persona = newPersona;
+            contacts[idx].backgroundImage = tempRoleBgUrl;
+            contacts[idx].userAvatar = newUserAvatar;
+            contacts[idx].userName = newUserName;
+            contacts[idx].userPersona = newUserPersona;
+            contacts[idx].customCss = newCss; // 写入
+            
+            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+            document.getElementById('chat-conv-title').innerText = newAlias;
+            document.getElementById('chat-conv-signature').innerText = newSignature;
+            
+            // 立即应用设置变化
+            if(tempRoleBgUrl) { document.getElementById('chat-conversation-view').style.backgroundImage = `url(${tempRoleBgUrl})`; } 
+            else { document.getElementById('chat-conversation-view').style.backgroundImage = 'none'; }
+            
+            // 立即应用 CSS 变化 (如果有 styleTag)
+            const styleTag = document.getElementById('custom-chat-style');
+            if(styleTag) styleTag.innerHTML = newCss;
+
+            renderChatList();
+            renderContactList(); 
+            renderConversationMessages();
+            showToast("设置已保存");
+            closeRoleSettings();
+        }
+    };
+
+    // --- Delete Friend Logic ---
+    window.confirmDeleteFriend = () => {
+        document.getElementById('delete-confirm-modal').classList.add('active');
+    };
+    window.closeDeleteModal = () => {
+        document.getElementById('delete-confirm-modal').classList.remove('active');
+    };
+    window.executeDeleteFriend = () => {
+        if (!currentChatContactId) return;
+        
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const newContacts = contacts.filter(c => c.id !== currentChatContactId);
+        
+        // 保存新联系人列表
+        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(newContacts));
+        
+        // 删除消息记录
+        localStorage.removeItem(getMessagesKey(currentChatContactId));
+        
+        showToast("好友已删除");
+        closeDeleteModal();
+        closeRoleSettings();
+        closeChatConversation(); // 退出聊天界面
+        
+        // 返回到 Chat 列表页 (Tab 0)
+        switchChatTab(0, 'Chat');
+        
+        // 刷新列表
+        renderChatList();
+        renderContactList();
+    };
+
+    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+    // --- Core Functions ---
+    const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
+    
+    const updateClock = () => {
+         const now = new Date();
+         clockTimeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+         if (!customDateText) {
+            const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const date = String(now.getDate()).padStart(2, '0'); const day = days[now.getDay()];
+            clockDateEl.innerText = `${year}年${month}月${date}日 ${day}`;
+        } else { clockDateEl.innerText = customDateText; }
     };
 
     window.handleDateEdit = (event) => {
         event.stopPropagation();
         const newText = prompt("请输入自定义日期文字（留空恢复实时日期）：", clockDateEl.innerText);
-        if (newText !== null) {
-            customDateText = newText.trim();
-            updateClock();
-            saveAllSettings();
-        }
+        if (newText !== null) { customDateText = newText.trim(); updateClock(); saveAllSettings(); }
     };
-
     window.handleTimeBgClick = (event) => { document.getElementById('input-time-bg').click(); };
     window.handleTimeBgUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const dataUrl = e.target.result;
-            timeContainer.style.backgroundImage = `url(${dataUrl})`;
-            saveAllSettings();
-            showToast('时间背景已更新 ^ω^');
-        };
+        const file = event.target.files[0]; if (!file) return;
+        const reader = new FileReader(); reader.onload = (e) => { const dataUrl = e.target.result; timeContainer.style.backgroundImage = `url(${dataUrl})`; saveAllSettings(); showToast('时间背景已更新 ^ω^'); };
         reader.readAsDataURL(file);
     };
 
@@ -1450,40 +2480,22 @@
 
     function handleUrlInput(inputEl, previewEl, callback) {
         const url = inputEl.value.trim();
-        if (url) {
-            const img = new Image();
-            img.onload = () => { previewEl.style.backgroundImage = `url(${url})`; if (callback) callback(url); };
-            img.onerror = () => { previewEl.style.backgroundImage = ''; };
-            img.src = url;
-        } else { previewEl.style.backgroundImage = ''; }
+        if (url) { const img = new Image(); img.onload = () => { previewEl.style.backgroundImage = `url(${url})`; if (callback) callback(url); }; img.onerror = () => { previewEl.style.backgroundImage = ''; }; img.src = url; } else { previewEl.style.backgroundImage = ''; }
     }
-    
     function handleImgSrcInput(inputEl, imgEl) {
         const url = inputEl.value.trim();
-        if (url) {
-             imgEl.src = url;
-             imgEl.onerror = () => { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }; 
-        } else {
-             imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-        }
+        if (url) { imgEl.src = url; imgEl.onerror = () => { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }; } else { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }
     }
 
     wallpaperUrlInput.addEventListener('input', () => handleUrlInput(wallpaperUrlInput, wallpaperPreview));
     widgetSquareUrlInput.addEventListener('input', () => handleUrlInput(widgetSquareUrlInput, widgetSquarePreview));
     customImageUrlInput.addEventListener('input', () => handleUrlInput(customImageUrlInput, customImagePreview));
 
-    const applyIconToUI = (appId, url) => { 
-        const el = document.getElementById(appId); 
-        if (!el) return;
-        if (url && (url.startsWith('http') || url.startsWith('data:'))) {
-            el.innerHTML = ''; el.style.backgroundImage = `url(${url})`;
-        } else {
+    const applyIconToUI = (appId, url) => {
+         const el = document.getElementById(appId); if (!el) return;
+        if (url && (url.startsWith('http') || url.startsWith('data:'))) { el.innerHTML = ''; el.style.backgroundImage = `url(${url})`; } else {
             el.style.backgroundImage = '';
-            const defaults = {
-                'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '📸',
-                'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '📅', 'icon-app8': '💰',
-                'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️'
-            };
+            const defaults = { 'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '📸', 'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '📅', 'icon-app8': '💰', 'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️' };
             if (defaults[appId]) el.innerHTML = defaults[appId];
         }
     };
@@ -1491,17 +2503,10 @@
     const populateSettingsList = () => {
         const container = document.getElementById('settings-app-list-container');
         container.innerHTML = '';
-        const appIcons = [
-            { id: 'icon-app1', name: 'Chat', default: '☁️' }, { id: 'icon-app2', name: '世界书', default: '🎵' },
-            { id: 'icon-app3', name: '提醒', default: '💬' }, { id: 'icon-app4', name: '相册', default: '📸' },
-            { id: 'icon-app5', name: 'HUshhh', default: '🧭' }, { id: 'icon-app6', name: 'pxx', default: '🎮' },
-            { id: 'icon-app7', name: '日历', default: '📅' }, { id: 'icon-app8', name: 'Wallet', default: '💰' }
-        ];
+        const appIcons = [ { id: 'icon-app1', name: 'Chat', default: '☁️' }, { id: 'icon-app2', name: '世界书', default: '🎵' }, { id: 'icon-app3', name: '提醒', default: '💬' }, { id: 'icon-app4', name: '相册', default: '📸' }, { id: 'icon-app5', name: 'HUshhh', default: '🧭' }, { id: 'icon-app6', name: 'pxx', default: '🎮' }, { id: 'icon-app7', name: '日历', default: '📅' }, { id: 'icon-app8', name: 'Wallet', default: '💰' } ];
         appIcons.forEach(app => {
-            const item = document.createElement('div');
-            item.className = 'app-icon-item';
-            const cur = document.getElementById(app.id);
-            const bg = cur.style.backgroundImage;
+            const item = document.createElement('div'); item.className = 'app-icon-item';
+            const cur = document.getElementById(app.id); const bg = cur.style.backgroundImage;
             item.innerHTML = `
                 <div class="app-icon-preview" id="preview-${app.id}" style="${bg ? `background-image:${bg}` : ''}">${!bg ? app.default : ''}</div>
                 <div class="app-icon-info">
@@ -1513,333 +2518,138 @@
                 </div>`;
             container.appendChild(item);
             const inp = document.getElementById(`url-${app.id}`);
-            inp.addEventListener('input', () => {
-                if (inp.value.trim()) handleUrlInput(inp, document.getElementById(`preview-${app.id}`), (u) => applyIconToUI(app.id, u));
-                else { applyIconToUI(app.id, ''); document.getElementById(`preview-${app.id}`).style.backgroundImage = ''; document.getElementById(`preview-${app.id}`).innerHTML = app.default; }
-            });
+            inp.addEventListener('input', () => { if (inp.value.trim()) handleUrlInput(inp, document.getElementById(`preview-${app.id}`), (u) => applyIconToUI(app.id, u)); else { applyIconToUI(app.id, ''); document.getElementById(`preview-${app.id}`).style.backgroundImage = ''; document.getElementById(`preview-${app.id}`).innerHTML = app.default; } });
         });
     };
 
     window.triggerIconUpload = (id) => { const i = document.getElementById('input-app-icon'); i.dataset.target = id; i.click(); };
     window.handleIconUpload = (e) => {
-        const f = e.target.files[0]; const id = e.target.dataset.target;
-        if (!f || !id) return;
-        const r = new FileReader();
-        r.onload = (ev) => {
-            const d = ev.target.result; applyIconToUI(id, d);
-            document.getElementById(`preview-${id}`).style.backgroundImage = `url(${d})`;
-            document.getElementById(`preview-${id}`).innerHTML = '';
-            document.getElementById(`url-${id}`).value = d;
-        };
-        r.readAsDataURL(f);
+        const f = e.target.files[0]; const id = e.target.dataset.target; if (!f || !id) return;
+        const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; applyIconToUI(id, d); document.getElementById(`preview-${id}`).style.backgroundImage = `url(${d})`; document.getElementById(`preview-${id}`).innerHTML = ''; document.getElementById(`url-${id}`).value = d; }; r.readAsDataURL(f);
     };
 
     window.handleWallpaperUpload = (e) => {
         const f = e.target.files[0]; if (!f) return;
-        const r = new FileReader();
-        r.onload = (ev) => {
-            const d = ev.target.result; body.style.backgroundImage = `url(${d})`;
-            wallpaperUrlInput.value = d; wallpaperPreview.style.backgroundImage = `url(${d})`;
-        };
-        r.readAsDataURL(f);
+        const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; body.style.backgroundImage = `url(${d})`; wallpaperUrlInput.value = d; wallpaperPreview.style.backgroundImage = `url(${d})`; }; r.readAsDataURL(f);
+    };
+    
+    window.editChatAvatarUrl = (id) => {
+        const currentUrl = document.getElementById(id).style.backgroundImage.slice(5, -2).replace(/['"]/g, '');
+        const newUrl = prompt("请输入图片链接 (URL):", currentUrl);
+        if(newUrl !== null && newUrl.trim() !== '') { document.getElementById(id).style.backgroundImage = `url('${newUrl.trim()}')`; saveAllSettings(); showToast("头像已更新!"); }
+    };
+    window.adjustInputWidth = (el) => { const len = el.value.length; const newWidth = Math.min(150, Math.max(60, (len * 10) + 30)); el.style.width = newWidth + 'px'; };
+    window.triggerPhotoWidgetUpload = () => { document.getElementById('input-photo-widget').click(); };
+    window.handlePhotoWidgetUpload = (e) => {
+        const file = e.target.files[0]; if(!file) return;
+        const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; const img = document.getElementById('photo-widget-img'); const ph = document.getElementById('photo-widget-placeholder'); img.src = d; img.style.display = 'block'; ph.style.display = 'none'; saveAllSettings(); showToast("小组件图片已更新!"); }; r.readAsDataURL(file);
     };
 
     // --- Profile (Me) Page Functions ---
     function getUserProfile() {
         try {
-            const p = localStorage.getItem(USER_PROFILE_KEY);
-            const profile = p ? JSON.parse(p) : {};
+            const p = localStorage.getItem(USER_PROFILE_KEY); const profile = p ? JSON.parse(p) : {};
             return {
-                cover: profile.cover || '',
-                avatar: profile.avatar || '',
-                nickname: profile.nickname || 'Antigravity',
-                qqId: profile.qqId || '20261314520',
-                likes: profile.likes === undefined ? 8888 : profile.likes,
-                signature: profile.signature || '这个人很懒，什么都没留下~',
-                memberIconUrl: profile.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png',
+                cover: profile.cover || '', avatar: profile.avatar || '', nickname: profile.nickname || 'Antigravity',
+                qqId: profile.qqId || '20261314520', likes: profile.likes === undefined ? 8888 : profile.likes,
+                signature: profile.signature || '这个人很懒，什么都没留下~', memberIconUrl: profile.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png',
                 memberUrls: profile.memberUrls || new Array(8).fill('')
             };
-        } catch(e) {
-            return { 
-                cover: '', avatar: '', nickname: 'Antigravity', qqId: '20261314520', 
-                likes: 8888, signature: '这个人很懒，什么都没留下~', 
-                memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png',
-                memberUrls: new Array(8).fill('')
-            };
-        }
+        } catch(e) { return { cover: '', avatar: '', nickname: 'Antigravity', qqId: '20261314520', likes: 8888, signature: '这个人很懒，什么都没留下~', memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png', memberUrls: new Array(8).fill('') }; }
     }
-
+    
     function saveUserProfile(profileData) {
-        try {
-            localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profileData));
-            // 实时更新 Wallet 的用户信息（如果打开着）
-            if (document.body.classList.contains('wallet-active')) {
-                loadWalletUI();
-            }
-        } catch (e) {
-            showToast("保存失败 (LocalStorage满)");
-        }
+        try { localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profileData)); if (document.body.classList.contains('wallet-active')) { loadWalletUI(); } } catch (e) { showToast("保存失败 (LocalStorage满)"); }
     }
 
     function loadUserProfile() {
         const p = getUserProfile();
+        const coverEl = document.getElementById('profile-cover'); const avatarEl = document.getElementById('profile-avatar');
+        const nickEl = document.getElementById('profile-nickname'); const qqEl = document.getElementById('profile-qq-id');
+        const likeEl = document.getElementById('profile-like-count'); const signatureEl = document.getElementById('profile-signature-text');
+        const memberIconEl = document.getElementById('me-member-icon-main'); const memberIconContainer = document.getElementById('me-member-icon-container');
+
+        if (p.cover) coverEl.style.backgroundImage = `url(${p.cover})`; else coverEl.style.backgroundImage = 'linear-gradient(to bottom, #7A88FF, #7AFFAF)';
+        if (p.avatar) avatarEl.src = p.avatar; else avatarEl.src = 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         
-        const coverEl = document.getElementById('profile-cover');
-        const avatarEl = document.getElementById('profile-avatar');
-        const nickEl = document.getElementById('profile-nickname');
-        const qqEl = document.getElementById('profile-qq-id');
-        const likeEl = document.getElementById('profile-like-count');
-        const signatureEl = document.getElementById('profile-signature-text');
-        const memberIconEl = document.getElementById('me-member-icon-main'); 
-        const memberIconContainer = document.getElementById('me-member-icon-container');
-
-        if (p.cover) {
-             coverEl.style.backgroundImage = `url(${p.cover})`;
-        } else {
-             coverEl.style.backgroundImage = 'linear-gradient(to bottom, #7A88FF, #7AFFAF)';
-        }
-
-        if (p.avatar) {
-            avatarEl.src = p.avatar;
-        } else {
-            avatarEl.src = 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        }
-
-        nickEl.innerText = p.nickname;
-        qqEl.innerText = `QQ: ${p.qqId}`;
-        likeEl.innerText = p.likes;
-        signatureEl.innerText = p.signature || '这个人很懒，什么都没留下~';
-        memberIconEl.src = p.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png';
+        nickEl.innerText = p.nickname; qqEl.innerText = `QQ: ${p.qqId}`; likeEl.innerText = p.likes;
+        signatureEl.innerText = p.signature || '这个人很懒，什么都没留下~'; memberIconEl.src = p.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png';
 
         memberIconContainer.innerHTML = '';
-        p.memberUrls.forEach((url, index) => {
-            if(url && url.trim() !== '') {
-                const img = document.createElement('img');
-                img.className = 'me-member-icon-slot';
-                img.src = url;
-                memberIconContainer.appendChild(img);
-            }
-        });
+        p.memberUrls.forEach((url, index) => { if(url && url.trim() !== '') { const img = document.createElement('img'); img.className = 'me-member-icon-slot'; img.src = url; memberIconContainer.appendChild(img); } });
     }
     
-    window.editSignature = () => {
-        const p = getUserProfile();
-        const newSignature = prompt("请输入你的个性签名：", p.signature);
-        if (newSignature !== null) { 
-            p.signature = newSignature.trim() || '这个人很懒，什么都没留下~'; 
-            saveUserProfile(p);
-            loadUserProfile(); 
-        }
-    };
+    window.editSignature = () => { const p = getUserProfile(); const newSignature = prompt("请输入你的个性签名：", p.signature); if (newSignature !== null) { p.signature = newSignature.trim() || '这个人很懒，什么都没留下~'; saveUserProfile(p); loadUserProfile(); } };
+    window.triggerProfileAvatarUpload = (e) => { if(e) e.stopPropagation(); document.getElementById('input-profile-avatar').click(); };
+    window.handleProfileAvatarUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, (base64) => { const p = getUserProfile(); p.avatar = base64; saveUserProfile(p); loadUserProfile(); showToast("头像已更新"); }); };
+    window.editNickname = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newName = prompt("请输入新昵称:", p.nickname); if (newName && newName.trim()) { p.nickname = newName.trim(); saveUserProfile(p); loadUserProfile(); } };
+    window.editQQID = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newID = prompt("请输入QQ号:", p.qqId); if (newID && newID.trim()) { p.qqId = newID.trim(); saveUserProfile(p); loadUserProfile(); } };
+    window.editLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newCount = prompt("请输入点赞数:", p.likes); if (newCount && !isNaN(newCount)) { p.likes = Number(newCount); saveUserProfile(p); loadUserProfile(); } };
+    window.incrementLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); p.likes = parseInt(p.likes) + 1; saveUserProfile(p); loadUserProfile(); const icon = document.querySelector('.me-like-icon'); icon.style.transform = "scale(1.2) rotate(-10deg)"; setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150); };
 
-    window.triggerProfileAvatarUpload = (e) => {
-        if(e) e.stopPropagation(); 
-        document.getElementById('input-profile-avatar').click();
-    };
-
-    window.handleProfileAvatarUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        compressImage(file, 200, (base64) => {
-            const p = getUserProfile();
-            p.avatar = base64;
-            saveUserProfile(p);
-            loadUserProfile();
-            showToast("头像已更新");
-        });
-    };
-
-    window.editNickname = (e) => {
-        if(e) e.stopPropagation();
-        const p = getUserProfile();
-        const newName = prompt("请输入新昵称:", p.nickname);
-        if (newName && newName.trim()) {
-            p.nickname = newName.trim();
-            saveUserProfile(p);
-            loadUserProfile();
-        }
-    };
-
-    window.editQQID = (e) => {
-        if(e) e.stopPropagation();
-        const p = getUserProfile();
-        const newID = prompt("请输入QQ号:", p.qqId);
-        if (newID && newID.trim()) {
-            p.qqId = newID.trim();
-            saveUserProfile(p);
-            loadUserProfile();
-        }
-    };
-
-    window.editLikeCount = (e) => {
-        if(e) e.stopPropagation();
-        const p = getUserProfile();
-        const newCount = prompt("请输入点赞数:", p.likes);
-        if (newCount && !isNaN(newCount)) {
-            p.likes = Number(newCount);
-            saveUserProfile(p);
-            loadUserProfile();
-        }
-    };
-    
-    window.incrementLikeCount = (e) => {
-        if(e) e.stopPropagation();
-        const p = getUserProfile();
-        p.likes = parseInt(p.likes) + 1;
-        saveUserProfile(p);
-        loadUserProfile();
-        const icon = document.querySelector('.me-like-icon');
-        icon.style.transform = "scale(1.2) rotate(-10deg)";
-        setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150);
-    };
-
-    // --- Me页面设置弹窗功能 ---
     window.openMeSettings = () => {
-        const p = getUserProfile();
-        meSettingsAvatarUrl.value = p.avatar || '';
-        meSettingsCoverUrl.value = p.cover || '';
-        meSettingsAvatarPreview.src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        meSettingsCoverPreview.src = p.cover || '';
-
-        // 填充8个会员图标输入框
-        for (let i = 0; i < 8; i++) {
-            const input = document.getElementById(`me-input-m${i+1}`);
-            const preview = document.getElementById(`me-preview-m${i+1}`);
-            const url = p.memberUrls[i] || '';
-            input.value = url;
-            preview.src = url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-            
-            input.oninput = () => { handleImgSrcInput(input, preview); };
-        }
+        const p = getUserProfile(); meSettingsAvatarUrl.value = p.avatar || ''; meSettingsCoverUrl.value = p.cover || ''; meSettingsAvatarPreview.src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; meSettingsCoverPreview.src = p.cover || '';
+        for (let i = 0; i < 8; i++) { const input = document.getElementById(`me-input-m${i+1}`); const preview = document.getElementById(`me-preview-m${i+1}`); const url = p.memberUrls[i] || ''; input.value = url; preview.src = url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; input.oninput = () => { handleImgSrcInput(input, preview); }; }
         meSettingsModal.classList.add('active');
     };
-
     window.closeMeSettings = () => { meSettingsModal.classList.remove('active'); };
-
     window.saveMeSettings = () => {
-        const p = getUserProfile();
-        p.avatar = meSettingsAvatarUrl.value.trim();
-        p.cover = meSettingsCoverUrl.value.trim();
-        
-        for (let i = 0; i < 8; i++) {
-            const val = document.getElementById(`me-input-m${i+1}`).value.trim();
-            p.memberUrls[i] = val;
-        }
-
-        saveUserProfile(p);
-        loadUserProfile(); 
-        showToast('个人主页设置已保存');
-        closeMeSettings();
+        const p = getUserProfile(); p.avatar = meSettingsAvatarUrl.value.trim(); p.cover = meSettingsCoverUrl.value.trim();
+        for (let i = 0; i < 8; i++) { const val = document.getElementById(`me-input-m${i+1}`).value.trim(); p.memberUrls[i] = val; }
+        saveUserProfile(p); loadUserProfile(); showToast('个人主页设置已保存'); closeMeSettings();
     };
 
     // --- API & Chat ---
-    const testApiBtn = document.getElementById('test-api-btn');
-    const fetchModelsBtn = document.getElementById('fetch-models-btn');
-    const modelSelect = document.getElementById('model-select');
-    const apiStatus = document.getElementById('api-status');
+    const testApiBtn = document.getElementById('test-api-btn'); const fetchModelsBtn = document.getElementById('fetch-models-btn'); const modelSelect = document.getElementById('model-select'); const apiStatus = document.getElementById('api-status');
+    testApiBtn.onclick = async () => { const url = apiUrlInput.value.trim(); const key = apiKeyInput.value.trim(); if (!url || !key) { showToast('请填写 API 地址和 Key'); return; } testApiBtn.disabled = true; apiStatus.innerText = "测试中..."; try { const res = await fetch(`${url.endsWith('/v1') ? url : url+'/v1'}/models`, { headers: { 'Authorization': `Bearer ${key}` } }); if (res.ok) { apiStatus.innerText = "已连接"; apiStatus.className = "api-status connected"; showToast("连接成功！"); } else throw new Error(); } catch(e) { apiStatus.innerText = "连接失败"; apiStatus.className = "api-status disconnected"; showToast("连接失败"); } finally { testApiBtn.disabled = false; } };
+    fetchModelsBtn.onclick = async () => { const url = apiUrlInput.value.trim(); const key = apiKeyInput.value.trim(); if (!url || !key) return; fetchModelsBtn.disabled = true; try { const res = await fetch(`${url.endsWith('/v1') ? url : url+'/v1'}/models`, { headers: { 'Authorization': `Bearer ${key}` } }); const data = await res.json(); modelSelect.innerHTML = data.data.map(m => `<option value="${m.id}">${m.id}</option>`).join(''); document.getElementById('model-select-wrapper').style.display = 'block'; } catch(e) { showToast("获取模型失败"); } finally { fetchModelsBtn.disabled = false; } };
 
-    testApiBtn.onclick = async () => {
-        const url = apiUrlInput.value.trim(); const key = apiKeyInput.value.trim();
-        if (!url || !key) { showToast('请填写 API 地址和 Key'); return; }
-        testApiBtn.disabled = true; apiStatus.innerText = "测试中...";
-        try {
-            const res = await fetch(`${url.endsWith('/v1') ? url : url+'/v1'}/models`, { headers: { 'Authorization': `Bearer ${key}` } });
-            if (res.ok) { apiStatus.innerText = "已连接"; apiStatus.className = "api-status connected"; showToast("连接成功！"); }
-            else throw new Error();
-        } catch(e) { apiStatus.innerText = "连接失败"; apiStatus.className = "api-status disconnected"; showToast("连接失败"); }
-        finally { testApiBtn.disabled = false; }
-    };
-
-    fetchModelsBtn.onclick = async () => {
-        const url = apiUrlInput.value.trim(); const key = apiKeyInput.value.trim();
-        if (!url || !key) return;
-        fetchModelsBtn.disabled = true;
-        try {
-            const res = await fetch(`${url.endsWith('/v1') ? url : url+'/v1'}/models`, { headers: { 'Authorization': `Bearer ${key}` } });
-            const data = await res.json();
-            modelSelect.innerHTML = data.data.map(m => `<option value="${m.id}">${m.id}</option>`).join('');
-            document.getElementById('model-select-wrapper').style.display = 'block';
-        } catch(e) { showToast("获取模型失败"); }
-        finally { fetchModelsBtn.disabled = false; }
-    };
-
-    window.openAIChat = () => {
-        const s = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!s || !s.api || !s.api.model) { showToast('请先在设置中配置 API'); return; }
-        document.getElementById('current-model-name').innerText = s.api.model;
-        document.getElementById('ai-chat-modal').classList.add('active');
-    };
+    window.openAIChat = () => { const s = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY)); if (!s || !s.api || !s.api.model) { showToast('请先在设置中配置 API'); return; } document.getElementById('current-model-name').innerText = s.api.model; document.getElementById('ai-chat-modal').classList.add('active'); };
     window.closeAIChat = () => document.getElementById('ai-chat-modal').classList.remove('active');
 
-    // --- Settings Storage ---
     function saveAllSettings() {
-        const icons = {};
-        document.querySelectorAll('.app-icon-input input').forEach(i => {
-            const id = i.id.replace('url-', ''); if (i.value.trim()) icons[id] = i.value.trim();
-        });
+        const icons = {}; document.querySelectorAll('.app-icon-input input').forEach(i => { const id = i.id.replace('url-', ''); if (i.value.trim()) icons[id] = i.value.trim(); });
+        const avatar1 = document.getElementById('chat-avatar-1'); const avatar2 = document.getElementById('chat-avatar-2'); const photoWidgetImg = document.getElementById('photo-widget-img');
+        const getBgUrl = (el) => { const bg = el.style.backgroundImage; return bg ? bg.slice(5, -2).replace(/['"]/g, '') : ''; };
+        const chatInput1 = document.querySelector('.chat-bubble-input.left-bubble'); const chatInput2 = document.querySelector('.chat-bubble-input.right-bubble');
         const settings = {
             api: { url: apiUrlInput.value, key: apiKeyInput.value, model: modelSelect.value, temp: tempSlider.value, tokens: maxTokensInput.value },
-            visual: {
-                wallpaper: wallpaperUrlInput.value,
-                widget: document.getElementById('widget-square-url').value,
-                customImg: document.getElementById('custom-image-url').value,
-                icons: icons,
-                timeBg: timeContainer.style.backgroundImage,
-                customDate: customDateText
-            }
+            visual: { wallpaper: wallpaperUrlInput.value, widget: document.getElementById('widget-square-url').value, customImg: document.getElementById('custom-image-url').value, icons: icons, timeBg: timeContainer.style.backgroundImage, customDate: customDateText, chatAvatar1: getBgUrl(avatar1), chatAvatar2: getBgUrl(avatar2), photoWidgetUrl: photoWidgetImg.src, chatText1: chatInput1 ? chatInput1.value : "Say Hi~", chatText2: chatInput2 ? chatInput2.value : "Hello!" }
         };
-        localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
-        if (event && event.type === 'click') showToast('设置已保存 ⩌⩊⩌');
-        applyVisual(settings.visual);
+        localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings)); if (event && event.type === 'click') showToast('设置已保存 ⩌⩊⩌'); applyVisual(settings.visual);
     }
 
     function applyVisual(v) {
         if (v.wallpaper) body.style.backgroundImage = `url(${v.wallpaper})`;
         if (v.timeBg) timeContainer.style.backgroundImage = v.timeBg;
-        customDateText = v.customDate || "";
-        updateClock();
-        const wq = document.getElementById('widget-square');
-        if (v.widget) wq.style.backgroundImage = `url(${v.widget})`;
-        const ci = document.getElementById('custom-image-display');
-        const ch = document.getElementById('custom-image-hint');
-        if (v.customImg) { ci.src = v.customImg; ci.style.display = 'block'; ch.style.display = 'none'; }
+        customDateText = v.customDate || ""; updateClock();
+        if(v.chatAvatar1) document.getElementById('chat-avatar-1').style.backgroundImage = `url(${v.chatAvatar1})`;
+        if(v.chatAvatar2) document.getElementById('chat-avatar-2').style.backgroundImage = `url(${v.chatAvatar2})`;
+        const i1 = document.querySelector('.chat-bubble-input.left-bubble'); const i2 = document.querySelector('.chat-bubble-input.right-bubble');
+        if(i1 && v.chatText1) { i1.value = v.chatText1; adjustInputWidth(i1); }
+        if(i2 && v.chatText2) { i2.value = v.chatText2; adjustInputWidth(i2); }
+        const pImg = document.getElementById('photo-widget-img'); const pPh = document.getElementById('photo-widget-placeholder');
+        if (v.photoWidgetUrl && v.photoWidgetUrl.length > 20 && !v.photoWidgetUrl.includes('null')) { pImg.src = v.photoWidgetUrl; pImg.style.display = 'block'; pPh.style.display = 'none'; } else { pImg.style.display = 'none'; pPh.style.display = 'flex'; }
         if (v.icons) Object.keys(v.icons).forEach(id => applyIconToUI(id, v.icons[id]));
     }
 
     function loadSettings() {
-        const s = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!s) return;
-        apiUrlInput.value = s.api.url || '';
-        apiKeyInput.value = s.api.key || '';
-        tempSlider.value = s.api.temp || 0.8;
-        maxTokensInput.value = s.api.tokens || 1000;
-        if (s.api.model) {
-            modelSelect.innerHTML = `<option value="${s.api.model}">${s.api.model}</option>`;
-            document.getElementById('model-select-wrapper').style.display = 'block';
-        }
-        wallpaperUrlInput.value = s.visual.wallpaper || '';
-        document.getElementById('widget-square-url').value = s.visual.widget || '';
-        document.getElementById('custom-image-url').value = s.visual.customImg || '';
+        const s = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY)); if (!s) return;
+        apiUrlInput.value = s.api.url || ''; apiKeyInput.value = s.api.key || ''; tempSlider.value = s.api.temp || 0.8; maxTokensInput.value = s.api.tokens || 1000;
+        if (s.api.model) { modelSelect.innerHTML = `<option value="${s.api.model}">${s.api.model}</option>`; document.getElementById('model-select-wrapper').style.display = 'block'; }
+        wallpaperUrlInput.value = s.visual.wallpaper || ''; document.getElementById('widget-square-url').value = s.visual.widget || ''; document.getElementById('custom-image-url').value = s.visual.customImg || '';
         applyVisual(s.visual);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        setInterval(updateClock, 1000);
-        loadSettings();
-        tempSlider.oninput = () => tempValueDisplay.innerText = tempSlider.value;
-        saveSettingsBtn.onclick = saveAllSettings;
-        
+        setInterval(updateClock, 1000); loadSettings(); tempSlider.oninput = () => tempValueDisplay.innerText = tempSlider.value; saveSettingsBtn.onclick = saveAllSettings;
         if (!localStorage.getItem(CHAT_DATA_KEY)) { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify([])); }
         if (!localStorage.getItem(USER_PROFILE_KEY)) { saveUserProfile(getUserProfile()); }
-        
-        meSettingsAvatarUrl.addEventListener('input', () => {
-            meSettingsAvatarPreview.src = meSettingsAvatarUrl.value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        });
+        meSettingsAvatarUrl.addEventListener('input', () => { meSettingsAvatarPreview.src = meSettingsAvatarUrl.value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; });
         meSettingsCoverUrl.addEventListener('input', () => { meSettingsCoverPreview.src = meSettingsCoverUrl.value.trim(); });
-
-        renderChatList(); 
-    });
+        renderChatList();
+        document.querySelectorAll('.chat-bubble-input').forEach(adjustInputWidth);
+     });
 </script>
-
 </body>
 </html>
