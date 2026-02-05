@@ -62,8 +62,9 @@
              display: flex;
              justify-content: center;
              align-items: center;
-             padding-top: env(safe-area-inset-top, 20px);
+             padding-top: 20px;
              flex-shrink: 0;
+             transition: padding-top 0.3s ease;
          }
         #time-container {
             text-align: center;
@@ -216,13 +217,13 @@
         body.chat-active #chat-app-page { transform: translateY(0); }
         
         .chat-app-header {
-            padding: calc(env(safe-area-inset-top, 20px) + 10px) 20px 15px;
+            padding: 30px 20px 15px;
             background: #fff;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: none;
             border-radius: 0 0 30px 30px;
             box-shadow: 0 4px 20px rgba(229, 138, 171, 0.15);
-            flex-shrink: 0; height: 70px; z-index: 10; transition: all 0.2s;
+            flex-shrink: 0; height: 70px; z-index: 10; transition: padding-top 0.3s ease;
         }
         
         .chat-app-header.hidden { display: none; }
@@ -249,13 +250,14 @@
 
         /* 1. 顶部导航栏 (角色聊天) */
         .chat-conv-header {
-            padding: calc(env(safe-area-inset-top, 20px) + 5px) 15px 10px;
+            padding: 25px 15px 10px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: space-between;
             border-radius: 0 0 35px 35px;
             box-shadow: 0 5px 25px rgba(229, 138, 171, 0.15);
             flex-shrink: 0; z-index: 20; height: 80px;
+            transition: padding-top 0.3s ease;
         }
         .chat-conv-back-btn { width: 32px; height: 32px; object-fit: contain; cursor: pointer; }
         
@@ -352,8 +354,8 @@
             background-color: var(--theme-pink-bg-light);
             z-index: 700;
             display: flex; flex-direction: column; align-items: center;
-            transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-            overflow-y: auto; padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 40px;
+            transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), padding-top 0.3s ease;
+            overflow-y: auto; padding: 40px 20px 40px;
         }
         #role-settings-page.active { transform: translateX(0); }
         
@@ -527,7 +529,7 @@
         /* --- Me Page Settings Modal --- */
         #me-settings-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--theme-pink-bg-light); z-index: 700; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: transform 0.3s ease, opacity 0.3s ease; transform: translateY(100%); }
         #me-settings-modal.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .me-settings-header-bar { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px; background: white; box-shadow: 0 1px 5px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .me-settings-header-bar { display: flex; justify-content: space-between; align-items: center; padding: 35px 20px 15px; background: white; box-shadow: 0 1px 5px rgba(0,0,0,0.05); flex-shrink: 0; transition: padding-top 0.3s ease; }
         .me-settings-header-title { font-size: 18px; font-weight: 600; color: #333; }
         .me-settings-close-btn { font-size: 16px; color: #666; cursor: pointer; background: none; border: none; }
         .me-settings-save-btn { background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); border: none; border-radius: 15px; padding: 6px 16px; font-size: 15px; font-weight: 600; cursor: pointer; }
@@ -554,9 +556,10 @@
         body.wallet-active #wallet-app-page { transform: translateY(0); }
         
         .wallet-header {
-            padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
+            padding: 35px 20px 15px;
             display: flex; align-items: center; justify-content: space-between;
             background-color: transparent; flex-shrink: 0;
+            transition: padding-top 0.3s ease;
         }
         .wallet-user-area { display: flex; align-items: center; }
         .wallet-avatar {
@@ -692,7 +695,7 @@
         .chat-nav-icon { width: 28px; height: 28px; object-fit: contain; pointer-events: none; }
 
         /* --- 全屏设置页面 --- */
-        #settings-page { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--theme-pink-bg-light); z-index: 100; display: flex; flex-direction: column; padding: env(safe-area-inset-top, 20px) 15px env(safe-area-inset-bottom, 20px) 15px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); overflow-x: hidden; }
+        #settings-page { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--theme-pink-bg-light); z-index: 100; display: flex; flex-direction: column; padding: 20px 15px env(safe-area-inset-bottom, 20px) 15px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), padding-top 0.3s ease; overflow-x: hidden; }
         body.settings-active #settings-page { transform: translateY(0); }
         .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
         .settings-header .back-btn-container { display: flex; align-items: center; }
@@ -727,6 +730,79 @@
         .app-icon-input { display: flex; gap: 8px; }
         .app-icon-input input { flex: 1; min-width: 0; padding: 6px 8px; font-size: 12px; }
         .app-icon-input button { padding: 6px 12px; width: auto; font-size: 12px; background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); border: none; }
+        
+        /* --- NEW: iOS Mode Switch Styles --- */
+        .settings-row-ios-mode {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 5px;
+        }
+        .settings-row-ios-mode > label {
+            margin-bottom: 0;
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+        .ios-switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+            flex-shrink: 0;
+        }
+        .ios-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .ios-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        .ios-switch .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+        }
+        .ios-switch input:checked + .slider {
+            background-color: #FFC0CB; /* Soft Pink */
+        }
+        .ios-switch input:focus + .slider {
+             box-shadow: 0 0 1px #FFC0CB;
+        }
+        .ios-switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .ios-switch .slider.round {
+            border-radius: 34px;
+        }
+        .ios-switch .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        /* --- NEW: iOS Mode Active Global Styles --- */
+        body.ios-mode-active #time-section { padding-top: env(safe-area-inset-top, 20px); }
+        body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 10px); }
+        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 5px); }
+        body.ios-mode-active #role-settings-page { padding-top: calc(env(safe-area-inset-top, 20px) + 20px); }
+        body.ios-mode-active .me-settings-header-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.ios-mode-active .wallet-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.ios-mode-active #settings-page { padding-top: env(safe-area-inset-top, 20px); }
+        body.ios-mode-active .wb-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.ios-mode-active .wb-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.ios-mode-active .wb-color-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
 
         #toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background-color: rgba(255, 230, 240, 0.98); color: #E58AAB; padding: 15px 25px; border-radius: 20px; font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; max-width: 80%; }
         #toast-notification.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -759,10 +835,11 @@
         body.worldbook-active #worldbook-app-page { transform: translateY(0); }
         
         .wb-header {
-            padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
+            padding: 35px 20px 15px;
             display: flex; align-items: center; justify-content: space-between;
             background: white; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             border-radius: 0 0 25px 25px; z-index: 10;
+            transition: padding-top 0.3s ease;
         }
         /* New class for the back button image */
         .wb-back-btn-img {
@@ -864,9 +941,10 @@
         }
         #worldbook-detail-modal.active { transform: translateX(0); }
         .wb-detail-header {
-             padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
+             padding: 35px 20px 15px;
              display: flex; align-items: center; gap: 15px; background: white;
              box-shadow: 0 2px 10px rgba(0,0,0,0.05); flex-shrink: 0;
+             transition: padding-top 0.3s ease;
         }
         .wb-detail-back { font-size: 24px; color: #333; cursor: pointer; }
         .wb-detail-title { flex: 1; font-size: 18px; font-weight: 600; color: var(--theme-pink-text); }
@@ -906,9 +984,10 @@
         }
         #worldbook-color-page.active { transform: translateY(0); }
         .wb-color-header {
-            padding: calc(env(safe-area-inset-top, 20px) + 15px) 20px 15px;
+            padding: 35px 20px 15px;
             display: flex; align-items: center; justify-content: space-between;
             background: white; flex-shrink: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: padding-top 0.3s ease;
         }
         .wb-color-title { font-size: 18px; font-weight: 600; color: var(--theme-pink-text); }
         .wb-color-save-btn {
@@ -1146,11 +1225,18 @@
         
         <textarea id="role-setting-persona" class="role-persona-input" placeholder="输入角色人设 (Persona)..."></textarea>
         
-        <div class="role-bg-upload-area">
-            <span style="font-size:13px; color:#555;">聊天背景</span>
-            <div id="role-bg-preview" class="role-bg-preview"></div>
-            <button class="role-bg-btn" onclick="triggerRoleBgUpload()">上传</button>
-        </div>
+        <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <span style="font-size:13px; color:#555;">聊天背景</span>
+        <div id="role-bg-preview" class="role-bg-preview" style="width: 40px; height: 60px; border-radius: 6px; background-color: #eee; background-size: cover; background-position: center; border: 1px solid #ddd;"></div>
+    </div>
+    <!-- 新增URL输入框 -->
+    <input type="text" id="role-bg-url-input" placeholder="输入背景图片URL" style="width: 100%; padding: 10px; border: 1px solid #FADBE6; border-radius: 8px; font-size: 14px;">
+    <div style="display: flex; gap: 10px;">
+        <button class="role-bg-btn" onclick="triggerRoleBgUpload()">上传图片</button>
+        <button class="role-bg-btn" onclick="setRoleBgByUrl()">应用URL</button>
+    </div>
+</div>
     </div>
 
     <!-- 用户设置卡片 -->
@@ -1350,6 +1436,17 @@
         <button id="save-settings-btn">OK</button>
     </div>
     <div class="settings-content">
+        <!-- NEW: iOS Mode Module -->
+        <div class="settings-module">
+            <h3>通用</h3>
+            <div class="settings-row-ios-mode">
+                <label for="ios-mode-switch">iOS 模式 (刘海屏适配)</label>
+                <label class="ios-switch">
+                    <input type="checkbox" id="ios-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
         <!-- AI 设置模块 -->
         <div class="settings-module">
             <h3>AI API 设置</h3>
@@ -1575,6 +1672,10 @@
     const meSettingsCoverUrl = document.getElementById('me-settings-cover-url');
     const meSettingsAvatarPreview = document.getElementById('me-settings-avatar-preview');
     const meSettingsCoverPreview = document.getElementById('me-settings-cover-preview');
+
+    // --- NEW: iOS Mode Elements & Key ---
+    const iosModeSwitch = document.getElementById('ios-mode-switch');
+    const IOS_MODE_KEY = 'iosModeEnabled_v1';
     
     const ALL_SETTINGS_KEY = 'appSettings_v15';
     const CHAT_DATA_KEY = 'chatData_v2_contacts';
@@ -1588,6 +1689,16 @@
     let currentChatContactId = null; 
     let tempRoleBgUrl = ""; 
     let currentWorldBookId = null; // for Detail view
+
+    // --- NEW: iOS Mode Function ---
+    function applyIOSMode(enabled) {
+      if (enabled) {
+        document.body.classList.add('ios-mode-active');
+      } else {
+        document.body.classList.remove('ios-mode-active');
+      }
+      localStorage.setItem(IOS_MODE_KEY, enabled);
+    }
 
     // --- Chat App Logic ---
     window.openChatApp = () => {
@@ -2228,11 +2339,14 @@
         document.getElementById('chat-conv-signature').innerText = contact.signature || '';
         
         const view = document.getElementById('chat-conversation-view');
-        if (contact.backgroundImage) {
-            view.style.backgroundImage = `url(${contact.backgroundImage})`;
-        } else {
-            view.style.backgroundImage = 'none';
-        }
+if (contact.backgroundImage) {
+    view.style.backgroundImage = `url(${contact.backgroundImage})`;
+    view.style.backgroundSize = 'cover'; // 铺满容器
+    view.style.backgroundPosition = 'center';
+    view.style.backgroundRepeat = 'no-repeat';
+} else {
+    view.style.backgroundImage = 'none';
+}
         
         // --- 注入自定义 CSS ---
         const styleId = 'custom-chat-style';
@@ -2359,10 +2473,31 @@
         if (newUrl && newUrl.trim()) { document.getElementById('role-setting-avatar').src = newUrl.trim(); }
     };
     window.triggerRoleBgUpload = () => { document.getElementById('input-role-chat-bg').click(); };
-    window.handleRoleChatBgUpload = (event) => {
-         const file = event.target.files[0]; if (!file) return;
-        compressImage(file, 600, (base64) => { tempRoleBgUrl = base64; document.getElementById('role-bg-preview').style.backgroundImage = `url(${base64})`; });
-    };
+window.handleRoleChatBgUpload = (event) => {
+     const file = event.target.files[0]; if (!file) return;
+    compressImage(file, 600, (base64) => { tempRoleBgUrl = base64; document.getElementById('role-bg-preview').style.backgroundImage = `url(${base64})`; });
+};
+
+// 👇 新增的函数放在这里（角色背景处理逻辑集中区）
+window.setRoleBgByUrl = () => {
+    const urlInput = document.getElementById('role-bg-url-input');
+    const bgUrl = urlInput.value.trim();
+    if (!bgUrl) {
+        showToast("请输入有效的图片URL");
+        return;
+    }
+    const bgPreview = document.getElementById('role-bg-preview');
+    bgPreview.style.backgroundImage = `url(${bgUrl})`;
+    tempRoleBgUrl = bgUrl;
+    showToast("背景URL已预览");
+};
+
+// 👇 后面是原本就有的其他函数（作为定位参考）
+window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
+window.handleRoleUserAvatarUpload = (event) => {
+    const file = event.target.files[0]; if (!file) return;
+    compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; });
+};
     window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
     window.handleRoleUserAvatarUpload = (event) => {
         const file = event.target.files[0]; if (!file) return;
@@ -2390,7 +2525,8 @@
             contacts[idx].signature = newSignature;
             contacts[idx].avatar = newAvatar;
             contacts[idx].persona = newPersona;
-            contacts[idx].backgroundImage = tempRoleBgUrl;
+            // 修复：如果上传了新背景则用tempRoleBgUrl，否则保留原背景
+contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage;
             contacts[idx].userAvatar = newUserAvatar;
             contacts[idx].userName = newUserName;
             contacts[idx].userPersona = newUserPersona;
@@ -2642,7 +2778,23 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        setInterval(updateClock, 1000); loadSettings(); tempSlider.oninput = () => tempValueDisplay.innerText = tempSlider.value; saveSettingsBtn.onclick = saveAllSettings;
+        updateClock(); 
+        setInterval(updateClock, 1000); 
+        loadSettings(); 
+        tempSlider.oninput = () => tempValueDisplay.innerText = tempSlider.value; 
+        saveSettingsBtn.onclick = saveAllSettings;
+
+        // --- NEW: iOS Mode Initialization ---
+        const isIOSModeOn = localStorage.getItem(IOS_MODE_KEY) === 'true';
+        iosModeSwitch.checked = isIOSModeOn;
+        if (isIOSModeOn) {
+            document.body.classList.add('ios-mode-active');
+        }
+        iosModeSwitch.addEventListener('change', (e) => {
+            applyIOSMode(e.target.checked);
+        });
+        // --- End of NEW ---
+        
         if (!localStorage.getItem(CHAT_DATA_KEY)) { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify([])); }
         if (!localStorage.getItem(USER_PROFILE_KEY)) { saveUserProfile(getUserProfile()); }
         meSettingsAvatarUrl.addEventListener('input', () => { meSettingsAvatarPreview.src = meSettingsAvatarUrl.value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; });
