@@ -218,14 +218,14 @@
         body.chat-active #chat-app-page { transform: translateY(0); }
         
         .chat-app-header {
-            padding: 30px 20px 15px;
+            padding: 35px 20px 15px;
             background: #fff;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: none;
             border-radius: 0 0 30px 30px;
             box-shadow: 0 4px 20px rgba(229, 138, 171, 0.15);
-            flex-shrink: 0; height: 70px; z-index: 10; 
-            transition: padding-top 0.3s ease, height 0.3s ease;
+            flex-shrink: 0; /* height is now auto */ z-index: 10; 
+            transition: padding-top 0.3s ease, background-color 0.3s, box-shadow 0.3s;
         }
         
         .chat-app-header.hidden { display: none; }
@@ -234,7 +234,7 @@
         .back-icon-img.hidden { opacity: 0; pointer-events: none; }
         .header-right-icon { width: 26px; height: 26px; object-fit: contain; cursor: pointer; transition: opacity 0.3s ease; }
         
-        .chat-app-content { flex: 1; overflow-y: auto; position: relative; padding-bottom: 100px; padding-top: 5px; scroll-behavior: smooth; background-color: var(--chat-bg-color); }
+        .chat-app-content { flex: 1; overflow-y: auto; position: relative; padding-bottom: 100px; scroll-behavior: smooth; background-color: var(--chat-bg-color); }
         .me-mode { padding-top: 0; background-color: var(--chat-bg-color); overflow-y: hidden; display: flex; flex-direction: column; justify-content: flex-end; height: 100vh; }
         .chat-tab-content { display: none; min-height: 100%; }
         .chat-tab-content.active { display: block; }
@@ -499,8 +499,9 @@
         
         .chat-placeholder-text { color: #E58AAB; text-align: center; padding-top: 50%; font-size: 16px; font-weight: 500; width: 100%; }
 
-        /* --- NEW: 朋友圈 (Moments) Styles --- */
+        /* --- NEW/MODIFIED: 朋友圈 (Moments) Styles --- */
         #moments-page-wrapper {
+            /* MODIFIED: Background changed to white */
             background-color: #fff;
             padding-bottom: 100px; /* Space for nav bar */
         }
@@ -515,14 +516,18 @@
             background-color: #ddd;
             background-size: cover;
             background-position: center;
+            position: relative;
+            /* NEW: Clickable */
+            cursor: pointer;
         }
         .moments-user-info {
             position: absolute;
-            bottom: 0;
+            bottom: -30px; /* Move down to overlap the list area slightly */
             right: 20px;
             display: flex;
             align-items: center;
             gap: 15px;
+            z-index: 2;
         }
         .moments-user-nickname {
             color: white;
@@ -537,10 +542,13 @@
             object-fit: cover;
             border: 3px solid white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
         }
         #moments-list {
             display: flex;
             flex-direction: column;
+            background-color: #fff;
+            padding-top: 50px; /* Space for the overlapping avatar */
         }
         .moment-item {
             display: flex;
@@ -706,6 +714,7 @@
             text-align: center;
             padding: 80px 20px;
             color: #bbb;
+            background-color: #fff;
         }
 
         /* --- Me Page 重构样式 --- */
@@ -979,8 +988,8 @@
         
         /* --- MODIFIED: iOS Mode Active Global Styles --- */
         body.ios-mode-active #time-section { padding-top: env(safe-area-inset-top, 20px); }
-        body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); height: 100px; } /* MODIFIED */
-        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); height: 100px; } /* MODIFIED */
+        body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); } 
+        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); height: 100px; }
         body.ios-mode-active #role-settings-page { padding-top: calc(env(safe-area-inset-top, 20px) + 20px); }
         body.ios-mode-active .me-settings-header-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .wallet-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
@@ -988,7 +997,7 @@
         body.ios-mode-active .wb-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .wb-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .wb-color-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-        body.ios-mode-active .add-moment-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); } /* NEW */
+        body.ios-mode-active .add-moment-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
 
         #toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background-color: rgba(255, 230, 240, 0.98); color: #E58AAB; padding: 15px 25px; border-radius: 20px; font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; max-width: 80%; }
         #toast-notification.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -1797,7 +1806,8 @@
     const WALLET_DATA_KEY = 'walletData_v1';
     const WORLDBOOK_DATA_KEY = 'worldbookData_v2'; 
     const IOS_MODE_KEY = 'iosModeEnabled_v1';
-    const MOMENTS_DATA_KEY = 'momentsData_v1'; // NEW: Key for Moments data
+    const MOMENTS_DATA_KEY = 'momentsData_v1';
+    const MOMENTS_PROFILE_KEY = 'momentsProfile_v1'; // NEW: Key for separate Moments profile
 
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
@@ -1838,7 +1848,11 @@
         document.querySelectorAll('.chat-tab-content').forEach((el, i) => el.classList.toggle('active', i === index));
         document.querySelectorAll('.chat-nav-item').forEach((el, i) => el.classList.toggle('active', i === index));
         
+        // Reset header to be visible by default for all tabs
         headerEl.classList.remove('hidden');
+        headerEl.style.backgroundColor = ''; // Use default CSS
+        headerEl.style.boxShadow = ''; // Use default CSS
+        
         backBtn.classList.remove('hidden');
         contentArea.classList.remove('me-mode');
         titleEl.innerText = title;
@@ -1846,7 +1860,7 @@
 
         addFriendIcon.style.display = 'none';
         addMomentIcon.style.display = 'none';
-
+        
         if (index === 0) { // Chat
             addFriendIcon.style.display = 'block';
         } else if (index === 1) { // Contacts
@@ -1857,16 +1871,42 @@
             backBtn.classList.add('hidden');
             renderMomentsPage();
         } else if (index === 3) { // Me
-            headerEl.classList.add('hidden');
+            headerEl.classList.add('hidden'); // Only "Me" page hides the header
             contentArea.classList.add('me-mode');
             loadUserProfile();
          }
     };
     
-    // --- NEW: Moments (朋友圈) Functions ---
+    // --- Moments (朋友圈) Functions ---
+    // --- NEW: Separate profile for Moments ---
+    function getMomentsProfile() {
+        try {
+            const p = localStorage.getItem(MOMENTS_PROFILE_KEY);
+            const profile = p ? JSON.parse(p) : {};
+            return {
+                cover: profile.cover || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80',
+                avatar: profile.avatar || 'https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png'
+            };
+        } catch (e) {
+            return {
+                cover: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80',
+                avatar: 'https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png'
+            };
+        }
+    }
+
+    function saveMomentsProfile(profileData) {
+        try {
+            localStorage.setItem(MOMENTS_PROFILE_KEY, JSON.stringify(profileData));
+        } catch (e) {
+            showToast("保存朋友圈信息失败 (LocalStorage可能已满)");
+        }
+    }
+    
     function getMomentsData() {
         try { return JSON.parse(localStorage.getItem(MOMENTS_DATA_KEY) || '[]'); } catch (e) { return []; }
     }
+
     function saveMomentsData(data) {
         localStorage.setItem(MOMENTS_DATA_KEY, JSON.stringify(data));
     }
@@ -1874,7 +1914,7 @@
     function formatTimestamp(ts) {
         const now = new Date();
         const postDate = new Date(ts);
-        const diff = now - postDate; // in milliseconds
+        const diff = now - postDate;
         const diffMinutes = Math.floor(diff / 60000);
         const diffHours = Math.floor(diff / 3600000);
         const diffDays = Math.floor(diff / 86400000);
@@ -1888,14 +1928,15 @@
 
     function renderMomentsPage() {
         const wrapper = document.getElementById('moments-page-wrapper');
-        const profile = getUserProfile();
+        const userProfile = getUserProfile(); // For nickname and posts
+        const momentsProfile = getMomentsProfile(); // For avatar and cover
         let moments = getMomentsData();
         
         let listHtml = '';
         if (moments.length > 0) {
-            moments.sort((a,b) => b.timestamp - a.timestamp); // Show newest first
+            moments.sort((a,b) => b.timestamp - a.timestamp); 
             moments.forEach(moment => {
-                const userHasLiked = moment.likes.includes(profile.qqId);
+                const userHasLiked = moment.likes.includes(userProfile.qqId);
                 const likeBtnText = userHasLiked ? '取消' : '赞';
 
                 let likesHtml = '';
@@ -1914,9 +1955,9 @@
 
                 listHtml += `
                     <div class="moment-item" id="moment-${moment.id}">
-                        <img src="${profile.avatar}" class="moment-item-avatar" alt="avatar">
+                        <img src="${userProfile.avatar}" class="moment-item-avatar" alt="avatar">
                         <div class="moment-item-content">
-                            <div class="moment-item-nickname">${escapeHtml(profile.nickname)}</div>
+                            <div class="moment-item-nickname">${escapeHtml(userProfile.nickname)}</div>
                             ${moment.text ? `<div class="moment-item-text">${escapeHtml(moment.text)}</div>` : ''}
                             ${moment.imageUrl ? `<img src="${moment.imageUrl}" class="moment-item-image">` : ''}
                             <div class="moment-item-meta">
@@ -1940,10 +1981,10 @@
         
         wrapper.innerHTML = `
             <div class="moments-header">
-                <div class="moments-cover-img" style="background-image: url(${profile.cover || 'linear-gradient(to bottom, #7A88FF, #7AFFAF)'})"></div>
+                <div class="moments-cover-img" style="background-image: url(${momentsProfile.cover})" onclick="editMomentsCover()"></div>
                 <div class="moments-user-info">
-                    <span class="moments-user-nickname">${escapeHtml(profile.nickname)}</span>
-                    <img src="${profile.avatar}" class="moments-user-avatar" alt="avatar">
+                    <span class="moments-user-nickname">${escapeHtml(userProfile.nickname)}</span>
+                    <img src="${momentsProfile.avatar}" class="moments-user-avatar" alt="avatar" onclick="editMomentsAvatar()">
                 </div>
             </div>
             <div id="moments-list">
@@ -1951,6 +1992,29 @@
             </div>
         `;
     }
+
+    // NEW/MODIFIED: Functions to edit moments avatar and cover (independent from 'Me' page)
+    window.editMomentsAvatar = () => {
+        const p = getMomentsProfile();
+        const newUrl = prompt("请输入朋友圈头像图片链接:", p.avatar);
+        if (newUrl && newUrl.trim() !== '') {
+            p.avatar = newUrl.trim();
+            saveMomentsProfile(p);
+            renderMomentsPage(); 
+            showToast("朋友圈头像已更新");
+        }
+    };
+    
+    window.editMomentsCover = () => {
+        const p = getMomentsProfile();
+        const newUrl = prompt("请输入朋友圈背景图片链接:", p.cover);
+        if (newUrl && newUrl.trim() !== '') {
+            p.cover = newUrl.trim();
+            saveMomentsProfile(p);
+            renderMomentsPage();
+            showToast("朋友圈背景已更新");
+        }
+    };
 
     window.toggleActionsPopup = (momentId, event) => {
         event.stopPropagation();
@@ -1961,7 +2025,7 @@
             popup.classList.toggle('active');
         }
     };
-    document.addEventListener('click', () => { // Close popups when clicking anywhere else
+    document.addEventListener('click', () => { 
         document.querySelectorAll('.moment-actions-popup').forEach(p => p.classList.remove('active'));
     });
 
@@ -1984,7 +2048,7 @@
         const profile = getUserProfile();
         const newMoment = {
             id: Date.now(),
-            authorId: profile.qqId, // Assuming qqId is the unique user ID
+            authorId: profile.qqId,
             timestamp: Date.now(),
             text: text,
             imageUrl: imageUrl,
@@ -2009,9 +2073,9 @@
         const likeIndex = moments[momentIndex].likes.indexOf(myId);
 
         if (likeIndex > -1) {
-            moments[momentIndex].likes.splice(likeIndex, 1); // Unlike
+            moments[momentIndex].likes.splice(likeIndex, 1);
         } else {
-            moments[momentIndex].likes.push(myId); // Like
+            moments[momentIndex].likes.push(myId);
         }
         
         saveMomentsData(moments);
@@ -2144,7 +2208,8 @@
     window.editNickname = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newName = prompt("请输入新昵称:", p.nickname); if (newName && newName.trim()) { p.nickname = newName.trim(); saveUserProfile(p); loadUserProfile(); } };
     window.editQQID = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newID = prompt("请输入QQ号:", p.qqId); if (newID && newID.trim()) { p.qqId = newID.trim(); saveUserProfile(p); loadUserProfile(); } };
     window.incrementLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); p.likes = parseInt(p.likes) + 1; saveUserProfile(p); loadUserProfile(); const icon = document.querySelector('.me-like-icon'); icon.style.transform = "scale(1.2) rotate(-10deg)"; setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150); };
-    window.openMeSettings = () => { const p = getUserProfile(); document.getElementById('me-settings-avatar-url').value = p.avatar || ''; document.getElementById('me-settings-cover-url').value = p.cover || ''; document.getElementById('me-settings-avatar-preview').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('me-settings-cover-preview').src = p.cover || ''; const container = document.getElementById('me-settings-member-icons-list'); container.innerHTML = ''; for (let i = 0; i < 8; i++) { const url = p.memberUrls[i] || ''; container.innerHTML += `<div class="me-settings-row"><div class="me-settings-label">会员${i+1}</div><div class="me-settings-preview-wrapper"><img id="me-preview-m${i+1}" class="me-settings-preview icon" src="${url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"></div><input type="text" id="me-input-m${i+1}" class="me-settings-input" placeholder="图片 URL" value="${url}"></div>`; } for (let i = 0; i < 8; i++) { const input = document.getElementById(`me-input-m${i+1}`); const preview = document.getElementById(`me-preview-m${i+1}`); input.oninput = () => { handleImgSrcInput(input, preview); }; } me-settings-modal.classList.add('active'); };
+    // --- FIXED: "Me" page settings icon functionality ---
+    window.openMeSettings = () => { const p = getUserProfile(); document.getElementById('me-settings-avatar-url').value = p.avatar || ''; document.getElementById('me-settings-cover-url').value = p.cover || ''; document.getElementById('me-settings-avatar-preview').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('me-settings-cover-preview').src = p.cover || ''; const container = document.getElementById('me-settings-member-icons-list'); container.innerHTML = ''; for (let i = 0; i < 8; i++) { const url = p.memberUrls[i] || ''; container.innerHTML += `<div class="me-settings-row"><div class="me-settings-label">会员${i+1}</div><div class="me-settings-preview-wrapper"><img id="me-preview-m${i+1}" class="me-settings-preview icon" src="${url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"></div><input type="text" id="me-input-m${i+1}" class="me-settings-input" placeholder="图片 URL" value="${url}"></div>`; } for (let i = 0; i < 8; i++) { const input = document.getElementById(`me-input-m${i+1}`); const preview = document.getElementById(`me-preview-m${i+1}`); input.oninput = () => { handleImgSrcInput(input, preview); }; } document.getElementById('me-settings-modal').classList.add('active'); };
     window.closeMeSettings = () => { document.getElementById('me-settings-modal').classList.remove('active'); };
     window.saveMeSettings = () => { const p = getUserProfile(); p.avatar = document.getElementById('me-settings-avatar-url').value.trim(); p.cover = document.getElementById('me-settings-cover-url').value.trim(); for (let i = 0; i < 8; i++) { p.memberUrls[i] = document.getElementById(`me-input-m${i+1}`).value.trim(); } saveUserProfile(p); loadUserProfile(); showToast('个人主页设置已保存'); closeMeSettings(); };
 
@@ -2198,9 +2263,12 @@
         if (isIOSModeOn) body.classList.add('ios-mode-active');
         iosModeSwitch.addEventListener('change', (e) => applyIOSMode(e.target.checked));
         
+        // Initialize storage if not present
         if (!localStorage.getItem(CHAT_DATA_KEY)) localStorage.setItem(CHAT_DATA_KEY, JSON.stringify([]));
         if (!localStorage.getItem(USER_PROFILE_KEY)) saveUserProfile(getUserProfile());
         if (!localStorage.getItem(MOMENTS_DATA_KEY)) saveMomentsData([]);
+        if (!localStorage.getItem(MOMENTS_PROFILE_KEY)) saveMomentsProfile(getMomentsProfile());
+
 
         document.getElementById('me-settings-avatar-url').addEventListener('input', () => { document.getElementById('me-settings-avatar-preview').src = document.getElementById('me-settings-avatar-url').value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; });
         document.getElementById('me-settings-cover-url').addEventListener('input', () => { document.getElementById('me-settings-cover-preview').src = document.getElementById('me-settings-cover-url').value.trim(); });
