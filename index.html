@@ -21,6 +21,7 @@
             --error-red: #F44336;
             --wallet-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%);
             --wallet-card-shadow: 0 10px 20px rgba(255, 154, 158, 0.3);
+            --link-blue: #5865F2;
         }
         * {
              box-sizing: border-box;
@@ -50,7 +51,7 @@
         body.settings-active #home-screen,
         body.chat-active #home-screen,
         body.wallet-active #home-screen,
-        body.worldbook-active #home-screen { /* Added worldbook-active */
+        body.worldbook-active #home-screen {
              opacity: 0;
              transform: scale(0.95);
              pointer-events: none;
@@ -223,7 +224,8 @@
             border-bottom: none;
             border-radius: 0 0 30px 30px;
             box-shadow: 0 4px 20px rgba(229, 138, 171, 0.15);
-            flex-shrink: 0; height: 70px; z-index: 10; transition: padding-top 0.3s ease;
+            flex-shrink: 0; height: 70px; z-index: 10; 
+            transition: padding-top 0.3s ease, height 0.3s ease;
         }
         
         .chat-app-header.hidden { display: none; }
@@ -232,7 +234,7 @@
         .back-icon-img.hidden { opacity: 0; pointer-events: none; }
         .header-right-icon { width: 26px; height: 26px; object-fit: contain; cursor: pointer; transition: opacity 0.3s ease; }
         
-        .chat-app-content { flex: 1; overflow-y: auto; position: relative; padding-bottom: 100px; padding-top: 5px; scroll-behavior: smooth; }
+        .chat-app-content { flex: 1; overflow-y: auto; position: relative; padding-bottom: 100px; padding-top: 5px; scroll-behavior: smooth; background-color: var(--chat-bg-color); }
         .me-mode { padding-top: 0; background-color: var(--chat-bg-color); overflow-y: hidden; display: flex; flex-direction: column; justify-content: flex-end; height: 100vh; }
         .chat-tab-content { display: none; min-height: 100%; }
         .chat-tab-content.active { display: block; }
@@ -257,7 +259,7 @@
             border-radius: 0 0 35px 35px;
             box-shadow: 0 5px 25px rgba(229, 138, 171, 0.15);
             flex-shrink: 0; z-index: 20; height: 80px;
-            transition: padding-top 0.3s ease;
+            transition: padding-top 0.3s ease, height 0.3s ease;
         }
         .chat-conv-back-btn { width: 32px; height: 32px; object-fit: contain; cursor: pointer; }
         
@@ -282,12 +284,10 @@
         .chat-conv-messages {
             flex: 1; overflow-y: auto; padding: 20px 15px;
             display: flex; flex-direction: column; gap: 18px;
-            /* 背景由父容器决定 */
         }
         .msg-bubble-row { display: flex; align-items: flex-end; width: 100%; gap: 8px; }
         .msg-bubble-row.me { justify-content: flex-end; }
         
-        /* 默认正方形头像 (8px圆角) */
         .msg-bubble-avatar {
             width: 38px; height: 38px; border-radius: 8px; object-fit: cover;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;
@@ -298,12 +298,10 @@
             position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             word-wrap: break-word;
         }
-        /* 对方气泡 */
         .msg-bubble-row.them .msg-bubble-content {
             background: #FFFFFF; color: #333;
             border-radius: 18px 18px 18px 4px;
         }
-        /* 我方气泡 */
         .msg-bubble-row.me .msg-bubble-content {
             background: var(--theme-pink-text); color: white;
             border-radius: 18px 18px 4px 18px;
@@ -345,7 +343,6 @@
             padding: 0 20px; font-size: 16px; color: #333;
             transition: background-color 0.2s;
         }
-        /* 修复：输入框聚焦不变色 (保持原色或白色) */
         .chat-conv-input:focus { background-color: #F5F5F7; border: 1px solid rgba(229, 138, 171, 0.3); }
 
         /* --- 角色设置页面 (Role Settings Page) --- */
@@ -402,7 +399,6 @@
         }
         .role-signature-edit:focus { border-bottom-color: var(--theme-pink-btn); }
         
-        /* 统一的输入框样式 */
         .role-persona-input, .role-css-input {
             width: 100%; height: 80px;
             border: 1px solid #eee; border-radius: 12px;
@@ -411,10 +407,7 @@
         }
         .role-persona-input:focus, .role-css-input:focus { background-color: white; border-color: var(--theme-pink-btn); }
         
-        .role-css-input {
-            height: 120px; font-family: monospace; font-size: 12px; /* 保持CSS输入框的代码字体，但颜色改为浅色 */
-        }
-        .role-css-input::placeholder { color: #999; }
+        .role-css-input { height: 120px; font-family: monospace; font-size: 12px; }
 
         .role-bg-upload-area {
             width: 100%; margin-top: 15px; display: flex; align-items: center; justify-content: space-between;
@@ -454,22 +447,35 @@
             text-decoration: underline; cursor: pointer; padding: 10px; font-weight: 500;
         }
 
+        .role-wb-binding-area {
+            width: 100%; display: flex; align-items: center; justify-content: space-between;
+            background: #f9f9f9; border-radius: 10px; padding: 10px 15px; margin-top: 10px;
+        }
+        #role-wb-display {
+            flex: 1; font-size: 14px; color: #555; font-weight: 500;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        #role-wb-display.unbound { color: #aaa; font-style: italic; }
+        .role-wb-binding-area .actions { display: flex; gap: 8px; margin-left: 10px; }
+        .role-wb-binding-area button {
+            font-size: 13px; padding: 6px 12px; border-radius: 15px; border: none; cursor: pointer;
+            background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text);
+        }
+        .role-wb-binding-area button#role-wb-clear-btn { background-color: #eee; color: #999; }
 
-        /* --- Chat List (Tab 0) & Contact List (Tab 1) Styles --- */
+        /* --- Chat List & Contact List Styles --- */
         .chat-list-container { width: 100%; }
-        .chat-list-item { display: flex; align-items: center; padding: 12px 20px; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: background-color 0.2s; margin-bottom: 1px; }
+        .chat-list-item { display: flex; align-items: center; padding: 12px 20px; background-color: white; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: background-color 0.2s; }
         .chat-list-item:active { background-color: #f0f0f0; }
         .chat-list-avatar { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; margin-right: 15px; background-color: #eee; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .chat-list-info { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
         .chat-list-name { font-size: 16px; color: #111; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-list-msg { font-size: 13px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* 通讯录专用样式 */
-        .contact-list-container { width: 100%; padding-bottom: 80px; padding-right: 25px; /* Leave space for index bar */ }
+        .contact-list-container { width: 100%; padding-bottom: 80px; padding-right: 25px; }
         .contact-section-title {
             padding: 8px 20px; font-size: 13px; font-weight: 600; color: #999;
-            background-color: #f7f7f7; position: sticky; top: 0; z-index: 5;
-            scroll-margin-top: 70px;
+            background-color: #f7f7f7; position: sticky; top: 0; z-index: 5; scroll-margin-top: 70px;
         }
         .contact-item {
             display: flex; align-items: center; padding: 10px 20px; background: white;
@@ -483,19 +489,224 @@
         .pinned-tag { display: none; margin-left: auto; font-size: 12px; color: orange; }
         .contact-item.pinned .pinned-tag { display: block; }
         
-        /* 字母索引条 */
         .alpha-index-bar {
             position: fixed; right: 5px; top: 120px; bottom: 100px;
             width: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 20; color: #aaa; font-size: 10px; font-weight: 600;
         }
-        .alpha-index-item {
-            flex: 1; width: 100%; display: flex; justify-content: center; align-items: center;
-            border-radius: 50%; cursor: pointer; transition: color 0.2s;
-        }
+        .alpha-index-item { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; border-radius: 50%; cursor: pointer; transition: color 0.2s; }
         .alpha-index-item:active { color: var(--theme-pink-text); background-color: rgba(0,0,0,0.03); }
         
         .chat-placeholder-text { color: #E58AAB; text-align: center; padding-top: 50%; font-size: 16px; font-weight: 500; width: 100%; }
+
+        /* --- NEW: 朋友圈 (Moments) Styles --- */
+        #moments-page-wrapper {
+            background-color: #fff;
+            padding-bottom: 100px; /* Space for nav bar */
+        }
+        .moments-header {
+            position: relative;
+            width: 100%;
+            padding-bottom: 40px; /* Space for floating user info */
+        }
+        .moments-cover-img {
+            width: 100%;
+            height: 300px;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+        }
+        .moments-user-info {
+            position: absolute;
+            bottom: 0;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .moments-user-nickname {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .moments-user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        #moments-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .moment-item {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .moment-item-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .moment-item-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .moment-item-nickname {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--link-blue);
+        }
+        .moment-item-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .moment-item-image {
+            max-width: 100%;
+            width: 200px; /* Set a fixed width for single images */
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .moment-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #999;
+        }
+        .moment-actions-btn {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+        }
+        .moment-actions-popup {
+            position: absolute;
+            right: 100%;
+            bottom: 0;
+            margin-right: 10px;
+            background-color: #4C4C4C;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transform: scale(0);
+            transform-origin: right center;
+            transition: transform 0.15s ease-out;
+            white-space: nowrap;
+        }
+        .moment-actions-popup.active {
+            transform: scale(1);
+        }
+        .moment-popup-btn {
+            padding: 8px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        .moment-popup-btn:not(:last-child) {
+            border-right: 1px solid #666;
+        }
+        .moment-popup-btn:active {
+            background-color: #333;
+        }
+        .moment-feedback {
+            margin-top: 10px;
+            background-color: #F7F7F7;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        .moment-likes {
+            color: var(--link-blue);
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .moment-likes:empty {
+            display: none;
+        }
+        .moment-likes:last-child { /* if no comments, remove border */
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .moment-comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .moment-comment-item .user {
+            color: var(--link-blue);
+            font-weight: 500;
+        }
+        .moment-comment-item .text {
+            color: #333;
+        }
+        #add-moment-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f7f7f7;
+            z-index: 650; display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.3s ease;
+        }
+        #add-moment-modal.active {
+            transform: translateY(0);
+        }
+        .add-moment-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 35px 20px 15px; background: #f7f7f7; flex-shrink: 0;
+        }
+        .add-moment-header button {
+            border: none; background: none; font-size: 16px; cursor: pointer; padding: 5px 10px;
+        }
+        .add-moment-cancel { color: #333; }
+        .add-moment-post {
+            background-color: var(--success-green); color: white; border-radius: 6px;
+            padding: 8px 20px !important; font-weight: 600;
+        }
+        .add-moment-content { padding: 0 20px; flex: 1; display: flex; flex-direction: column; }
+        #add-moment-text {
+            width: 100%;
+            height: 150px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 16px;
+            resize: none;
+            padding: 10px 0;
+        }
+        #add-moment-image-url {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; margin-top: 20px;
+        }
+        .moments-empty-placeholder {
+            text-align: center;
+            padding: 80px 20px;
+            color: #bbb;
+        }
 
         /* --- Me Page 重构样式 --- */
         .me-page-container { width: 100%; display: flex; flex-direction: column; height: auto; max-height: 100vh; }
@@ -731,7 +942,7 @@
         .app-icon-input input { flex: 1; min-width: 0; padding: 6px 8px; font-size: 12px; }
         .app-icon-input button { padding: 6px 12px; width: auto; font-size: 12px; background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); border: none; }
         
-        /* --- NEW: iOS Mode Switch Styles --- */
+        /* --- iOS Mode Switch Styles --- */
         .settings-row-ios-mode {
             display: flex;
             justify-content: space-between;
@@ -751,51 +962,25 @@
             height: 31px;
             flex-shrink: 0;
         }
-        .ios-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .ios-switch input { opacity: 0; width: 0; height: 0; }
         .ios-switch .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s;
         }
         .ios-switch .slider:before {
-            position: absolute;
-            content: "";
-            height: 27px;
-            width: 27px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
+            position: absolute; content: ""; height: 27px; width: 27px;
+            left: 2px; bottom: 2px; background-color: white; transition: .4s;
         }
-        .ios-switch input:checked + .slider {
-            background-color: #FFC0CB; /* Soft Pink */
-        }
-        .ios-switch input:focus + .slider {
-             box-shadow: 0 0 1px #FFC0CB;
-        }
-        .ios-switch input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-        .ios-switch .slider.round {
-            border-radius: 34px;
-        }
-        .ios-switch .slider.round:before {
-            border-radius: 50%;
-        }
+        .ios-switch input:checked + .slider { background-color: #FFC0CB; }
+        .ios-switch input:focus + .slider { box-shadow: 0 0 1px #FFC0CB; }
+        .ios-switch input:checked + .slider:before { transform: translateX(20px); }
+        .ios-switch .slider.round { border-radius: 34px; }
+        .ios-switch .slider.round:before { border-radius: 50%; }
         
-        /* --- NEW: iOS Mode Active Global Styles --- */
+        /* --- MODIFIED: iOS Mode Active Global Styles --- */
         body.ios-mode-active #time-section { padding-top: env(safe-area-inset-top, 20px); }
-        body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 10px); }
-        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 5px); }
+        body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); height: 100px; } /* MODIFIED */
+        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); height: 100px; } /* MODIFIED */
         body.ios-mode-active #role-settings-page { padding-top: calc(env(safe-area-inset-top, 20px) + 20px); }
         body.ios-mode-active .me-settings-header-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .wallet-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
@@ -803,12 +988,13 @@
         body.ios-mode-active .wb-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .wb-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .wb-color-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.ios-mode-active .add-moment-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); } /* NEW */
 
         #toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background-color: rgba(255, 230, 240, 0.98); color: #E58AAB; padding: 15px 25px; border-radius: 20px; font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; max-width: 80%; }
         #toast-notification.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         .file-input-hidden { display: none; }
 
-        /* AI Chat UI (保留功能，但使用新页面交互) */
+        /* AI Chat UI */
         #ai-chat-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #ai-chat-modal.active { opacity: 1; pointer-events: all; }
         #ai-chat-container { width: 90%; max-width: 500px; height: 80%; background-color: white; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -824,7 +1010,7 @@
         .chat-input-area input { flex: 1; padding: 10px 15px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 20px; font-size: 14px; outline: none; }
         .chat-input-area button { padding: 0 18px; background-color: var(--theme-pink-text); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; }
 
-        /* --- World Book App Styles (MODIFIED) --- */
+        /* --- World Book App Styles --- */
         #worldbook-app-page {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: var(--theme-pink-bg-soft);
@@ -841,7 +1027,6 @@
             border-radius: 0 0 25px 25px; z-index: 10;
             transition: padding-top 0.3s ease;
         }
-        /* New class for the back button image */
         .wb-back-btn-img {
             width: 30px; height: 30px; object-fit: contain; cursor: pointer;
         }
@@ -864,7 +1049,7 @@
         
         .wb-book-cover {
             width: 90px; height: 120px;
-            background: linear-gradient(135deg, #f5f5f5 0%, #EAEAEA 100%); /* Default background */
+            background: linear-gradient(135deg, #f5f5f5 0%, #EAEAEA 100%);
             border-radius: 4px 8px 8px 4px;
             box-shadow: 2px 4px 10px rgba(0,0,0,0.1), inset 4px 0 10px rgba(0,0,0,0.05);
             display: flex; justify-content: center; align-items: center; padding: 10px;
@@ -877,7 +1062,6 @@
         }
         .wb-book-name { font-size: 13px; font-weight: 600; color: #555; text-align: center; word-break: break-all; line-height: 1.4; }
 
-        /* World Book Add Modal (MODIFIED) */
         #worldbook-add-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); z-index: 600; backdrop-filter: blur(8px);
@@ -903,14 +1087,8 @@
         .wb-main-input:focus { border-color: var(--theme-pink-btn); box-shadow: 0 0 0 2px rgba(245, 179, 201, 0.3); }
 
         .wb-entry-row {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #FADBE6;
+            display: flex; flex-direction: column; gap: 8px; margin-top: 15px; padding: 15px;
+            background-color: #ffffff; border-radius: 12px; border: 1px solid #FADBE6;
         }
         .wb-entry-input {
             width: 100%; border: none; background: #f9f9f9;
@@ -932,7 +1110,6 @@
         .wb-btn-cancel { background: transparent; color: #aaa; }
         .wb-btn-ok { background: var(--theme-pink-btn); color: white; box-shadow: 0 4px 10px rgba(245, 179, 201, 0.4); }
 
-        /* World Book Detail View Modal (MODIFIED) */
         #worldbook-detail-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--theme-pink-bg-soft); z-index: 650;
@@ -965,7 +1142,6 @@
         .wb-detail-key { font-size: 13px; color: #999; font-weight: 500; margin-bottom: 6px; }
         .wb-detail-val { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
 
-        /* New styles for editing entries */
         .wb-detail-item-actions { display: flex; gap: 10px; align-self: flex-end; margin-top: 15px; }
         .wb-detail-item-actions button {
             background: #f0f0f0; border: none; border-radius: 8px; padding: 5px 12px;
@@ -975,7 +1151,6 @@
         .wb-detail-item .edit-form textarea { min-height: 80px; }
 
 
-        /* World Book Color Settings Page (NEW) */
         #worldbook-color-page {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: var(--theme-pink-bg-light); z-index: 700;
@@ -1009,6 +1184,55 @@
         .wb-color-input::-webkit-color-swatch { border: 1px solid #ddd; border-radius: 8px; }
         .wb-color-input::-moz-color-swatch { border: 1px solid #ddd; border-radius: 8px; }
 
+        #worldbook-bind-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 800; backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #worldbook-bind-modal.active { opacity: 1; pointer-events: auto; }
+        .wb-bind-modal-card {
+            background: white;
+            width: 85%; max-width: 340px; border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            max-height: 70vh; display: flex; flex-direction: column;
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #worldbook-bind-modal.active .wb-bind-modal-card { transform: scale(1); }
+        .wb-bind-modal-header {
+            padding: 15px 20px;
+            font-size: 16px; font-weight: 600; color: var(--theme-pink-text);
+            text-align: center; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        .wb-bind-modal-header .close-btn {
+            font-size: 20px; color: #aaa; cursor: pointer;
+        }
+        .wb-bind-modal-list {
+            flex: 1; overflow-y: auto; padding: 10px;
+        }
+        .wb-bind-list-item {
+            padding: 15px;
+            font-size: 15px; color: #333;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .wb-bind-list-item:last-child {
+            border-bottom: none;
+        }
+        .wb-bind-list-item:hover {
+            background-color: #f9f9f9;
+        }
+        .wb-bind-list-item:active {
+            background-color: #f0f0f0;
+        }
+        .wb-bind-list-empty {
+            text-align: center; color: #ccc;
+            padding: 40px 20px; font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
@@ -1017,7 +1241,7 @@
     <div id="time-section">
         <div id="time-container" onclick="handleTimeBgClick(event)">
             <div id="clock-time">12:00</div>
-            <div id="clock-date" onclick="handleDateEdit(event)">2026年02月03日 星期二</div>
+            <div id="clock-date" onclick="handleDateEdit(event)">2026年02月06日 星期五</div>
         </div>
     </div>
     <div id="grid-area">
@@ -1087,27 +1311,28 @@
     <div class="chat-app-header" id="chat-app-header-el">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-icon-img" id="chat-back-btn" onclick="closeChatApp()">
         <div class="chat-header-title" id="chat-page-title">Chat</div>
-        <img id="chat-header-right-icon" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png" class="header-right-icon" onclick="openAddFriendModal()">
+        <!-- 右上角图标容器 -->
+        <div id="chat-header-right-icons" style="display: flex; gap: 15px;">
+            <img id="chat-header-add-friend-icon" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png" class="header-right-icon" onclick="openAddFriendModal()">
+            <img id="chat-header-add-moment-icon" src="https://img.heliar.top/file/1770339943568_相机_camera-one.png" class="header-right-icon" onclick="openAddMomentModal()" style="display: none;">
+        </div>
     </div>
     
     <div class="chat-app-content" id="chat-content-area">
         <div id="chat-tab-0" class="chat-tab-content active">
             <div class="chat-list-container" id="chat-list-container">
-                <div class="chat-placeholder-text">没有新信息</div>
+                <!-- Chat list dynamically generated -->
             </div>
         </div>
         <div id="chat-tab-1" class="chat-tab-content">
             <div class="contact-list-container" id="contact-list-container">
-                 <!-- 动态生成通讯录 -->
-                <div class="chat-placeholder-text">通讯录为空</div>
+                 <!-- Contacts dynamically generated -->
             </div>
-            <!-- 字母索引条 -->
-            <div class="alpha-index-bar" id="alpha-index-bar">
-                <!-- A-Z -->
-            </div>
+            <div class="alpha-index-bar" id="alpha-index-bar"></div>
         </div>
         <div id="chat-tab-2" class="chat-tab-content">
-            <div class="chat-placeholder-text">朋友圈暂无动态</div>
+            <!-- NEW: Moments page will be rendered here -->
+            <div id="moments-page-wrapper"></div>
         </div>
         
         <div id="chat-tab-3" class="chat-tab-content">
@@ -1115,7 +1340,7 @@
                 <div class="me-cover-area" id="profile-cover">
                     <div class="me-like-wrapper">
                         <img src="https://img.heliar.top/file/1770079217317_赞_thumbs-up_2.png" class="me-like-icon" onclick="incrementLikeCount(event)">
-                        <div class="me-like-count" id="profile-like-count" onclick="editLikeCount(event)">8888</div>
+                        <div class="me-like-count" id="profile-like-count">8888</div>
                     </div>
                     <div class="me-setting-wrapper">
                         <img src="https://img.heliar.top/file/1770083061419_设置_setting-two.png" class="me-setting-icon" onclick="openMeSettings()">
@@ -1164,12 +1389,12 @@
         <div class="chat-nav-item" onclick="switchChatTab(2, '朋友圈')">
             <img src="https://img.heliar.top/file/1770068142240_朋友圈_friends-circle_2.png" class="chat-nav-icon">
         </div>
-        <div class="chat-nav-item" onclick="switchChatTab(3, 'me')">
+        <div class="chat-nav-item" onclick="switchChatTab(3, '我')">
             <img src="https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png" class="chat-nav-icon">
         </div>
     </div>
 
-    <!-- 角色聊天专属页面 (Overlay) -->
+    <!-- 角色聊天专属页面 -->
     <div id="chat-conversation-view">
         <div class="chat-conv-header">
             <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="chat-conv-back-btn" onclick="closeChatConversation()">
@@ -1177,43 +1402,25 @@
                 <div class="chat-conv-title" id="chat-conv-title">角色名称</div>
                 <div class="chat-conv-signature" id="chat-conv-signature"></div>
             </div>
-            <!-- 修改后的右上角更多图标 -->
             <img class="chat-conv-right-icon" src="https://img.heliar.top/file/1770241189848_更多_more.png" onclick="openRoleSettings()">
         </div>
-        <div class="chat-conv-messages" id="chat-conv-messages">
-            <!-- 动态生成消息 -->
-        </div>
+        <div class="chat-conv-messages" id="chat-conv-messages"></div>
         <div class="chat-conv-footer">
-            <!-- 图标1：开关/语音 -->
-            <button class="chat-conv-btn">
-                <img src="https://img.heliar.top/file/1770239041392_开关_power.png" style="width: 24px; height: 24px; object-fit: contain;">
-            </button>
-            
-            <!-- 输入框 -->
+            <button class="chat-conv-btn"><img src="https://img.heliar.top/file/1770239041392_开关_power.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
             <div class="chat-conv-input-wrapper">
                 <input type="text" class="chat-conv-input" id="chat-conv-input" placeholder="输入消息...">
             </div>
-            
-            <!-- 修复：图标2：更多/加号 (填补空缺，确保发送是第三个图片) -->
-            <button class="chat-conv-btn" style="margin-right: 0;">
-                <img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;">
-            </button>
-            
-             <!-- 图标3：发送按钮 -->
-            <button class="chat-conv-btn send" onclick="sendConversationMessage()">
-                <img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;">
-            </button>
+            <button class="chat-conv-btn" style="margin-right: 0;"><img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
+            <button class="chat-conv-btn send" onclick="sendConversationMessage()"><img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;"></button>
         </div>
     </div>
 </div>
 
-<!-- 角色设置页面 (新设计) -->
+<!-- 角色设置页面 -->
 <div id="role-settings-page">
     <div class="role-setting-close-area">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="role-setting-back-btn" onclick="closeRoleSettings()">
     </div>
-    
-    <!-- 角色设置卡片 -->
     <div class="settings-section-card">
         <div class="settings-card-title">角色设置 (Role)</div>
         <div class="role-avatar-edit-wrapper" onclick="triggerRoleAvatarEdit()">
@@ -1222,24 +1429,29 @@
         </div>
         <input type="text" id="role-setting-alias" class="role-alias-edit" placeholder="备注名">
         <input type="text" id="role-setting-signature" class="role-signature-edit" placeholder="角色签名...">
-        
         <textarea id="role-setting-persona" class="role-persona-input" placeholder="输入角色人设 (Persona)..."></textarea>
-        
         <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-        <span style="font-size:13px; color:#555;">聊天背景</span>
-        <div id="role-bg-preview" class="role-bg-preview" style="width: 40px; height: 60px; border-radius: 6px; background-color: #eee; background-size: cover; background-position: center; border: 1px solid #ddd;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <span style="font-size:13px; color:#555;">聊天背景</span>
+                <div id="role-bg-preview" class="role-bg-preview"></div>
+            </div>
+            <input type="text" id="role-bg-url-input" placeholder="输入背景图片URL" style="width: 100%; padding: 10px; border: 1px solid #FADBE6; border-radius: 8px; font-size: 14px;">
+            <div style="display: flex; gap: 10px;">
+                <button class="role-bg-btn" onclick="triggerRoleBgUpload()">上传图片</button>
+                <button class="role-bg-btn" onclick="setRoleBgByUrl()">应用URL</button>
+            </div>
+        </div>
     </div>
-    <!-- 新增URL输入框 -->
-    <input type="text" id="role-bg-url-input" placeholder="输入背景图片URL" style="width: 100%; padding: 10px; border: 1px solid #FADBE6; border-radius: 8px; font-size: 14px;">
-    <div style="display: flex; gap: 10px;">
-        <button class="role-bg-btn" onclick="triggerRoleBgUpload()">上传图片</button>
-        <button class="role-bg-btn" onclick="setRoleBgByUrl()">应用URL</button>
+    <div class="settings-section-card">
+        <div class="settings-card-title">角色世界书</div>
+        <div class="role-wb-binding-area">
+            <div id="role-wb-display" class="unbound">未绑定</div>
+            <div class="actions">
+                <button id="role-wb-clear-btn" onclick="clearWorldBookBinding()" style="display: none;">清除</button>
+                <button onclick="openWorldBookBindModal()">选择</button>
+            </div>
+        </div>
     </div>
-</div>
-    </div>
-
-    <!-- 用户设置卡片 -->
     <div class="settings-section-card">
         <div class="settings-card-title">用户设置 (User)</div>
         <div class="user-avatar-row">
@@ -1251,20 +1463,24 @@
         </div>
         <textarea id="role-user-persona" class="role-persona-input" placeholder="输入您的人设 (User Persona)..."></textarea>
     </div>
-    
-    <!-- 新增：自定义 CSS 样式 -->
     <div class="settings-section-card">
         <div class="settings-card-title">自定义样式 (CSS)</div>
-        <!-- 样式修改：浅色背景 -->
-        <textarea id="role-setting-css" class="role-css-input" placeholder="/* 在这里输入CSS代码修改气泡样式 */
-.msg-bubble-row.them .msg-bubble-content {
-  border-radius: 20px 20px 20px 0;
-  background: #fff;
-}"></textarea>
+        <textarea id="role-setting-css" class="role-css-input" placeholder="/* 在这里输入CSS代码修改气泡样式 */..."></textarea>
     </div>
-    
     <button class="role-save-btn" onclick="saveRoleSettings()">保存设置</button>
     <button class="role-delete-btn" onclick="confirmDeleteFriend()">删除好友</button>
+</div>
+
+<!-- NEW: Add Moment Modal -->
+<div id="add-moment-modal">
+    <div class="add-moment-header">
+        <button class="add-moment-cancel" onclick="closeAddMomentModal()">取消</button>
+        <button class="add-moment-post" onclick="saveNewMoment()">发表</button>
+    </div>
+    <div class="add-moment-content">
+        <textarea id="add-moment-text" placeholder="这一刻的想法..."></textarea>
+        <input type="text" id="add-moment-image-url" placeholder="粘贴图片链接 (可选)">
+    </div>
 </div>
 
 
@@ -1277,13 +1493,11 @@
             <span id="wallet-nickname" class="wallet-nickname" onclick="editNickname(event)">User</span>
         </div>
     </div>
-    
     <div class="wallet-content">
         <div class="wallet-balance-card">
             <div class="wallet-balance-label">总余额 (CNY)</div>
             <div class="wallet-balance-amount" id="wallet-total-balance">0.00</div>
         </div>
-        
         <div class="wallet-stats-row">
             <div class="wallet-stat-box">
                 <div class="wallet-stat-label in">本月收入</div>
@@ -1295,26 +1509,20 @@
             </div>
         </div>
         <div class="wallet-actions">
-            <button class="wallet-btn income" onclick="openWalletModal('income')">
-                <span>+</span> 记收入
-            </button>
-            <button class="wallet-btn expense" onclick="openWalletModal('expense')">
-                <span>-</span> 记支出
-            </button>
+            <button class="wallet-btn income" onclick="openWalletModal('income')"><span>+</span> 记收入</button>
+            <button class="wallet-btn expense" onclick="openWalletModal('expense')"><span>-</span> 记支出</button>
         </div>
         <div class="wallet-list-container">
             <div class="wallet-list-header">
                 <div class="wallet-list-title">本月明细</div>
                 <div class="wallet-month-badge" id="wallet-current-month">2月</div>
             </div>
-            <div class="wallet-items-scroll" id="wallet-transaction-list">
-                <div class="wallet-empty">本月暂无收支记录</div>
-            </div>
+            <div class="wallet-items-scroll" id="wallet-transaction-list"></div>
         </div>
     </div>
 </div>
 
-<!-- World Book App Page (MODIFIED) -->
+<!-- World Book App Page -->
 <div id="worldbook-app-page">
     <div class="wb-header">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="wb-back-btn-img" onclick="closeWorldBookApp()">
@@ -1324,30 +1532,24 @@
             <div class="wb-add-btn" onclick="openWorldBookAddModal()">+</div>
         </div>
     </div>
-    <div class="wb-content" id="worldbook-list">
-        <!-- JS 动态生成世界书列表 -->
-    </div>
+    <div class="wb-content" id="worldbook-list"></div>
 </div>
 
-<!-- World Book Add Modal (MODIFIED) -->
+<!-- World Book Add Modal -->
 <div id="worldbook-add-modal">
     <div class="wb-modal-card">
         <div class="wb-modal-header">添加世界书</div>
         <div class="wb-modal-scroll-area">
             <div class="wb-input-label">世界书名</div>
             <input type="text" id="wb-title-input" class="wb-main-input" placeholder="输入世界书名称...">
-            
             <div id="wb-dynamic-entries">
-                <!-- 动态词条行 -->
                 <div class="wb-entry-row wb-dynamic-row">
                     <input type="text" class="wb-entry-input key" placeholder="名称（可选）">
                     <textarea class="wb-entry-input val" placeholder="世界书内容"></textarea>
                 </div>
             </div>
-            
             <button class="wb-plus-row-btn" onclick="addWorldBookEntryRow()">+</button>
         </div>
-        
         <div class="wb-modal-actions">
             <button class="wb-action-btn wb-btn-cancel" onclick="closeWorldBookAddModal()">取消</button>
             <button class="wb-action-btn wb-btn-ok" onclick="saveWorldBook()">OK</button>
@@ -1355,28 +1557,24 @@
     </div>
 </div>
 
-<!-- World Book Detail Modal (MODIFIED) -->
+<!-- World Book Detail Modal -->
 <div id="worldbook-detail-modal">
     <div class="wb-detail-header">
         <div class="wb-detail-back" onclick="closeWorldBookDetail()">＜</div>
         <div class="wb-detail-title" id="wb-detail-title-text">Title</div>
         <button class="wb-delete-book-btn" onclick="deleteCurrentWorldBook()">删除</button>
     </div>
-    <div class="wb-detail-content" id="wb-detail-content-area">
-        <!-- 动态渲染内容 -->
-    </div>
+    <div class="wb-detail-content" id="wb-detail-content-area"></div>
 </div>
 
-<!-- World Book Color Settings Page (NEW) -->
+<!-- World Book Color Settings Page -->
 <div id="worldbook-color-page">
     <div class="wb-color-header">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="wb-back-btn-img" onclick="closeWorldBookColorSettings()">
         <div class="wb-color-title">设置封面颜色</div>
         <button class="wb-color-save-btn" onclick="saveWorldBookColors()">OK</button>
     </div>
-    <div class="wb-color-content" id="wb-color-list">
-        <!-- JS will populate this -->
-    </div>
+    <div class="wb-color-content" id="wb-color-list"></div>
 </div>
 
 
@@ -1384,7 +1582,6 @@
 <div id="wallet-add-modal">
     <div class="wallet-add-card">
         <div class="wallet-modal-title">记一笔</div>
-        
         <div class="wallet-type-select">
             <button class="wallet-type-btn active in" id="w-btn-in" onclick="setWalletType('income')">收入</button>
             <button class="wallet-type-btn" id="w-btn-out" onclick="setWalletType('expense')">支出</button>
@@ -1405,7 +1602,6 @@
     <div class="add-friend-card">
         <div class="add-friend-close" onclick="closeAddFriendModal()">✕</div>
         <img src="https://img.heliar.top/file/1770069003752_保存_save.png" class="add-friend-save" onclick="saveNewFriend()">
-        
         <div class="add-friend-avatar-upload" onclick="triggerAvatarUpload()">
             <span id="avatar-placeholder-icon">+</span>
             <img id="new-friend-avatar-preview" class="add-friend-avatar-preview">
@@ -1427,6 +1623,17 @@
     </div>
 </div>
 
+<!-- World Book Binding Modal -->
+<div id="worldbook-bind-modal">
+    <div class="wb-bind-modal-card">
+        <div class="wb-bind-modal-header">
+            <span>选择绑定的世界书</span>
+            <span class="close-btn" onclick="closeWorldBookBindModal()">✕</span>
+        </div>
+        <div class="wb-bind-modal-list" id="worldbook-bind-list"></div>
+    </div>
+</div>
+
 <div id="settings-page">
     <div class="settings-header">
         <div class="back-btn-container" onclick="hideSettingsPage()">
@@ -1436,7 +1643,6 @@
         <button id="save-settings-btn">OK</button>
     </div>
     <div class="settings-content">
-        <!-- NEW: iOS Mode Module -->
         <div class="settings-module">
             <h3>通用</h3>
             <div class="settings-row-ios-mode">
@@ -1447,7 +1653,6 @@
                 </label>
             </div>
         </div>
-        <!-- AI 设置模块 -->
         <div class="settings-module">
             <h3>AI API 设置</h3>
             <div class="settings-row">
@@ -1489,7 +1694,6 @@
                 <input type="number" id="max-tokens-input" placeholder="例如: 1000" value="1000">
             </div>
         </div>
-
         <div class="settings-module">
             <h3>界面美化</h3>
             <div class="settings-row">
@@ -1500,7 +1704,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="settings-module">
             <h3>组件图片</h3>
             <div class="settings-row">
@@ -1518,12 +1721,9 @@
                 </div>
             </div>
         </div>
-        
         <div class="settings-module">
             <h3>图标自定义</h3>
-            <div class="settings-app-list" id="settings-app-list-container">
-                <!-- 动态生成 -->
-            </div>
+            <div class="settings-app-list" id="settings-app-list-container"></div>
         </div>
     </div>
 </div>
@@ -1535,9 +1735,7 @@
             <button class="close-btn" onclick="closeAIChat()">×</button>
         </div>
         <div class="chat-messages" id="chat-messages">
-            <div class="message ai">
-                你好！我是 AI 助手。请点击底栏第一个图标进入设置配置 API，然后我们就可以聊天了。
-            </div>
+            <div class="message ai">你好！我是 AI 助手。请点击底栏第一个图标进入设置配置 API，然后我们就可以聊天了。</div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="说点什么..." onkeypress="handleChatKeyPress(event)">
@@ -1554,83 +1752,24 @@
         <span class="me-settings-header-title">个人主页设置</span>
         <button class="me-settings-save-btn" onclick="saveMeSettings()">保存</button>
     </div>
-    
     <div class="me-settings-scroll-content">
         <div class="me-settings-group">
             <h3>基础信息</h3>
             <div class="me-settings-row">
                 <div class="me-settings-label">头像</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-settings-avatar-preview" class="me-settings-preview avatar">
-                </div>
+                <div class="me-settings-preview-wrapper"><img id="me-settings-avatar-preview" class="me-settings-preview avatar"></div>
                 <input type="text" id="me-settings-avatar-url" class="me-settings-input" placeholder="头像 URL">
             </div>
             <div class="me-settings-row">
                 <div class="me-settings-label">背景</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-settings-cover-preview" class="me-settings-preview cover">
-                </div>
+                <div class="me-settings-preview-wrapper"><img id="me-settings-cover-preview" class="me-settings-preview cover"></div>
                 <input type="text" id="me-settings-cover-url" class="me-settings-input" placeholder="背景图 URL">
             </div>
         </div>
-
         <div class="me-settings-group">
             <h3>会员图标列表 (8个)</h3>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员1</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m1" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m1" class="me-settings-input" placeholder="图片 URL">
-            </div>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员2</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m2" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m2" class="me-settings-input" placeholder="图片 URL">
-            </div>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员3</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m3" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m3" class="me-settings-input" placeholder="图片 URL">
-            </div>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员4</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m4" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m4" class="me-settings-input" placeholder="图片 URL">
-            </div>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员5</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m5" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m5" class="me-settings-input" placeholder="图片 URL">
-            </div>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员6</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m6" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m6" class="me-settings-input" placeholder="图片 URL">
-            </div>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员7</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m7" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m7" class="me-settings-input" placeholder="图片 URL">
-            </div>
-            <div class="me-settings-row">
-                <div class="me-settings-label">会员8</div>
-                <div class="me-settings-preview-wrapper">
-                    <img id="me-preview-m8" class="me-settings-preview icon">
-                </div>
-                <input type="text" id="me-input-m8" class="me-settings-input" placeholder="图片 URL">
+            <div id="me-settings-member-icons-list">
+                <!-- Dynamically generated -->
             </div>
         </div>
     </div>
@@ -1648,49 +1787,34 @@
 <script>
     'use strict';
     // --- DOM & Keys ---
-    const clockTimeEl = document.getElementById('clock-time');
-    const clockDateEl = document.getElementById('clock-date');
-    const timeContainer = document.getElementById('time-container');
-    const apiUrlInput = document.getElementById('api-url-input');
-    const apiKeyInput = document.getElementById('api-key-input');
-    const tempSlider = document.getElementById('temp-slider');
-    const tempValueDisplay = document.getElementById('temp-value-display');
-    const maxTokensInput = document.getElementById('max-tokens-input');
-    const saveSettingsBtn = document.getElementById('save-settings-btn');
-    const toast = document.getElementById('toast-notification');
     const body = document.body;
+    const toast = document.getElementById('toast-notification');
     
-    const wallpaperUrlInput = document.getElementById('wallpaper-url');
-    const widgetSquareUrlInput = document.getElementById('widget-square-url');
-    const customImageUrlInput = document.getElementById('custom-image-url');
-    const wallpaperPreview = document.getElementById('wallpaper-preview');
-    const widgetSquarePreview = document.getElementById('widget-square-preview');
-    const customImagePreview = document.getElementById('custom-image-preview');
-
-    const meSettingsModal = document.getElementById('me-settings-modal');
-    const meSettingsAvatarUrl = document.getElementById('me-settings-avatar-url');
-    const meSettingsCoverUrl = document.getElementById('me-settings-cover-url');
-    const meSettingsAvatarPreview = document.getElementById('me-settings-avatar-preview');
-    const meSettingsCoverPreview = document.getElementById('me-settings-cover-preview');
-
-    // --- NEW: iOS Mode Elements & Key ---
-    const iosModeSwitch = document.getElementById('ios-mode-switch');
-    const IOS_MODE_KEY = 'iosModeEnabled_v1';
-    
+    // --- LocalStorage Keys ---
     const ALL_SETTINGS_KEY = 'appSettings_v15';
     const CHAT_DATA_KEY = 'chatData_v2_contacts';
     const USER_PROFILE_KEY = 'userProfile_v4'; 
     const WALLET_DATA_KEY = 'walletData_v1';
-    const WORLDBOOK_DATA_KEY = 'worldbookData_v2'; // Updated World Book Key for new structure
+    const WORLDBOOK_DATA_KEY = 'worldbookData_v2'; 
+    const IOS_MODE_KEY = 'iosModeEnabled_v1';
+    const MOMENTS_DATA_KEY = 'momentsData_v1'; // NEW: Key for Moments data
 
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
     let currentWalletType = 'income';
     let currentChatContactId = null; 
     let tempRoleBgUrl = ""; 
-    let currentWorldBookId = null; // for Detail view
+    let currentWorldBookId = null; 
+    let tempSelectedWorldBookId = null;
 
-    // --- NEW: iOS Mode Function ---
+    // --- Utility Functions ---
+    const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
+    function escapeHtml(text) { if(typeof text !== 'string') return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+    function compressImage(file, maxSize, callback) {
+        if (!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let width = img.width; let height = img.height; if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } } canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/jpeg', 0.7)); }; img.src = e.target.result; }; reader.readAsDataURL(file);
+    }
+    
+    // --- iOS Mode Function ---
     function applyIOSMode(enabled) {
       if (enabled) {
         document.body.classList.add('ios-mode-active');
@@ -1701,1063 +1825,348 @@
     }
 
     // --- Chat App Logic ---
-    window.openChatApp = () => {
-        body.classList.add('chat-active');
-        switchChatTab(0, 'Chat');
-        renderChatList();
-     };
-    window.closeChatApp = () => {
-        body.classList.remove('chat-active');
-        closeChatConversation();
-    };
+    window.openChatApp = () => { body.classList.add('chat-active'); switchChatTab(0, 'Chat'); renderChatList(); };
+    window.closeChatApp = () => { body.classList.remove('chat-active'); closeChatConversation(); };
     window.switchChatTab = (index, title) => {
         const titleEl = document.getElementById('chat-page-title');
-        const rightIcon = document.getElementById('chat-header-right-icon');
+        const addFriendIcon = document.getElementById('chat-header-add-friend-icon');
+        const addMomentIcon = document.getElementById('chat-header-add-moment-icon');
         const headerEl = document.getElementById('chat-app-header-el');
         const backBtn = document.getElementById('chat-back-btn');
         const contentArea = document.getElementById('chat-content-area');
-        const contents = document.querySelectorAll('.chat-tab-content');
-        contents.forEach((el, i) => {
-            if (i === index) el.classList.add('active');
-            else el.classList.remove('active');
-        });
-
-        const navItems = document.querySelectorAll('.chat-nav-item');
-        navItems.forEach((el, i) => {
-            if (i === index) el.classList.add('active');
-            else el.classList.remove('active');
-        });
-
+        
+        document.querySelectorAll('.chat-tab-content').forEach((el, i) => el.classList.toggle('active', i === index));
+        document.querySelectorAll('.chat-nav-item').forEach((el, i) => el.classList.toggle('active', i === index));
+        
         headerEl.classList.remove('hidden');
         backBtn.classList.remove('hidden');
         contentArea.classList.remove('me-mode');
         titleEl.innerText = title;
+        titleEl.style.color = (index === 0 || index === 1 || index === 2) ? "#f5b3c9" : "#333";
 
-        // 修改： Chat、通讯录、朋友圈标题颜色统一为 #f5b3c9
-        if (index === 0 || index === 1 || index === 2) {
-            titleEl.style.color = "#f5b3c9"; 
-        } else {
-            titleEl.style.color = "#333";
-        }
+        addFriendIcon.style.display = 'none';
+        addMomentIcon.style.display = 'none';
 
-        if (index === 0) {
-            rightIcon.style.opacity = "1";
-            rightIcon.style.pointerEvents = "auto";
-        } else if (index === 1) {
-             rightIcon.style.opacity = "0";
-             rightIcon.style.pointerEvents = "none";
-             backBtn.classList.add('hidden');
-             renderContactList(); 
-        } else if (index === 2) {
-            rightIcon.style.opacity = "0";
-            rightIcon.style.pointerEvents = "none";
+        if (index === 0) { // Chat
+            addFriendIcon.style.display = 'block';
+        } else if (index === 1) { // Contacts
             backBtn.classList.add('hidden');
-        } else if (index === 3) {
+            renderContactList(); 
+        } else if (index === 2) { // Moments
+            addMomentIcon.style.display = 'block';
+            backBtn.classList.add('hidden');
+            renderMomentsPage();
+        } else if (index === 3) { // Me
             headerEl.classList.add('hidden');
             contentArea.classList.add('me-mode');
             loadUserProfile();
          }
     };
-
-    // --- World Book App Logic (MODIFIED & NEW) ---
-    window.openWorldBookApp = () => {
-        body.classList.add('worldbook-active');
-        renderWorldBooks();
-    };
-    window.closeWorldBookApp = () => {
-        body.classList.remove('worldbook-active');
-        closeWorldBookDetail(); // Ensure detail view is closed
-        closeWorldBookColorSettings(); // Ensure color settings is closed
-    };
     
-    // 打开添加弹窗
-    window.openWorldBookAddModal = () => {
-        document.getElementById('wb-title-input').value = "";
-        const dynamicContainer = document.getElementById('wb-dynamic-entries');
-        dynamicContainer.innerHTML = ''; 
-        addWorldBookEntryRow(); // 默认添加一行
-        document.getElementById('worldbook-add-modal').classList.add('active');
-    };
-    window.closeWorldBookAddModal = () => {
-        document.getElementById('worldbook-add-modal').classList.remove('active');
-    };
+    // --- NEW: Moments (朋友圈) Functions ---
+    function getMomentsData() {
+        try { return JSON.parse(localStorage.getItem(MOMENTS_DATA_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function saveMomentsData(data) {
+        localStorage.setItem(MOMENTS_DATA_KEY, JSON.stringify(data));
+    }
     
-    // 动态添加输入行
-    window.addWorldBookEntryRow = () => {
-        const container = document.getElementById('wb-dynamic-entries');
-        const row = document.createElement('div');
-        row.className = 'wb-entry-row wb-dynamic-row';
-        row.innerHTML = `
-            <input type="text" class="wb-entry-input key" placeholder="名称（可选）">
-            <textarea class="wb-entry-input val" placeholder="世界书内容"></textarea>
-        `;
-        container.appendChild(row);
-    };
+    function formatTimestamp(ts) {
+        const now = new Date();
+        const postDate = new Date(ts);
+        const diff = now - postDate; // in milliseconds
+        const diffMinutes = Math.floor(diff / 60000);
+        const diffHours = Math.floor(diff / 3600000);
+        const diffDays = Math.floor(diff / 86400000);
 
-    // 保存世界书
-    window.saveWorldBook = () => {
-        const title = document.getElementById('wb-title-input').value.trim();
-        if(!title) { showToast("请输入世界书名"); return; }
-        
-        const rows = document.querySelectorAll('.wb-dynamic-row');
-        const entries = [];
-        let hasContent = false;
-        rows.forEach(row => {
-            const key = row.querySelector('.key').value.trim();
-            const val = row.querySelector('.val').value.trim();
-            if(val) {
-                entries.push({ key: key, content: val });
-                hasContent = true;
-            }
-        });
-
-        if (!hasContent) { showToast("请至少输入一条世界书内容"); return; }
-
-        const newBook = {
-            id: Date.now(),
-            title: title,
-            entries: entries,
-            coverColor: '#EAEAEA' // Default color
-        };
-
-        let books = [];
-        try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {}
-        books.push(newBook);
-        localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
-        
-        showToast("世界书已保存");
-        closeWorldBookAddModal();
-        renderWorldBooks();
-    };
-
-    // 渲染世界书列表
-    window.renderWorldBooks = () => {
-        const container = document.getElementById('worldbook-list');
-        container.innerHTML = '';
-        let books = [];
-        try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) { books = []; }
-        
-        books.sort((a,b) => b.id - a.id).forEach(book => {
-            const item = document.createElement('div');
-            item.className = 'wb-book-item';
-            item.onclick = () => viewWorldBook(book.id);
-            item.innerHTML = `
-                <div class="wb-book-cover">
-                    <div class="wb-book-name">${escapeHtml(book.title)}</div>
-                </div>
-            `;
-            const coverEl = item.querySelector('.wb-book-cover');
-            if (book.coverColor) {
-                coverEl.style.background = book.coverColor;
-            }
-            container.appendChild(item);
-        });
-    };
-
-    // 查看世界书详情
-    window.viewWorldBook = (id) => {
-        currentWorldBookId = id;
-        renderWorldBookDetailView();
-        document.getElementById('worldbook-detail-modal').classList.add('active');
-    };
-    
-    // 渲染详情页内容 (抽取为独立函数)
-    function renderWorldBookDetailView() {
-        if (!currentWorldBookId) return;
-        let books = [];
-        try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {}
-        const book = books.find(b => b.id === currentWorldBookId);
-        if(!book) { closeWorldBookDetail(); return; }
-
-        document.getElementById('wb-detail-title-text').innerText = book.title;
-        const contentArea = document.getElementById('wb-detail-content-area');
-        contentArea.innerHTML = '';
-
-        book.entries.forEach((entry, index) => {
-            const div = document.createElement('div');
-            div.className = 'wb-detail-item';
-            div.id = `wb-entry-item-${index}`;
-            div.innerHTML = `
-                <div class="wb-detail-item-content">
-                    ${entry.key ? `<div class="wb-detail-key">${escapeHtml(entry.key)}</div>` : ''}
-                    <div class="wb-detail-val">${escapeHtml(entry.content)}</div>
-                </div>
-                <div class="wb-detail-item-actions">
-                    <button onclick="editWorldBookEntry(${index})">修改</button>
-                    <button onclick="deleteWorldBookEntry(${index})">删除</button>
-                </div>
-            `;
-            contentArea.appendChild(div);
-        });
+        if (diffMinutes < 1) return '刚刚';
+        if (diffMinutes < 60) return `${diffMinutes}分钟前`;
+        if (diffHours < 24 && now.getDate() === postDate.getDate()) return `${diffHours}小时前`;
+        if (diffDays === 1 || (diffHours < 48 && now.getDate() - 1 === postDate.getDate())) return '昨天';
+        return `${postDate.getMonth() + 1}月${postDate.getDate()}日`;
     }
 
-    // 修改条目
-    window.editWorldBookEntry = (index) => {
-        const itemEl = document.getElementById(`wb-entry-item-${index}`);
-        if (!itemEl) return;
+    function renderMomentsPage() {
+        const wrapper = document.getElementById('moments-page-wrapper');
+        const profile = getUserProfile();
+        let moments = getMomentsData();
         
-        const books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-        const book = books.find(b => b.id === currentWorldBookId);
-        if (!book || !book.entries[index]) return;
+        let listHtml = '';
+        if (moments.length > 0) {
+            moments.sort((a,b) => b.timestamp - a.timestamp); // Show newest first
+            moments.forEach(moment => {
+                const userHasLiked = moment.likes.includes(profile.qqId);
+                const likeBtnText = userHasLiked ? '取消' : '赞';
 
-        const entry = book.entries[index];
-        itemEl.innerHTML = `
-            <div class="edit-form">
-                <input type="text" class="wb-entry-input key" placeholder="名称（可选）" value="${escapeHtml(entry.key)}">
-                <textarea class="wb-entry-input val" placeholder="世界书内容">${escapeHtml(entry.content)}</textarea>
+                let likesHtml = '';
+                if (moment.likes.length > 0) {
+                    likesHtml = `<div class="moment-likes">❤️ ${moment.likes.length}</div>`;
+                }
+
+                let commentsHtml = '';
+                if (moment.comments.length > 0) {
+                    commentsHtml = `<div class="moment-comments-list">` +
+                        moment.comments.map(c => 
+                            `<div class="moment-comment-item"><span class="user">${escapeHtml(c.user)}:</span> <span class="text">${escapeHtml(c.text)}</span></div>`
+                        ).join('') +
+                    `</div>`;
+                }
+
+                listHtml += `
+                    <div class="moment-item" id="moment-${moment.id}">
+                        <img src="${profile.avatar}" class="moment-item-avatar" alt="avatar">
+                        <div class="moment-item-content">
+                            <div class="moment-item-nickname">${escapeHtml(profile.nickname)}</div>
+                            ${moment.text ? `<div class="moment-item-text">${escapeHtml(moment.text)}</div>` : ''}
+                            ${moment.imageUrl ? `<img src="${moment.imageUrl}" class="moment-item-image">` : ''}
+                            <div class="moment-item-meta">
+                                <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
+                                <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
+                                    ...
+                                    <div class="moment-actions-popup">
+                                        <div class="moment-popup-btn" onclick="toggleLike(${moment.id})">👍 ${likeBtnText}</div>
+                                        <div class="moment-popup-btn" onclick="addComment(${moment.id})">💬 评论</div>
+                                    </div>
+                                </div>
+                            </div>
+                            ${(likesHtml || commentsHtml) ? `<div class="moment-feedback">${likesHtml}${commentsHtml}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            listHtml = '<div class="moments-empty-placeholder">还没有动态，点击右上角相机发布第一条吧！</div>';
+        }
+        
+        wrapper.innerHTML = `
+            <div class="moments-header">
+                <div class="moments-cover-img" style="background-image: url(${profile.cover || 'linear-gradient(to bottom, #7A88FF, #7AFFAF)'})"></div>
+                <div class="moments-user-info">
+                    <span class="moments-user-nickname">${escapeHtml(profile.nickname)}</span>
+                    <img src="${profile.avatar}" class="moments-user-avatar" alt="avatar">
+                </div>
             </div>
-            <div class="wb-detail-item-actions">
-                <button class="save" onclick="saveWorldBookEntry(${index})">保存</button>
-                <button onclick="renderWorldBookDetailView()">取消</button>
+            <div id="moments-list">
+                ${listHtml}
             </div>
         `;
-    };
+    }
 
-    // 保存条目修改
-    window.saveWorldBookEntry = (index) => {
-        const itemEl = document.getElementById(`wb-entry-item-${index}`);
-        const newKey = itemEl.querySelector('.key').value.trim();
-        const newVal = itemEl.querySelector('.val').value.trim();
-
-        if (!newVal) { showToast("内容不能为空"); return; }
-        
-        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-        const bookIndex = books.findIndex(b => b.id === currentWorldBookId);
-        if (bookIndex !== -1 && books[bookIndex].entries[index]) {
-            books[bookIndex].entries[index] = { key: newKey, content: newVal };
-            localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
-            showToast("已保存");
-            renderWorldBookDetailView(); // 重新渲染整个详情页
+    window.toggleActionsPopup = (momentId, event) => {
+        event.stopPropagation();
+        const allPopups = document.querySelectorAll('.moment-actions-popup');
+        allPopups.forEach(p => p.classList.remove('active'));
+        const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
+        if (popup) {
+            popup.classList.toggle('active');
         }
     };
-    
-    // 删除条目
-    window.deleteWorldBookEntry = (index) => {
-        if (!confirm("确定要删除这个条目吗？")) return;
-        
-        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-        const bookIndex = books.findIndex(b => b.id === currentWorldBookId);
-        if (bookIndex !== -1 && books[bookIndex].entries[index]) {
-            books[bookIndex].entries.splice(index, 1);
-            localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
-            showToast("已删除");
-            renderWorldBookDetailView();
-        }
+    document.addEventListener('click', () => { // Close popups when clicking anywhere else
+        document.querySelectorAll('.moment-actions-popup').forEach(p => p.classList.remove('active'));
+    });
+
+    window.openAddMomentModal = () => {
+        document.getElementById('add-moment-text').value = '';
+        document.getElementById('add-moment-image-url').value = '';
+        document.getElementById('add-moment-modal').classList.add('active');
+    };
+    window.closeAddMomentModal = () => {
+        document.getElementById('add-moment-modal').classList.remove('active');
     };
 
-    window.closeWorldBookDetail = () => {
-        document.getElementById('worldbook-detail-modal').classList.remove('active');
-        currentWorldBookId = null;
-    };
-    
-    // 删除世界书
-    window.deleteCurrentWorldBook = () => {
-        if(!currentWorldBookId) return;
-        if(confirm("确定要删除这本世界书吗？此操作不可撤销。")) {
-             let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-             books = books.filter(b => b.id !== currentWorldBookId);
-             localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
-             closeWorldBookDetail();
-             renderWorldBooks();
-             showToast("世界书已删除");
+    window.saveNewMoment = () => {
+        const text = document.getElementById('add-moment-text').value.trim();
+        const imageUrl = document.getElementById('add-moment-image-url').value.trim();
+        if (!text && !imageUrl) {
+            showToast("内容不能为空");
+            return;
         }
+        const profile = getUserProfile();
+        const newMoment = {
+            id: Date.now(),
+            authorId: profile.qqId, // Assuming qqId is the unique user ID
+            timestamp: Date.now(),
+            text: text,
+            imageUrl: imageUrl,
+            likes: [],
+            comments: []
+        };
+        let moments = getMomentsData();
+        moments.unshift(newMoment);
+        saveMomentsData(moments);
+        showToast("发布成功");
+        renderMomentsPage();
+        closeAddMomentModal();
     };
     
-    // 颜色设置
-    window.openWorldBookColorSettings = () => {
-        const page = document.getElementById('worldbook-color-page');
-        const container = document.getElementById('wb-color-list');
-        container.innerHTML = '';
-        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+    window.toggleLike = (momentId) => {
+        let moments = getMomentsData();
+        const momentIndex = moments.findIndex(m => m.id === momentId);
+        if (momentIndex === -1) return;
         
-        if (books.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#999;">还没有创建世界书哦</p>';
+        const profile = getUserProfile();
+        const myId = profile.qqId;
+        const likeIndex = moments[momentIndex].likes.indexOf(myId);
+
+        if (likeIndex > -1) {
+            moments[momentIndex].likes.splice(likeIndex, 1); // Unlike
         } else {
-            books.forEach(book => {
-                const item = document.createElement('div');
-                item.className = 'wb-color-item';
-                item.innerHTML = `
-                    <span class="wb-color-item-name">${escapeHtml(book.title)}</span>
-                    <input type="color" class="wb-color-input" data-book-id="${book.id}" value="${book.coverColor || '#EAEAEA'}">
-                `;
-                container.appendChild(item);
-            });
+            moments[momentIndex].likes.push(myId); // Like
         }
-        page.classList.add('active');
-    };
-    window.closeWorldBookColorSettings = () => {
-        document.getElementById('worldbook-color-page').classList.remove('active');
-    };
-    window.saveWorldBookColors = () => {
-        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-        const colorInputs = document.querySelectorAll('.wb-color-input');
         
-        colorInputs.forEach(input => {
-            const bookId = parseInt(input.dataset.bookId);
-            const newColor = input.value;
-            const bookIndex = books.findIndex(b => b.id === bookId);
-            if (bookIndex !== -1) {
-                books[bookIndex].coverColor = newColor;
-            }
-        });
-        
-        localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
-        showToast("封面颜色已保存");
-        closeWorldBookColorSettings();
-        renderWorldBooks(); // Refresh the list view
+        saveMomentsData(moments);
+        renderMomentsPage();
     };
+
+    window.addComment = (momentId) => {
+        const commentText = prompt("请输入你的评论:");
+        if (!commentText || !commentText.trim()) return;
+
+        let moments = getMomentsData();
+        const momentIndex = moments.findIndex(m => m.id === momentId);
+        if (momentIndex === -1) return;
+
+        const profile = getUserProfile();
+        const newComment = {
+            user: profile.nickname,
+            userId: profile.qqId,
+            text: commentText.trim()
+        };
+        
+        moments[momentIndex].comments.push(newComment);
+        saveMomentsData(moments);
+        renderMomentsPage();
+    };
+
+    // --- World Book App Logic ---
+    window.openWorldBookApp = () => { body.classList.add('worldbook-active'); renderWorldBooks(); };
+    window.closeWorldBookApp = () => { body.classList.remove('worldbook-active'); closeWorldBookDetail(); closeWorldBookColorSettings(); };
+    window.openWorldBookAddModal = () => { document.getElementById('wb-title-input').value = ""; document.getElementById('wb-dynamic-entries').innerHTML = ''; addWorldBookEntryRow(); document.getElementById('worldbook-add-modal').classList.add('active'); };
+    window.closeWorldBookAddModal = () => { document.getElementById('worldbook-add-modal').classList.remove('active'); };
+    window.addWorldBookEntryRow = () => { const container = document.getElementById('wb-dynamic-entries'); const row = document.createElement('div'); row.className = 'wb-entry-row wb-dynamic-row'; row.innerHTML = `<input type="text" class="wb-entry-input key" placeholder="名称（可选）"><textarea class="wb-entry-input val" placeholder="世界书内容"></textarea>`; container.appendChild(row); };
+    window.saveWorldBook = () => { const title = document.getElementById('wb-title-input').value.trim(); if(!title) { showToast("请输入世界书名"); return; } const rows = document.querySelectorAll('.wb-dynamic-row'); const entries = []; let hasContent = false; rows.forEach(row => { const key = row.querySelector('.key').value.trim(); const val = row.querySelector('.val').value.trim(); if(val) { entries.push({ key: key, content: val }); hasContent = true; } }); if (!hasContent) { showToast("请至少输入一条世界书内容"); return; } const newBook = { id: Date.now(), title: title, entries: entries, coverColor: '#EAEAEA' }; let books = []; try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {} books.push(newBook); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("世界书已保存"); closeWorldBookAddModal(); renderWorldBooks(); };
+    window.renderWorldBooks = () => { const container = document.getElementById('worldbook-list'); container.innerHTML = ''; let books = []; try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) { books = []; } books.sort((a,b) => b.id - a.id).forEach(book => { const item = document.createElement('div'); item.className = 'wb-book-item'; item.onclick = () => viewWorldBook(book.id); item.innerHTML = `<div class="wb-book-cover"><div class="wb-book-name">${escapeHtml(book.title)}</div></div>`; const coverEl = item.querySelector('.wb-book-cover'); if (book.coverColor) { coverEl.style.background = book.coverColor; } container.appendChild(item); }); };
+    window.viewWorldBook = (id) => { currentWorldBookId = id; renderWorldBookDetailView(); document.getElementById('worldbook-detail-modal').classList.add('active'); };
+    function renderWorldBookDetailView() { if (!currentWorldBookId) return; let books = []; try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {} const book = books.find(b => b.id === currentWorldBookId); if(!book) { closeWorldBookDetail(); return; } document.getElementById('wb-detail-title-text').innerText = book.title; const contentArea = document.getElementById('wb-detail-content-area'); contentArea.innerHTML = ''; book.entries.forEach((entry, index) => { const div = document.createElement('div'); div.className = 'wb-detail-item'; div.id = `wb-entry-item-${index}`; div.innerHTML = `<div class="wb-detail-item-content">${entry.key ? `<div class="wb-detail-key">${escapeHtml(entry.key)}</div>` : ''}<div class="wb-detail-val">${escapeHtml(entry.content)}</div></div><div class="wb-detail-item-actions"><button onclick="editWorldBookEntry(${index})">修改</button><button onclick="deleteWorldBookEntry(${index})">删除</button></div>`; contentArea.appendChild(div); }); }
+    window.editWorldBookEntry = (index) => { const itemEl = document.getElementById(`wb-entry-item-${index}`); if (!itemEl) return; const books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const book = books.find(b => b.id === currentWorldBookId); if (!book || !book.entries[index]) return; const entry = book.entries[index]; itemEl.innerHTML = `<div class="edit-form"><input type="text" class="wb-entry-input key" placeholder="名称（可选）" value="${escapeHtml(entry.key)}"><textarea class="wb-entry-input val" placeholder="世界书内容">${escapeHtml(entry.content)}</textarea></div><div class="wb-detail-item-actions"><button class="save" onclick="saveWorldBookEntry(${index})">保存</button><button onclick="renderWorldBookDetailView()">取消</button></div>`; };
+    window.saveWorldBookEntry = (index) => { const itemEl = document.getElementById(`wb-entry-item-${index}`); const newKey = itemEl.querySelector('.key').value.trim(); const newVal = itemEl.querySelector('.val').value.trim(); if (!newVal) { showToast("内容不能为空"); return; } let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const bookIndex = books.findIndex(b => b.id === currentWorldBookId); if (bookIndex !== -1 && books[bookIndex].entries[index]) { books[bookIndex].entries[index] = { key: newKey, content: newVal }; localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("已保存"); renderWorldBookDetailView(); } };
+    window.deleteWorldBookEntry = (index) => { if (!confirm("确定要删除这个条目吗？")) return; let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const bookIndex = books.findIndex(b => b.id === currentWorldBookId); if (bookIndex !== -1 && books[bookIndex].entries[index]) { books[bookIndex].entries.splice(index, 1); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("已删除"); renderWorldBookDetailView(); } };
+    window.closeWorldBookDetail = () => { document.getElementById('worldbook-detail-modal').classList.remove('active'); currentWorldBookId = null; };
+    window.deleteCurrentWorldBook = () => { if(!currentWorldBookId) return; if(confirm("确定要删除这本世界书吗？此操作不可撤销。")) { let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); books = books.filter(b => b.id !== currentWorldBookId); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); closeWorldBookDetail(); renderWorldBooks(); showToast("世界书已删除"); } };
+    window.openWorldBookColorSettings = () => { const page = document.getElementById('worldbook-color-page'); const container = document.getElementById('wb-color-list'); container.innerHTML = ''; let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); if (books.length === 0) { container.innerHTML = '<p style="text-align:center; color:#999;">还没有创建世界书哦</p>'; } else { books.forEach(book => { const item = document.createElement('div'); item.className = 'wb-color-item'; item.innerHTML = `<span class="wb-color-item-name">${escapeHtml(book.title)}</span><input type="color" class="wb-color-input" data-book-id="${book.id}" value="${book.coverColor || '#EAEAEA'}">`; container.appendChild(item); }); } page.classList.add('active'); };
+    window.closeWorldBookColorSettings = () => { document.getElementById('worldbook-color-page').classList.remove('active'); };
+    window.saveWorldBookColors = () => { let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const colorInputs = document.querySelectorAll('.wb-color-input'); colorInputs.forEach(input => { const bookId = parseInt(input.dataset.bookId); const newColor = input.value; const bookIndex = books.findIndex(b => b.id === bookId); if (bookIndex !== -1) { books[bookIndex].coverColor = newColor; } }); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("封面颜色已保存"); closeWorldBookColorSettings(); renderWorldBooks(); };
 
 
     // --- Wallet App Logic ---
     window.openWalletApp = () => { body.classList.add('wallet-active'); loadWalletUI(); };
     window.closeWalletApp = () => { body.classList.remove('wallet-active'); };
-    function getWalletData() {
-        try { const data = localStorage.getItem(WALLET_DATA_KEY); return data ? JSON.parse(data) : { balance: 0.00, transactions: [] }; } catch (e) { return { balance: 0.00, transactions: [] }; }
-    }
+    function getWalletData() { try { const data = localStorage.getItem(WALLET_DATA_KEY); return data ? JSON.parse(data) : { balance: 0.00, transactions: [] }; } catch (e) { return { balance: 0.00, transactions: [] }; } }
     function saveWalletData(data) { localStorage.setItem(WALLET_DATA_KEY, JSON.stringify(data)); }
-    function loadWalletUI() {
-        const profile = getUserProfile();
-        document.getElementById('wallet-avatar').src = profile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        document.getElementById('wallet-nickname').innerText = profile.nickname || 'User';
-
-        const data = getWalletData();
-        document.getElementById('wallet-total-balance').innerText = parseFloat(data.balance).toFixed(2);
-        
-        const now = new Date();
-        const currentMonthStr = `${now.getFullYear()}-${now.getMonth() + 1}`;
-        document.getElementById('wallet-current-month').innerText = `${now.getMonth() + 1}月`;
-        
-        let monthIncome = 0; let monthExpense = 0; let monthTransactions = [];
-        data.transactions.forEach(t => {
-            const tDate = new Date(t.timestamp);
-            const tMonthStr = `${tDate.getFullYear()}-${tDate.getMonth() + 1}`;
-            if (tMonthStr === currentMonthStr) {
-                monthTransactions.push(t);
-                if (t.type === 'income') monthIncome += parseFloat(t.amount); else monthExpense += parseFloat(t.amount);
-            }
-        });
-        document.getElementById('wallet-month-income').innerText = monthIncome.toFixed(2);
-        document.getElementById('wallet-month-expense').innerText = monthExpense.toFixed(2);
-        
-        const listContainer = document.getElementById('wallet-transaction-list');
-        listContainer.innerHTML = '';
-        if (monthTransactions.length === 0) {
-            listContainer.innerHTML = '<div class="wallet-empty">本月暂无收支记录</div>';
-        } else {
-            monthTransactions.sort((a, b) => b.timestamp - a.timestamp);
-            monthTransactions.forEach(t => {
-                const item = document.createElement('div');
-                item.className = 'wallet-item';
-                const dateObj = new Date(t.timestamp);
-                const dateStr = `${dateObj.getMonth()+1}-${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
-                let icon = t.type === 'income' ? '🧧' : '💰';
-                if (t.desc.includes('餐饮') || t.desc.includes('吃')) icon = '🍔';
-                else if (t.desc.includes('交通') || t.desc.includes('车')) icon = '🚗';
-                else if (t.desc.includes('购物') || t.desc.includes('买')) icon = '🛍️';
-
-                item.innerHTML = `
-                    <div class="wallet-item-icon">${icon}</div>
-                    <div class="wallet-item-info">
-                        <div class="wallet-item-cat">${escapeHtml(t.desc || (t.type === 'income' ? '收入' : '支出'))}</div>
-                        <div class="wallet-item-date">${dateStr}</div>
-                    </div>
-                    <div class="wallet-item-amount ${t.type === 'income' ? 'in' : 'out'}">
-                        ${t.type === 'income' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)}
-                    </div>`;
-                listContainer.appendChild(item);
-            });
-        }
-    }
+    function loadWalletUI() { const profile = getUserProfile(); document.getElementById('wallet-avatar').src = profile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('wallet-nickname').innerText = profile.nickname || 'User'; const data = getWalletData(); document.getElementById('wallet-total-balance').innerText = parseFloat(data.balance).toFixed(2); const now = new Date(); const currentMonthStr = `${now.getFullYear()}-${now.getMonth() + 1}`; document.getElementById('wallet-current-month').innerText = `${now.getMonth() + 1}月`; let monthIncome = 0; let monthExpense = 0; let monthTransactions = []; data.transactions.forEach(t => { const tDate = new Date(t.timestamp); const tMonthStr = `${tDate.getFullYear()}-${tDate.getMonth() + 1}`; if (tMonthStr === currentMonthStr) { monthTransactions.push(t); if (t.type === 'income') monthIncome += parseFloat(t.amount); else monthExpense += parseFloat(t.amount); } }); document.getElementById('wallet-month-income').innerText = monthIncome.toFixed(2); document.getElementById('wallet-month-expense').innerText = monthExpense.toFixed(2); const listContainer = document.getElementById('wallet-transaction-list'); listContainer.innerHTML = ''; if (monthTransactions.length === 0) { listContainer.innerHTML = '<div class="wallet-empty">本月暂无收支记录</div>'; } else { monthTransactions.sort((a, b) => b.timestamp - a.timestamp).forEach(t => { const item = document.createElement('div'); item.className = 'wallet-item'; const dateObj = new Date(t.timestamp); const dateStr = `${dateObj.getMonth()+1}-${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`; let icon = t.type === 'income' ? '🧧' : '💰'; if (t.desc.includes('餐饮') || t.desc.includes('吃')) icon = '🍔'; else if (t.desc.includes('交通') || t.desc.includes('车')) icon = '🚗'; else if (t.desc.includes('购物') || t.desc.includes('买')) icon = '🛍️'; item.innerHTML = `<div class="wallet-item-icon">${icon}</div><div class="wallet-item-info"><div class="wallet-item-cat">${escapeHtml(t.desc || (t.type === 'income' ? '收入' : '支出'))}</div><div class="wallet-item-date">${dateStr}</div></div><div class="wallet-item-amount ${t.type === 'income' ? 'in' : 'out'}">${t.type === 'income' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)}</div>`; listContainer.appendChild(item); }); } }
     window.openWalletModal = (type) => { currentWalletType = type; setWalletType(type); document.getElementById('wallet-amount-input').value = ''; document.getElementById('wallet-desc-input').value = ''; document.getElementById('wallet-add-modal').classList.add('active'); };
     window.closeWalletModal = () => { document.getElementById('wallet-add-modal').classList.remove('active'); };
-    window.setWalletType = (type) => {
-        currentWalletType = type;
-        const btnIn = document.getElementById('w-btn-in'); const btnOut = document.getElementById('w-btn-out');
-        if (type === 'income') { btnIn.classList.add('active', 'in'); btnOut.className = 'wallet-type-btn'; } else { btnOut.classList.add('active', 'out'); btnIn.className = 'wallet-type-btn'; }
-    };
-    window.saveTransaction = () => {
-        const amountStr = document.getElementById('wallet-amount-input').value;
-        const desc = document.getElementById('wallet-desc-input').value.trim();
-        const amount = parseFloat(amountStr);
-        if (isNaN(amount) || amount <= 0) { showToast('请输入有效金额'); return; }
-
-        const data = getWalletData();
-        const transaction = { id: Date.now(), type: currentWalletType, amount: amount, desc: desc, timestamp: Date.now() };
-        data.transactions.push(transaction);
-        if (currentWalletType === 'income') data.balance = parseFloat(data.balance) + amount;
-        else data.balance = parseFloat(data.balance) - amount;
-        saveWalletData(data); closeWalletModal(); loadWalletUI(); showToast('记账成功');
-    };
+    window.setWalletType = (type) => { currentWalletType = type; const btnIn = document.getElementById('w-btn-in'); const btnOut = document.getElementById('w-btn-out'); if (type === 'income') { btnIn.classList.add('active', 'in'); btnOut.className = 'wallet-type-btn'; } else { btnOut.classList.add('active', 'out'); btnIn.className = 'wallet-type-btn'; } };
+    window.saveTransaction = () => { const amountStr = document.getElementById('wallet-amount-input').value; const desc = document.getElementById('wallet-desc-input').value.trim(); const amount = parseFloat(amountStr); if (isNaN(amount) || amount <= 0) { showToast('请输入有效金额'); return; } const data = getWalletData(); const transaction = { id: Date.now(), type: currentWalletType, amount: amount, desc: desc, timestamp: Date.now() }; data.transactions.push(transaction); if (currentWalletType === 'income') data.balance = parseFloat(data.balance) + amount; else data.balance = parseFloat(data.balance) - amount; saveWalletData(data); closeWalletModal(); loadWalletUI(); showToast('记账成功'); };
 
     // --- Friend Adding & Chat List Logic ---
-    window.openAddFriendModal = () => {
-        tempAvatarUrl = ""; document.getElementById('new-friend-name').value = ""; document.getElementById('new-friend-alias').value = ""; document.getElementById('new-friend-avatar-url').value = "";
-         document.getElementById('new-friend-avatar-preview').style.display = 'none'; document.getElementById('new-friend-avatar-preview').src = ""; document.getElementById('avatar-placeholder-icon').style.display = 'block';
-        document.getElementById('add-friend-modal').classList.add('active');
-    };
+    window.openAddFriendModal = () => { tempAvatarUrl = ""; document.getElementById('new-friend-name').value = ""; document.getElementById('new-friend-alias').value = ""; document.getElementById('new-friend-avatar-url').value = ""; const preview = document.getElementById('new-friend-avatar-preview'); preview.style.display = 'none'; preview.src = ""; document.getElementById('avatar-placeholder-icon').style.display = 'block'; document.getElementById('add-friend-modal').classList.add('active'); };
     window.closeAddFriendModal = () => { document.getElementById('add-friend-modal').classList.remove('active'); };
     window.triggerAvatarUpload = () => { document.getElementById('input-friend-avatar').click(); };
-    window.handleAvatarUrlInput = (input) => {
-        const url = input.value.trim();
-        if (url) { tempAvatarUrl = url; const imgEl = document.getElementById('new-friend-avatar-preview'); imgEl.src = url; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; }
-        else { tempAvatarUrl = ""; document.getElementById('new-friend-avatar-preview').style.display = 'none'; document.getElementById('avatar-placeholder-icon').style.display = 'block'; }
-    };
-    function compressImage(file, maxSize, callback) {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                let width = img.width; let height = img.height;
-                if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
-                canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
-                callback(canvas.toDataURL('image/jpeg', 0.7));
-            }; img.src = e.target.result;
-        }; reader.readAsDataURL(file);
-    }
-    window.handleFriendAvatarUpload = (event) => {
-        compressImage(event.target.files[0], 200, (base64) => {
-            tempAvatarUrl = base64; document.getElementById('new-friend-avatar-url').value = "";
-            const imgEl = document.getElementById('new-friend-avatar-preview'); imgEl.src = tempAvatarUrl; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none';
-        });
-    };
-    window.saveNewFriend = () => {
-        const name = document.getElementById('new-friend-name').value.trim();
-        const alias = document.getElementById('new-friend-alias').value.trim();
-        if (!name) { showToast("请输入姓名"); return; }
-        if (!tempAvatarUrl) { showToast("请上传头像或输入URL"); return; }
-        
-        let contacts = [];
-        try { const storedContacts = localStorage.getItem(CHAT_DATA_KEY); contacts = storedContacts ? JSON.parse(storedContacts) : []; } catch (e) { contacts = []; }
-        if (contacts.length >= 200) { showToast("好友数量已达上限 (200)"); return; }
-        const existingContact = contacts.find(contact => contact.name === name || (alias && contact.alias === alias));
-        if (existingContact) { showToast("该好友已存在"); return; }
+    window.handleAvatarUrlInput = (input) => { const url = input.value.trim(); const imgEl = document.getElementById('new-friend-avatar-preview'); if (url) { tempAvatarUrl = url; imgEl.src = url; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; } else { tempAvatarUrl = ""; imgEl.style.display = 'none'; document.getElementById('avatar-placeholder-icon').style.display = 'block'; } };
+    window.handleFriendAvatarUpload = (event) => { compressImage(event.target.files[0], 200, (base64) => { tempAvatarUrl = base64; document.getElementById('new-friend-avatar-url').value = ""; const imgEl = document.getElementById('new-friend-avatar-preview'); imgEl.src = tempAvatarUrl; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; }); };
+    window.saveNewFriend = () => { const name = document.getElementById('new-friend-name').value.trim(); const alias = document.getElementById('new-friend-alias').value.trim(); if (!name) { showToast("请输入姓名"); return; } if (!tempAvatarUrl) { showToast("请上传头像或输入URL"); return; } let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch (e) { contacts = []; } if (contacts.find(c => c.name === name || (alias && c.alias === alias))) { showToast("该好友已存在"); return; } const newContact = { id: Date.now(), name: name, alias: alias, avatar: tempAvatarUrl, lastMsg: "点击开始聊天", timestamp: Date.now(), signature: "", backgroundImage: "", isPinned: false, worldbookId: null }; contacts.unshift(newContact); try { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); showToast("添加成功！"); closeAddFriendModal(); renderChatList(); renderContactList(); } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); } };
 
-        const newContact = { 
-            id: Date.now(), 
-            name: name, 
-            alias: alias, 
-            avatar: tempAvatarUrl, 
-            lastMsg: "点击开始聊天", 
-            timestamp: Date.now(),
-            signature: "", 
-            backgroundImage: "",
-            isPinned: false
-        };
-        contacts.unshift(newContact);
-        try { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); showToast("添加成功！"); closeAddFriendModal(); renderChatList(); renderContactList(); } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); }
-    };
-
-    window.renderChatList = () => {
-        const container = document.getElementById('chat-list-container');
-        let contacts = [];
-        try { const storedContacts = localStorage.getItem(CHAT_DATA_KEY); contacts = storedContacts ? JSON.parse(storedContacts) : []; } catch (e) { contacts = []; }
-
-        if (contacts.length === 0) { container.innerHTML = '<div class="chat-placeholder-text">没有新信息</div>'; return; }
-        container.innerHTML = '';
-        contacts.sort((a, b) => b.timestamp - a.timestamp);
-        
-        contacts.forEach(contact => {
-            const displayName = contact.alias ? contact.alias : contact.name;
-            const item = document.createElement('div');
-            item.className = 'chat-list-item';
-            // Explicitly bind the click event to open the chat window
-            item.onclick = (e) => {
-                e.stopPropagation(); 
-                openChatWindow(contact.id);
-            };
-            item.innerHTML = `
-                <img src="${contact.avatar}" class="chat-list-avatar" alt="avatar" onerror="this.src='https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'">
-                <div class="chat-list-info">
-                    <div class="chat-list-name">${escapeHtml(displayName)}</div>
-                    <div class="chat-list-msg">${escapeHtml(contact.lastMsg || '点击开始聊天')}</div>
-                </div>`;
-            container.appendChild(item);
-        });
-    };
+    window.renderChatList = () => { const container = document.getElementById('chat-list-container'); let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch (e) { contacts = []; } if (contacts.length === 0) { container.innerHTML = '<div class="chat-placeholder-text">没有新信息</div>'; return; } container.innerHTML = ''; contacts.sort((a, b) => b.timestamp - a.timestamp).forEach(contact => { const displayName = contact.alias || contact.name; const item = document.createElement('div'); item.className = 'chat-list-item'; item.onclick = (e) => { e.stopPropagation(); openChatWindow(contact.id); }; item.innerHTML = `<img src="${contact.avatar}" class="chat-list-avatar" alt="avatar" onerror="this.src='https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'"><div class="chat-list-info"><div class="chat-list-name">${escapeHtml(displayName)}</div><div class="chat-list-msg">${escapeHtml(contact.lastMsg || '点击开始聊天')}</div></div>`; container.appendChild(item); }); };
     
-    // --- Advanced Contact Sorting Logic (Pinyin Boundary) ---
-    function getSortLetter(str) {
-        if (!str) return '#';
-        const firstChar = str.charAt(0);
-        
-        if (/[a-zA-Z]/.test(firstChar)) {
-            return firstChar.toUpperCase();
-        }
-        
-        const zh = "阿芭擦搭蛾发噶哈击喀垃妈拿哦啪期然撒塌挖昔压匝";
-        const letters = "ABCDEFGHJKLMNOPQRSTWXYZ";
-        
-        if (firstChar.localeCompare('阿', 'zh-CN') < 0) return '#'; 
-        if (firstChar.localeCompare('匝', 'zh-CN') >= 0) return 'Z'; 
-        
-        for (let i = 0; i < zh.length - 1; i++) {
-            if (firstChar.localeCompare(zh[i], 'zh-CN') >= 0 && firstChar.localeCompare(zh[i+1], 'zh-CN') < 0) {
-                return letters[i];
-            }
-        }
-        
-        return '#';
-    }
-
-    window.renderContactList = () => {
-        const container = document.getElementById('contact-list-container');
-        const indexBar = document.getElementById('alpha-index-bar');
-        
-        let contacts = [];
-        try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e) { contacts = []; }
-        
-        if (contacts.length === 0) { 
-            container.innerHTML = '<div class="chat-placeholder-text">通讯录为空</div>'; 
-            indexBar.innerHTML = '';
-            return; 
-        }
-        container.innerHTML = '';
-        indexBar.innerHTML = '';
-        
-        const groups = { '🔝': [] };
-        const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-        allLetters.forEach(l => groups[l] = []);
-        groups['#'] = [];
-        
-        contacts.forEach(c => {
-            if (c.isPinned) {
-                groups['🔝'].push(c);
-            } else {
-                const name = c.alias || c.name;
-                const letter = getSortLetter(name);
-                if (groups[letter]) {
-                    groups[letter].push(c);
-                } else {
-                    groups['#'].push(c);
-                }
-            }
-        });
-        
-        const activeLetters = []; 
-        
-        if (groups['🔝'].length > 0) {
-            groups['🔝'].sort((a, b) => (a.alias||a.name).localeCompare(b.alias||b.name, 'zh-CN'));
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'contact-section-title';
-            titleDiv.id = 'group-pinned';
-            titleDiv.innerText = '🔝';
-            container.appendChild(titleDiv);
-            activeLetters.push({ key: '🔝', id: 'group-pinned' });
-            
-            groups['🔝'].forEach(contact => container.appendChild(createContactItem(contact)));
-        }
-        
-        const sortKeys = [...allLetters, '#'];
-        sortKeys.forEach(key => {
-            const groupContacts = groups[key];
-            if (groupContacts && groupContacts.length > 0) {
-                groupContacts.sort((a, b) => (a.alias||a.name).localeCompare(b.alias||b.name, 'zh-CN'));
-                
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'contact-section-title';
-                titleDiv.id = `group-${key}`;
-                titleDiv.innerText = key;
-                container.appendChild(titleDiv);
-                activeLetters.push({ key: key, id: `group-${key}` });
-                
-                groupContacts.forEach(contact => container.appendChild(createContactItem(contact)));
-            }
-        });
-        
-        allLetters.forEach(letter => {
-            const exists = activeLetters.find(x => x.key === letter);
-            const item = document.createElement('div');
-            item.className = 'alpha-index-item';
-            item.innerText = letter;
-            
-            if (exists) {
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    document.getElementById(exists.id).scrollIntoView({ behavior: 'smooth' });
-                };
-                item.style.color = '#555'; 
-            } else {
-                 item.style.color = '#eee'; 
-                 item.onclick = (e) => e.stopPropagation();
-            }
-            indexBar.appendChild(item);
-        });
-    };
-    
-    function createContactItem(contact) {
-        const item = document.createElement('div');
-        item.className = 'contact-item';
-        if(contact.isPinned) item.classList.add('pinned');
-        const displayName = contact.alias || contact.name;
-        const signature = contact.signature ? escapeHtml(contact.signature) : '';
-        
-        item.innerHTML = `
-            <img src="${contact.avatar}" class="contact-avatar">
-            <div class="chat-list-info">
-                <div class="contact-name">${escapeHtml(displayName)}</div>
-                <div class="contact-signature">${signature}</div>
-            </div>
-            <div class="pinned-tag">★</div>
-        `;
-        
-        item.onclick = () => {
-             currentChatContactId = contact.id;
-             openRoleSettings();
-        };
-        
-        let pressTimer;
-        item.addEventListener('touchstart', (e) => {
-            pressTimer = setTimeout(() => { toggleContactPin(contact.id); }, 600);
-        });
-        item.addEventListener('touchend', () => clearTimeout(pressTimer));
-        item.addEventListener('touchmove', () => clearTimeout(pressTimer));
-        return item;
-    }
-    
-    window.toggleContactPin = (id) => {
-        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const idx = contacts.findIndex(c => c.id === id);
-        if (idx !== -1) {
-            contacts[idx].isPinned = !contacts[idx].isPinned;
-            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-            renderContactList();
-            showToast(contacts[idx].isPinned ? "已置顶" : "已取消置顶");
-        }
-    };
+    function getSortLetter(str) { if (!str) return '#'; const firstChar = str.charAt(0); if (/[a-zA-Z]/.test(firstChar)) return firstChar.toUpperCase(); const pinyin = "ABCDEFGHJKLMNOPQRSTWXYZ"; const zh = "阿芭擦搭蛾发噶哈击喀垃妈拿哦啪期然撒塌挖昔压匝"; if (firstChar.localeCompare('阿', 'zh-CN') < 0) return '#'; if (firstChar.localeCompare('匝', 'zh-CN') >= 0) return 'Z'; for (let i = 0; i < zh.length; i++) { if (firstChar.localeCompare(zh[i], 'zh-CN') >= 0 && firstChar.localeCompare(zh[i+1], 'zh-CN') < 0) return pinyin[i]; } return '#'; }
+    window.renderContactList = () => { const container = document.getElementById('contact-list-container'); const indexBar = document.getElementById('alpha-index-bar'); let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e) { contacts = []; } if (contacts.length === 0) { container.innerHTML = '<div class="chat-placeholder-text">通讯录为空</div>'; indexBar.innerHTML = ''; return; } container.innerHTML = ''; indexBar.innerHTML = ''; const groups = { '🔝': [], ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('').reduce((acc, l) => ({...acc, [l]: []}), {}) }; contacts.forEach(c => { if (c.isPinned) { groups['🔝'].push(c); } else { const letter = getSortLetter(c.alias || c.name); (groups[letter] || groups['#']).push(c); } }); const activeLetters = []; const renderGroup = (key, title) => { const groupContacts = groups[key]; if (groupContacts.length > 0) { groupContacts.sort((a, b) => (a.alias||a.name).localeCompare(b.alias||b.name, 'zh-CN')); const titleDiv = document.createElement('div'); titleDiv.className = 'contact-section-title'; titleDiv.id = `group-${key}`; titleDiv.innerText = title; container.appendChild(titleDiv); activeLetters.push({ key: key, id: `group-${key}` }); groupContacts.forEach(contact => container.appendChild(createContactItem(contact))); } }; renderGroup('🔝', '🔝'); 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('').forEach(key => renderGroup(key, key)); 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => { const exists = activeLetters.find(x => x.key === letter); const item = document.createElement('div'); item.className = 'alpha-index-item'; item.innerText = letter; if (exists) { item.onclick = (e) => { e.stopPropagation(); document.getElementById(exists.id).scrollIntoView({ behavior: 'smooth' }); }; item.style.color = '#555'; } else { item.style.color = '#eee'; item.onclick = (e) => e.stopPropagation(); } indexBar.appendChild(item); }); };
+    function createContactItem(contact) { const item = document.createElement('div'); item.className = 'contact-item'; if(contact.isPinned) item.classList.add('pinned'); const displayName = contact.alias || contact.name; const signature = contact.signature ? escapeHtml(contact.signature) : ''; item.innerHTML = `<img src="${contact.avatar}" class="contact-avatar"><div class="chat-list-info"><div class="contact-name">${escapeHtml(displayName)}</div><div class="contact-signature">${signature}</div></div><div class="pinned-tag">★</div>`; item.onclick = () => { currentChatContactId = contact.id; openRoleSettings(); }; let pressTimer; item.addEventListener('touchstart', (e) => { pressTimer = setTimeout(() => { toggleContactPin(contact.id); }, 600); }); item.addEventListener('touchend', () => clearTimeout(pressTimer)); item.addEventListener('touchmove', () => clearTimeout(pressTimer)); return item; }
+    window.toggleContactPin = (id) => { let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === id); if (idx !== -1) { contacts[idx].isPinned = !contacts[idx].isPinned; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); renderContactList(); showToast(contacts[idx].isPinned ? "已置顶" : "已取消置顶"); } };
 
     // --- Role Chat Conversation Logic ---
-    window.openChatWindow = (contactId) => {
-        currentChatContactId = contactId;
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contact = contacts.find(c => c.id === contactId);
-        
-        if (!contact) return;
-        
-        document.getElementById('chat-conv-title').innerText = contact.alias || contact.name;
-        document.getElementById('chat-conv-signature').innerText = contact.signature || '';
-        
-        const view = document.getElementById('chat-conversation-view');
-if (contact.backgroundImage) {
-    view.style.backgroundImage = `url(${contact.backgroundImage})`;
-    view.style.backgroundSize = 'cover'; // 铺满容器
-    view.style.backgroundPosition = 'center';
-    view.style.backgroundRepeat = 'no-repeat';
-} else {
-    view.style.backgroundImage = 'none';
-}
-        
-        // --- 注入自定义 CSS ---
-        const styleId = 'custom-chat-style';
-        let styleTag = document.getElementById(styleId);
-        if (!styleTag) {
-            styleTag = document.createElement('style');
-            styleTag.id = styleId;
-            document.head.appendChild(styleTag);
-        }
-        // 如果角色有自定义 CSS，则应用
-        if (contact.customCss) {
-            styleTag.innerHTML = contact.customCss;
-        } else {
-            styleTag.innerHTML = '';
-        }
-
-        view.classList.add('active'); 
-        renderConversationMessages();
-    };
-    
-    window.closeChatConversation = () => {
-        document.getElementById('chat-conversation-view').classList.remove('active');
-        currentChatContactId = null;
-        
-        // 清除自定义 CSS
-        const styleTag = document.getElementById('custom-chat-style');
-        if (styleTag) styleTag.innerHTML = '';
-        
-        renderChatList(); 
-    };
-
+    window.openChatWindow = (contactId) => { currentChatContactId = contactId; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === contactId); if (!contact) return; document.getElementById('chat-conv-title').innerText = contact.alias || contact.name; document.getElementById('chat-conv-signature').innerText = contact.signature || ''; const view = document.getElementById('chat-conversation-view'); view.style.backgroundImage = contact.backgroundImage ? `url(${contact.backgroundImage})` : ''; let styleTag = document.getElementById('custom-chat-style'); if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = 'custom-chat-style'; document.head.appendChild(styleTag); } styleTag.innerHTML = contact.customCss || ''; view.classList.add('active'); renderConversationMessages(); };
+    window.closeChatConversation = () => { document.getElementById('chat-conversation-view').classList.remove('active'); currentChatContactId = null; const styleTag = document.getElementById('custom-chat-style'); if (styleTag) styleTag.innerHTML = ''; renderChatList(); };
     function getMessagesKey(contactId) { return `chat_msgs_${contactId}`; }
-
-    window.renderConversationMessages = () => {
-        if (!currentChatContactId) return;
-        const container = document.getElementById('chat-conv-messages');
-        const key = getMessagesKey(currentChatContactId);
-        let messages = [];
-        try { messages = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
-        
-        container.innerHTML = '';
-        
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contact = contacts.find(c => c.id === currentChatContactId);
-        const themAvatar = contact ? contact.avatar : '';
-        const globalProfile = getUserProfile();
-        const meAvatar = (contact && contact.userAvatar) ? contact.userAvatar : (globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');
-
-        messages.forEach(msg => {
-            const row = document.createElement('div');
-            row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`;
-            const avatarHtml = `<img src="${msg.type === 'sent' ? meAvatar : themAvatar}" class="msg-bubble-avatar">`;
-            const contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`;
-            if (msg.type === 'sent') {
-                row.innerHTML = contentHtml + avatarHtml;
-            } else {
-                row.innerHTML = avatarHtml + contentHtml;
-            }
-            container.appendChild(row);
-        });
-        
-        container.scrollTop = container.scrollHeight;
-    };
-
-    window.sendConversationMessage = () => {
-        if (!currentChatContactId) return;
-        const input = document.getElementById('chat-conv-input');
-        const text = input.value.trim();
-        if (!text) return;
-        
-        const key = getMessagesKey(currentChatContactId);
-        let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        
-        const newMsg = { id: Date.now(), text: text, type: 'sent', timestamp: Date.now() };
-        messages.push(newMsg);
-        localStorage.setItem(key, JSON.stringify(messages));
-        
-        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contactIndex = contacts.findIndex(c => c.id === currentChatContactId);
-        if (contactIndex !== -1) {
-            contacts[contactIndex].lastMsg = text;
-            contacts[contactIndex].timestamp = Date.now();
-            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-        }
-
-        input.value = '';
-        renderConversationMessages();
-    };
+    window.renderConversationMessages = () => { if (!currentChatContactId) return; const container = document.getElementById('chat-conv-messages'); const key = getMessagesKey(currentChatContactId); let messages = []; try { messages = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {} container.innerHTML = ''; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); const themAvatar = contact ? contact.avatar : ''; const globalProfile = getUserProfile(); const meAvatar = (contact && contact.userAvatar) ? contact.userAvatar : (globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'); messages.forEach(msg => { const row = document.createElement('div'); row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`; const avatarHtml = `<img src="${msg.type === 'sent' ? meAvatar : themAvatar}" class="msg-bubble-avatar">`; const contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`; row.innerHTML = msg.type === 'sent' ? contentHtml + avatarHtml : avatarHtml + contentHtml; container.appendChild(row); }); container.scrollTop = container.scrollHeight; };
+    window.sendConversationMessage = () => { if (!currentChatContactId) return; const input = document.getElementById('chat-conv-input'); const text = input.value.trim(); if (!text) return; const key = getMessagesKey(currentChatContactId); let messages = JSON.parse(localStorage.getItem(key) || '[]'); messages.push({ id: Date.now(), text: text, type: 'sent', timestamp: Date.now() }); localStorage.setItem(key, JSON.stringify(messages)); let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contactIndex = contacts.findIndex(c => c.id === currentChatContactId); if (contactIndex !== -1) { contacts[contactIndex].lastMsg = text; contacts[contactIndex].timestamp = Date.now(); localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); } input.value = ''; renderConversationMessages(); };
 
     // --- Role Settings Logic ---
-    window.openRoleSettings = () => {
-        if (!currentChatContactId) return;
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contact = contacts.find(c => c.id === currentChatContactId);
-        
-        if (!contact) return;
-        
-        document.getElementById('role-setting-avatar').src = contact.avatar || '';
-        document.getElementById('role-setting-alias').value = contact.alias || contact.name;
-        document.getElementById('role-setting-signature').value = contact.signature || '';
-        document.getElementById('role-setting-persona').value = contact.persona || '';
-        document.getElementById('role-setting-css').value = contact.customCss || ''; // 加载 CSS
-        
-        const bgPreview = document.getElementById('role-bg-preview');
-        tempRoleBgUrl = contact.backgroundImage || '';
-        if (tempRoleBgUrl) {
-            bgPreview.style.backgroundImage = `url(${tempRoleBgUrl})`;
-        } else {
-            bgPreview.style.backgroundImage = '';
-        }
-
-        const globalProfile = getUserProfile();
-        document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || '';
-        document.getElementById('role-user-persona').value = contact.userPersona || '';
-
-        document.getElementById('role-settings-page').classList.add('active');
-    };
-    
+    window.openRoleSettings = () => { if (!currentChatContactId) return; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); if (!contact) return; tempSelectedWorldBookId = contact.worldbookId || null; document.getElementById('role-setting-avatar').src = contact.avatar || ''; document.getElementById('role-setting-alias').value = contact.alias || contact.name; document.getElementById('role-setting-signature').value = contact.signature || ''; document.getElementById('role-setting-persona').value = contact.persona || ''; document.getElementById('role-setting-css').value = contact.customCss || `/* Example */\n.msg-bubble-row.them .msg-bubble-content {\n  border-radius: 20px 20px 20px 0;\n  background: #fff;\n}`; tempRoleBgUrl = contact.backgroundImage || ''; document.getElementById('role-bg-preview').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : ''; const globalProfile = getUserProfile(); document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || ''; document.getElementById('role-user-persona').value = contact.userPersona || ''; updateRoleWbDisplay(contact.worldbookId); document.getElementById('role-settings-page').classList.add('active'); };
     window.closeRoleSettings = () => { document.getElementById('role-settings-page').classList.remove('active'); };
-    window.triggerRoleAvatarEdit = () => {
-        const currentUrl = document.getElementById('role-setting-avatar').src;
-        const newUrl = prompt("输入新头像的图片链接:", currentUrl);
-        if (newUrl && newUrl.trim()) { document.getElementById('role-setting-avatar').src = newUrl.trim(); }
-    };
+    window.triggerRoleAvatarEdit = () => { const currentUrl = document.getElementById('role-setting-avatar').src; const newUrl = prompt("输入新头像的图片链接:", currentUrl); if (newUrl && newUrl.trim()) { document.getElementById('role-setting-avatar').src = newUrl.trim(); } };
     window.triggerRoleBgUpload = () => { document.getElementById('input-role-chat-bg').click(); };
-window.handleRoleChatBgUpload = (event) => {
-     const file = event.target.files[0]; if (!file) return;
-    compressImage(file, 600, (base64) => { tempRoleBgUrl = base64; document.getElementById('role-bg-preview').style.backgroundImage = `url(${base64})`; });
-};
-
-// 👇 新增的函数放在这里（角色背景处理逻辑集中区）
-window.setRoleBgByUrl = () => {
-    const urlInput = document.getElementById('role-bg-url-input');
-    const bgUrl = urlInput.value.trim();
-    if (!bgUrl) {
-        showToast("请输入有效的图片URL");
-        return;
-    }
-    const bgPreview = document.getElementById('role-bg-preview');
-    bgPreview.style.backgroundImage = `url(${bgUrl})`;
-    tempRoleBgUrl = bgUrl;
-    showToast("背景URL已预览");
-};
-
-// 👇 后面是原本就有的其他函数（作为定位参考）
-window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
-window.handleRoleUserAvatarUpload = (event) => {
-    const file = event.target.files[0]; if (!file) return;
-    compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; });
-};
+    window.handleRoleChatBgUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 600, (base64) => { tempRoleBgUrl = base64; document.getElementById('role-bg-preview').style.backgroundImage = `url(${base64})`; }); };
+    window.setRoleBgByUrl = () => { const urlInput = document.getElementById('role-bg-url-input'); const bgUrl = urlInput.value.trim(); if (!bgUrl) { showToast("请输入有效的图片URL"); return; } document.getElementById('role-bg-preview').style.backgroundImage = `url(${bgUrl})`; tempRoleBgUrl = bgUrl; showToast("背景URL已预览"); };
     window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
-    window.handleRoleUserAvatarUpload = (event) => {
-        const file = event.target.files[0]; if (!file) return;
-        compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; });
-    };
-    
-    window.saveRoleSettings = () => {
-        if (!currentChatContactId) return;
-        const newAlias = document.getElementById('role-setting-alias').value.trim();
-        const newSignature = document.getElementById('role-setting-signature').value.trim();
-        const newAvatar = document.getElementById('role-setting-avatar').src;
-        const newPersona = document.getElementById('role-setting-persona').value.trim();
-        const newUserAvatar = document.getElementById('role-user-avatar').src;
-        const newUserName = document.getElementById('role-user-name').value.trim();
-        const newUserPersona = document.getElementById('role-user-persona').value.trim();
-        const newCss = document.getElementById('role-setting-css').value; // 保存 CSS
+    window.handleRoleUserAvatarUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; }); };
+    window.saveRoleSettings = () => { if (!currentChatContactId) return; const newAlias = document.getElementById('role-setting-alias').value.trim(); if (!newAlias) { showToast("备注名不能为空"); return; } let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === currentChatContactId); if (idx !== -1) { contacts[idx].alias = newAlias; contacts[idx].signature = document.getElementById('role-setting-signature').value.trim(); contacts[idx].avatar = document.getElementById('role-setting-avatar').src; contacts[idx].persona = document.getElementById('role-setting-persona').value.trim(); contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage; contacts[idx].userAvatar = document.getElementById('role-user-avatar').src; contacts[idx].userName = document.getElementById('role-user-name').value.trim(); contacts[idx].userPersona = document.getElementById('role-user-persona').value.trim(); contacts[idx].customCss = document.getElementById('role-setting-css').value; contacts[idx].worldbookId = tempSelectedWorldBookId; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); document.getElementById('chat-conv-title').innerText = newAlias; document.getElementById('chat-conv-signature').innerText = contacts[idx].signature; document.getElementById('chat-conversation-view').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : 'none'; const styleTag = document.getElementById('custom-chat-style'); if(styleTag) styleTag.innerHTML = contacts[idx].customCss; renderChatList(); renderContactList(); renderConversationMessages(); showToast("设置已保存"); closeRoleSettings(); } };
 
-        if (!newAlias) { showToast("备注名不能为空"); return; }
-        
-        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const idx = contacts.findIndex(c => c.id === currentChatContactId);
-        
-        if (idx !== -1) {
-            contacts[idx].alias = newAlias;
-            contacts[idx].signature = newSignature;
-            contacts[idx].avatar = newAvatar;
-            contacts[idx].persona = newPersona;
-            // 修复：如果上传了新背景则用tempRoleBgUrl，否则保留原背景
-contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage;
-            contacts[idx].userAvatar = newUserAvatar;
-            contacts[idx].userName = newUserName;
-            contacts[idx].userPersona = newUserPersona;
-            contacts[idx].customCss = newCss; // 写入
-            
-            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-            document.getElementById('chat-conv-title').innerText = newAlias;
-            document.getElementById('chat-conv-signature').innerText = newSignature;
-            
-            // 立即应用设置变化
-            if(tempRoleBgUrl) { document.getElementById('chat-conversation-view').style.backgroundImage = `url(${tempRoleBgUrl})`; } 
-            else { document.getElementById('chat-conversation-view').style.backgroundImage = 'none'; }
-            
-            // 立即应用 CSS 变化 (如果有 styleTag)
-            const styleTag = document.getElementById('custom-chat-style');
-            if(styleTag) styleTag.innerHTML = newCss;
-
-            renderChatList();
-            renderContactList(); 
-            renderConversationMessages();
-            showToast("设置已保存");
-            closeRoleSettings();
-        }
-    };
+    // --- World Book Binding Functions ---
+    function getWorldBookTitleById(bookId) { if (!bookId) return null; try { const books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const book = books.find(b => b.id === bookId); return book ? book.title : null; } catch (e) { return null; } }
+    function updateRoleWbDisplay(bookId) { const displayEl = document.getElementById('role-wb-display'); const clearBtn = document.getElementById('role-wb-clear-btn'); const bookTitle = getWorldBookTitleById(bookId); if (bookTitle) { displayEl.textContent = bookTitle; displayEl.classList.remove('unbound'); clearBtn.style.display = 'inline-block'; } else { displayEl.textContent = '未绑定'; displayEl.classList.add('unbound'); clearBtn.style.display = 'none'; } }
+    window.openWorldBookBindModal = () => { const modal = document.getElementById('worldbook-bind-modal'); const listEl = document.getElementById('worldbook-bind-list'); listEl.innerHTML = ''; let books = []; try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {} if (books.length > 0) { books.forEach(book => { const item = document.createElement('div'); item.className = 'wb-bind-list-item'; item.textContent = book.title; item.onclick = () => bindWorldBook(book.id, book.title); listEl.appendChild(item); }); } else { listEl.innerHTML = `<div class="wb-bind-list-empty">还没有创建任何世界书哦，先去世界书App创建一个吧~</div>`; } modal.classList.add('active'); };
+    window.closeWorldBookBindModal = () => { document.getElementById('worldbook-bind-modal').classList.remove('active'); };
+    window.bindWorldBook = (bookId, bookTitle) => { tempSelectedWorldBookId = bookId; updateRoleWbDisplay(bookId); closeWorldBookBindModal(); };
+    window.clearWorldBookBinding = () => { tempSelectedWorldBookId = null; updateRoleWbDisplay(null); };
 
     // --- Delete Friend Logic ---
-    window.confirmDeleteFriend = () => {
-        document.getElementById('delete-confirm-modal').classList.add('active');
-    };
-    window.closeDeleteModal = () => {
-        document.getElementById('delete-confirm-modal').classList.remove('active');
-    };
-    window.executeDeleteFriend = () => {
-        if (!currentChatContactId) return;
-        
-        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const newContacts = contacts.filter(c => c.id !== currentChatContactId);
-        
-        // 保存新联系人列表
-        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(newContacts));
-        
-        // 删除消息记录
-        localStorage.removeItem(getMessagesKey(currentChatContactId));
-        
-        showToast("好友已删除");
-        closeDeleteModal();
-        closeRoleSettings();
-        closeChatConversation(); // 退出聊天界面
-        
-        // 返回到 Chat 列表页 (Tab 0)
-        switchChatTab(0, 'Chat');
-        
-        // 刷新列表
-        renderChatList();
-        renderContactList();
-    };
-
-    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+    window.confirmDeleteFriend = () => { document.getElementById('delete-confirm-modal').classList.add('active'); };
+    window.closeDeleteModal = () => { document.getElementById('delete-confirm-modal').classList.remove('active'); };
+    window.executeDeleteFriend = () => { if (!currentChatContactId) return; let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const newContacts = contacts.filter(c => c.id !== currentChatContactId); localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(newContacts)); localStorage.removeItem(getMessagesKey(currentChatContactId)); showToast("好友已删除"); closeDeleteModal(); closeRoleSettings(); closeChatConversation(); switchChatTab(0, 'Chat'); renderChatList(); renderContactList(); };
 
     // --- Core Functions ---
-    const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
-    
-    const updateClock = () => {
-         const now = new Date();
-         clockTimeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-         if (!customDateText) {
-            const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const date = String(now.getDate()).padStart(2, '0'); const day = days[now.getDay()];
-            clockDateEl.innerText = `${year}年${month}月${date}日 ${day}`;
-        } else { clockDateEl.innerText = customDateText; }
-    };
-
-    window.handleDateEdit = (event) => {
-        event.stopPropagation();
-        const newText = prompt("请输入自定义日期文字（留空恢复实时日期）：", clockDateEl.innerText);
-        if (newText !== null) { customDateText = newText.trim(); updateClock(); saveAllSettings(); }
-    };
+    const updateClock = () => { const clockTimeEl = document.getElementById('clock-time'); const clockDateEl = document.getElementById('clock-date'); const now = new Date(); clockTimeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`; if (!customDateText) { const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']; clockDateEl.innerText = `${now.getFullYear()}年${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 ${days[now.getDay()]}`; } else { clockDateEl.innerText = customDateText; } };
+    window.handleDateEdit = (event) => { event.stopPropagation(); const newText = prompt("请输入自定义日期文字（留空恢复实时日期）：", document.getElementById('clock-date').innerText); if (newText !== null) { customDateText = newText.trim(); updateClock(); saveAllSettings(); } };
     window.handleTimeBgClick = (event) => { document.getElementById('input-time-bg').click(); };
-    window.handleTimeBgUpload = (event) => {
-        const file = event.target.files[0]; if (!file) return;
-        const reader = new FileReader(); reader.onload = (e) => { const dataUrl = e.target.result; timeContainer.style.backgroundImage = `url(${dataUrl})`; saveAllSettings(); showToast('时间背景已更新 ^ω^'); };
-        reader.readAsDataURL(file);
-    };
-
+    window.handleTimeBgUpload = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { document.getElementById('time-container').style.backgroundImage = `url(${e.target.result})`; saveAllSettings(); showToast('时间背景已更新 ^ω^'); }; reader.readAsDataURL(file); };
     const showSettingsPage = () => { populateSettingsList(); body.classList.add('settings-active'); };
     const hideSettingsPage = () => body.classList.remove('settings-active');
-
-    function handleUrlInput(inputEl, previewEl, callback) {
-        const url = inputEl.value.trim();
-        if (url) { const img = new Image(); img.onload = () => { previewEl.style.backgroundImage = `url(${url})`; if (callback) callback(url); }; img.onerror = () => { previewEl.style.backgroundImage = ''; }; img.src = url; } else { previewEl.style.backgroundImage = ''; }
-    }
-    function handleImgSrcInput(inputEl, imgEl) {
-        const url = inputEl.value.trim();
-        if (url) { imgEl.src = url; imgEl.onerror = () => { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }; } else { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }
-    }
-
-    wallpaperUrlInput.addEventListener('input', () => handleUrlInput(wallpaperUrlInput, wallpaperPreview));
-    widgetSquareUrlInput.addEventListener('input', () => handleUrlInput(widgetSquareUrlInput, widgetSquarePreview));
-    customImageUrlInput.addEventListener('input', () => handleUrlInput(customImageUrlInput, customImagePreview));
-
-    const applyIconToUI = (appId, url) => {
-         const el = document.getElementById(appId); if (!el) return;
-        if (url && (url.startsWith('http') || url.startsWith('data:'))) { el.innerHTML = ''; el.style.backgroundImage = `url(${url})`; } else {
-            el.style.backgroundImage = '';
-            const defaults = { 'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '📸', 'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '📅', 'icon-app8': '💰', 'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️' };
-            if (defaults[appId]) el.innerHTML = defaults[appId];
-        }
-    };
-
-    const populateSettingsList = () => {
-        const container = document.getElementById('settings-app-list-container');
-        container.innerHTML = '';
-        const appIcons = [ { id: 'icon-app1', name: 'Chat', default: '☁️' }, { id: 'icon-app2', name: '世界书', default: '🎵' }, { id: 'icon-app3', name: '提醒', default: '💬' }, { id: 'icon-app4', name: '相册', default: '📸' }, { id: 'icon-app5', name: 'HUshhh', default: '🧭' }, { id: 'icon-app6', name: 'pxx', default: '🎮' }, { id: 'icon-app7', name: '日历', default: '📅' }, { id: 'icon-app8', name: 'Wallet', default: '💰' } ];
-        appIcons.forEach(app => {
-            const item = document.createElement('div'); item.className = 'app-icon-item';
-            const cur = document.getElementById(app.id); const bg = cur.style.backgroundImage;
-            item.innerHTML = `
-                <div class="app-icon-preview" id="preview-${app.id}" style="${bg ? `background-image:${bg}` : ''}">${!bg ? app.default : ''}</div>
-                <div class="app-icon-info">
-                    <div class="app-icon-name">${app.name}</div>
-                    <div class="app-icon-input">
-                        <input type="text" id="url-${app.id}" placeholder="图片 URL" value="${bg ? bg.slice(5, -2).replace(/['"]/g, '') : ''}">
-                        <button onclick="triggerIconUpload('${app.id}')">上传</button>
-                    </div>
-                </div>`;
-            container.appendChild(item);
-            const inp = document.getElementById(`url-${app.id}`);
-            inp.addEventListener('input', () => { if (inp.value.trim()) handleUrlInput(inp, document.getElementById(`preview-${app.id}`), (u) => applyIconToUI(app.id, u)); else { applyIconToUI(app.id, ''); document.getElementById(`preview-${app.id}`).style.backgroundImage = ''; document.getElementById(`preview-${app.id}`).innerHTML = app.default; } });
-        });
-    };
-
+    function handleUrlInput(inputEl, previewEl, callback) { const url = inputEl.value.trim(); if (url) { const img = new Image(); img.onload = () => { previewEl.style.backgroundImage = `url(${url})`; if (callback) callback(url); }; img.onerror = () => { previewEl.style.backgroundImage = ''; }; img.src = url; } else { previewEl.style.backgroundImage = ''; } }
+    function handleImgSrcInput(inputEl, imgEl) { const url = inputEl.value.trim(); if (url) { imgEl.src = url; imgEl.onerror = () => { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }; } else { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; } }
+    const applyIconToUI = (appId, url) => { const el = document.getElementById(appId); if (!el) return; if (url && (url.startsWith('http') || url.startsWith('data:'))) { el.innerHTML = ''; el.style.backgroundImage = `url(${url})`; } else { el.style.backgroundImage = ''; const defaults = { 'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '📸', 'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '📅', 'icon-app8': '💰', 'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️' }; if (defaults[appId]) el.innerHTML = defaults[appId]; } };
+    const populateSettingsList = () => { const container = document.getElementById('settings-app-list-container'); container.innerHTML = ''; const appIcons = [ { id: 'icon-app1', name: 'Chat', default: '☁️' }, { id: 'icon-app2', name: '世界书', default: '🎵' }, { id: 'icon-app3', name: '提醒', default: '💬' }, { id: 'icon-app4', name: '相册', default: '📸' }, { id: 'icon-app5', name: 'HUshhh', default: '🧭' }, { id: 'icon-app6', name: 'pxx', default: '🎮' }, { id: 'icon-app7', name: '日历', default: '📅' }, { id: 'icon-app8', name: 'Wallet', default: '💰' } ]; appIcons.forEach(app => { const item = document.createElement('div'); item.className = 'app-icon-item'; const cur = document.getElementById(app.id); const bg = cur.style.backgroundImage; item.innerHTML = `<div class="app-icon-preview" id="preview-${app.id}" style="${bg ? `background-image:${bg}` : ''}">${!bg ? app.default : ''}</div><div class="app-icon-info"><div class="app-icon-name">${app.name}</div><div class="app-icon-input"><input type="text" id="url-${app.id}" placeholder="图片 URL" value="${bg ? bg.slice(5, -2).replace(/['"]/g, '') : ''}"><button onclick="triggerIconUpload('${app.id}')">上传</button></div></div>`; container.appendChild(item); const inp = document.getElementById(`url-${app.id}`); inp.addEventListener('input', () => { if (inp.value.trim()) handleUrlInput(inp, document.getElementById(`preview-${app.id}`), (u) => applyIconToUI(app.id, u)); else { applyIconToUI(app.id, ''); document.getElementById(`preview-${app.id}`).style.backgroundImage = ''; document.getElementById(`preview-${app.id}`).innerHTML = app.default; } }); }); };
     window.triggerIconUpload = (id) => { const i = document.getElementById('input-app-icon'); i.dataset.target = id; i.click(); };
-    window.handleIconUpload = (e) => {
-        const f = e.target.files[0]; const id = e.target.dataset.target; if (!f || !id) return;
-        const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; applyIconToUI(id, d); document.getElementById(`preview-${id}`).style.backgroundImage = `url(${d})`; document.getElementById(`preview-${id}`).innerHTML = ''; document.getElementById(`url-${id}`).value = d; }; r.readAsDataURL(f);
-    };
-
-    window.handleWallpaperUpload = (e) => {
-        const f = e.target.files[0]; if (!f) return;
-        const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; body.style.backgroundImage = `url(${d})`; wallpaperUrlInput.value = d; wallpaperPreview.style.backgroundImage = `url(${d})`; }; r.readAsDataURL(f);
-    };
-    
-    window.editChatAvatarUrl = (id) => {
-        const currentUrl = document.getElementById(id).style.backgroundImage.slice(5, -2).replace(/['"]/g, '');
-        const newUrl = prompt("请输入图片链接 (URL):", currentUrl);
-        if(newUrl !== null && newUrl.trim() !== '') { document.getElementById(id).style.backgroundImage = `url('${newUrl.trim()}')`; saveAllSettings(); showToast("头像已更新!"); }
-    };
+    window.handleIconUpload = (e) => { const f = e.target.files[0]; const id = e.target.dataset.target; if (!f || !id) return; const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; applyIconToUI(id, d); document.getElementById(`preview-${id}`).style.backgroundImage = `url(${d})`; document.getElementById(`preview-${id}`).innerHTML = ''; document.getElementById(`url-${id}`).value = d; }; r.readAsDataURL(f); };
+    window.handleWallpaperUpload = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; body.style.backgroundImage = `url(${d})`; document.getElementById('wallpaper-url').value = d; document.getElementById('wallpaper-preview').style.backgroundImage = `url(${d})`; }; r.readAsDataURL(f); };
+    window.editChatAvatarUrl = (id) => { const currentUrl = document.getElementById(id).style.backgroundImage.slice(5, -2).replace(/['"]/g, ''); const newUrl = prompt("请输入图片链接 (URL):", currentUrl); if(newUrl !== null && newUrl.trim() !== '') { document.getElementById(id).style.backgroundImage = `url('${newUrl.trim()}')`; saveAllSettings(); showToast("头像已更新!"); } };
     window.adjustInputWidth = (el) => { const len = el.value.length; const newWidth = Math.min(150, Math.max(60, (len * 10) + 30)); el.style.width = newWidth + 'px'; };
     window.triggerPhotoWidgetUpload = () => { document.getElementById('input-photo-widget').click(); };
-    window.handlePhotoWidgetUpload = (e) => {
-        const file = e.target.files[0]; if(!file) return;
-        const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; const img = document.getElementById('photo-widget-img'); const ph = document.getElementById('photo-widget-placeholder'); img.src = d; img.style.display = 'block'; ph.style.display = 'none'; saveAllSettings(); showToast("小组件图片已更新!"); }; r.readAsDataURL(file);
-    };
+    window.handlePhotoWidgetUpload = (e) => { const file = e.target.files[0]; if(!file) return; const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; const img = document.getElementById('photo-widget-img'); const ph = document.getElementById('photo-widget-placeholder'); img.src = d; img.style.display = 'block'; ph.style.display = 'none'; saveAllSettings(); showToast("小组件图片已更新!"); }; r.readAsDataURL(file); };
 
     // --- Profile (Me) Page Functions ---
-    function getUserProfile() {
-        try {
-            const p = localStorage.getItem(USER_PROFILE_KEY); const profile = p ? JSON.parse(p) : {};
-            return {
-                cover: profile.cover || '', avatar: profile.avatar || '', nickname: profile.nickname || 'Antigravity',
-                qqId: profile.qqId || '20261314520', likes: profile.likes === undefined ? 8888 : profile.likes,
-                signature: profile.signature || '这个人很懒，什么都没留下~', memberIconUrl: profile.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png',
-                memberUrls: profile.memberUrls || new Array(8).fill('')
-            };
-        } catch(e) { return { cover: '', avatar: '', nickname: 'Antigravity', qqId: '20261314520', likes: 8888, signature: '这个人很懒，什么都没留下~', memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png', memberUrls: new Array(8).fill('') }; }
-    }
-    
-    function saveUserProfile(profileData) {
-        try { localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profileData)); if (document.body.classList.contains('wallet-active')) { loadWalletUI(); } } catch (e) { showToast("保存失败 (LocalStorage满)"); }
-    }
-
-    function loadUserProfile() {
-        const p = getUserProfile();
-        const coverEl = document.getElementById('profile-cover'); const avatarEl = document.getElementById('profile-avatar');
-        const nickEl = document.getElementById('profile-nickname'); const qqEl = document.getElementById('profile-qq-id');
-        const likeEl = document.getElementById('profile-like-count'); const signatureEl = document.getElementById('profile-signature-text');
-        const memberIconEl = document.getElementById('me-member-icon-main'); const memberIconContainer = document.getElementById('me-member-icon-container');
-
-        if (p.cover) coverEl.style.backgroundImage = `url(${p.cover})`; else coverEl.style.backgroundImage = 'linear-gradient(to bottom, #7A88FF, #7AFFAF)';
-        if (p.avatar) avatarEl.src = p.avatar; else avatarEl.src = 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        
-        nickEl.innerText = p.nickname; qqEl.innerText = `QQ: ${p.qqId}`; likeEl.innerText = p.likes;
-        signatureEl.innerText = p.signature || '这个人很懒，什么都没留下~'; memberIconEl.src = p.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png';
-
-        memberIconContainer.innerHTML = '';
-        p.memberUrls.forEach((url, index) => { if(url && url.trim() !== '') { const img = document.createElement('img'); img.className = 'me-member-icon-slot'; img.src = url; memberIconContainer.appendChild(img); } });
-    }
-    
+    function getUserProfile() { try { const p = localStorage.getItem(USER_PROFILE_KEY); const profile = p ? JSON.parse(p) : {}; return { cover: profile.cover || '', avatar: profile.avatar || '', nickname: profile.nickname || 'Antigravity', qqId: profile.qqId || Date.now(), likes: profile.likes === undefined ? 8888 : profile.likes, signature: profile.signature || '这个人很懒，什么都没留下~', memberIconUrl: profile.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png', memberUrls: profile.memberUrls || new Array(8).fill('') }; } catch(e) { return { cover: '', avatar: '', nickname: 'Antigravity', qqId: Date.now(), likes: 8888, signature: '这个人很懒，什么都没留下~', memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png', memberUrls: new Array(8).fill('') }; } }
+    function saveUserProfile(profileData) { try { localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profileData)); if (document.body.classList.contains('wallet-active')) { loadWalletUI(); } } catch (e) { showToast("保存失败 (LocalStorage满)"); } }
+    function loadUserProfile() { const p = getUserProfile(); document.getElementById('profile-cover').style.backgroundImage = p.cover ? `url(${p.cover})` : 'linear-gradient(to bottom, #7A88FF, #7AFFAF)'; document.getElementById('profile-avatar').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('profile-nickname').innerText = p.nickname; document.getElementById('profile-qq-id').innerText = `QQ: ${p.qqId}`; document.getElementById('profile-like-count').innerText = p.likes; document.getElementById('profile-signature-text').innerText = p.signature || '这个人很懒，什么都没留下~'; document.getElementById('me-member-icon-main').src = p.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png'; const memberIconContainer = document.getElementById('me-member-icon-container'); memberIconContainer.innerHTML = ''; p.memberUrls.forEach((url) => { if(url && url.trim() !== '') { const img = document.createElement('img'); img.className = 'me-member-icon-slot'; img.src = url; memberIconContainer.appendChild(img); } }); }
     window.editSignature = () => { const p = getUserProfile(); const newSignature = prompt("请输入你的个性签名：", p.signature); if (newSignature !== null) { p.signature = newSignature.trim() || '这个人很懒，什么都没留下~'; saveUserProfile(p); loadUserProfile(); } };
     window.triggerProfileAvatarUpload = (e) => { if(e) e.stopPropagation(); document.getElementById('input-profile-avatar').click(); };
     window.handleProfileAvatarUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, (base64) => { const p = getUserProfile(); p.avatar = base64; saveUserProfile(p); loadUserProfile(); showToast("头像已更新"); }); };
     window.editNickname = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newName = prompt("请输入新昵称:", p.nickname); if (newName && newName.trim()) { p.nickname = newName.trim(); saveUserProfile(p); loadUserProfile(); } };
     window.editQQID = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newID = prompt("请输入QQ号:", p.qqId); if (newID && newID.trim()) { p.qqId = newID.trim(); saveUserProfile(p); loadUserProfile(); } };
-    window.editLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newCount = prompt("请输入点赞数:", p.likes); if (newCount && !isNaN(newCount)) { p.likes = Number(newCount); saveUserProfile(p); loadUserProfile(); } };
     window.incrementLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); p.likes = parseInt(p.likes) + 1; saveUserProfile(p); loadUserProfile(); const icon = document.querySelector('.me-like-icon'); icon.style.transform = "scale(1.2) rotate(-10deg)"; setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150); };
-
-    window.openMeSettings = () => {
-        const p = getUserProfile(); meSettingsAvatarUrl.value = p.avatar || ''; meSettingsCoverUrl.value = p.cover || ''; meSettingsAvatarPreview.src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; meSettingsCoverPreview.src = p.cover || '';
-        for (let i = 0; i < 8; i++) { const input = document.getElementById(`me-input-m${i+1}`); const preview = document.getElementById(`me-preview-m${i+1}`); const url = p.memberUrls[i] || ''; input.value = url; preview.src = url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; input.oninput = () => { handleImgSrcInput(input, preview); }; }
-        meSettingsModal.classList.add('active');
-    };
-    window.closeMeSettings = () => { meSettingsModal.classList.remove('active'); };
-    window.saveMeSettings = () => {
-        const p = getUserProfile(); p.avatar = meSettingsAvatarUrl.value.trim(); p.cover = meSettingsCoverUrl.value.trim();
-        for (let i = 0; i < 8; i++) { const val = document.getElementById(`me-input-m${i+1}`).value.trim(); p.memberUrls[i] = val; }
-        saveUserProfile(p); loadUserProfile(); showToast('个人主页设置已保存'); closeMeSettings();
-    };
+    window.openMeSettings = () => { const p = getUserProfile(); document.getElementById('me-settings-avatar-url').value = p.avatar || ''; document.getElementById('me-settings-cover-url').value = p.cover || ''; document.getElementById('me-settings-avatar-preview').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('me-settings-cover-preview').src = p.cover || ''; const container = document.getElementById('me-settings-member-icons-list'); container.innerHTML = ''; for (let i = 0; i < 8; i++) { const url = p.memberUrls[i] || ''; container.innerHTML += `<div class="me-settings-row"><div class="me-settings-label">会员${i+1}</div><div class="me-settings-preview-wrapper"><img id="me-preview-m${i+1}" class="me-settings-preview icon" src="${url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"></div><input type="text" id="me-input-m${i+1}" class="me-settings-input" placeholder="图片 URL" value="${url}"></div>`; } for (let i = 0; i < 8; i++) { const input = document.getElementById(`me-input-m${i+1}`); const preview = document.getElementById(`me-preview-m${i+1}`); input.oninput = () => { handleImgSrcInput(input, preview); }; } me-settings-modal.classList.add('active'); };
+    window.closeMeSettings = () => { document.getElementById('me-settings-modal').classList.remove('active'); };
+    window.saveMeSettings = () => { const p = getUserProfile(); p.avatar = document.getElementById('me-settings-avatar-url').value.trim(); p.cover = document.getElementById('me-settings-cover-url').value.trim(); for (let i = 0; i < 8; i++) { p.memberUrls[i] = document.getElementById(`me-input-m${i+1}`).value.trim(); } saveUserProfile(p); loadUserProfile(); showToast('个人主页设置已保存'); closeMeSettings(); };
 
     // --- API & Chat ---
-    const testApiBtn = document.getElementById('test-api-btn'); const fetchModelsBtn = document.getElementById('fetch-models-btn'); const modelSelect = document.getElementById('model-select'); const apiStatus = document.getElementById('api-status');
+    const testApiBtn = document.getElementById('test-api-btn'); const fetchModelsBtn = document.getElementById('fetch-models-btn'); const modelSelect = document.getElementById('model-select'); const apiStatus = document.getElementById('api-status'); const apiUrlInput = document.getElementById('api-url-input'); const apiKeyInput = document.getElementById('api-key-input');
     testApiBtn.onclick = async () => { const url = apiUrlInput.value.trim(); const key = apiKeyInput.value.trim(); if (!url || !key) { showToast('请填写 API 地址和 Key'); return; } testApiBtn.disabled = true; apiStatus.innerText = "测试中..."; try { const res = await fetch(`${url.endsWith('/v1') ? url : url+'/v1'}/models`, { headers: { 'Authorization': `Bearer ${key}` } }); if (res.ok) { apiStatus.innerText = "已连接"; apiStatus.className = "api-status connected"; showToast("连接成功！"); } else throw new Error(); } catch(e) { apiStatus.innerText = "连接失败"; apiStatus.className = "api-status disconnected"; showToast("连接失败"); } finally { testApiBtn.disabled = false; } };
     fetchModelsBtn.onclick = async () => { const url = apiUrlInput.value.trim(); const key = apiKeyInput.value.trim(); if (!url || !key) return; fetchModelsBtn.disabled = true; try { const res = await fetch(`${url.endsWith('/v1') ? url : url+'/v1'}/models`, { headers: { 'Authorization': `Bearer ${key}` } }); const data = await res.json(); modelSelect.innerHTML = data.data.map(m => `<option value="${m.id}">${m.id}</option>`).join(''); document.getElementById('model-select-wrapper').style.display = 'block'; } catch(e) { showToast("获取模型失败"); } finally { fetchModelsBtn.disabled = false; } };
-
     window.openAIChat = () => { const s = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY)); if (!s || !s.api || !s.api.model) { showToast('请先在设置中配置 API'); return; } document.getElementById('current-model-name').innerText = s.api.model; document.getElementById('ai-chat-modal').classList.add('active'); };
     window.closeAIChat = () => document.getElementById('ai-chat-modal').classList.remove('active');
 
     function saveAllSettings() {
         const icons = {}; document.querySelectorAll('.app-icon-input input').forEach(i => { const id = i.id.replace('url-', ''); if (i.value.trim()) icons[id] = i.value.trim(); });
-        const avatar1 = document.getElementById('chat-avatar-1'); const avatar2 = document.getElementById('chat-avatar-2'); const photoWidgetImg = document.getElementById('photo-widget-img');
         const getBgUrl = (el) => { const bg = el.style.backgroundImage; return bg ? bg.slice(5, -2).replace(/['"]/g, '') : ''; };
-        const chatInput1 = document.querySelector('.chat-bubble-input.left-bubble'); const chatInput2 = document.querySelector('.chat-bubble-input.right-bubble');
         const settings = {
-            api: { url: apiUrlInput.value, key: apiKeyInput.value, model: modelSelect.value, temp: tempSlider.value, tokens: maxTokensInput.value },
-            visual: { wallpaper: wallpaperUrlInput.value, widget: document.getElementById('widget-square-url').value, customImg: document.getElementById('custom-image-url').value, icons: icons, timeBg: timeContainer.style.backgroundImage, customDate: customDateText, chatAvatar1: getBgUrl(avatar1), chatAvatar2: getBgUrl(avatar2), photoWidgetUrl: photoWidgetImg.src, chatText1: chatInput1 ? chatInput1.value : "Say Hi~", chatText2: chatInput2 ? chatInput2.value : "Hello!" }
+            api: { url: apiUrlInput.value, key: apiKeyInput.value, model: modelSelect.value, temp: document.getElementById('temp-slider').value, tokens: document.getElementById('max-tokens-input').value },
+            visual: { wallpaper: document.getElementById('wallpaper-url').value, widget: document.getElementById('widget-square-url').value, customImg: document.getElementById('custom-image-url').value, icons: icons, timeBg: document.getElementById('time-container').style.backgroundImage, customDate: customDateText, chatAvatar1: getBgUrl(document.getElementById('chat-avatar-1')), chatAvatar2: getBgUrl(document.getElementById('chat-avatar-2')), photoWidgetUrl: document.getElementById('photo-widget-img').src, chatText1: document.querySelector('.chat-bubble-input.left-bubble')?.value || "Say Hi~", chatText2: document.querySelector('.chat-bubble-input.right-bubble')?.value || "Hello!" }
         };
         localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings)); if (event && event.type === 'click') showToast('设置已保存 ⩌⩊⩌'); applyVisual(settings.visual);
     }
-
     function applyVisual(v) {
         if (v.wallpaper) body.style.backgroundImage = `url(${v.wallpaper})`;
-        if (v.timeBg) timeContainer.style.backgroundImage = v.timeBg;
+        if (v.timeBg) document.getElementById('time-container').style.backgroundImage = v.timeBg;
         customDateText = v.customDate || ""; updateClock();
         if(v.chatAvatar1) document.getElementById('chat-avatar-1').style.backgroundImage = `url(${v.chatAvatar1})`;
         if(v.chatAvatar2) document.getElementById('chat-avatar-2').style.backgroundImage = `url(${v.chatAvatar2})`;
@@ -2768,37 +2177,34 @@ contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage;
         if (v.photoWidgetUrl && v.photoWidgetUrl.length > 20 && !v.photoWidgetUrl.includes('null')) { pImg.src = v.photoWidgetUrl; pImg.style.display = 'block'; pPh.style.display = 'none'; } else { pImg.style.display = 'none'; pPh.style.display = 'flex'; }
         if (v.icons) Object.keys(v.icons).forEach(id => applyIconToUI(id, v.icons[id]));
     }
-
     function loadSettings() {
         const s = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY)); if (!s) return;
-        apiUrlInput.value = s.api.url || ''; apiKeyInput.value = s.api.key || ''; tempSlider.value = s.api.temp || 0.8; maxTokensInput.value = s.api.tokens || 1000;
+        apiUrlInput.value = s.api.url || ''; apiKeyInput.value = s.api.key || ''; document.getElementById('temp-slider').value = s.api.temp || 0.8; document.getElementById('max-tokens-input').value = s.api.tokens || 1000;
         if (s.api.model) { modelSelect.innerHTML = `<option value="${s.api.model}">${s.api.model}</option>`; document.getElementById('model-select-wrapper').style.display = 'block'; }
-        wallpaperUrlInput.value = s.visual.wallpaper || ''; document.getElementById('widget-square-url').value = s.visual.widget || ''; document.getElementById('custom-image-url').value = s.visual.customImg || '';
+        document.getElementById('wallpaper-url').value = s.visual.wallpaper || ''; document.getElementById('widget-square-url').value = s.visual.widget || ''; document.getElementById('custom-image-url').value = s.visual.customImg || '';
         applyVisual(s.visual);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        updateClock(); 
-        setInterval(updateClock, 1000); 
+        updateClock(); setInterval(updateClock, 30000); 
         loadSettings(); 
-        tempSlider.oninput = () => tempValueDisplay.innerText = tempSlider.value; 
-        saveSettingsBtn.onclick = saveAllSettings;
+        
+        document.getElementById('temp-slider').oninput = () => document.getElementById('temp-value-display').innerText = document.getElementById('temp-slider').value; 
+        document.getElementById('save-settings-btn').onclick = saveAllSettings;
 
-        // --- NEW: iOS Mode Initialization ---
+        const iosModeSwitch = document.getElementById('ios-mode-switch');
         const isIOSModeOn = localStorage.getItem(IOS_MODE_KEY) === 'true';
         iosModeSwitch.checked = isIOSModeOn;
-        if (isIOSModeOn) {
-            document.body.classList.add('ios-mode-active');
-        }
-        iosModeSwitch.addEventListener('change', (e) => {
-            applyIOSMode(e.target.checked);
-        });
-        // --- End of NEW ---
+        if (isIOSModeOn) body.classList.add('ios-mode-active');
+        iosModeSwitch.addEventListener('change', (e) => applyIOSMode(e.target.checked));
         
-        if (!localStorage.getItem(CHAT_DATA_KEY)) { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify([])); }
-        if (!localStorage.getItem(USER_PROFILE_KEY)) { saveUserProfile(getUserProfile()); }
-        meSettingsAvatarUrl.addEventListener('input', () => { meSettingsAvatarPreview.src = meSettingsAvatarUrl.value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; });
-        meSettingsCoverUrl.addEventListener('input', () => { meSettingsCoverPreview.src = meSettingsCoverUrl.value.trim(); });
+        if (!localStorage.getItem(CHAT_DATA_KEY)) localStorage.setItem(CHAT_DATA_KEY, JSON.stringify([]));
+        if (!localStorage.getItem(USER_PROFILE_KEY)) saveUserProfile(getUserProfile());
+        if (!localStorage.getItem(MOMENTS_DATA_KEY)) saveMomentsData([]);
+
+        document.getElementById('me-settings-avatar-url').addEventListener('input', () => { document.getElementById('me-settings-avatar-preview').src = document.getElementById('me-settings-avatar-url').value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; });
+        document.getElementById('me-settings-cover-url').addEventListener('input', () => { document.getElementById('me-settings-cover-preview').src = document.getElementById('me-settings-cover-url').value.trim(); });
+        
         renderChatList();
         document.querySelectorAll('.chat-bubble-input').forEach(adjustInputWidth);
      });
