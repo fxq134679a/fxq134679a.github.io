@@ -13,9 +13,9 @@
              --theme-pink-bg-med: rgba(229, 138, 171, 0.15);
              --theme-pink-bg-soft: #FFF8FA;
             --theme-pink-text: #E58AAB;
-            --theme-pink-title: #f5b3c9; /* 新的标题颜色 */
+            --theme-pink-title: #f5b3c9;
             --theme-pink-btn: #F5B3C9; 
-            --wb-plus-btn: #FDCEDF; /* 世界书加号颜色 */
+            --wb-plus-btn: #FDCEDF;
              --chat-bg-color: #FFF8FA;
              --success-green: #4CAF50;
             --error-red: #F44336;
@@ -261,11 +261,16 @@
             flex-shrink: 0; z-index: 20; height: 80px;
             transition: padding-top 0.3s ease, height 0.3s ease;
         }
+/* iOS模式 聊天顶栏按钮上移 */
+body.ios-mode-active .chat-conv-back-btn,
+body.ios-mode-active .chat-conv-right-icon {
+    transform: translateY(-6px); /* 上移数值按需改 */
+}
         .chat-conv-back-btn { width: 32px; height: 32px; object-fit: contain; cursor: pointer; }
         
         .chat-conv-title-container {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            overflow: hidden; padding: 0 10px;
+            overflow: hidden; padding: 0 10px; transition: margin-top 0.3s ease;
         }
         .chat-conv-title {
             font-size: 17px; font-weight: 600; color: var(--theme-pink-text); 
@@ -334,6 +339,10 @@
             filter: brightness(0) invert(1); 
             pointer-events: none;
         }
+        /* AI触发按钮专属样式，可根据需要微调 */
+.chat-conv-btn.ai-trigger {
+    background-color: var(--theme-pink-btn);
+}
 
         .chat-conv-input-wrapper { flex: 1; height: 42px; position: relative; }
         .chat-conv-input {
@@ -501,14 +510,13 @@
 
         /* --- NEW/MODIFIED: 朋友圈 (Moments) Styles --- */
         #moments-page-wrapper {
-            /* MODIFIED: Background changed to white */
             background-color: #fff;
             padding-bottom: 100px; /* Space for nav bar */
         }
         .moments-header {
             position: relative;
             width: 100%;
-            padding-bottom: 40px; /* Space for floating user info */
+            padding-bottom: 40px; /* Space for content below cover */
         }
         .moments-cover-img {
             width: 100%;
@@ -517,24 +525,27 @@
             background-size: cover;
             background-position: center;
             position: relative;
-            /* NEW: Clickable */
             cursor: pointer;
         }
+        
         .moments-user-info {
             position: absolute;
-            bottom: -30px; /* Move down to overlap the list area slightly */
+            top: 265px; /* Cover height (300) - half avatar (35) */
             right: 20px;
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* Align top, so text sits above boundary */
             gap: 15px;
             z-index: 2;
         }
+        
         .moments-user-nickname {
             color: white;
             font-size: 18px;
             font-weight: 600;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            margin-top: 15px; /* Adjust to align visually with the "upper part" of the avatar */
         }
+        
         .moments-user-avatar {
             width: 70px;
             height: 70px;
@@ -543,12 +554,14 @@
             border: 3px solid white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             cursor: pointer;
+            flex-shrink: 0;
         }
+
         #moments-list {
             display: flex;
             flex-direction: column;
             background-color: #fff;
-            padding-top: 50px; /* Space for the overlapping avatar */
+            padding-top: 30px; /* Space for the overlapping avatar */
         }
         .moment-item {
             display: flex;
@@ -989,7 +1002,9 @@
         /* --- MODIFIED: iOS Mode Active Global Styles --- */
         body.ios-mode-active #time-section { padding-top: env(safe-area-inset-top, 20px); }
         body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); } 
-        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); height: 100px; }
+        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 35px); height: 100px; }
+        body.ios-mode-active .chat-conv-title-container { margin-top: -20px; }
+        
         body.ios-mode-active #role-settings-page { padding-top: calc(env(safe-area-inset-top, 20px) + 20px); }
         body.ios-mode-active .me-settings-header-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .wallet-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
@@ -1241,7 +1256,58 @@
             text-align: center; color: #ccc;
             padding: 40px 20px; font-size: 14px;
         }
-
+        
+        /* --- NEW: Moments Action Sheet (Popup) --- */
+        #moments-action-sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+        #moments-action-sheet-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        #moments-action-sheet {
+            background-color: var(--theme-pink-bg-soft);
+            width: 95%; max-width: 400px;
+            margin: 0 auto 15px; /* Bottom margin */
+            border-radius: 20px;
+            overflow: hidden;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        #moments-action-sheet-overlay.active #moments-action-sheet { transform: translateY(0); }
+        
+        .action-sheet-option {
+            background: white;
+            padding: 18px;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .action-sheet-option:active { background-color: #f9f9f9; }
+        .action-title { font-size: 16px; color: #333; }
+        .action-subtitle { font-size: 12px; color: #999; margin-top: 2px; }
+        
+        .action-sheet-cancel {
+            background: white;
+            padding: 18px;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px; /* Visual separation */
+            border-radius: 20px;
+        }
+        .action-sheet-cancel:active { background-color: #f9f9f9; }
+        
     </style>
 </head>
 <body>
@@ -1323,7 +1389,7 @@
         <!-- 右上角图标容器 -->
         <div id="chat-header-right-icons" style="display: flex; gap: 15px;">
             <img id="chat-header-add-friend-icon" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png" class="header-right-icon" onclick="openAddFriendModal()">
-            <img id="chat-header-add-moment-icon" src="https://img.heliar.top/file/1770339943568_相机_camera-one.png" class="header-right-icon" onclick="openAddMomentModal()" style="display: none;">
+            <img id="chat-header-add-moment-icon" src="https://img.heliar.top/file/1770345149331_相机_camera.png" class="header-right-icon" onclick="openMomentsActionSheet()" style="display: none;">
         </div>
     </div>
     
@@ -1417,10 +1483,11 @@
         <div class="chat-conv-footer">
             <button class="chat-conv-btn"><img src="https://img.heliar.top/file/1770239041392_开关_power.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
             <div class="chat-conv-input-wrapper">
-                <input type="text" class="chat-conv-input" id="chat-conv-input" placeholder="输入消息...">
+                <input type="text" class="chat-conv-input" id="chat-conv-input" placeholder="输入消息..." onkeydown="handleChatInputKey(event)">
             </div>
             <button class="chat-conv-btn" style="margin-right: 0;"><img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
-            <button class="chat-conv-btn send" onclick="sendConversationMessage()"><img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;"></button>
+            <!-- 仅保留AI触发功能 -->
+            <button class="chat-conv-btn send ai-trigger" onclick="triggerAIAutoReply()"><img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;"></button>
         </div>
     </div>
 </div>
@@ -1643,6 +1710,18 @@
     </div>
 </div>
 
+<!-- NEW: Moments Action Sheet (Popup) -->
+<div id="moments-action-sheet-overlay" onclick="closeMomentsActionSheet()">
+   <div id="moments-action-sheet" onclick="event.stopPropagation()">
+       <div class="action-sheet-option" onclick="handleMomentAction('shoot')">
+            <div class="action-title">拍摄</div>
+            <div class="action-subtitle">照片或视频</div>
+       </div>
+       <div class="action-sheet-option" onclick="handleMomentAction('album')">从手机相册选择</div>
+       <div class="action-sheet-cancel" onclick="closeMomentsActionSheet()">取消</div>
+   </div>
+</div>
+
 <div id="settings-page">
     <div class="settings-header">
         <div class="back-btn-container" onclick="hideSettingsPage()">
@@ -1807,7 +1886,7 @@
     const WORLDBOOK_DATA_KEY = 'worldbookData_v2'; 
     const IOS_MODE_KEY = 'iosModeEnabled_v1';
     const MOMENTS_DATA_KEY = 'momentsData_v1';
-    const MOMENTS_PROFILE_KEY = 'momentsProfile_v1'; // NEW: Key for separate Moments profile
+    const MOMENTS_PROFILE_KEY = 'momentsProfile_v1';
 
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
@@ -1848,10 +1927,9 @@
         document.querySelectorAll('.chat-tab-content').forEach((el, i) => el.classList.toggle('active', i === index));
         document.querySelectorAll('.chat-nav-item').forEach((el, i) => el.classList.toggle('active', i === index));
         
-        // Reset header to be visible by default for all tabs
         headerEl.classList.remove('hidden');
-        headerEl.style.backgroundColor = ''; // Use default CSS
-        headerEl.style.boxShadow = ''; // Use default CSS
+        headerEl.style.backgroundColor = ''; 
+        headerEl.style.boxShadow = ''; 
         
         backBtn.classList.remove('hidden');
         contentArea.classList.remove('me-mode');
@@ -1871,14 +1949,13 @@
             backBtn.classList.add('hidden');
             renderMomentsPage();
         } else if (index === 3) { // Me
-            headerEl.classList.add('hidden'); // Only "Me" page hides the header
+            headerEl.classList.add('hidden'); 
             contentArea.classList.add('me-mode');
             loadUserProfile();
          }
     };
     
     // --- Moments (朋友圈) Functions ---
-    // --- NEW: Separate profile for Moments ---
     function getMomentsProfile() {
         try {
             const p = localStorage.getItem(MOMENTS_PROFILE_KEY);
@@ -1928,8 +2005,8 @@
 
     function renderMomentsPage() {
         const wrapper = document.getElementById('moments-page-wrapper');
-        const userProfile = getUserProfile(); // For nickname and posts
-        const momentsProfile = getMomentsProfile(); // For avatar and cover
+        const userProfile = getUserProfile(); 
+        const momentsProfile = getMomentsProfile(); 
         let moments = getMomentsData();
         
         let listHtml = '';
@@ -1993,7 +2070,6 @@
         `;
     }
 
-    // NEW/MODIFIED: Functions to edit moments avatar and cover (independent from 'Me' page)
     window.editMomentsAvatar = () => {
         const p = getMomentsProfile();
         const newUrl = prompt("请输入朋友圈头像图片链接:", p.avatar);
@@ -2028,6 +2104,24 @@
     document.addEventListener('click', () => { 
         document.querySelectorAll('.moment-actions-popup').forEach(p => p.classList.remove('active'));
     });
+
+    // NEW: Action Sheet Logic
+    window.openMomentsActionSheet = () => {
+        document.getElementById('moments-action-sheet-overlay').classList.add('active');
+    };
+    
+    window.closeMomentsActionSheet = () => {
+        document.getElementById('moments-action-sheet-overlay').classList.remove('active');
+    };
+    
+    window.handleMomentAction = (action) => {
+        closeMomentsActionSheet();
+        if (action === 'shoot' || action === 'album') {
+            setTimeout(() => {
+                openAddMomentModal();
+            }, 300);
+        }
+    };
 
     window.openAddMomentModal = () => {
         document.getElementById('add-moment-text').value = '';
@@ -2148,12 +2242,197 @@
     function createContactItem(contact) { const item = document.createElement('div'); item.className = 'contact-item'; if(contact.isPinned) item.classList.add('pinned'); const displayName = contact.alias || contact.name; const signature = contact.signature ? escapeHtml(contact.signature) : ''; item.innerHTML = `<img src="${contact.avatar}" class="contact-avatar"><div class="chat-list-info"><div class="contact-name">${escapeHtml(displayName)}</div><div class="contact-signature">${signature}</div></div><div class="pinned-tag">★</div>`; item.onclick = () => { currentChatContactId = contact.id; openRoleSettings(); }; let pressTimer; item.addEventListener('touchstart', (e) => { pressTimer = setTimeout(() => { toggleContactPin(contact.id); }, 600); }); item.addEventListener('touchend', () => clearTimeout(pressTimer)); item.addEventListener('touchmove', () => clearTimeout(pressTimer)); return item; }
     window.toggleContactPin = (id) => { let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === id); if (idx !== -1) { contacts[idx].isPinned = !contacts[idx].isPinned; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); renderContactList(); showToast(contacts[idx].isPinned ? "已置顶" : "已取消置顶"); } };
 
-    // --- Role Chat Conversation Logic ---
+    // --- Role Chat Conversation Logic (Updated) ---
     window.openChatWindow = (contactId) => { currentChatContactId = contactId; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === contactId); if (!contact) return; document.getElementById('chat-conv-title').innerText = contact.alias || contact.name; document.getElementById('chat-conv-signature').innerText = contact.signature || ''; const view = document.getElementById('chat-conversation-view'); view.style.backgroundImage = contact.backgroundImage ? `url(${contact.backgroundImage})` : ''; let styleTag = document.getElementById('custom-chat-style'); if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = 'custom-chat-style'; document.head.appendChild(styleTag); } styleTag.innerHTML = contact.customCss || ''; view.classList.add('active'); renderConversationMessages(); };
     window.closeChatConversation = () => { document.getElementById('chat-conversation-view').classList.remove('active'); currentChatContactId = null; const styleTag = document.getElementById('custom-chat-style'); if (styleTag) styleTag.innerHTML = ''; renderChatList(); };
     function getMessagesKey(contactId) { return `chat_msgs_${contactId}`; }
+    
     window.renderConversationMessages = () => { if (!currentChatContactId) return; const container = document.getElementById('chat-conv-messages'); const key = getMessagesKey(currentChatContactId); let messages = []; try { messages = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {} container.innerHTML = ''; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); const themAvatar = contact ? contact.avatar : ''; const globalProfile = getUserProfile(); const meAvatar = (contact && contact.userAvatar) ? contact.userAvatar : (globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'); messages.forEach(msg => { const row = document.createElement('div'); row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`; const avatarHtml = `<img src="${msg.type === 'sent' ? meAvatar : themAvatar}" class="msg-bubble-avatar">`; const contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`; row.innerHTML = msg.type === 'sent' ? contentHtml + avatarHtml : avatarHtml + contentHtml; container.appendChild(row); }); container.scrollTop = container.scrollHeight; };
-    window.sendConversationMessage = () => { if (!currentChatContactId) return; const input = document.getElementById('chat-conv-input'); const text = input.value.trim(); if (!text) return; const key = getMessagesKey(currentChatContactId); let messages = JSON.parse(localStorage.getItem(key) || '[]'); messages.push({ id: Date.now(), text: text, type: 'sent', timestamp: Date.now() }); localStorage.setItem(key, JSON.stringify(messages)); let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contactIndex = contacts.findIndex(c => c.id === currentChatContactId); if (contactIndex !== -1) { contacts[contactIndex].lastMsg = text; contacts[contactIndex].timestamp = Date.now(); localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); } input.value = ''; renderConversationMessages(); };
+    
+    // NEW: Handle Enter Key for sending messages
+    window.handleChatInputKey = (event) => {
+        if (event.key === 'Enter') {
+            sendConversationMessage();
+        }
+    };
+
+    // MODIFIED: Only sends user message, does NOT trigger AI automatically
+    window.sendConversationMessage = () => { 
+        if (!currentChatContactId) return; 
+        const input = document.getElementById('chat-conv-input'); 
+        const text = input.value.trim(); 
+        if (!text) return; 
+        
+        const key = getMessagesKey(currentChatContactId); 
+        let messages = JSON.parse(localStorage.getItem(key) || '[]'); 
+        messages.push({ id: Date.now(), text: text, type: 'sent', timestamp: Date.now() }); 
+        localStorage.setItem(key, JSON.stringify(messages)); 
+        
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); 
+        const contactIndex = contacts.findIndex(c => c.id === currentChatContactId); 
+        if (contactIndex !== -1) { 
+            contacts[contactIndex].lastMsg = text; 
+            contacts[contactIndex].timestamp = Date.now(); 
+            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); 
+        } 
+        
+        input.value = ''; 
+        renderConversationMessages(); 
+    };
+
+    // NEW: AI Auto Reply Trigger Logic
+    window.triggerAIAutoReply = async () => {
+        if (!currentChatContactId) return;
+        
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        if (!settings || !settings.api || !settings.api.url || !settings.api.key) {
+            showToast('请先在设置中配置 API');
+            return;
+        }
+
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contact = contacts.find(c => c.id === currentChatContactId);
+        if (!contact) return;
+
+        showToast('AI 正在思考中...', 3000);
+
+        // 1. Build Context
+        // Role Persona
+        const rolePersona = contact.persona || "Default Role";
+        // User Persona (specific to this contact from Role Settings)
+        const userPersona = contact.userPersona || "User"; 
+        
+        // World Book Context
+        let worldBookContext = "No specific world book bound.";
+        if (contact.worldbookId) {
+            const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+            const wb = worldbooks.find(b => b.id === contact.worldbookId);
+            if (wb) {
+                worldBookContext = `World Book Title: ${wb.title}\nEntries:\n`;
+                wb.entries.forEach(entry => {
+                    worldBookContext += `${entry.key ? entry.key + ': ' : ''}${entry.content}\n`;
+                });
+            }
+        }
+
+        // Recent Chat History (Last 10 messages for context)
+        const msgKey = getMessagesKey(currentChatContactId);
+        let history = JSON.parse(localStorage.getItem(msgKey) || '[]');
+        const recentHistory = history.slice(-10).map(m => `${m.type === 'sent' ? 'User' : 'Role'}: ${m.text}`).join('\n');
+
+        // 2. Construct Prompt
+        const systemPrompt = `
+You are roleplaying. 
+Role Name: ${contact.alias || contact.name}
+Role Persona: ${rolePersona}
+User Persona: ${userPersona}
+World Setting (World Book): ${worldBookContext}
+
+Instructions:
+1. Reply to the User based on the conversation history.
+2. Incorporate World Book elements naturally if relevant.
+3. Your reply MUST be formatted as natural text.
+4. IMPORTANT: Your response will be split into multiple separate bubbles based on punctuation (commas and periods). Ensure your sentences flow well when split.
+5. Do not output 'Role:' or 'User:', just the reply text.
+`;
+
+        // 3. Call API
+        try {
+            const response = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url+'/v1'}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${settings.api.key}`
+                },
+                body: JSON.stringify({
+                    model: settings.api.model || 'gpt-3.5-turbo',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: `Conversation History:\n${recentHistory}\n\n(Reply now)` }
+                    ],
+                    temperature: parseFloat(settings.api.temp || 0.7),
+                    max_tokens: parseInt(settings.api.tokens || 1000)
+                })
+            });
+
+            if (!response.ok) throw new Error('API Request Failed');
+            
+            const data = await response.json();
+            const aiText = data.choices[0].message.content.trim();
+
+            // 4. Process Response (Split by comma and period)
+            // Regex splits by comma or period, keeping the delimiter if needed, or just splitting.
+            // Requirement: "Strictly split by punctuation: comma and period... each segment is a separate bubble"
+            // We will split by comma (， or ,) and period (。 or .) and newlines.
+            const rawSegments = aiText.split(/([，,。.\n])/);
+            let combinedSegments = [];
+            
+            // Re-assemble segments to ensure we don't just have dangling punctuation
+            // Strategy: "Text" + "Punctuation" -> Bubble.
+            // Or pure split. The prompt says: "Every comma content... every period content... separate bubble". 
+            // This usually implies the segment *ending* with the punctuation is one bubble, or the punctuation is the break point.
+            // Let's iterate and build bubbles.
+            
+            let currentBuffer = "";
+            const punctuationRegex = /[，,。.\n]/;
+
+            for (let i = 0; i < rawSegments.length; i++) {
+                const part = rawSegments[i];
+                if (punctuationRegex.test(part)) {
+                    // It's punctuation. Append to buffer?
+                    // Requirement: "strictly split". Usually in Chinese novels/chat, punctuation is part of the sentence.
+                    // Let's treat punctuation as the end of a bubble.
+                    if (currentBuffer.trim() !== "") {
+                         // Add punctuation to the previous text? Or keep it separate?
+                         // "Hello," -> Bubble 1: "Hello,"
+                         currentBuffer += part;
+                         combinedSegments.push(currentBuffer);
+                         currentBuffer = "";
+                    } else {
+                        // Just punctuation? Ignore or append?
+                    }
+                } else {
+                    currentBuffer += part;
+                }
+            }
+            if (currentBuffer.trim() !== "") combinedSegments.push(currentBuffer);
+
+            // If the split resulted in too few or weird segments (e.g. AI didn't use punctuation), just use the text.
+            if (combinedSegments.length === 0 && aiText) combinedSegments.push(aiText);
+
+            // 5. Save and Render sequentially
+            let currentMessages = JSON.parse(localStorage.getItem(msgKey) || '[]');
+            
+            combinedSegments.forEach(segment => {
+                if (segment.trim()) {
+                    currentMessages.push({
+                        id: Date.now() + Math.random(), // Unique ID
+                        text: segment.trim(),
+                        type: 'received',
+                        timestamp: Date.now()
+                    });
+                }
+            });
+            
+            localStorage.setItem(msgKey, JSON.stringify(currentMessages));
+            
+            // Update last message in contact list
+            let contactsList = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); 
+            const contactIdx = contactsList.findIndex(c => c.id === currentChatContactId); 
+            if (contactIdx !== -1) { 
+                contactsList[contactIdx].lastMsg = combinedSegments[combinedSegments.length-1] || "Image/Text"; 
+                contactsList[contactIdx].timestamp = Date.now(); 
+                localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contactsList)); 
+            } 
+
+            renderConversationMessages();
+            renderChatList(); // Update list preview
+
+        } catch (error) {
+            console.error(error);
+            showToast('AI 回复失败: ' + error.message);
+        }
+    };
 
     // --- Role Settings Logic ---
     window.openRoleSettings = () => { if (!currentChatContactId) return; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); if (!contact) return; tempSelectedWorldBookId = contact.worldbookId || null; document.getElementById('role-setting-avatar').src = contact.avatar || ''; document.getElementById('role-setting-alias').value = contact.alias || contact.name; document.getElementById('role-setting-signature').value = contact.signature || ''; document.getElementById('role-setting-persona').value = contact.persona || ''; document.getElementById('role-setting-css').value = contact.customCss || `/* Example */\n.msg-bubble-row.them .msg-bubble-content {\n  border-radius: 20px 20px 20px 0;\n  background: #fff;\n}`; tempRoleBgUrl = contact.backgroundImage || ''; document.getElementById('role-bg-preview').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : ''; const globalProfile = getUserProfile(); document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || ''; document.getElementById('role-user-persona').value = contact.userPersona || ''; updateRoleWbDisplay(contact.worldbookId); document.getElementById('role-settings-page').classList.add('active'); };
@@ -2208,7 +2487,6 @@
     window.editNickname = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newName = prompt("请输入新昵称:", p.nickname); if (newName && newName.trim()) { p.nickname = newName.trim(); saveUserProfile(p); loadUserProfile(); } };
     window.editQQID = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newID = prompt("请输入QQ号:", p.qqId); if (newID && newID.trim()) { p.qqId = newID.trim(); saveUserProfile(p); loadUserProfile(); } };
     window.incrementLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); p.likes = parseInt(p.likes) + 1; saveUserProfile(p); loadUserProfile(); const icon = document.querySelector('.me-like-icon'); icon.style.transform = "scale(1.2) rotate(-10deg)"; setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150); };
-    // --- FIXED: "Me" page settings icon functionality ---
     window.openMeSettings = () => { const p = getUserProfile(); document.getElementById('me-settings-avatar-url').value = p.avatar || ''; document.getElementById('me-settings-cover-url').value = p.cover || ''; document.getElementById('me-settings-avatar-preview').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('me-settings-cover-preview').src = p.cover || ''; const container = document.getElementById('me-settings-member-icons-list'); container.innerHTML = ''; for (let i = 0; i < 8; i++) { const url = p.memberUrls[i] || ''; container.innerHTML += `<div class="me-settings-row"><div class="me-settings-label">会员${i+1}</div><div class="me-settings-preview-wrapper"><img id="me-preview-m${i+1}" class="me-settings-preview icon" src="${url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"></div><input type="text" id="me-input-m${i+1}" class="me-settings-input" placeholder="图片 URL" value="${url}"></div>`; } for (let i = 0; i < 8; i++) { const input = document.getElementById(`me-input-m${i+1}`); const preview = document.getElementById(`me-preview-m${i+1}`); input.oninput = () => { handleImgSrcInput(input, preview); }; } document.getElementById('me-settings-modal').classList.add('active'); };
     window.closeMeSettings = () => { document.getElementById('me-settings-modal').classList.remove('active'); };
     window.saveMeSettings = () => { const p = getUserProfile(); p.avatar = document.getElementById('me-settings-avatar-url').value.trim(); p.cover = document.getElementById('me-settings-cover-url').value.trim(); for (let i = 0; i < 8; i++) { p.memberUrls[i] = document.getElementById(`me-input-m${i+1}`).value.trim(); } saveUserProfile(p); loadUserProfile(); showToast('个人主页设置已保存'); closeMeSettings(); };
