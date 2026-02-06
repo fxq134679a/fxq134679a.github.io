@@ -34,14 +34,14 @@
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
         body {
-             width: 100vw;
-             height: 100vh;
-             overflow: hidden;
-             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
-             position: relative;
-             transition: background-image 0.3s ease-in-out;
-            z-index: -2;
-        }
+     width: 100vw;
+     height: 100vh;
+     overflow: hidden;
+     background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+     position: relative;
+     transition: background-image 0.3s ease-in-out;
+    z-index: -2;
+}
         #home-screen {
              width: 100%;
              height: 100%;
@@ -3199,4 +3199,105 @@ Instructions:
         if(i2 && v.chatText2) { i2.value = v.chatText2; adjustInputWidth(i2); }
         const pImg = document.getElementById('photo-widget-img'); const pPh = document.getElementById('photo-widget-placeholder');
         if (v.photoWidgetUrl && v.photoWidgetUrl.length > 20 && !v.photoWidgetUrl.includes('null')) { pImg.src = v.photoWidgetUrl; pImg.style.display = 'block'; pPh.style.display = 'none'; } else { pImg.style.display = 'none'; pPh.style.display = 'flex'; }
-        if (v.icons) Object.keys(v.icons).forEach(id => applyIconToUI(id,
+        if (v.icons) Object.keys(v.icons).forEach(id => applyIconToUI(id,            v.icons[id]));
+        }
+
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+            if (!settings) return;
+            
+            if (settings.api) {
+                apiUrlInput.value = settings.api.url || '';
+                apiKeyInput.value = settings.api.key || '';
+                if(settings.api.model) {
+                     modelSelect.innerHTML = `<option value="${settings.api.model}">${settings.api.model}</option>`;
+                }
+                document.getElementById('temp-slider').value = settings.api.temp || 0.8;
+                document.getElementById('temp-value-display').innerText = settings.api.temp || 0.8;
+                document.getElementById('max-tokens-input').value = settings.api.tokens || 1000;
+            }
+            if (settings.visual) {
+                document.getElementById('wallpaper-url').value = settings.visual.wallpaper || '';
+                document.getElementById('widget-square-url').value = settings.visual.widget || '';
+                document.getElementById('custom-image-url').value = settings.visual.customImg || '';
+                applyVisual(settings.visual);
+                // Pre-fill icon inputs in settings page
+                if (settings.visual.icons) {
+                   // Slight delay to ensure elements exist if populateSettingsList hasn't run yet
+                   setTimeout(() => {
+                       Object.keys(settings.visual.icons).forEach(id => {
+                           const inp = document.getElementById(`url-${id}`);
+                           if(inp) inp.value = settings.visual.icons[id];
+                       });
+                   }, 100);
+                }
+            }
+            
+            // iOS Mode Load
+            const iosMode = localStorage.getItem(IOS_MODE_KEY) === 'true';
+            document.getElementById('ios-mode-switch').checked = iosMode;
+            applyIOSMode(iosMode);
+        }
+
+        document.getElementById('save-settings-btn').onclick = () => {
+             saveAllSettings();
+             hideSettingsPage();
+             
+             // Save iOS Mode
+             const iosEnabled = document.getElementById('ios-mode-switch').checked;
+             applyIOSMode(iosEnabled);
+        };
+        
+        document.getElementById('temp-slider').oninput = (e) => {
+            document.getElementById('temp-value-display').innerText = e.target.value;
+        };
+
+        // --- AI Chat Logic (Standalone) ---
+        window.handleChatKeyPress = (e) => { if (e.key === 'Enter') sendChatMessage(); };
+        window.sendChatMessage = async () => {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const msgsDiv = document.getElementById('chat-messages');
+            msgsDiv.innerHTML += `<div class="message user">${escapeHtml(text)}</div>`;
+            input.value = '';
+            msgsDiv.scrollTop = msgsDiv.scrollHeight;
+
+            const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+            if (!settings || !settings.api) {
+                 msgsDiv.innerHTML += `<div class="message ai">请先配置 API。</div>`;
+                 return;
+            }
+
+            try {
+                const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url+'/v1'}/chat/completions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
+                    body: JSON.stringify({
+                        model: settings.api.model || 'gpt-3.5-turbo',
+                        messages: [{ role: 'user', content: text }],
+                        temperature: parseFloat(settings.api.temp || 0.7)
+                    })
+                });
+                const data = await res.json();
+                const reply = data.choices[0].message.content;
+                msgsDiv.innerHTML += `<div class="message ai">${escapeHtml(reply)}</div>`;
+                msgsDiv.scrollTop = msgsDiv.scrollHeight;
+            } catch (e) {
+                msgsDiv.innerHTML += `<div class="message ai">Error: ${e.message}</div>`;
+            }
+        };
+
+        // --- Initialization ---
+        window.onload = () => {
+            updateClock();
+            setInterval(updateClock, 1000); 
+            populateSettingsList(); // Init settings UI
+            loadSettings(); // Load saved data
+            renderChatList();
+            loadUserProfile(); // Me page init
+        };
+    </script>
+</body>
+</html>
