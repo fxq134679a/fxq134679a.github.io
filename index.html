@@ -22,6 +22,8 @@
             --wallet-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%);
             --wallet-card-shadow: 0 10px 20px rgba(255, 154, 158, 0.3);
             --link-blue: #5865F2;
+            --moments-nickname-color: #8687B4; /* 朋友圈昵称颜色 */
+            --menu-pink: #fdcee0;
         }
         * {
              box-sizing: border-box;
@@ -261,11 +263,17 @@
             flex-shrink: 0; z-index: 20; height: 80px;
             transition: padding-top 0.3s ease, height 0.3s ease;
         }
-/* iOS模式 聊天顶栏按钮上移 */
-body.ios-mode-active .chat-conv-back-btn,
-body.ios-mode-active .chat-conv-right-icon {
-    transform: translateY(-6px); /* 上移数值按需改 */
-}
+        /* iOS模式 聊天顶栏调整：下移更多 */
+        body.ios-mode-active .chat-conv-back-btn,
+        body.ios-mode-active .chat-conv-right-icon {
+            transform: translateY(-20px); /* 向上移动 */
+        }
+        body.ios-mode-active .chat-conv-header { 
+            padding-top: calc(env(safe-area-inset-top, 20px) + 25px); /* 减少padding-top */
+            height: 120px; /* 增加高度适应 */
+        }
+        body.ios-mode-active .chat-conv-title-container { margin-top: -30px; /* 向上移动 */ }
+
         .chat-conv-back-btn { width: 32px; height: 32px; object-fit: contain; cursor: pointer; }
         
         .chat-conv-title-container {
@@ -276,6 +284,17 @@ body.ios-mode-active .chat-conv-right-icon {
             font-size: 17px; font-weight: 600; color: var(--theme-pink-text); 
             text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
         }
+        /* 对方正在输入中... 闪烁动画类 */
+        @keyframes blinkColor {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .typing-anim {
+            color: #FDCEDF !important;
+            animation: blinkColor 1.5s infinite ease-in-out;
+        }
+
         .chat-conv-signature {
             font-size: 11px; color: var(--theme-pink-text); opacity: 0.8;
             margin-top: 2px; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -290,9 +309,30 @@ body.ios-mode-active .chat-conv-right-icon {
             flex: 1; overflow-y: auto; padding: 20px 15px;
             display: flex; flex-direction: column; gap: 18px;
         }
-        .msg-bubble-row { display: flex; align-items: flex-end; width: 100%; gap: 8px; }
+        
+        /* Time Stamp Style */
+        .chat-time-stamp {
+            align-self: center;
+            font-size: 12px;
+            color: #b0b0b0;
+            margin: 10px 0;
+            font-weight: 400;
+        }
+        
+        .msg-bubble-row { display: flex; align-items: flex-end; width: 100%; gap: 8px; transition: transform 0.3s; position: relative; }
         .msg-bubble-row.me { justify-content: flex-end; }
         
+        /* Recalled Tip */
+        .msg-recalled-tip {
+            align-self: center;
+            font-size: 12px;
+            color: #b0b0b0;
+            background: rgba(0,0,0,0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+
         .msg-bubble-avatar {
             width: 38px; height: 38px; border-radius: 8px; object-fit: cover;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;
@@ -301,7 +341,7 @@ body.ios-mode-active .chat-conv-right-icon {
         .msg-bubble-content {
             max-width: 70%; padding: 12px 16px; font-size: 15px; line-height: 1.5;
             position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            word-wrap: break-word;
+            word-wrap: break-word; user-select: text; /* Allow text selection */
         }
         .msg-bubble-row.them .msg-bubble-content {
             background: #FFFFFF; color: #333;
@@ -311,9 +351,65 @@ body.ios-mode-active .chat-conv-right-icon {
             background: var(--theme-pink-text); color: white;
             border-radius: 18px 18px 4px 18px;
         }
-        .msg-time-stamp {
-            font-size: 11px; color: #ccc; text-align: center; margin: 5px 0;
+
+        /* Bubble Context Menu (Popup) */
+        .bubble-context-menu {
+            position: absolute;
+            background-color: var(--menu-pink);
+            border-radius: 12px;
+            padding: 5px;
+            display: flex;
+            gap: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            z-index: 1000;
+            white-space: nowrap;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+            display: none;
         }
+        .bubble-context-menu.active { display: flex; }
+        .bubble-menu-item {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: white; /* Contrast with light pink bg? Maybe darker text */
+            color: #555;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .bubble-menu-item:active { background-color: rgba(255,255,255,0.4); }
+        .bubble-context-menu::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px;
+            border-width: 6px; border-style: solid;
+            border-color: var(--menu-pink) transparent transparent transparent;
+        }
+
+        /* Multi-select Mode Styles */
+        .chat-conv-messages.multi-select-active .msg-bubble-row {
+            padding-left: 30px; /* Space for checkbox */
+        }
+        .chat-checkbox {
+            position: absolute; left: -30px; top: 50%; transform: translateY(-50%);
+            width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd;
+            display: none; justify-content: center; align-items: center;
+            background: white; transition: all 0.2s;
+        }
+        .chat-conv-messages.multi-select-active .chat-checkbox { display: flex; left: 0; }
+        .chat-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
+        .chat-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+        
+        .chat-multiselect-footer {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
+            background: white; border-top: 1px solid #eee; z-index: 25;
+            display: none; justify-content: center; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        .chat-multiselect-footer.active { display: flex; }
+        .chat-multiselect-delete-btn {
+            background: #ffebee; color: #F44336; padding: 10px 30px; border-radius: 20px;
+            border: none; font-weight: 600; font-size: 14px; cursor: pointer;
+        }
+
 
         /* 2. 底部输入栏 (角色聊天) */
         .chat-conv-footer {
@@ -340,9 +436,9 @@ body.ios-mode-active .chat-conv-right-icon {
             pointer-events: none;
         }
         /* AI触发按钮专属样式，可根据需要微调 */
-.chat-conv-btn.ai-trigger {
-    background-color: var(--theme-pink-btn);
-}
+        .chat-conv-btn.ai-trigger {
+            background-color: var(--theme-pink-btn);
+        }
 
         .chat-conv-input-wrapper { flex: 1; height: 42px; position: relative; }
         .chat-conv-input {
@@ -509,9 +605,14 @@ body.ios-mode-active .chat-conv-right-icon {
         .chat-placeholder-text { color: #E58AAB; text-align: center; padding-top: 50%; font-size: 16px; font-weight: 500; width: 100%; }
 
         /* --- NEW/MODIFIED: 朋友圈 (Moments) Styles --- */
+        #chat-tab-2 {
+            background-color: #ffffff; /* 确保朋友圈 Tab 背景纯白 */
+            min-height: 100vh;
+        }
         #moments-page-wrapper {
-            background-color: #fff;
+            background-color: #ffffff; /* 强制白色背景 */
             padding-bottom: 100px; /* Space for nav bar */
+            min-height: 100%;
         }
         .moments-header {
             position: relative;
@@ -560,7 +661,7 @@ body.ios-mode-active .chat-conv-right-icon {
         #moments-list {
             display: flex;
             flex-direction: column;
-            background-color: #fff;
+            background-color: #ffffff; /* 强制白色背景 */
             padding-top: 30px; /* Space for the overlapping avatar */
         }
         .moment-item {
@@ -585,7 +686,7 @@ body.ios-mode-active .chat-conv-right-icon {
         .moment-item-nickname {
             font-size: 16px;
             font-weight: 600;
-            color: var(--link-blue);
+            color: var(--moments-nickname-color); /* 修改颜色为 #8687B4 */
         }
         .moment-item-text {
             font-size: 15px;
@@ -594,34 +695,83 @@ body.ios-mode-active .chat-conv-right-icon {
             white-space: pre-wrap;
             word-break: break-word;
         }
-        .moment-item-image {
-            max-width: 100%;
-            width: 200px; /* Set a fixed width for single images */
-            border-radius: 8px;
+        
+        /* Nine Grid Image Layout */
+        .moments-img-grid {
+            display: grid;
+            gap: 5px;
+            margin-top: 5px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .moments-img-grid.single-img {
+            grid-template-columns: 1fr;
+        }
+        .moments-img-grid.grid-2, .moments-img-grid.grid-4 {
+            grid-template-columns: repeat(2, 1fr);
+            width: 200px; /* Limit width for 2x2 */
+        }
+        .moments-img-grid.grid-3, .moments-img-grid.grid-5, .moments-img-grid.grid-6, 
+        .moments-img-grid.grid-7, .moments-img-grid.grid-8, .moments-img-grid.grid-9 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .moment-grid-img {
+            width: 100%;
+            aspect-ratio: 1/1;
             object-fit: cover;
+            border-radius: 4px;
             cursor: pointer;
         }
+        .moments-img-grid.single-img .moment-grid-img {
+            max-width: 200px;
+            max-height: 200px;
+            aspect-ratio: auto;
+            width: auto;
+            height: auto;
+        }
+
         .moment-item-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
             color: #999;
         }
+        .moment-item-meta-left {
+            display: flex;
+            align-items: center;
+            gap: 1em; /* '两个字的距离' */
+            font-size: 13px;
+        }
+        .moment-delete-btn {
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .moment-delete-btn:hover { opacity: 1; }
+
         .moment-actions-btn {
             background-color: #f0f0f0;
             border-radius: 4px;
-            padding: 2px 8px;
+            padding: 0px 6px;
             font-weight: bold;
-            font-size: 16px;
-            color: #666;
+            font-size: 18px; /* Slightly larger for ".." */
+            color: #8687B4; /* 修改为指定颜色 */
             cursor: pointer;
             position: relative;
+            line-height: 14px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            letter-spacing: -2px; /* Make dots closer */
         }
         .moment-actions-popup {
             position: absolute;
             right: 100%;
-            bottom: 0;
+            bottom: -8px; /* Slight adjustment */
             margin-right: 10px;
             background-color: #4C4C4C;
             color: white;
@@ -645,6 +795,9 @@ body.ios-mode-active .chat-conv-right-icon {
             gap: 5px;
             font-size: 14px;
         }
+        .moment-popup-btn img {
+            width: 16px; height: 16px; object-fit: contain;
+        }
         .moment-popup-btn:not(:last-child) {
             border-right: 1px solid #666;
         }
@@ -659,7 +812,7 @@ body.ios-mode-active .chat-conv-right-icon {
             font-size: 14px;
         }
         .moment-likes {
-            color: var(--link-blue);
+            color: var(--moments-nickname-color);
             padding-bottom: 5px;
             border-bottom: 1px solid #eee;
             margin-bottom: 5px;
@@ -681,7 +834,7 @@ body.ios-mode-active .chat-conv-right-icon {
             gap: 3px;
         }
         .moment-comment-item .user {
-            color: var(--link-blue);
+            color: var(--moments-nickname-color); /* 修改颜色为 #8687B4 */
             font-weight: 500;
         }
         .moment-comment-item .text {
@@ -704,10 +857,16 @@ body.ios-mode-active .chat-conv-right-icon {
             border: none; background: none; font-size: 16px; cursor: pointer; padding: 5px 10px;
         }
         .add-moment-cancel { color: #333; }
+        
+        /* Updated Post Button Style */
         .add-moment-post {
-            background-color: var(--success-green); color: white; border-radius: 6px;
-            padding: 8px 20px !important; font-weight: 600;
+            background-color: #F8C8DC; /* Pale Pink */
+            color: black; 
+            border-radius: 4px; /* Rectangular-ish */
+            padding: 6px 15px !important; 
+            font-weight: 500;
         }
+        
         .add-moment-content { padding: 0 20px; flex: 1; display: flex; flex-direction: column; }
         #add-moment-text {
             width: 100%;
@@ -719,16 +878,117 @@ body.ios-mode-active .chat-conv-right-icon {
             resize: none;
             padding: 10px 0;
         }
-        #add-moment-image-url {
-            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
-            font-size: 14px; margin-top: 20px;
+        
+        /* Add Moment Image Grid */
+        .add-moment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
         }
+        
+        .add-moment-image-upload { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            background-color: #eaeaea; 
+            cursor: pointer; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 30px; color: #aaa; 
+            border-radius: 8px; 
+            position: relative; overflow: hidden; 
+        }
+        .add-moment-img-cell {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .add-moment-img-cell img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .add-moment-remove-img {
+            position: absolute; top: 2px; right: 2px;
+            background: rgba(0,0,0,0.5); color: white;
+            width: 20px; height: 20px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 12px; cursor: pointer;
+        }
+        
         .moments-empty-placeholder {
             text-align: center;
             padding: 80px 20px;
             color: #bbb;
             background-color: #fff;
         }
+
+        /* --- NEW: Moments Comment MODAL (Updated) --- */
+        #moments-comment-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            z-index: 1900;
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #moments-comment-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        #moments-comment-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #F7F7F7; /* Input area background - Light Gray */
+            padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 0px));
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        #moments-comment-modal.active {
+            transform: translateY(0);
+        }
+        #moments-comment-input {
+            flex: 1;
+            height: 40px;
+            padding: 0 15px;
+            border-radius: 20px; /* Rounded rectangle */
+            border: 1px solid #EAEAEA; /* Faint border */
+            background-color: #FCFCFC; /* Near white/Very light gray */
+            font-size: 15px;
+            outline: none;
+            color: #333;
+            margin-bottom: 0;
+        }
+        #moments-comment-input::placeholder {
+            color: #999;
+        }
+        #moments-comment-input:focus {
+            background-color: #FFFFFF;
+        }
+        .moments-emoji-btn {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        #moments-comment-submit-btn {
+            border: none;
+            background: none;
+            color: var(--theme-pink-text);
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 5px;
+            white-space: nowrap;
+        }
+
 
         /* --- Me Page 重构样式 --- */
         .me-page-container { width: 100%; display: flex; flex-direction: column; height: auto; max-height: 100vh; }
@@ -908,11 +1168,11 @@ body.ios-mode-active .chat-conv-right-icon {
         .add-friend-input { width: 100%; padding: 12px 15px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 12px; margin-bottom: 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
         .add-friend-input:focus { border-color: var(--theme-pink-text); background-color: white; }
 
-        /* --- 删除好友弹窗 --- */
-        #delete-confirm-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 800; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-        #delete-confirm-modal.active { opacity: 1; pointer-events: auto; }
+        /* --- 删除确认弹窗 (通用) --- */
+        .delete-confirm-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 800; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .delete-confirm-modal.active { opacity: 1; pointer-events: auto; }
         .delete-card { background: white; width: 80%; max-width: 280px; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(0.9); transition: transform 0.2s; }
-        #delete-confirm-modal.active .delete-card { transform: scale(1); }
+        .delete-confirm-modal.active .delete-card { transform: scale(1); }
         .delete-card-title { font-size: 16px; font-weight: 500; color: #333; margin-bottom: 25px; }
         .delete-card-actions { display: flex; justify-content: space-around; gap: 10px; }
         .delete-card-btn { flex: 1; padding: 10px 0; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
@@ -964,14 +1224,15 @@ body.ios-mode-active .chat-conv-right-icon {
         .app-icon-input input { flex: 1; min-width: 0; padding: 6px 8px; font-size: 12px; }
         .app-icon-input button { padding: 6px 12px; width: auto; font-size: 12px; background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); border: none; }
         
-        /* --- iOS Mode Switch Styles --- */
-        .settings-row-ios-mode {
+        /* --- iOS Mode Switch Styles (Generic row with switch) --- */
+        .settings-row-with-switch {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 5px;
+            padding: 5px 0; /* Adjusted padding */
+            margin-bottom: 5px;
         }
-        .settings-row-ios-mode > label {
+        .settings-row-with-switch > label {
             margin-bottom: 0;
             font-size: 14px;
             color: #555;
@@ -1002,8 +1263,16 @@ body.ios-mode-active .chat-conv-right-icon {
         /* --- MODIFIED: iOS Mode Active Global Styles --- */
         body.ios-mode-active #time-section { padding-top: env(safe-area-inset-top, 20px); }
         body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); } 
-        body.ios-mode-active .chat-conv-header { padding-top: calc(env(safe-area-inset-top, 20px) + 35px); height: 100px; }
-        body.ios-mode-active .chat-conv-title-container { margin-top: -20px; }
+        /* 修改：下移聊天顶栏 */
+        body.ios-mode-active .chat-conv-header { 
+            padding-top: calc(env(safe-area-inset-top, 20px) + 25px); /* 减少padding-top */
+            height: 120px; /* 增加高度适应 */
+        }
+        body.ios-mode-active .chat-conv-back-btn,
+        body.ios-mode-active .chat-conv-right-icon {
+            transform: translateY(-20px); /* 向上移动 */
+        }
+        body.ios-mode-active .chat-conv-title-container { margin-top: -30px; /* 向上移动 */ }
         
         body.ios-mode-active #role-settings-page { padding-top: calc(env(safe-area-inset-top, 20px) + 20px); }
         body.ios-mode-active .me-settings-header-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
@@ -1489,6 +1758,10 @@ body.ios-mode-active .chat-conv-right-icon {
             <!-- 仅保留AI触发功能 -->
             <button class="chat-conv-btn send ai-trigger" onclick="triggerAIAutoReply()"><img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;"></button>
         </div>
+        <!-- Multiselect Footer -->
+        <div class="chat-multiselect-footer" id="chat-multiselect-footer">
+             <button class="chat-multiselect-delete-btn" onclick="executeBatchDelete()">删除</button>
+        </div>
     </div>
 </div>
 
@@ -1506,7 +1779,23 @@ body.ios-mode-active .chat-conv-right-icon {
         <input type="text" id="role-setting-alias" class="role-alias-edit" placeholder="备注名">
         <input type="text" id="role-setting-signature" class="role-signature-edit" placeholder="角色签名...">
         <textarea id="role-setting-persona" class="role-persona-input" placeholder="输入角色人设 (Persona)..."></textarea>
-        <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px;">
+        
+        <!-- NEW: Time Perception Switch -->
+        <div class="settings-row-with-switch" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 10px;">
+            <label for="role-time-perception-switch">时间感知</label>
+            <label class="ios-switch">
+                <input type="checkbox" id="role-time-perception-switch">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <!-- NEW: Memory Depth Input -->
+        <div class="settings-row" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <label for="role-memory-depth" style="font-size:14px; color:#555; font-weight:500;">记忆条数 (Memory)</label>
+            <input type="number" id="role-memory-depth" placeholder="10" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        </div>
+
+        <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px; margin-top: 15px;">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <span style="font-size:13px; color:#555;">聊天背景</span>
                 <div id="role-bg-preview" class="role-bg-preview"></div>
@@ -1555,8 +1844,20 @@ body.ios-mode-active .chat-conv-right-icon {
     </div>
     <div class="add-moment-content">
         <textarea id="add-moment-text" placeholder="这一刻的想法..."></textarea>
-        <input type="text" id="add-moment-image-url" placeholder="粘贴图片链接 (可选)">
+        <div class="add-moment-grid" id="add-moment-grid">
+            <div class="add-moment-image-upload" onclick="triggerMomentImageUpload()">
+                 <span id="moment-upload-icon">+</span>
+            </div>
+        </div>
     </div>
+</div>
+
+<!-- NEW: Moments Comment MODAL (Updated Layout) -->
+<div id="moments-comment-overlay" onclick="closeCommentInput()"></div>
+<div id="moments-comment-modal">
+    <input type="text" id="moments-comment-input" placeholder="发表评论:" onkeypress="handleCommentKey(event)">
+    <img src="https://img.heliar.top/file/1770357295773_笑脸_smiling-face_2.png" class="moments-emoji-btn">
+    <button id="moments-comment-submit-btn" onclick="submitComment()">发送</button>
 </div>
 
 
@@ -1689,12 +1990,23 @@ body.ios-mode-active .chat-conv-right-icon {
 </div>
 
 <!-- 删除好友确认弹窗 -->
-<div id="delete-confirm-modal">
+<div id="delete-friend-confirm-modal" class="delete-confirm-modal">
     <div class="delete-card">
         <div class="delete-card-title">确定删除该好友吗π_π</div>
         <div class="delete-card-actions">
-            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal()">取消</button>
-            <button class="delete-card-btn btn-confirm-delete" onclick="executeDeleteFriend()">确定</button>
+            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('delete-friend-confirm-modal')">取消</button>
+            <button class="delete-card-btn btn-confirm-delete" onclick="executeDeleteFriend()">删除</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: 删除朋友圈确认弹窗 -->
+<div id="delete-moment-confirm-modal" class="delete-confirm-modal">
+    <div class="delete-card">
+        <div class="delete-card-title">删除该朋友圈？</div>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('delete-moment-confirm-modal')">取消</button>
+            <button class="delete-card-btn btn-confirm-delete" onclick="executeDeleteMoment()">删除</button>
         </div>
     </div>
 </div>
@@ -1733,7 +2045,7 @@ body.ios-mode-active .chat-conv-right-icon {
     <div class="settings-content">
         <div class="settings-module">
             <h3>通用</h3>
-            <div class="settings-row-ios-mode">
+            <div class="settings-row-with-switch">
                 <label for="ios-mode-switch">iOS 模式 (刘海屏适配)</label>
                 <label class="ios-switch">
                     <input type="checkbox" id="ios-mode-switch">
@@ -1871,6 +2183,7 @@ body.ios-mode-active .chat-conv-right-icon {
 <input type="file" id="input-photo-widget" class="file-input-hidden" accept="image/*" onchange="handlePhotoWidgetUpload(event)">
 <input type="file" id="input-role-user-avatar" class="file-input-hidden" accept="image/*" onchange="handleRoleUserAvatarUpload(event)">
 <input type="file" id="input-role-chat-bg" class="file-input-hidden" accept="image/*" onchange="handleRoleChatBgUpload(event)">
+<input type="file" id="input-moment-image" class="file-input-hidden" multiple accept="image/*" onchange="handleMomentImageUpload(event)">
 
 <script>
     'use strict';
@@ -1885,7 +2198,7 @@ body.ios-mode-active .chat-conv-right-icon {
     const WALLET_DATA_KEY = 'walletData_v1';
     const WORLDBOOK_DATA_KEY = 'worldbookData_v2'; 
     const IOS_MODE_KEY = 'iosModeEnabled_v1';
-    const MOMENTS_DATA_KEY = 'momentsData_v1';
+    const MOMENTS_DATA_KEY = 'momentsData_v2'; // Bump version for image array
     const MOMENTS_PROFILE_KEY = 'momentsProfile_v1';
 
     let customDateText = ""; 
@@ -1895,6 +2208,12 @@ body.ios-mode-active .chat-conv-right-icon {
     let tempRoleBgUrl = ""; 
     let currentWorldBookId = null; 
     let tempSelectedWorldBookId = null;
+    let tempMomentImages = []; // Stores array of base64 images
+    let currentCommentMomentId = null; 
+    let currentDeleteMomentId = null; 
+    let activeMsgIdForMenu = null; // Store msg id for active context menu
+    let isMultiSelectMode = false;
+    let selectedMsgIds = new Set();
 
     // --- Utility Functions ---
     const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
@@ -1939,6 +2258,9 @@ body.ios-mode-active .chat-conv-right-icon {
         addFriendIcon.style.display = 'none';
         addMomentIcon.style.display = 'none';
         
+        // Hide comment input if switching tabs
+        closeCommentInput();
+
         if (index === 0) { // Chat
             addFriendIcon.style.display = 'block';
         } else if (index === 1) { // Contacts
@@ -2015,10 +2337,11 @@ body.ios-mode-active .chat-conv-right-icon {
             moments.forEach(moment => {
                 const userHasLiked = moment.likes.includes(userProfile.qqId);
                 const likeBtnText = userHasLiked ? '取消' : '赞';
+                const likeIconUrl = userHasLiked ? "https://img.heliar.top/file/1770356886806_喜欢_like_3.png" : "https://img.heliar.top/file/1770353311894_喜欢_like_2.png";
 
                 let likesHtml = '';
                 if (moment.likes.length > 0) {
-                    likesHtml = `<div class="moment-likes">❤️ ${moment.likes.length}</div>`;
+                    likesHtml = `<div class="moment-likes"><img src="https://img.heliar.top/file/1770356881218_喜欢_like_4.png" style="width:14px;height:14px;object-fit:contain;"> ${moment.likes.length}</div>`;
                 }
 
                 let commentsHtml = '';
@@ -2029,6 +2352,24 @@ body.ios-mode-active .chat-conv-right-icon {
                         ).join('') +
                     `</div>`;
                 }
+                
+                // NEW: Image Grid Render Logic
+                let imageGridHtml = '';
+                let images = moment.images || (moment.imageUrl ? [moment.imageUrl] : []); // Compatibility
+                
+                if (images.length > 0) {
+                    let gridClass = 'single-img';
+                    if (images.length === 1) gridClass = 'single-img';
+                    else if (images.length === 2 || images.length === 4) gridClass = `grid-${images.length}`; // 2 col
+                    else gridClass = `grid-${images.length}`; // 3 col default logic handled in CSS usually, but here distinct classes help
+                    
+                    imageGridHtml = `<div class="moments-img-grid ${gridClass}">` + 
+                        images.map(url => `<img src="${url}" class="moment-grid-img" onclick="event.stopPropagation()">`).join('') +
+                    `</div>`;
+                }
+                
+                // Delete icon added here
+                const deleteIconHtml = `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">`;
 
                 listHtml += `
                     <div class="moment-item" id="moment-${moment.id}">
@@ -2036,14 +2377,17 @@ body.ios-mode-active .chat-conv-right-icon {
                         <div class="moment-item-content">
                             <div class="moment-item-nickname">${escapeHtml(userProfile.nickname)}</div>
                             ${moment.text ? `<div class="moment-item-text">${escapeHtml(moment.text)}</div>` : ''}
-                            ${moment.imageUrl ? `<img src="${moment.imageUrl}" class="moment-item-image">` : ''}
+                            ${imageGridHtml}
                             <div class="moment-item-meta">
-                                <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
+                                <div class="moment-item-meta-left">
+                                    <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
+                                    ${deleteIconHtml}
+                                </div>
                                 <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
-                                    ...
+                                    ··
                                     <div class="moment-actions-popup">
-                                        <div class="moment-popup-btn" onclick="toggleLike(${moment.id})">👍 ${likeBtnText}</div>
-                                        <div class="moment-popup-btn" onclick="addComment(${moment.id})">💬 评论</div>
+                                        <div class="moment-popup-btn" onclick="toggleLike(${moment.id})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
+                                        <div class="moment-popup-btn" onclick="openCommentInput(${moment.id})"><img src="https://img.heliar.top/file/1770353307524_评论_comment.png"> 评论</div>
                                     </div>
                                 </div>
                             </div>
@@ -2069,6 +2413,24 @@ body.ios-mode-active .chat-conv-right-icon {
             </div>
         `;
     }
+    
+    // NEW: Moment Deletion Logic
+    window.confirmDeleteMoment = (momentId) => {
+        currentDeleteMomentId = momentId;
+        document.getElementById('delete-moment-confirm-modal').classList.add('active');
+    };
+    
+    window.executeDeleteMoment = () => {
+        if (!currentDeleteMomentId) return;
+        let moments = getMomentsData();
+        const updatedMoments = moments.filter(m => m.id !== currentDeleteMomentId);
+        saveMomentsData(updatedMoments);
+        closeDeleteModal('delete-moment-confirm-modal');
+        renderMomentsPage();
+        showToast("动态已删除");
+        currentDeleteMomentId = null;
+    };
+
 
     window.editMomentsAvatar = () => {
         const p = getMomentsProfile();
@@ -2101,8 +2463,16 @@ body.ios-mode-active .chat-conv-right-icon {
             popup.classList.toggle('active');
         }
     };
-    document.addEventListener('click', () => { 
+    document.addEventListener('click', (e) => { 
+        // Close popup if clicking elsewhere
         document.querySelectorAll('.moment-actions-popup').forEach(p => p.classList.remove('active'));
+        
+        // Close bubble menu if clicking elsewhere
+        const bubbleMenu = document.querySelector('.bubble-context-menu');
+        if (bubbleMenu && activeMsgIdForMenu && !e.target.closest('.bubble-context-menu')) {
+            bubbleMenu.remove();
+            activeMsgIdForMenu = null;
+        }
     });
 
     // NEW: Action Sheet Logic
@@ -2125,17 +2495,68 @@ body.ios-mode-active .chat-conv-right-icon {
 
     window.openAddMomentModal = () => {
         document.getElementById('add-moment-text').value = '';
-        document.getElementById('add-moment-image-url').value = '';
+        tempMomentImages = [];
+        renderAddMomentGrid();
         document.getElementById('add-moment-modal').classList.add('active');
     };
     window.closeAddMomentModal = () => {
         document.getElementById('add-moment-modal').classList.remove('active');
     };
 
+    window.triggerMomentImageUpload = () => {
+        document.getElementById('input-moment-image').click();
+    };
+
+    window.handleMomentImageUpload = (event) => {
+        const files = Array.from(event.target.files);
+        if (files.length === 0) return;
+        
+        // Process multiple files
+        let processedCount = 0;
+        files.forEach(file => {
+            if (tempMomentImages.length >= 9) return;
+            compressImage(file, 600, (base64) => {
+                tempMomentImages.push(base64);
+                processedCount++;
+                if (processedCount === files.length || tempMomentImages.length === 9) {
+                     renderAddMomentGrid();
+                }
+            });
+        });
+        // Reset input
+        event.target.value = '';
+    };
+    
+    function renderAddMomentGrid() {
+        const grid = document.getElementById('add-moment-grid');
+        // Clear existing preview images but keep upload button
+        const uploadBtn = grid.querySelector('.add-moment-image-upload');
+        grid.innerHTML = '';
+        
+        tempMomentImages.forEach((src, index) => {
+            const cell = document.createElement('div');
+            cell.className = 'add-moment-img-cell';
+            cell.innerHTML = `
+                <img src="${src}">
+                <div class="add-moment-remove-img" onclick="removeMomentImage(${index})">✕</div>
+            `;
+            grid.appendChild(cell);
+        });
+        
+        if (tempMomentImages.length < 9) {
+            grid.appendChild(uploadBtn);
+        }
+    }
+    
+    window.removeMomentImage = (index) => {
+        tempMomentImages.splice(index, 1);
+        renderAddMomentGrid();
+    };
+
     window.saveNewMoment = () => {
         const text = document.getElementById('add-moment-text').value.trim();
-        const imageUrl = document.getElementById('add-moment-image-url').value.trim();
-        if (!text && !imageUrl) {
+        const images = [...tempMomentImages]; // Copy array
+        if (!text && images.length === 0) {
             showToast("内容不能为空");
             return;
         }
@@ -2145,7 +2566,8 @@ body.ios-mode-active .chat-conv-right-icon {
             authorId: profile.qqId,
             timestamp: Date.now(),
             text: text,
-            imageUrl: imageUrl,
+            imageUrl: null, // Legacy field
+            images: images, // New field
             likes: [],
             comments: []
         };
@@ -2176,25 +2598,62 @@ body.ios-mode-active .chat-conv-right-icon {
         renderMomentsPage();
     };
 
-    window.addComment = (momentId) => {
-        const commentText = prompt("请输入你的评论:");
-        if (!commentText || !commentText.trim()) return;
+    // --- NEW Comment Logic (Modal) ---
+    window.openCommentInput = (momentId) => {
+        currentCommentMomentId = momentId;
+        const modal = document.getElementById('moments-comment-modal');
+        const overlay = document.getElementById('moments-comment-overlay');
+        const inputField = document.getElementById('moments-comment-input');
+        
+        inputField.value = ''; // Clear previous text
+        modal.classList.add('active');
+        overlay.classList.add('active');
+        
+        // Use timeout to ensure the element is visible before focusing
+        setTimeout(() => {
+            inputField.focus();
+        }, 100);
+    };
+
+    window.closeCommentInput = () => {
+        document.getElementById('moments-comment-modal').classList.remove('active');
+        document.getElementById('moments-comment-overlay').classList.remove('active');
+        document.getElementById('moments-comment-input').blur();
+        currentCommentMomentId = null;
+    };
+
+    window.handleCommentKey = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission if any
+            submitComment();
+        }
+    };
+
+    window.submitComment = () => {
+        if (!currentCommentMomentId) return;
+        
+        const inputField = document.getElementById('moments-comment-input');
+        const commentText = inputField.value.trim();
+        if (!commentText) return;
 
         let moments = getMomentsData();
-        const momentIndex = moments.findIndex(m => m.id === momentId);
+        const momentIndex = moments.findIndex(m => m.id === currentCommentMomentId);
         if (momentIndex === -1) return;
 
         const profile = getUserProfile();
         const newComment = {
             user: profile.nickname,
             userId: profile.qqId,
-            text: commentText.trim()
+            text: commentText
         };
         
         moments[momentIndex].comments.push(newComment);
         saveMomentsData(moments);
+        
+        closeCommentInput();
         renderMomentsPage();
     };
+
 
     // --- World Book App Logic ---
     window.openWorldBookApp = () => { body.classList.add('worldbook-active'); renderWorldBooks(); };
@@ -2233,7 +2692,7 @@ body.ios-mode-active .chat-conv-right-icon {
     window.triggerAvatarUpload = () => { document.getElementById('input-friend-avatar').click(); };
     window.handleAvatarUrlInput = (input) => { const url = input.value.trim(); const imgEl = document.getElementById('new-friend-avatar-preview'); if (url) { tempAvatarUrl = url; imgEl.src = url; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; } else { tempAvatarUrl = ""; imgEl.style.display = 'none'; document.getElementById('avatar-placeholder-icon').style.display = 'block'; } };
     window.handleFriendAvatarUpload = (event) => { compressImage(event.target.files[0], 200, (base64) => { tempAvatarUrl = base64; document.getElementById('new-friend-avatar-url').value = ""; const imgEl = document.getElementById('new-friend-avatar-preview'); imgEl.src = tempAvatarUrl; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; }); };
-    window.saveNewFriend = () => { const name = document.getElementById('new-friend-name').value.trim(); const alias = document.getElementById('new-friend-alias').value.trim(); if (!name) { showToast("请输入姓名"); return; } if (!tempAvatarUrl) { showToast("请上传头像或输入URL"); return; } let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch (e) { contacts = []; } if (contacts.find(c => c.name === name || (alias && c.alias === alias))) { showToast("该好友已存在"); return; } const newContact = { id: Date.now(), name: name, alias: alias, avatar: tempAvatarUrl, lastMsg: "点击开始聊天", timestamp: Date.now(), signature: "", backgroundImage: "", isPinned: false, worldbookId: null }; contacts.unshift(newContact); try { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); showToast("添加成功！"); closeAddFriendModal(); renderChatList(); renderContactList(); } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); } };
+    window.saveNewFriend = () => { const name = document.getElementById('new-friend-name').value.trim(); const alias = document.getElementById('new-friend-alias').value.trim(); if (!name) { showToast("请输入姓名"); return; } if (!tempAvatarUrl) { showToast("请上传头像或输入URL"); return; } let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch (e) { contacts = []; } if (contacts.find(c => c.name === name || (alias && c.alias === alias))) { showToast("该好友已存在"); return; } const newContact = { id: Date.now(), name: name, alias: alias, avatar: tempAvatarUrl, lastMsg: "点击开始聊天", timestamp: Date.now(), signature: "", backgroundImage: "", isPinned: false, worldbookId: null, timePerceptionEnabled: false }; contacts.unshift(newContact); try { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); showToast("添加成功！"); closeAddFriendModal(); renderChatList(); renderContactList(); } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); } };
 
     window.renderChatList = () => { const container = document.getElementById('chat-list-container'); let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch (e) { contacts = []; } if (contacts.length === 0) { container.innerHTML = '<div class="chat-placeholder-text">没有新信息</div>'; return; } container.innerHTML = ''; contacts.sort((a, b) => b.timestamp - a.timestamp).forEach(contact => { const displayName = contact.alias || contact.name; const item = document.createElement('div'); item.className = 'chat-list-item'; item.onclick = (e) => { e.stopPropagation(); openChatWindow(contact.id); }; item.innerHTML = `<img src="${contact.avatar}" class="chat-list-avatar" alt="avatar" onerror="this.src='https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'"><div class="chat-list-info"><div class="chat-list-name">${escapeHtml(displayName)}</div><div class="chat-list-msg">${escapeHtml(contact.lastMsg || '点击开始聊天')}</div></div>`; container.appendChild(item); }); };
     
@@ -2243,13 +2702,247 @@ body.ios-mode-active .chat-conv-right-icon {
     window.toggleContactPin = (id) => { let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === id); if (idx !== -1) { contacts[idx].isPinned = !contacts[idx].isPinned; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); renderContactList(); showToast(contacts[idx].isPinned ? "已置顶" : "已取消置顶"); } };
 
     // --- Role Chat Conversation Logic (Updated) ---
-    window.openChatWindow = (contactId) => { currentChatContactId = contactId; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === contactId); if (!contact) return; document.getElementById('chat-conv-title').innerText = contact.alias || contact.name; document.getElementById('chat-conv-signature').innerText = contact.signature || ''; const view = document.getElementById('chat-conversation-view'); view.style.backgroundImage = contact.backgroundImage ? `url(${contact.backgroundImage})` : ''; let styleTag = document.getElementById('custom-chat-style'); if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = 'custom-chat-style'; document.head.appendChild(styleTag); } styleTag.innerHTML = contact.customCss || ''; view.classList.add('active'); renderConversationMessages(); };
+    window.openChatWindow = (contactId) => { 
+        currentChatContactId = contactId; 
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); 
+        const contact = contacts.find(c => c.id === contactId); 
+        if (!contact) return; 
+        document.getElementById('chat-conv-title').innerText = contact.alias || contact.name; 
+        document.getElementById('chat-conv-signature').innerText = contact.signature || ''; 
+        const view = document.getElementById('chat-conversation-view'); 
+        view.style.backgroundImage = contact.backgroundImage ? `url(${contact.backgroundImage})` : ''; 
+        let styleTag = document.getElementById('custom-chat-style'); 
+        if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = 'custom-chat-style'; document.head.appendChild(styleTag); } 
+        styleTag.innerHTML = contact.customCss || ''; 
+        
+        // Reset Multiselect
+        isMultiSelectMode = false;
+        selectedMsgIds.clear();
+        document.getElementById('chat-multiselect-footer').classList.remove('active');
+        document.getElementById('chat-conv-messages').classList.remove('multi-select-active');
+        
+        view.classList.add('active'); 
+        renderConversationMessages(); 
+    };
+    
     window.closeChatConversation = () => { document.getElementById('chat-conversation-view').classList.remove('active'); currentChatContactId = null; const styleTag = document.getElementById('custom-chat-style'); if (styleTag) styleTag.innerHTML = ''; renderChatList(); };
     function getMessagesKey(contactId) { return `chat_msgs_${contactId}`; }
     
-    window.renderConversationMessages = () => { if (!currentChatContactId) return; const container = document.getElementById('chat-conv-messages'); const key = getMessagesKey(currentChatContactId); let messages = []; try { messages = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {} container.innerHTML = ''; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); const themAvatar = contact ? contact.avatar : ''; const globalProfile = getUserProfile(); const meAvatar = (contact && contact.userAvatar) ? contact.userAvatar : (globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'); messages.forEach(msg => { const row = document.createElement('div'); row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`; const avatarHtml = `<img src="${msg.type === 'sent' ? meAvatar : themAvatar}" class="msg-bubble-avatar">`; const contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`; row.innerHTML = msg.type === 'sent' ? contentHtml + avatarHtml : avatarHtml + contentHtml; container.appendChild(row); }); container.scrollTop = container.scrollHeight; };
+    // Time Formatter
+    function formatChatTime(ts) {
+        const now = new Date();
+        const date = new Date(ts);
+        const diff = now - date;
+        const diffHours = diff / 3600000;
+        
+        const pad = n => n.toString().padStart(2, '0');
+        const timeStr = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        const dateStr = `${date.getMonth() + 1}月${date.getDate()}日`;
+        
+        // Same day
+        if (now.toDateString() === date.toDateString()) {
+            return timeStr;
+        }
+        
+        // Yesterday check (Simple 24-48h logic based on prompt, but usually calendar day is preferred)
+        // Prompt says: "Over 24h up to 48h displays Yesterday HH:MM"
+        if (diffHours >= 24 && diffHours < 48) {
+             return `昨天 ${timeStr}`;
+        }
+        
+        // Over 1 month (approx 30 days)
+        const oneMonth = 30 * 24 * 60 * 60 * 1000;
+        if (diff >= oneMonth) {
+            const weeks = ['日', '一', '二', '三', '四', '五', '六'];
+            return `${dateStr} 星期${weeks[date.getDay()]}`;
+        }
+        
+        // Gap (48h to 1 month): Fallback standard M月D日 HH:MM
+        return `${dateStr} ${timeStr}`;
+    }
+
+    window.renderConversationMessages = () => { 
+        if (!currentChatContactId) return; 
+        const container = document.getElementById('chat-conv-messages'); 
+        const key = getMessagesKey(currentChatContactId); 
+        let messages = []; try { messages = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {} 
+        container.innerHTML = ''; 
+        
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); 
+        const contact = contacts.find(c => c.id === currentChatContactId); 
+        const themAvatar = contact ? contact.avatar : ''; 
+        const globalProfile = getUserProfile(); 
+        const meAvatar = (contact && contact.userAvatar) ? contact.userAvatar : (globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'); 
+
+        let lastMsgTime = 0;
+
+        messages.forEach(msg => { 
+            // 1. Time Stamp Logic
+            if (msg.timestamp - lastMsgTime > 5 * 60 * 1000) {
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'chat-time-stamp';
+                timeDiv.innerText = formatChatTime(msg.timestamp);
+                container.appendChild(timeDiv);
+                lastMsgTime = msg.timestamp;
+            }
+
+            // 2. Recall Logic
+            if (msg.type === 'recalled') {
+                 const tipDiv = document.createElement('div');
+                 tipDiv.className = 'msg-recalled-tip';
+                 tipDiv.innerText = '你撤回了一条消息';
+                 container.appendChild(tipDiv);
+                 return; 
+            }
+
+            // 3. Render Message Bubble
+            const row = document.createElement('div'); 
+            row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`; 
+            
+            // Multiselect Checkbox
+            const checkbox = document.createElement('div');
+            checkbox.className = `chat-checkbox ${selectedMsgIds.has(msg.id) ? 'checked' : ''}`;
+            checkbox.onclick = (e) => { e.stopPropagation(); toggleMsgSelection(msg.id); };
+            
+            const avatarHtml = `<img src="${msg.type === 'sent' ? meAvatar : themAvatar}" class="msg-bubble-avatar">`; 
+            const contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`; 
+            
+            if (isMultiSelectMode) {
+                // In select mode, clicking row selects it
+                row.onclick = (e) => { e.stopPropagation(); toggleMsgSelection(msg.id); };
+            } else {
+                // Normal mode, double click menu
+                row.ondblclick = (e) => { showBubbleMenu(e, msg.id, msg.text); };
+            }
+
+            row.innerHTML = msg.type === 'sent' ? contentHtml + avatarHtml : avatarHtml + contentHtml; 
+            row.prepend(checkbox);
+            container.appendChild(row); 
+        }); 
+        
+        // Toggle multiselect class on container
+        if (isMultiSelectMode) container.classList.add('multi-select-active');
+        else container.classList.remove('multi-select-active');
+        
+        if (!isMultiSelectMode) container.scrollTop = container.scrollHeight; 
+    };
     
-    // NEW: Handle Enter Key for sending messages
+    // Bubble Context Menu Logic
+    window.showBubbleMenu = (event, msgId, text) => {
+        event.stopPropagation();
+        // Remove existing menu
+        const existing = document.querySelector('.bubble-context-menu');
+        if (existing) existing.remove();
+        
+        activeMsgIdForMenu = msgId;
+        
+        const menu = document.createElement('div');
+        menu.className = 'bubble-context-menu active';
+        menu.innerHTML = `
+            <div class="bubble-menu-item" onclick="handleEditMsg('${msgId}', '${escapeHtml(text)}')">编辑</div>
+            <div class="bubble-menu-item" onclick="handleDeleteMsg('${msgId}')">删除</div>
+            <div class="bubble-menu-item" onclick="handleRecallMsg('${msgId}')">撤回</div>
+            <div class="bubble-menu-item" onclick="handleMultiSelectMode()">多选</div>
+        `;
+        
+        // Position menu above bubble content
+        const bubbleContent = event.currentTarget.querySelector('.msg-bubble-content');
+        const rect = bubbleContent.getBoundingClientRect();
+        
+        menu.style.top = `${rect.top + window.scrollY}px`;
+        menu.style.left = `${rect.left + rect.width / 2}px`;
+        
+        document.body.appendChild(menu);
+    };
+
+    window.handleEditMsg = (msgId, oldText) => {
+        const newText = prompt("修改消息:", oldText); // In a real app, prefer modal, simplified here
+        if (newText !== null && newText.trim() !== "") {
+            updateMessageInStorage(msgId, (msg) => { msg.text = newText.trim(); });
+            renderConversationMessages();
+        }
+        closeBubbleMenu();
+    };
+
+    window.handleDeleteMsg = (msgId) => {
+        deleteMessageFromStorage(msgId);
+        renderConversationMessages();
+        closeBubbleMenu();
+    };
+
+    window.handleRecallMsg = (msgId) => {
+        updateMessageInStorage(msgId, (msg) => { msg.type = 'recalled'; });
+        renderConversationMessages();
+        closeBubbleMenu();
+    };
+
+    window.closeBubbleMenu = () => {
+        const menu = document.querySelector('.bubble-context-menu');
+        if (menu) menu.remove();
+        activeMsgIdForMenu = null;
+    };
+    
+    // Storage Helpers
+    function updateMessageInStorage(msgId, updateFn) {
+        if (!currentChatContactId) return;
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        const idx = messages.findIndex(m => m.id === msgId || m.id === parseFloat(msgId)); // ID might be string/number mix
+        if (idx !== -1) {
+            updateFn(messages[idx]);
+            localStorage.setItem(key, JSON.stringify(messages));
+        }
+    }
+
+    function deleteMessageFromStorage(msgId) {
+        if (!currentChatContactId) return;
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        messages = messages.filter(m => m.id !== msgId && m.id !== parseFloat(msgId));
+        localStorage.setItem(key, JSON.stringify(messages));
+    }
+
+    // Multiselect Logic
+    window.handleMultiSelectMode = () => {
+        isMultiSelectMode = true;
+        selectedMsgIds.clear();
+        document.getElementById('chat-multiselect-footer').classList.add('active');
+        closeBubbleMenu();
+        renderConversationMessages();
+    };
+    
+    window.toggleMsgSelection = (msgId) => {
+        if (!isMultiSelectMode) return;
+        if (selectedMsgIds.has(msgId)) selectedMsgIds.delete(msgId);
+        else selectedMsgIds.add(msgId);
+        renderConversationMessages(); // Re-render to update checkboxes state
+    };
+    
+    window.executeBatchDelete = () => {
+        if (selectedMsgIds.size === 0) {
+            // Exit mode if nothing selected
+            isMultiSelectMode = false;
+            document.getElementById('chat-multiselect-footer').classList.remove('active');
+            renderConversationMessages();
+            return;
+        }
+        
+        if (!confirm(`确定删除选中的 ${selectedMsgIds.size} 条消息吗？`)) return;
+        
+        if (!currentChatContactId) return;
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        messages = messages.filter(m => !selectedMsgIds.has(m.id));
+        localStorage.setItem(key, JSON.stringify(messages));
+        
+        isMultiSelectMode = false;
+        selectedMsgIds.clear();
+        document.getElementById('chat-multiselect-footer').classList.remove('active');
+        renderConversationMessages();
+        showToast("已批量删除");
+    };
+
+    // Handle Enter Key for sending messages
     window.handleChatInputKey = (event) => {
         if (event.key === 'Enter') {
             sendConversationMessage();
@@ -2280,7 +2973,7 @@ body.ios-mode-active .chat-conv-right-icon {
         renderConversationMessages(); 
     };
 
-    // NEW: AI Auto Reply Trigger Logic
+    // NEW: AI Auto Reply Trigger Logic (with Time Perception & Memory Depth)
     window.triggerAIAutoReply = async () => {
         if (!currentChatContactId) return;
         
@@ -2294,15 +2987,27 @@ body.ios-mode-active .chat-conv-right-icon {
         const contact = contacts.find(c => c.id === currentChatContactId);
         if (!contact) return;
 
-        showToast('AI 正在思考中...', 3000);
+        const titleEl = document.getElementById('chat-conv-title');
+        const originalTitle = titleEl.innerText;
+        titleEl.innerText = "正在输入中...";
+        titleEl.classList.add('typing-anim');
 
-        // 1. Build Context
-        // Role Persona
+        // Time Perception Logic
+        let timeContext = "";
+        if (contact.timePerceptionEnabled) {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 9) timeContext = "现在是早上。";
+            else if (hour >= 9 && hour < 12) timeContext = "现在是上午。";
+            else if (hour >= 12 && hour < 14) timeContext = "现在是中午。";
+            else if (hour >= 14 && hour < 18) timeContext = "现在是下午。";
+            else if (hour >= 18 && hour < 23) timeContext = "现在是晚上。";
+            else timeContext = "现在是深夜或凌晨。";
+        }
+
+        // Build Context
         const rolePersona = contact.persona || "Default Role";
-        // User Persona (specific to this contact from Role Settings)
         const userPersona = contact.userPersona || "User"; 
         
-        // World Book Context
         let worldBookContext = "No specific world book bound.";
         if (contact.worldbookId) {
             const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
@@ -2315,13 +3020,18 @@ body.ios-mode-active .chat-conv-right-icon {
             }
         }
 
-        // Recent Chat History (Last 10 messages for context)
         const msgKey = getMessagesKey(currentChatContactId);
         let history = JSON.parse(localStorage.getItem(msgKey) || '[]');
-        const recentHistory = history.slice(-10).map(m => `${m.type === 'sent' ? 'User' : 'Role'}: ${m.text}`).join('\n');
+        
+        // NEW: Apply Memory Depth
+        const memoryLimit = contact.memoryDepth || 10;
+        // Filter out recalled messages from AI context
+        const validHistory = history.filter(m => m.type !== 'recalled');
+        const recentHistory = validHistory.slice(-memoryLimit).map(m => `${m.type === 'sent' ? 'User' : 'Role'}: ${m.text}`).join('\n');
 
-        // 2. Construct Prompt
+        // Construct Prompt with Time context
         const systemPrompt = `
+${timeContext ? `Time Context: ${timeContext}\n` : ''}
 You are roleplaying. 
 Role Name: ${contact.alias || contact.name}
 Role Persona: ${rolePersona}
@@ -2329,21 +3039,18 @@ User Persona: ${userPersona}
 World Setting (World Book): ${worldBookContext}
 
 Instructions:
-1. Reply to the User based on the conversation history.
+1. Reply to the User based on the conversation history (last ${memoryLimit} messages provided).
 2. Incorporate World Book elements naturally if relevant.
 3. Your reply MUST be formatted as natural text.
-4. IMPORTANT: Your response will be split into multiple separate bubbles based on punctuation (commas and periods). Ensure your sentences flow well when split.
+4. **IMPORTANT**: Output your response as 5 to 10 separate short sentences/paragraphs.
+   If the Persona specifically requests a different number of messages, prioritize the Persona's instructions.
 5. Do not output 'Role:' or 'User:', just the reply text.
 `;
 
-        // 3. Call API
         try {
             const response = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url+'/v1'}/chat/completions`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${settings.api.key}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
                 body: JSON.stringify({
                     model: settings.api.model || 'gpt-3.5-turbo',
                     messages: [
@@ -2355,68 +3062,39 @@ Instructions:
                 })
             });
 
-            if (!response.ok) throw new Error('API Request Failed');
+            if (!response.ok) throw new Error(`API Request Failed: ${response.statusText}`);
             
             const data = await response.json();
             const aiText = data.choices[0].message.content.trim();
 
-            // 4. Process Response (Split by comma and period)
-            // Regex splits by comma or period, keeping the delimiter if needed, or just splitting.
-            // Requirement: "Strictly split by punctuation: comma and period... each segment is a separate bubble"
-            // We will split by comma (， or ,) and period (。 or .) and newlines.
             const rawSegments = aiText.split(/([，,。.\n])/);
             let combinedSegments = [];
-            
-            // Re-assemble segments to ensure we don't just have dangling punctuation
-            // Strategy: "Text" + "Punctuation" -> Bubble.
-            // Or pure split. The prompt says: "Every comma content... every period content... separate bubble". 
-            // This usually implies the segment *ending* with the punctuation is one bubble, or the punctuation is the break point.
-            // Let's iterate and build bubbles.
-            
             let currentBuffer = "";
             const punctuationRegex = /[，,。.\n]/;
 
             for (let i = 0; i < rawSegments.length; i++) {
                 const part = rawSegments[i];
                 if (punctuationRegex.test(part)) {
-                    // It's punctuation. Append to buffer?
-                    // Requirement: "strictly split". Usually in Chinese novels/chat, punctuation is part of the sentence.
-                    // Let's treat punctuation as the end of a bubble.
                     if (currentBuffer.trim() !== "") {
-                         // Add punctuation to the previous text? Or keep it separate?
-                         // "Hello," -> Bubble 1: "Hello,"
                          currentBuffer += part;
                          combinedSegments.push(currentBuffer);
                          currentBuffer = "";
-                    } else {
-                        // Just punctuation? Ignore or append?
                     }
                 } else {
                     currentBuffer += part;
                 }
             }
             if (currentBuffer.trim() !== "") combinedSegments.push(currentBuffer);
-
-            // If the split resulted in too few or weird segments (e.g. AI didn't use punctuation), just use the text.
             if (combinedSegments.length === 0 && aiText) combinedSegments.push(aiText);
 
-            // 5. Save and Render sequentially
             let currentMessages = JSON.parse(localStorage.getItem(msgKey) || '[]');
-            
             combinedSegments.forEach(segment => {
                 if (segment.trim()) {
-                    currentMessages.push({
-                        id: Date.now() + Math.random(), // Unique ID
-                        text: segment.trim(),
-                        type: 'received',
-                        timestamp: Date.now()
-                    });
+                    currentMessages.push({ id: Date.now() + Math.random(), text: segment.trim(), type: 'received', timestamp: Date.now() });
                 }
             });
-            
             localStorage.setItem(msgKey, JSON.stringify(currentMessages));
             
-            // Update last message in contact list
             let contactsList = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); 
             const contactIdx = contactsList.findIndex(c => c.id === currentChatContactId); 
             if (contactIdx !== -1) { 
@@ -2426,16 +3104,19 @@ Instructions:
             } 
 
             renderConversationMessages();
-            renderChatList(); // Update list preview
+            renderChatList();
 
         } catch (error) {
             console.error(error);
             showToast('AI 回复失败: ' + error.message);
+        } finally {
+            titleEl.innerText = originalTitle;
+            titleEl.classList.remove('typing-anim');
         }
     };
 
-    // --- Role Settings Logic ---
-    window.openRoleSettings = () => { if (!currentChatContactId) return; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); if (!contact) return; tempSelectedWorldBookId = contact.worldbookId || null; document.getElementById('role-setting-avatar').src = contact.avatar || ''; document.getElementById('role-setting-alias').value = contact.alias || contact.name; document.getElementById('role-setting-signature').value = contact.signature || ''; document.getElementById('role-setting-persona').value = contact.persona || ''; document.getElementById('role-setting-css').value = contact.customCss || `/* Example */\n.msg-bubble-row.them .msg-bubble-content {\n  border-radius: 20px 20px 20px 0;\n  background: #fff;\n}`; tempRoleBgUrl = contact.backgroundImage || ''; document.getElementById('role-bg-preview').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : ''; const globalProfile = getUserProfile(); document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || ''; document.getElementById('role-user-persona').value = contact.userPersona || ''; updateRoleWbDisplay(contact.worldbookId); document.getElementById('role-settings-page').classList.add('active'); };
+    // --- Role Settings Logic (with Time Perception & Memory Depth) ---
+    window.openRoleSettings = () => { if (!currentChatContactId) return; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); if (!contact) return; tempSelectedWorldBookId = contact.worldbookId || null; document.getElementById('role-setting-avatar').src = contact.avatar || ''; document.getElementById('role-setting-alias').value = contact.alias || contact.name; document.getElementById('role-setting-signature').value = contact.signature || ''; document.getElementById('role-setting-persona').value = contact.persona || ''; document.getElementById('role-time-perception-switch').checked = contact.timePerceptionEnabled || false; document.getElementById('role-memory-depth').value = contact.memoryDepth || 10; document.getElementById('role-setting-css').value = contact.customCss || `/* Example */\n.msg-bubble-row.them .msg-bubble-content {\n  border-radius: 20px 20px 20px 0;\n  background: #fff;\n}`; tempRoleBgUrl = contact.backgroundImage || ''; document.getElementById('role-bg-preview').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : ''; const globalProfile = getUserProfile(); document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || ''; document.getElementById('role-user-persona').value = contact.userPersona || ''; updateRoleWbDisplay(contact.worldbookId); document.getElementById('role-settings-page').classList.add('active'); };
     window.closeRoleSettings = () => { document.getElementById('role-settings-page').classList.remove('active'); };
     window.triggerRoleAvatarEdit = () => { const currentUrl = document.getElementById('role-setting-avatar').src; const newUrl = prompt("输入新头像的图片链接:", currentUrl); if (newUrl && newUrl.trim()) { document.getElementById('role-setting-avatar').src = newUrl.trim(); } };
     window.triggerRoleBgUpload = () => { document.getElementById('input-role-chat-bg').click(); };
@@ -2443,7 +3124,7 @@ Instructions:
     window.setRoleBgByUrl = () => { const urlInput = document.getElementById('role-bg-url-input'); const bgUrl = urlInput.value.trim(); if (!bgUrl) { showToast("请输入有效的图片URL"); return; } document.getElementById('role-bg-preview').style.backgroundImage = `url(${bgUrl})`; tempRoleBgUrl = bgUrl; showToast("背景URL已预览"); };
     window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
     window.handleRoleUserAvatarUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; }); };
-    window.saveRoleSettings = () => { if (!currentChatContactId) return; const newAlias = document.getElementById('role-setting-alias').value.trim(); if (!newAlias) { showToast("备注名不能为空"); return; } let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === currentChatContactId); if (idx !== -1) { contacts[idx].alias = newAlias; contacts[idx].signature = document.getElementById('role-setting-signature').value.trim(); contacts[idx].avatar = document.getElementById('role-setting-avatar').src; contacts[idx].persona = document.getElementById('role-setting-persona').value.trim(); contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage; contacts[idx].userAvatar = document.getElementById('role-user-avatar').src; contacts[idx].userName = document.getElementById('role-user-name').value.trim(); contacts[idx].userPersona = document.getElementById('role-user-persona').value.trim(); contacts[idx].customCss = document.getElementById('role-setting-css').value; contacts[idx].worldbookId = tempSelectedWorldBookId; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); document.getElementById('chat-conv-title').innerText = newAlias; document.getElementById('chat-conv-signature').innerText = contacts[idx].signature; document.getElementById('chat-conversation-view').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : 'none'; const styleTag = document.getElementById('custom-chat-style'); if(styleTag) styleTag.innerHTML = contacts[idx].customCss; renderChatList(); renderContactList(); renderConversationMessages(); showToast("设置已保存"); closeRoleSettings(); } };
+    window.saveRoleSettings = () => { if (!currentChatContactId) return; const newAlias = document.getElementById('role-setting-alias').value.trim(); if (!newAlias) { showToast("备注名不能为空"); return; } let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === currentChatContactId); if (idx !== -1) { contacts[idx].alias = newAlias; contacts[idx].signature = document.getElementById('role-setting-signature').value.trim(); contacts[idx].avatar = document.getElementById('role-setting-avatar').src; contacts[idx].persona = document.getElementById('role-setting-persona').value.trim(); contacts[idx].timePerceptionEnabled = document.getElementById('role-time-perception-switch').checked; contacts[idx].memoryDepth = parseInt(document.getElementById('role-memory-depth').value) || 10; contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage; contacts[idx].userAvatar = document.getElementById('role-user-avatar').src; contacts[idx].userName = document.getElementById('role-user-name').value.trim(); contacts[idx].userPersona = document.getElementById('role-user-persona').value.trim(); contacts[idx].customCss = document.getElementById('role-setting-css').value; contacts[idx].worldbookId = tempSelectedWorldBookId; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); document.getElementById('chat-conv-title').innerText = newAlias; document.getElementById('chat-conv-signature').innerText = contacts[idx].signature; document.getElementById('chat-conversation-view').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : 'none'; const styleTag = document.getElementById('custom-chat-style'); if(styleTag) styleTag.innerHTML = contacts[idx].customCss; renderChatList(); renderContactList(); renderConversationMessages(); showToast("设置已保存"); closeRoleSettings(); } };
 
     // --- World Book Binding Functions ---
     function getWorldBookTitleById(bookId) { if (!bookId) return null; try { const books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const book = books.find(b => b.id === bookId); return book ? book.title : null; } catch (e) { return null; } }
@@ -2454,9 +3135,9 @@ Instructions:
     window.clearWorldBookBinding = () => { tempSelectedWorldBookId = null; updateRoleWbDisplay(null); };
 
     // --- Delete Friend Logic ---
-    window.confirmDeleteFriend = () => { document.getElementById('delete-confirm-modal').classList.add('active'); };
-    window.closeDeleteModal = () => { document.getElementById('delete-confirm-modal').classList.remove('active'); };
-    window.executeDeleteFriend = () => { if (!currentChatContactId) return; let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const newContacts = contacts.filter(c => c.id !== currentChatContactId); localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(newContacts)); localStorage.removeItem(getMessagesKey(currentChatContactId)); showToast("好友已删除"); closeDeleteModal(); closeRoleSettings(); closeChatConversation(); switchChatTab(0, 'Chat'); renderChatList(); renderContactList(); };
+    window.confirmDeleteFriend = () => { document.getElementById('delete-friend-confirm-modal').classList.add('active'); };
+    window.closeDeleteModal = (modalId) => { document.getElementById(modalId).classList.remove('active'); };
+    window.executeDeleteFriend = () => { if (!currentChatContactId) return; let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const newContacts = contacts.filter(c => c.id !== currentChatContactId); localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(newContacts)); localStorage.removeItem(getMessagesKey(currentChatContactId)); showToast("好友已删除"); closeDeleteModal('delete-friend-confirm-modal'); closeRoleSettings(); closeChatConversation(); switchChatTab(0, 'Chat'); renderChatList(); renderContactList(); };
 
     // --- Core Functions ---
     const updateClock = () => { const clockTimeEl = document.getElementById('clock-time'); const clockDateEl = document.getElementById('clock-date'); const now = new Date(); clockTimeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`; if (!customDateText) { const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']; clockDateEl.innerText = `${now.getFullYear()}年${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 ${days[now.getDay()]}`; } else { clockDateEl.innerText = customDateText; } };
@@ -2518,42 +3199,4 @@ Instructions:
         if(i2 && v.chatText2) { i2.value = v.chatText2; adjustInputWidth(i2); }
         const pImg = document.getElementById('photo-widget-img'); const pPh = document.getElementById('photo-widget-placeholder');
         if (v.photoWidgetUrl && v.photoWidgetUrl.length > 20 && !v.photoWidgetUrl.includes('null')) { pImg.src = v.photoWidgetUrl; pImg.style.display = 'block'; pPh.style.display = 'none'; } else { pImg.style.display = 'none'; pPh.style.display = 'flex'; }
-        if (v.icons) Object.keys(v.icons).forEach(id => applyIconToUI(id, v.icons[id]));
-    }
-    function loadSettings() {
-        const s = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY)); if (!s) return;
-        apiUrlInput.value = s.api.url || ''; apiKeyInput.value = s.api.key || ''; document.getElementById('temp-slider').value = s.api.temp || 0.8; document.getElementById('max-tokens-input').value = s.api.tokens || 1000;
-        if (s.api.model) { modelSelect.innerHTML = `<option value="${s.api.model}">${s.api.model}</option>`; document.getElementById('model-select-wrapper').style.display = 'block'; }
-        document.getElementById('wallpaper-url').value = s.visual.wallpaper || ''; document.getElementById('widget-square-url').value = s.visual.widget || ''; document.getElementById('custom-image-url').value = s.visual.customImg || '';
-        applyVisual(s.visual);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        updateClock(); setInterval(updateClock, 30000); 
-        loadSettings(); 
-        
-        document.getElementById('temp-slider').oninput = () => document.getElementById('temp-value-display').innerText = document.getElementById('temp-slider').value; 
-        document.getElementById('save-settings-btn').onclick = saveAllSettings;
-
-        const iosModeSwitch = document.getElementById('ios-mode-switch');
-        const isIOSModeOn = localStorage.getItem(IOS_MODE_KEY) === 'true';
-        iosModeSwitch.checked = isIOSModeOn;
-        if (isIOSModeOn) body.classList.add('ios-mode-active');
-        iosModeSwitch.addEventListener('change', (e) => applyIOSMode(e.target.checked));
-        
-        // Initialize storage if not present
-        if (!localStorage.getItem(CHAT_DATA_KEY)) localStorage.setItem(CHAT_DATA_KEY, JSON.stringify([]));
-        if (!localStorage.getItem(USER_PROFILE_KEY)) saveUserProfile(getUserProfile());
-        if (!localStorage.getItem(MOMENTS_DATA_KEY)) saveMomentsData([]);
-        if (!localStorage.getItem(MOMENTS_PROFILE_KEY)) saveMomentsProfile(getMomentsProfile());
-
-
-        document.getElementById('me-settings-avatar-url').addEventListener('input', () => { document.getElementById('me-settings-avatar-preview').src = document.getElementById('me-settings-avatar-url').value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; });
-        document.getElementById('me-settings-cover-url').addEventListener('input', () => { document.getElementById('me-settings-cover-preview').src = document.getElementById('me-settings-cover-url').value.trim(); });
-        
-        renderChatList();
-        document.querySelectorAll('.chat-bubble-input').forEach(adjustInputWidth);
-     });
-</script>
-</body>
-</html>
+        if (v.icons) Object.keys(v.icons).forEach(id => applyIconToUI(id,
