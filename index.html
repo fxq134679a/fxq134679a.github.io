@@ -4012,7 +4012,7 @@
                  <div class="me-settings-row" style="margin-top: 15px;">
                     <div class="me-settings-label">背景</div>
                     <div class="me-settings-preview-wrapper" onclick="triggerForumMeBgUpload()">
-                        <img id="forum-me-settings-bg-preview" class="me-settings-preview cover" style="cursor:pointer;">
+                                                <img id="forum-me-settings-bg-preview" class="me-settings-preview cover" style="cursor:pointer;">
                     </div>
                     <input type="text" id="forum-me-settings-bg-url" class="me-settings-input" placeholder="背景 URL">
                 </div>
@@ -5237,7 +5237,6 @@ Strictly adhere to the JSON format. Example:
                 const isUserMoment = !moment.authorId || moment.authorId === userProfile.qqId;
                 const author = isUserMoment ? userProfile : contacts.find(c => c.id === moment.authorId);
                 
-                // If it's a private moment from a role, skip rendering
                 if (moment.isPrivate && !isUserMoment) {
                     return;
                 }
@@ -5249,7 +5248,6 @@ Strictly adhere to the JSON format. Example:
                 const likeBtnText = userHasLiked ? '取消' : '赞';
                 const likeIconUrl = userHasLiked ? "https://img.heliar.top/file/1770356886806_喜欢_like_3.png" : "https://img.heliar.top/file/1770353311894_喜欢_like_2.png";
                 
-                // New "Only You Can See" tag
                 const privateTag = moment.isPrivate ? `<span style="color: #999; font-weight: 400;">仅你可见</span>` : '';
 
 
@@ -5281,8 +5279,6 @@ Strictly adhere to the JSON format. Example:
                     `</div>`;
                 }
                 
-                // For user moments, the delete button is available.
-                // For role moments, a different action button is used.
                 const metaActionsHtml = isUserMoment 
                     ? `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">`
                     : '';
@@ -5300,11 +5296,11 @@ Strictly adhere to the JSON format. Example:
                                     ${privateTag}
                                     ${metaActionsHtml}
                                 </div>
-                                                               <div class="moment-actions-btn" onclick="toggleActionsPopup(${momentId}, event)">
+                                <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
                                     ··
                                     <div class="moment-actions-popup">
-                                        <div class="moment-popup-btn" onclick="toggleLike(${momentId})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
-                                        <div class="moment-popup-btn" onclick="openCommentInput(${momentId})"><img src="https://img.heliar.top/file/1770353307524_评论_comment.png"> 评论</div>
+                                        <div class="moment-popup-btn" onclick="toggleLike(${moment.id})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
+                                        <div class="moment-popup-btn" onclick="openCommentInput(${moment.id})"><img src="https://img.heliar.top/file/1770353307524_评论_comment.png"> 评论</div>
                                     </div>
                                 </div>
                             </div>
@@ -5319,7 +5315,7 @@ Strictly adhere to the JSON format. Example:
         
         wrapper.innerHTML = `
             <div class="moments-header">
-                <div class="moments-cover-img" style="background-image: url(${momentsProfile.cover})" onclick="editMomentsCover()"></div>
+                <div class="moments-cover-img" style="background-image: url('${momentsProfile.cover}')" onclick="editMomentsCover()"></div>
                 <div class="moments-user-info">
                     <span class="moments-user-nickname">${escapeHtml(userProfile.nickname)}</span>
                     <img src="${momentsProfile.avatar}" class="moments-user-avatar" alt="avatar" onclick="editMomentsAvatar()">
@@ -5354,7 +5350,7 @@ Strictly adhere to the JSON format. Example:
         if (newUrl && newUrl.trim() !== '') {
             p.avatar = newUrl.trim();
             saveMomentsProfile(p);
-            renderMomentsPage(); 
+            renderMomentsPage();
             showToast("朋友圈头像已更新");
         }
     };
@@ -5365,13 +5361,13 @@ Strictly adhere to the JSON format. Example:
         if (newUrl && newUrl.trim() !== '') {
             p.cover = newUrl.trim();
             saveMomentsProfile(p);
+            renderMomentsPage();
             showToast("朋友圈背景已更新");
         }
     };
 
     window.toggleActionsPopup = (momentId, event) => {
         event.stopPropagation();
-        // Close any other open popups first
         document.querySelectorAll('.moment-actions-popup.active').forEach(p => {
              if (!p.closest(`#moment-${momentId}`)) {
                 p.classList.remove('active');
@@ -5384,12 +5380,10 @@ Strictly adhere to the JSON format. Example:
     };
 
     document.addEventListener('click', (e) => { 
-        // Hide moments action popups
         if (!e.target.closest('.moment-actions-btn')) {
             document.querySelectorAll('.moment-actions-popup').forEach(p => p.classList.remove('active'));
         }
         
-        // Hide chat bubble context menu
         if (activeMsgIdForMenu && !e.target.closest('.bubble-context-menu')) {
             closeBubbleMenu();
         }
@@ -5517,7 +5511,6 @@ Strictly adhere to the JSON format. Example:
         saveMomentsData(moments);
         renderMomentsPage();
         
-        // Ensure the popup closes after action
         const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
         if (popup) popup.classList.remove('active');
     };
@@ -5528,7 +5521,6 @@ Strictly adhere to the JSON format. Example:
         const overlay = document.getElementById('moments-comment-overlay');
         const inputField = document.getElementById('moments-comment-input');
         
-        // Ensure the popup closes before opening the comment input
         const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
         if (popup) popup.classList.remove('active');
         
@@ -5640,7 +5632,6 @@ Strictly adhere to the JSON format. Example:
             if (wbContents) worldBookContext = wbContents;
         }
         
-        // MODIFIED PROMPT
         const prompt = `你现在是角色“${contact.alias || contact.name}”，你的核心人设是：“${contact.persona}”。
         世界观背景设定如下（必须严格遵守）：
         ${worldBookContext}
@@ -5680,7 +5671,6 @@ Strictly adhere to the JSON format. Example:
             const data = await res.json();
             const rawContent = data.choices[0].message.content.trim();
             
-            // Extract JSON from the response
             const jsonMatch = rawContent.match(/{[\s\S]*}/);
             if (!jsonMatch) throw new Error("API did not return valid JSON.");
             
@@ -5695,7 +5685,7 @@ Strictly adhere to the JSON format. Example:
                 authorId: contact.id,
                 timestamp: Date.now(),
                 text: momentData.text,
-                isPrivate: momentData.isPrivate, // New field
+                isPrivate: momentData.isPrivate,
                 images: [],
                 likes: [],
                 comments: []
@@ -5714,27 +5704,22 @@ Strictly adhere to the JSON format. Example:
         }
 
         closeUrgeToPostModal();
-        showToast('正在生成动态，请稍候...', 5000); // 延长提示时间
+        showToast('正在生成动态，请稍候...', 5000);
 
         const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         let moments = getMomentsData();
 
-        // 创建一个包含所有生成任务的“承诺”数组
         const generationPromises = Array.from(selectedUrgeCharIds).map(contactId => {
             const contact = contacts.find(c => c.id === contactId);
             if (contact) {
-                // 返回生成动态的函数调用，让它在后台执行
                 return generateMomentForCharacter(contact);
             }
-            // 如果找不到角色，返回一个已解决的空值
             return Promise.resolve(null);
         });
 
-        // 等待所有“承诺”完成
-        const newMoments = (await Promise.all(generationPromises)).filter(Boolean); // filter(Boolean) 会过滤掉所有 null 的结果
+        const newMoments = (await Promise.all(generationPromises)).filter(Boolean);
 
         if (newMoments.length > 0) {
-            // 将所有新生成的动态一次性添加到最前面
             moments.unshift(...newMoments);
             saveMomentsData(moments);
             renderMomentsPage();
@@ -5761,14 +5746,12 @@ Strictly adhere to the JSON format. Example:
                         let moments = getMomentsData();
                         moments.unshift(newMoment);
                         saveMomentsData(moments);
-                        // If user is on moments page, refresh it
                         if (document.getElementById('chat-tab-2').classList.contains('active')) {
                             renderMomentsPage();
                         }
                         console.log(`[AutoPost] Successfully posted for ${contact.alias || contact.name}`);
                     }
                 } else {
-                    // Stop timer if the setting is disabled
                     clearInterval(autoPostTimers[contactId]);
                     delete autoPostTimers[contactId];
                 }
@@ -6153,7 +6136,6 @@ Strictly adhere to the JSON format. Example:
 
         let lastMsgTime = 0;
 
-        // Create a document fragment to build the list in memory
         const fragment = document.createDocumentFragment();
 
         messages.forEach(msg => {
@@ -6175,7 +6157,7 @@ Strictly adhere to the JSON format. Example:
 
             const row = document.createElement('div');
             row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`;
-            row.id = `msg-${msg.id}`; // Add ID for easier selection
+            row.id = `msg-${msg.id}`; 
 
             const checkbox = document.createElement('div');
             checkbox.className = `chat-checkbox ${selectedMsgIds.has(msg.id) ? 'checked' : ''}`;
@@ -6192,7 +6174,6 @@ Strictly adhere to the JSON format. Example:
                 contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`;
             }
             
-            // This is the element that holds the bubble/card
             const contentElement = document.createRange().createContextualFragment(contentHtml).firstElementChild;
             contentElement.ondblclick = (e) => { 
                 e.stopPropagation(); 
@@ -6215,13 +6196,11 @@ Strictly adhere to the JSON format. Example:
             fragment.appendChild(row);
         });
 
-        // Append the whole list at once
         container.appendChild(fragment);
         
         if (isMultiSelectMode) container.classList.add('multi-select-active');
         else container.classList.remove('multi-select-active');
         
-        // Scroll to bottom only if not in multi-select mode
         if (!isMultiSelectMode) {
             container.scrollTop = container.scrollHeight;
         }
@@ -6236,7 +6215,7 @@ Strictly adhere to the JSON format. Example:
         
         const receiverName = msg.transferData.receiverName || '对方';
         
-        if (msg.type === 'sent') { // User sent the transfer
+        if (msg.type === 'sent') { 
             mainText = `转账给 ${escapeHtml(receiverName)}`;
             switch(transferStatus) {
                 case 'pending':
@@ -6244,26 +6223,24 @@ Strictly adhere to the JSON format. Example:
                     iconUrl = 'https://img.heliar.top/file/1770723126205_兑换4_exchange-four.png'; break;
                 case 'accepted':
                     bgColor = '#fdddaf'; statusText = '对方已收钱';
-                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break; // Original was wrong icon
+                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break; 
                 case 'rejected':
                     bgColor = '#fdddaf'; statusText = '对方已退还';
-                    iconUrl = 'https://img.heliar.top/file/1770726817049_向下左角_corner-down-left.png'; break; // Use correct icon
+                    iconUrl = 'https://img.heliar.top/file/1770726817049_向下左角_corner-down-left.png'; break;
             }
-                } else { // Role sent the transfer to user
+                } else { 
             mainText = '转账给你';
             switch(transferStatus) {
-                case 'pending': // Role initiated a transfer, user needs to accept
+                case 'pending': 
                     bgColor = '#fd9806'; statusText = '待收款';
                     iconUrl = 'https://img.heliar.top/file/1770723126205_兑换4_exchange-four.png';
-                    // 只有角色发的待收款气泡可以点击
                     clickHandler = `onclick="openReceiveTransferModal('${id}')" style="cursor: pointer;"`;
                     break;
-                case 'accepted': // User accepted
+                case 'accepted': 
                     bgColor = '#fdddaf'; statusText = '已收款';
-                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break; // Original was wrong icon
+                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break; 
                 
-                // --- MODIFIED: Use correct icon for rejected by user ---
-                case 'rejected': // User rejected
+                case 'rejected':
                     bgColor = '#fdddaf'; statusText = '已退还';
                     iconUrl = 'https://img.heliar.top/file/1770726817049_向下左角_corner-down-left.png'; break;
             }
@@ -6283,7 +6260,6 @@ Strictly adhere to the JSON format. Example:
         `;
     }
 
-    // 新增：打开收款弹窗的函数
     window.openReceiveTransferModal = (transferId) => {
         if (!currentChatContactId) return;
 
@@ -6302,21 +6278,17 @@ Strictly adhere to the JSON format. Example:
 
         currentReceivingTransferId = transferId;
 
-        // 格式化时间
         const date = new Date(timestamp);
         const pad = n => String(n).padStart(2, '0');
         const formattedTime = `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 
-        // 填充弹窗内容
         document.getElementById('receive-transfer-amount').textContent = `¥${amount.toFixed(2)}`;
         document.getElementById('receive-transfer-time').textContent = formattedTime;
 
-        // 显示弹窗
         const overlay = document.getElementById('receive-transfer-overlay');
         overlay.classList.add('active');
     };
     
-    // 新增：关闭收款弹窗
     window.closeReceiveTransferModal = () => {
         const overlay = document.getElementById('receive-transfer-overlay');
         overlay.classList.remove('active');
@@ -6354,11 +6326,9 @@ Strictly adhere to the JSON format. Example:
         const msg = messages[msgIndex];
         const amount = parseFloat(msg.transferData.amount);
 
-        // 更新消息状态为“已收款”
         msg.transferData.transferStatus = 'accepted';
         localStorage.setItem(key, JSON.stringify(messages));
         
-        // 将钱款添加到用户钱包
         let walletData = getWalletData();
         walletData.balance += amount;
         walletData.transactions.push({
@@ -6371,11 +6341,10 @@ Strictly adhere to the JSON format. Example:
         saveWalletData(walletData);
 
         showToast(`已收款 ¥${amount.toFixed(2)}`);
-        closeReceiveTransferModal(); // 关闭弹窗
-        renderConversationMessages(); // 重新渲染聊天记录以更新气泡状态
+        closeReceiveTransferModal();
+        renderConversationMessages();
     };
     
-    // This function is for AI to process a user's transfer.
     function handleTransferResponse(transferId, isAccepted) {
         if (!currentChatContactId) return;
         
@@ -6393,10 +6362,9 @@ Strictly adhere to the JSON format. Example:
         if (isAccepted) {
             sentMsg.transferData.transferStatus = 'accepted';
 
-        } else { // Rejected
+        } else {
             sentMsg.transferData.transferStatus = 'rejected';
             
-            // Refund to user's wallet
             let walletData = getWalletData();
             walletData.balance += amount;
             walletData.transactions.push({
@@ -6410,7 +6378,6 @@ Strictly adhere to the JSON format. Example:
             showToast(`¥${amount.toFixed(2)} 已退回至零钱`);
         }
         
-        // We only update the sender's original message status
         localStorage.setItem(key, JSON.stringify(messages));
         renderConversationMessages();
     }
@@ -6418,7 +6385,7 @@ Strictly adhere to the JSON format. Example:
     window.showBubbleMenu = (event, msgId, text, type, isTransfer) => {
         event.preventDefault();
         event.stopPropagation();
-        closeBubbleMenu(); // Close any existing menu
+        closeBubbleMenu(); 
         
         activeMsgIdForMenu = msgId;
         
@@ -6437,11 +6404,9 @@ Strictly adhere to the JSON format. Example:
             <div class="bubble-menu-item" onclick="event.stopPropagation(); handleMultiSelectMode()">多选</div>
         `;
         
-        // Find the specific message row by its unique ID
         const row = document.getElementById(`msg-${msgId}`);
         if (!row) return;
 
-        // Find the bubble content within that row
         const bubbleContent = row.querySelector('.msg-bubble-content, .transfer-message-card');
         if (!bubbleContent) return;
         const rect = bubbleContent.getBoundingClientRect();
@@ -6450,7 +6415,7 @@ Strictly adhere to the JSON format. Example:
         
         menu.style.top = `${rect.top + window.scrollY}px`;
         menu.style.left = `${rect.left + rect.width / 2}px`;
-        menu.classList.add('active'); // Add active class to show it
+        menu.classList.add('active'); 
     };
 
     window.handleEditMsg = (msgId, oldText) => {
@@ -6477,8 +6442,8 @@ Strictly adhere to the JSON format. Example:
     window.handleRecallMsg = (msgId) => {
         updateMessageInStorage(msgId, (msg) => { 
             msg.type = 'recalled'; 
-            msg.text = '你撤回了一条消息'; // Set text for recall tip
-            delete msg.isTransfer; // Remove transfer flag if it exists
+            msg.text = '你撤回了一条消息'; 
+            delete msg.isTransfer; 
             delete msg.transferData;
         });
         renderConversationMessages();
@@ -6560,9 +6525,9 @@ Strictly adhere to the JSON format. Example:
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         
         const newMsg = { 
-            id: Date.now() + Math.random(), // Add random to prevent ID collision
+            id: Date.now() + Math.random(), 
             text: text, 
-            type: type, // 'sent' or 'received'
+            type: type, 
             timestamp: Date.now(), 
             isTransfer: isTransfer,
             transferData: transferData
@@ -6578,7 +6543,6 @@ Strictly adhere to the JSON format. Example:
             localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); 
         } 
         
-        // If this is the current chat, re-render
         if (contactId === currentChatContactId) {
             renderConversationMessages();
         }
@@ -6625,9 +6589,7 @@ Strictly adhere to the JSON format. Example:
         document.getElementById('transfer-page').classList.remove('active');
     };
     
-    window.checkTransferAmount = (input) => {
-        // This function is now just for potential future validation
-    };
+    window.checkTransferAmount = (input) => {};
 
     window.handleTransferInputKey = (event) => {
         if (event.key === 'Enter') {
@@ -6721,15 +6683,12 @@ Strictly adhere to the JSON format. Example:
     }
     
         function verifyPassword() {
-        // 👇👇👇 这是修改和新增的行 👇👇👇
         const userProfile = getUserProfile();
-        const correctPassword = userProfile.paymentPassword || '000000'; // 读取自定义密码，如果没设置就用默认的
-        // 👆👆👆 修改结束 👆👆👆
+        const correctPassword = userProfile.paymentPassword || '000000'; 
 
         const amount = parseFloat(document.getElementById('transfer-amount-input').value);
     
         if (currentPasswordInput === correctPassword) {
-            // Check balance
             const walletData = getWalletData();
             if (walletData.balance < amount) {
                 showToast('余额不足，转账失败');
@@ -6741,7 +6700,6 @@ Strictly adhere to the JSON format. Example:
                 return;
             }
             
-            // Deduct balance and add transaction record
             walletData.balance -= amount;
             
             const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); 
@@ -7056,11 +7014,10 @@ ${recentHistory}
         localStorage.setItem(CSS_PRESETS_KEY, JSON.stringify(presets));
 
         showToast('预设已删除');
-        renderCssPresets(); // Re-render the dropdown
-        document.getElementById('css-preset-actions').style.display = 'none'; // Hide actions
+        renderCssPresets(); 
+        document.getElementById('css-preset-actions').style.display = 'none'; 
     };
-    // --- End CSS Preset Functions ---
-
+    
     function updateRoleWbDisplay(bookIds) {
         const displayEl = document.getElementById('role-wb-display');
         const clearBtn = document.getElementById('role-wb-clear-btn');
@@ -7104,7 +7061,7 @@ ${recentHistory}
         if (type === 'roles') {
             items = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
             tempSelectedIds = tempForumBoundRoleIds;
-        } else { // worldbook
+        } else { 
             items = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
             let currentContactWB = tempSelectedWorldBookIds.length > 0 ? tempSelectedWorldBookIds : [];
             let newForumWB = tempForumWbIds.length > 0 ? tempForumWbIds : [];
@@ -7166,10 +7123,8 @@ ${recentHistory}
     
     window.showSettingsPage = () => { populateSettingsList(); body.classList.add('settings-active'); };
     
-    // --- 核心修复：退出设置页时重新应用手机框逻辑 ---
     window.hideSettingsPage = () => {
         body.classList.remove('settings-active');
-        // 当从设置页退出时，重新读取并应用设置
         const phoneFrameEnabled = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
         applyPhoneFrame(phoneFrameEnabled);
     };
@@ -7189,7 +7144,6 @@ ${recentHistory}
             const d = ev.target.result; 
             document.getElementById('wallpaper-url').value = d; 
             document.getElementById('wallpaper-preview').style.backgroundImage = `url(${d})`; 
-            // 应用壁纸时，根据手机框状态决定应用到哪里
             const isPhoneFrameActive = document.body.classList.contains('phone-frame-active');
             if (isPhoneFrameActive) {
                 document.getElementById('phone-screen-content').style.backgroundImage = `url(${d})`;
@@ -7209,7 +7163,6 @@ ${recentHistory}
         try {
             const p = localStorage.getItem(USER_PROFILE_KEY);
             const profile = p ? JSON.parse(p) : {};
-            // 定义一个默认的配置对象
             const defaults = {
                 cover: '',
                 avatar: '',
@@ -7219,12 +7172,10 @@ ${recentHistory}
                 signature: '这个人很懒，什么都没留下~',
                 memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png',
                 memberUrls: new Array(8).fill(''),
-                paymentPassword: '000000' // 👇👇👇 把支付密码也加入到默认配置中
+                paymentPassword: '000000'
             };
-            // 使用展开运算符(...)，用缓存中的数据覆盖默认数据，这样就不会漏掉任何字段了
             return { ...defaults, ...profile };
         } catch (e) {
-            // 如果出错，返回完整的默认对象
             return {
                 cover: '',
                 avatar: '',
@@ -7247,7 +7198,6 @@ ${recentHistory}
     window.editQQID = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newID = prompt("请输入QQ号:", p.qqId); if (newID && newID.trim()) { p.qqId = newID.trim(); saveUserProfile(p); loadUserProfile(); } };
     window.incrementLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); p.likes = parseInt(p.likes) + 1; saveUserProfile(p); loadUserProfile(); const icon = document.querySelector('.me-like-icon'); icon.style.transform = "scale(1.2) rotate(-10deg)"; setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150); };
     
-    // 核心修复3：打开/关闭/保存 "我" 页面的设置
         window.openMeSettings = () => {
         const p = getUserProfile();
         document.getElementById('me-settings-nickname').value = p.nickname || '';
@@ -7258,7 +7208,6 @@ ${recentHistory}
         document.getElementById('me-settings-avatar-preview').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         document.getElementById('me-settings-cover-preview').style.backgroundImage = p.cover ? `url(${p.cover})` : '';
 
-        // 👇👇👇 这是新添加的一行 👇👇👇
         document.getElementById('me-settings-payment-password').value = p.paymentPassword || '000000';
 
         const container = document.getElementById('me-settings-member-icons-list');
@@ -7285,15 +7234,12 @@ ${recentHistory}
         p.qqId = document.getElementById('me-settings-qq-id').value.trim();
         p.likes = parseInt(document.getElementById('me-settings-likes').value) || 0;
         
-        // 👇👇👇 这是新添加的代码块 👇👇👇
         const paymentPassInput = document.getElementById('me-settings-payment-password').value;
         if (/^\d{6}$/.test(paymentPassInput)) {
             p.paymentPassword = paymentPassInput;
         } else if (paymentPassInput !== (p.paymentPassword || '000000') && paymentPassInput !== '') {
-            // 只有在用户输入了新的、但格式不正确的内容时才提示
             showToast('支付密码必须为6位数字，本次未保存。');
         }
-        // 👆👆👆 新添加代码块结束 👆👆👆
 
         const avatarUrlFromInput = document.getElementById('me-settings-avatar-url').value.trim();
         if (avatarUrlFromInput.startsWith('data:image')) {
@@ -7415,7 +7361,6 @@ ${recentHistory}
          saveAllSettings(event);
          hideSettingsPage();
          
-         // 核心修复：点击 OK 按钮时才应用这些设置
          applyIOSMode(document.getElementById('ios-mode-switch').checked);
          applyPhoneFrame(document.getElementById('phone-frame-switch').checked);
          applyCatEars(document.getElementById('cat-ears-switch').checked);
@@ -7427,13 +7372,7 @@ ${recentHistory}
         document.getElementById('temp-value-display').innerText = e.target.value;
     };
     
-    // --- 修复：移除所有即时生效的监听器，只保留输入框的值同步 ---
-    // 之前这里有 onchange 监听器直接调用 apply... 函数，现已移除，改为只在 save-settings-btn 点击时调用
-    
     document.getElementById('phone-case-color-input').addEventListener('input', (event) => {
-        // 这里的实时预览保留，提升用户体验，但如果不点OK，下次刷新会还原（逻辑上可以接受，或严格移除）
-        // 如果要严格遵循“不点OK不应用”，则应移除这里的预览。
-        // 但颜色选择器通常需要预览，这里保留预览效果，持久化存储在saveAllSettings中。
         document.documentElement.style.setProperty('--phone-case-color', event.target.value);
     });
     
@@ -7481,7 +7420,6 @@ ${recentHistory}
         function exportBackup() {
         showToast('正在准备备份文件...', 2000);
 
-        // 定义所有需要备份的核心数据键
         const keysToBackup = [
             ALL_SETTINGS_KEY, CHAT_DATA_KEY, USER_PROFILE_KEY, WALLET_DATA_KEY,
             WORLDBOOK_DATA_KEY, IOS_MODE_KEY, PHONE_FRAME_KEY, PHONE_CASE_COLOR_KEY,
@@ -7490,9 +7428,7 @@ ${recentHistory}
         ];
 
         const backupData = {};
-//... 后续代码省略
 
-        // 备份核心数据
         keysToBackup.forEach(key => {
             const data = localStorage.getItem(key);
             if (data) {
@@ -7500,7 +7436,6 @@ ${recentHistory}
             }
         });
 
-        // 单独备份所有的聊天记录 (它们的键是动态生成的)
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key.startsWith('chat_msgs_')) {
@@ -7508,22 +7443,18 @@ ${recentHistory}
             }
         }
 
-        // 将备份数据转换为JSON字符串
         const jsonString = JSON.stringify(backupData, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
         
-        // 创建下载链接
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         const now = new Date();
         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         a.download = `Hushhh_Backup_${dateStr}.json`;
         
-        // 触发下载
         document.body.appendChild(a);
         a.click();
         
-        // 清理
         document.body.removeChild(a);
         URL.revokeObjectURL(a.href);
         
@@ -7536,9 +7467,8 @@ ${recentHistory}
             return;
         }
 
-        // 警告用户，这是一个危险操作
         if (!confirm('导入备份将会覆盖您当前的所有数据，且此操作不可逆！确定要继续吗？')) {
-            event.target.value = ''; // 清空文件选择，以便下次还能选择同一个文件
+            event.target.value = ''; 
             return;
         }
 
@@ -7550,10 +7480,8 @@ ${recentHistory}
                 const jsonString = e.target.result;
                 const backupData = JSON.parse(jsonString);
 
-                // 清空当前所有数据
                 localStorage.clear();
 
-                // 恢复数据
                 for (const key in backupData) {
                     if (Object.prototype.hasOwnProperty.call(backupData, key)) {
                         localStorage.setItem(key, backupData[key]);
@@ -7562,7 +7490,6 @@ ${recentHistory}
                 
                 showToast('导入成功！页面即将刷新...', 2000);
 
-                // 2秒后刷新页面以应用所有新设置
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
@@ -7571,7 +7498,7 @@ ${recentHistory}
                 console.error("导入备份失败:", error);
                 showToast('导入失败，请确保备份文件格式正确！', 3000);
             } finally {
-                 event.target.value = ''; // 无论成功失败，都清空文件选择
+                 event.target.value = ''; 
             }
         };
 
