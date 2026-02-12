@@ -7186,7 +7186,39 @@ ${recentHistory}
     window.handlePhotoWidgetUpload = (e) => { const file = e.target.files[0]; if(!file) return; const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; const img = document.getElementById('photo-widget-img'); const ph = document.getElementById('photo-widget-placeholder'); img.src = d; img.style.display = 'block'; ph.style.display = 'none'; saveAllSettings(); showToast("小组件图片已更新!"); }; r.readAsDataURL(file); };
 
     // --- Profile (Me) Page Functions ---
-    function getUserProfile() { try { const p = localStorage.getItem(USER_PROFILE_KEY); const profile = p ? JSON.parse(p) : {}; return { cover: profile.cover || '', avatar: profile.avatar || '', nickname: profile.nickname || 'Antigravity', qqId: profile.qqId || Date.now(), likes: profile.likes === undefined ? 8888 : profile.likes, signature: profile.signature || '这个人很懒，什么都没留下~', memberIconUrl: profile.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png', memberUrls: profile.memberUrls || new Array(8).fill('') }; } catch(e) { return { cover: '', avatar: '', nickname: 'Antigravity', qqId: Date.now(), likes: 8888, signature: '这个人很懒，什么都没留下~', memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png', memberUrls: new Array(8).fill('') }; } }
+        function getUserProfile() {
+        try {
+            const p = localStorage.getItem(USER_PROFILE_KEY);
+            const profile = p ? JSON.parse(p) : {};
+            // 定义一个默认的配置对象
+            const defaults = {
+                cover: '',
+                avatar: '',
+                nickname: 'Antigravity',
+                qqId: Date.now(),
+                likes: 8888,
+                signature: '这个人很懒，什么都没留下~',
+                memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png',
+                memberUrls: new Array(8).fill(''),
+                paymentPassword: '000000' // 👇👇👇 把支付密码也加入到默认配置中
+            };
+            // 使用展开运算符(...)，用缓存中的数据覆盖默认数据，这样就不会漏掉任何字段了
+            return { ...defaults, ...profile };
+        } catch (e) {
+            // 如果出错，返回完整的默认对象
+            return {
+                cover: '',
+                avatar: '',
+                nickname: 'Antigravity',
+                qqId: Date.now(),
+                likes: 8888,
+                signature: '这个人很懒，什么都没留下~',
+                memberIconUrl: 'https://img.heliar.top/file/1770081928967_vip_vip-one.png',
+                memberUrls: new Array(8).fill(''),
+                paymentPassword: '000000'
+            };
+        }
+    }
     function saveUserProfile(profileData) { try { localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profileData)); if (document.body.classList.contains('wallet-active')) { loadWalletUI(); } } catch (e) { showToast("保存失败 (LocalStorage满)"); } }
     function loadUserProfile() { const p = getUserProfile(); document.getElementById('profile-cover').style.backgroundImage = p.cover ? `url(${p.cover})` : 'linear-gradient(to bottom, #7A88FF, #7AFFAF)'; document.getElementById('profile-avatar').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('profile-nickname').innerText = p.nickname; document.getElementById('profile-qq-id').innerText = `QQ: ${p.qqId}`; document.getElementById('profile-like-count').innerText = p.likes; document.getElementById('profile-signature-text').innerText = p.signature || '这个人很懒，什么都没留下~'; document.getElementById('me-member-icon-main').src = p.memberIconUrl || 'https://img.heliar.top/file/1770081928967_vip_vip-one.png'; const memberIconContainer = document.getElementById('me-member-icon-container'); memberIconContainer.innerHTML = ''; p.memberUrls.forEach((url) => { if(url && url.trim() !== '') { const img = document.createElement('img'); img.className = 'me-member-icon-slot'; img.src = url; memberIconContainer.appendChild(img); } }); }
     window.editSignature = () => { const p = getUserProfile(); const newSignature = prompt("请输入你的个性签名：", p.signature); if (newSignature !== null) { p.signature = newSignature.trim() || '这个人很懒，什么都没留下~'; saveUserProfile(p); loadUserProfile(); } };
