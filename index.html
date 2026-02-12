@@ -41,7 +41,7 @@
              width: 100vw;
              height: 100vh;
              overflow: hidden;
-             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
              position: relative;
              transition: background-image 0.3s ease-in-out;
             z-index: -2;
@@ -234,11 +234,20 @@
             box-shadow: 0 4px 20px rgba(229, 138, 171, 0.15);
             flex-shrink: 0; /* height is now auto */ z-index: 10; 
             transition: padding-top 0.3s ease, background-color 0.3s, box-shadow 0.3s;
+            position: relative; /* MODIFIED: For title centering */
         }
         
         .chat-app-header.hidden { display: none; }
-        /* 修改：使用 header-text-custom 变量 */
-        .chat-header-title { font-size: 18px; font-weight: 600; color: var(--header-text-custom); transition: color 0.3s ease; }
+        /* MODIFIED: Title is now absolutely centered */
+        .chat-header-title { 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: var(--header-text-custom); 
+            transition: color 0.3s ease;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
         .back-icon-img { width: 30px; height: 30px; object-fit: contain; cursor: pointer; opacity: 1; pointer-events: auto; }
         .back-icon-img.hidden { opacity: 0; pointer-events: none; }
         .header-right-icon { width: 26px; height: 26px; object-fit: contain; cursor: pointer; transition: opacity 0.3s ease; }
@@ -270,16 +279,22 @@
             flex-shrink: 0; z-index: 20; height: 80px;
             transition: padding-top 0.3s ease, height 0.3s ease;
         }
-        /* iOS模式 聊天顶栏调整：下移更多 */
+        
+        body.ios-mode-active .chat-conv-header { 
+            padding-top: calc(env(safe-area-inset-top, 20px) + 25px);
+            height: 120px; 
+        }
         body.ios-mode-active .chat-conv-back-btn,
         body.ios-mode-active .chat-conv-right-icon {
-            transform: translateY(-20px); /* 向上移动 */
+            transform: translateY(-20px);
         }
-        body.ios-mode-active .chat-conv-header { 
-            padding-top: calc(env(safe-area-inset-top, 20px) + 25px); /* 减少padding-top */
-            height: 120px; /* 增加高度适应 */
+        body.ios-mode-active .chat-conv-title-container { margin-top: -30px; }
+        
+        /* 1. 手机框模式下，聊天页备注上移 */
+        body.phone-frame-active .chat-conv-title-container {
+            margin-top: -10px;
         }
-        body.ios-mode-active .chat-conv-title-container { margin-top: -30px; /* 向上移动 */ }
+
 
         .chat-conv-back-btn { width: 32px; height: 32px; object-fit: contain; cursor: pointer; }
         
@@ -413,32 +428,50 @@
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Bubble Context Menu (Popup) */
+        /* Bubble Context Menu (Popup) z-index 修复 */
+                /* --- 美化后的气泡菜单 (粉白圆滑风格) --- */
         .bubble-context-menu {
             position: absolute;
-            background-color: var(--menu-pink);
-            border-radius: 12px;
-            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.95); /* 半透明白色背景 */
+            backdrop-filter: blur(10px); /* 毛玻璃效果 */
+            border-radius: 16px; /* 更圆润的边角 */
+            padding: 6px;
             display: flex;
-            gap: 5px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            z-index: 1000;
+            gap: 6px;
+            box-shadow: 0 8px 25px rgba(229, 138, 171, 0.25); /* 粉色系柔和阴影 */
+            z-index: 10020;
             white-space: nowrap;
             transform: translate(-50%, -100%);
-            margin-top: -10px;
+            margin-top: -12px;
             display: none;
+            border: 1px solid rgba(255, 240, 245, 0.6); /* 极淡的粉色边框 */
+            animation: popMenu 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        @keyframes popMenu { from { opacity: 0; transform: translate(-50%, -90%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -100%) scale(1); } }
+        
         .bubble-context-menu.active { display: flex; }
+        
         .bubble-menu-item {
-            padding: 8px 12px;
+            padding: 8px 16px;
             font-size: 14px;
             color: #555;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 12px; /* 按钮也圆润 */
+            transition: all 0.2s;
         }
-        .bubble-menu-item:active { background-color: rgba(255,255,255,0.4); }
+        .bubble-menu-item:active, .bubble-menu-item:hover { 
+            background-color: #FFF0F5; /* 薰衣草/浅粉背景 */
+            color: #E58AAB; /* 粉色文字 */
+        }
+        
+        /* 菜单下方的小箭头 */
         .bubble-context-menu::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -7px;
+            border-width: 7px; border-style: solid;
+            border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+            filter: drop-shadow(0 2px 2px rgba(229, 138, 171, 0.1));
+        }
             content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px;
             border-width: 6px; border-style: solid;
             border-color: var(--menu-pink) transparent transparent transparent;
@@ -674,44 +707,6 @@
         }
         .role-wb-binding-area button#role-wb-clear-btn { background-color: #eee; color: #999; }
         
-        /* NEW: CSS Preset Styles */
-        .preset-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .preset-item span {
-            font-weight: 500;
-            color: #555;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .preset-item .actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-            margin-left: 10px;
-        }
-        .preset-item .actions button {
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            background-color: var(--theme-pink-bg-med);
-            color: var(--theme-pink-text);
-            white-space: nowrap;
-        }
-        .preset-item .actions .delete-preset-btn {
-            background-color: #eee;
-            color: #999;
-        }
-
         /* --- Chat List & Contact List Styles --- */
         .chat-list-container { width: 100%; }
         .chat-list-item { display: flex; align-items: center; padding: 12px 20px; background-color: white; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: background-color 0.2s; }
@@ -884,7 +879,7 @@
         .moment-item-meta-left {
             display: flex;
             align-items: center;
-            gap: 1em; /* '两个字的距离' */
+            gap: 8px; /* '两个字的距离' reduced for better spacing with new tag*/
             font-size: 13px;
         }
         .moment-delete-btn {
@@ -927,6 +922,7 @@
             transform-origin: right center;
             transition: transform 0.15s ease-out;
             white-space: nowrap;
+            z-index: 10; /* Ensure it's above other elements */
         }
         .moment-actions-popup.active {
             transform: scale(1);
@@ -1414,15 +1410,6 @@
         /* --- MODIFIED: iOS Mode Active Global Styles --- */
         body.ios-mode-active #time-section { padding-top: env(safe-area-inset-top, 20px); }
         body.ios-mode-active .chat-app-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); } 
-        body.ios-mode-active .chat-conv-header { 
-            padding-top: calc(env(safe-area-inset-top, 20px) + 25px); 
-            height: 120px; 
-        }
-        body.ios-mode-active .chat-conv-back-btn,
-        body.ios-mode-active .chat-conv-right-icon {
-            transform: translateY(-20px);
-        }
-        body.ios-mode-active .chat-conv-title-container { margin-top: -30px; }
         body.ios-mode-active #role-settings-page { padding-top: calc(env(safe-area-inset-top, 20px) + 20px); }
         body.ios-mode-active .me-settings-header-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active .me-setting-wrapper { top: calc(env(safe-area-inset-top, 20px) + 20px); } /* MODIFIED: Move down setting icon on Me page */
@@ -1436,13 +1423,16 @@
         body.ios-mode-active #forum-detail-header,
         body.ios-mode-active .forum-post-top-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active #mall-app-page .mall-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-        .transfer-back-btn { /* [FIXED] Consolidated back button style */
+        
+                /* --- 修复：转账页返回按钮位置更靠上 --- */
+        .transfer-back-btn {
             position: absolute;
-            top: calc(env(safe-area-inset-top, 0px) + 10px); /* [FIXED] Moved up */
+            /* 原来是 calc(env(...) + 20px)，现在直接改为 10px，让它贴近边缘 */
+            top: 13px; 
             left: 20px;
             width: 30px; height: 30px;
             object-fit: contain; cursor: pointer;
-            z-index: 10;
+            z-index: 900; /* 提高层级，防止被遮挡 */
         }
 
         #toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background-color: rgba(255, 230, 240, 0.98); color: #E58AAB; padding: 15px 25px; border-radius: 20px; font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; max-width: 80%; }
@@ -2378,7 +2368,7 @@
             color: #333;
         }
 
-        /* --- Mall App Styles (NEW) --- */
+        /* --- Mall App Styles (MODIFIED) --- */
         #mall-app-page {
             position: fixed;
             top: 0;
@@ -2470,34 +2460,52 @@
             cursor: pointer;
             white-space: nowrap;
             position: relative;
-            transition: color 0.2s;
             flex-shrink: 0;
             margin: 0 5px;
         }
-
-        .mall-category-item.active {
-            color: #C27C96; /* 选中：深粉色，原浅粉色的深色变体 */
-            font-weight: 600;
-        }
-        .mall-category-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 10px;
-            right: 10px;
-            height: 3px;
-            background-color: var(--theme-pink-text); /* 选中：浅粉色下划线 #E58AAB */
-            border-radius: 1.5px;
-        }
+        
         .mall-content {
             flex: 1;
             overflow-y: auto;
             background-color: var(--theme-pink-bg-soft); /* 柔和粉色系背景 */
             padding: 20px;
             color: #333; /* 深灰色常规文字 */
+            padding-bottom: 80px; /* MODIFIED: Space for bottom nav */
         }
         .mall-content h1 { color: #333; }
         .mall-content p { color: #888; } /* 浅灰色次要文字 */
+        
+        /* NEW: Mall Bottom Nav Bar */
+        .mall-bottom-nav {
+            background-color: #ffffff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 5px 0 calc(5px + env(safe-area-inset-bottom, 0));
+            flex-shrink: 0;
+        }
+        .mall-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex: 1;
+            padding: 5px 0;
+        }
+        .mall-nav-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+        .mall-nav-text {
+            font-size: 10px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .mall-nav-item.active .mall-nav-text {
+            color: var(--theme-pink-text);
+        }
         
         /* --- [REFACTORED] Transfer Page Styles --- */
         #transfer-page {
@@ -2557,7 +2565,7 @@
         .transfer-amount-input-area {
             display: flex;
             align-items: baseline;
-                        border-bottom: 1px solid #f0d8e2;
+            border-bottom: 1px solid #f0d8e2;
             padding-bottom: 15px;
         }
         .transfer-currency-symbol {
@@ -2638,10 +2646,10 @@
             margin-bottom: 10px;
         }
         #confirm-transfer-amount {
-            font-size: 40px;
+            font-size: 36px;
             font-weight: bold;
             color: #000;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .confirm-payment-method {
             display: flex;
@@ -2658,9 +2666,9 @@
             align-items: center;
             gap: 8px;
             background-color: #fffaf3; /* 浅米黄色 */
-            padding: 8px 12px; /* 放大 */
-            border-radius: 8px; /* 放大 */
-            width: 100%; /* 拉长 */
+            padding: 8px 12px;
+            border-radius: 8px;
+            width: 100%;
             box-sizing: border-box;
         }
         .payment-icon { width: 20px; height: 20px; }
@@ -2670,7 +2678,7 @@
         .password-input-section {
             padding: 20px;
             text-align: center;
-            background: #ffffff; /* MODIFIED */
+            background: #ffffff;
         }
         .password-input-section p {
             font-size: 15px;
@@ -2709,7 +2717,7 @@
         .numeric-keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            background-color: #f6f2f4; /* MODIFIED */
+            background-color: #f6f2f4;
             padding-bottom: env(safe-area-inset-bottom, 0);
         }
         .keypad-btn {
@@ -2735,19 +2743,99 @@
             width: 28px; height: 28px;
             pointer-events: none;
         }
+
+                /* --- 3. 手机框模式下：支付密码弹窗的强力修复 --- */
+        
+        /* 缩小整个弹窗的头部内边距 */
+        body.phone-frame-active .confirm-popup-header {
+            padding: 10px 10px 5px 10px;
+            font-size: 15px;
+        }
+
+        /* 缩小内容区域（转账对象和金额）的间距 */
+        body.phone-frame-active .confirm-popup-content {
+            padding: 10px 15px;
+        }
+        
+        /* 缩小显示的金额字体 */
+        body.phone-frame-active #confirm-transfer-amount {
+            font-size: 26px !important;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        /* 调整“付款方式”那一行的高度 */
+        body.phone-frame-active .confirm-payment-method {
+            padding-top: 5px;
+            gap: 4px;
+        }
+        body.phone-frame-active .payment-method-details {
+            padding: 5px 8px;
+        }
+
+        /* 压缩密码输入区域的上下间距 */
+        body.phone-frame-active .password-input-section {
+            padding: 10px 0 5px 0;
+            margin-bottom: 0;
+        }
+        body.phone-frame-active .password-input-section p {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        /* 缩小 6 个密码框的尺寸 */
+        body.phone-frame-active .password-box {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 14px;
+            border-radius: 6px;
+            margin: 0 2px;
+        }
+
+        /* 强制去除键盘底部的安全距离（因为手机框里不需要） */
+        body.phone-frame-active .numeric-keypad {
+            padding-bottom: 0 !important;
+            background-color: #f6f2f4;
+        }
+
+        /* 压扁数字键盘的按钮高度 */
+        body.phone-frame-active .keypad-btn {
+            padding: 8px 0 !important; /* 减少内边距 */
+            height: 42px !important;   /* 强制固定高度 */
+            font-size: 18px !important;
+            line-height: 42px; /* 让文字垂直居中 */
+        }
+
+        /* 缩小删除按钮的图标 */
+        body.phone-frame-active .keypad-btn.delete img {
+            width: 20px; 
+            height: 20px;
+            vertical-align: middle;
+        }
+        
+        /* 确保弹窗在手机框内绝对定位到底部 */
+        body.phone-frame-active #transfer-confirm-popup {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transform: translateY(100%); /* 默认隐藏 */
+        }
+        /* 激活状态 */
+        body.phone-frame-active #transfer-confirm-overlay.active #transfer-confirm-popup {
+            transform: translateY(0);
+        }
         
        /* --- 手机外框 - 新增与修改 --- */
-
-        /* 新增：包裹所有App页面的容器 */
         #app-wrapper {
           width: 100%;
           height: 100%;
-          position: relative; /* 关键：让内部的页面相对于它定位 */
+          position: relative;
           background-size: cover;
           background-position: center;
         }
         
-        /* 修复：在手机框模式下，为各App页面顶部适配刘海高度 */
         body.phone-frame-active #home-screen {
             padding-top: var(--status-bar-height);
         }
@@ -2765,17 +2853,16 @@
         body.phone-frame-active #add-moment-modal > .add-moment-header,
         body.phone-frame-active #role-settings-page > .role-setting-close-area,
         body.phone-frame-active #chat-conversation-view > .chat-conv-header {
-            padding-top: calc(15px + var(--status-bar-height)); /* 示例：原始padding-top + 状态栏高度 */
+            padding-top: calc(15px + var(--status-bar-height));
         }
         
-        /* 新增：在手机框模式下，约束所有弹窗和页面 */
         body.phone-frame-active #app-wrapper > div[id*="-page"],
         body.phone-frame-active #app-wrapper > div[id*="-modal"],
         body.phone-frame-active #app-wrapper > div[id*="-overlay"],
         body.phone-frame-active #app-wrapper > .delete-confirm-modal {
-            position: absolute; /* 从 fixed 改为 absolute 以便被约束 */
-            width: 100%;      /* 从 100vw 改为 100% */
-            height: 100%;     /* 从 100vh 改为 100% */
+            position: absolute;
+            width: 100%;
+            height: 100%;
         }
         
         .phone-container {
@@ -2784,69 +2871,65 @@
           left: 0;
           width: 100%;
           height: 100%;
-          display: none; /* 默认隐藏 */
+          display: none;
           justify-content: center;
           align-items: center;
-          background: #f0f0f0; /* 修改：手机框外部的背景为浅灰色 */
+          background: #f0f0f0;
           z-index: 9999;
         }
         
         body.phone-frame-active .phone-container {
-          display: flex; /* 开启时显示 */
+          display: flex;
         }
         
-        /* 手机外框 */
         .phone{
           width: 390px;
           height: 780px;
-          background: #050505; /* 修改：内部背景设为黑色，模拟黑边 Bezel */
+          background: #050505;
           background-clip: padding-box; 
           border-radius: 48px;
-          padding: 6px; /* 这6px的padding露出了background的黑色，形成黑边 */
+          padding: 6px;
           position: relative;
           box-shadow: 0 0 40px rgba(0,0,0,0.5);
-          border: 6px solid var(--phone-case-color); /* 外部边框为手机壳颜色 */
+          border: 6px solid var(--phone-case-color);
           transition: border-color 0.3s;
         }
         
-        /* 新增：手机壳猫耳朵 */
         body.cat-ears-active .phone::before,
         body.cat-ears-active .phone::after {
             content: '';
             position: absolute;
-            top: -20px; /* 控制耳朵高度 */
-            width: 50px; /* 控制耳朵宽度 */
-            height: 50px; /* 控制耳朵高度 */
-            background-color: var(--cat-ear-color); /* 使用猫耳朵颜色变量 */
+            top: -20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--cat-ear-color);
             z-index: -1;
             transition: background-color 0.3s;
-            border-radius: 12px; /* 稍微圆滑的尖角，更自然的耳朵形状 */
-            box-shadow: 0 0 20px rgba(0,0,0,0.3); /* 添加柔和阴影，解决突兀问题 */
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
         }
 
         body.cat-ears-active .phone::before {
-            left: 30px; /* 左耳朵位置 */
-            transform: rotate(-45deg); /* 旋转正方形形成耳朵 */
+            left: 30px;
+            transform: rotate(-45deg);
         }
 
         body.cat-ears-active .phone::after {
-            right: 30px; /* 右耳朵位置 */
-            transform: rotate(45deg); /* 旋转正方形形成耳朵 */
+            right: 30px;
+            transform: rotate(45deg);
         }
 
-        /* 屏幕 */
         .screen{
           width: 100%;
           height: 100%;
           border-radius: 36px;
           overflow: hidden;
           position: relative;
-          background: transparent; /* 修改：屏幕背景透明，以便显示壁纸 */
+          background: transparent;
           background-size: cover;
           background-position: center;
         }
         
-        /* 刘海 */
         .notch{
           position: absolute;
           top: 10px;
@@ -2856,38 +2939,35 @@
           height: 34px;
           background: #000;
           border-radius: 18px;
-          z-index: 10010; /* 确保在最顶层 */
-          pointer-events: none; /* 让点击可以穿透 */
+          z-index: 10010;
+          pointer-events: none;
         }
         
-        /* 状态栏 */
         .status-bar{
           height: var(--status-bar-height);
           padding: 0 14px;
           display: flex;
-          align-items: flex-start; /* 修改：改为flex-start，让元素从顶部开始排列 */
+          align-items: flex-start;
           font-size: 16px;
           font-weight: 600;
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
-          z-index: 10009; /* 确保在刘海下方，页面内容之上 */
+          z-index: 10009;
           color: #fff;
           pointer-events: none;
         }
         
-        /* 左边时间 */
         .status-time{
           margin-left: 18px;
           color: #000;
-          padding-top: 14px; /* 修改：向下移动，与右侧对齐 */
+          padding-top: 14px;
         }
         
-        /* 右边图标 */
         .status-right{
           position: absolute;
-          top: 14px; /* 修改：从顶部开始对齐 */
+          top: 14px;
           right: 20px;
           display: flex;
           gap: 8px;
@@ -2896,7 +2976,134 @@
         .status-right img{
           height: 14px;
         }
-        /* --- 手机外框样式结束 --- */
+        
+                         /* --- 新增：收款弹窗样式 (已应用新布局和颜色) --- */
+        #receive-transfer-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: white; 
+            z-index: 2000; 
+            display: flex;
+            flex-direction: column;
+            /* 1. 修改：整体布局，内容上移，按钮下沉 */
+            justify-content: space-between; 
+            padding-top: 100px; /* 让顶部内容块从导航栏下方开始 */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #receive-transfer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .receive-back-btn {
+            position: absolute;
+            top: 13px; 
+            left: 20px;
+            width: 30px; height: 30px;
+            object-fit: contain; cursor: pointer;
+            z-index: 2001;
+            transition: top 0.3s ease;
+        }
+        body.phone-frame-active .receive-back-btn {
+            top: calc(15px + var(--status-bar-height));
+        }
+        body.ios-mode-active .receive-back-btn {
+            top: calc(env(safe-area-inset-top, 20px) + 15px);
+        }
+        
+        .receive-card {
+            /* 1. 修改：移除 flex:1 和 justify-content, 让它自然地待在顶部 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 0 30px;
+            background: transparent;
+            transform: none !important;
+            box-shadow: none;
+        }
+        
+        .receive-icon { width: 60px; height: 60px; margin-bottom: 10px; }
+        .receive-status { font-size: 18px; color: #333; font-weight: 500; }
+        /* 2. 修改：金额字体缩小 */
+        .receive-amount { font-size: 48px; font-weight: bold; color: #000; margin: 10px 0 30px 0; }
+        
+        .receive-info-section {
+            width: 100%;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            /* 3. 修改：移除底部横线 */
+            border-bottom: none; 
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            color: #666;
+        }
+        .receive-info-value { color: #333; }
+        
+        .receive-actions-footer {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 30px);
+        }
+        
+        .receive-confirm-btn {
+            /* 4. 修改：收款按钮长度缩短一半 */
+            width: 40%;
+            max-width: 300px;
+            padding: 14px;
+            background: #06C755;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .receive-reject-btn {
+            background: none;
+            border: none;
+            color: #667588;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        /* --- NEW: Styles for Urge Post Modal --- */
+        .urge-post-char-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 5px;
+            transition: all 0.2s;
+        }
+        .urge-post-char-item.selected {
+            border-color: var(--theme-pink-btn);
+            background-color: var(--theme-pink-bg-med);
+        }
+        .urge-post-char-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-bottom: 5px;
+        }
+        .urge-post-char-item span {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
@@ -2938,6 +3145,7 @@
                 </div>
                 <div class="app-item" onclick="openWorldBookApp()"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
                 <div class="app-item" onclick="openForumApp()"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="论坛">论坛</span></div>
+                <div class="app-item" onclick="openForumApp()"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="论坛">论坛</span></div>
                 <div class="app-item"><div class="app-icon" id="icon-app4">📸</div><span class="app-name" data-app-name="相册">相册</span></div>
             </div>
         </div>
@@ -2973,10 +3181,14 @@
 <!-- Chat App 页面 -->
 <div id="chat-app-page">
     <div class="chat-app-header" id="chat-app-header-el">
-        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-icon-img" id="chat-back-btn" onclick="closeChatApp()">
+        <!-- MODIFIED: Container for left icons -->
+        <div id="chat-header-left-icons" style="display: flex; gap: 15px; z-index: 2;">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-icon-img" id="chat-back-btn" onclick="closeChatApp()">
+            <img id="urge-post-icon" src="https://img.heliar.top/file/1770904788245_喜欢_like_5.png" class="back-icon-img" onclick="openUrgeToPostModal()" style="display: none;">
+        </div>
         <div class="chat-header-title" id="chat-page-title">Chat</div>
         <!-- 右上角图标容器 -->
-        <div id="chat-header-right-icons" style="display: flex; gap: 15px;">
+        <div id="chat-header-right-icons" style="display: flex; gap: 15px; z-index: 2;">
             <img id="chat-header-add-friend-icon" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png" class="header-right-icon" onclick="openAddFriendModal()">
             <img id="chat-header-add-moment-icon" src="https://img.heliar.top/file/1770345149331_相机_camera.png" class="header-right-icon" onclick="openMomentsActionSheet()" style="display: none;">
         </div>
@@ -3132,8 +3344,8 @@
         </div>
 
         <!-- NEW: Memory Depth Input -->
-        <div class="settings-row" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
-            <label for="role-memory-depth" style="font-size:14px; color:#555; font-weight:500;">记忆条数 (Memory)</label>
+        <div class="settings-row" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+            <label for="role-memory-depth" style="margin-bottom:0;">记忆条数 (Memory)</label>
             <input type="number" id="role-memory-depth" placeholder="10" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
         </div>
 
@@ -3170,21 +3382,43 @@
         </div>
         <textarea id="role-user-persona" class="role-persona-input" placeholder="输入您的人设 (User Persona)..."></textarea>
     </div>
-    
-    <!-- NEW: CSS Preset Section -->
+
+    <!-- MODIFIED: Active Post Moment Section -->
     <div class="settings-section-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <div class="settings-card-title" style="margin-bottom: 0; border-bottom: none;">预设样式</div>
-            <button class="role-bg-btn" onclick="saveCurrentCssPreset()">保存当前预设</button>
+        <div class="settings-card-title">主动发动态</div>
+        <div class="settings-row-with-switch" style="width:100%; padding: 10px 5px;">
+            <label for="role-auto-post-switch">开启自动发动态</label>
+            <label class="ios-switch">
+                <input type="checkbox" id="role-auto-post-switch">
+                <span class="slider round"></span>
+            </label>
         </div>
-        <div id="css-preset-list" style="width: 100%; margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-            <!-- Presets will be dynamically added here -->
+        <div class="settings-row" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+            <label for="role-auto-post-interval" style="margin-bottom:0;">间隔时间 (分钟)</label>
+            <input type="number" id="role-auto-post-interval" placeholder="10" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
         </div>
     </div>
-
+    
+    <!-- MODIFIED: CSS Preset Section -->
     <div class="settings-section-card">
-        <div class="settings-card-title">自定义样式 (CSS)</div>
+         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 15px;">
+            <div class="settings-card-title" style="margin-bottom: 0; border-bottom: none;">自定义样式 (CSS)</div>
+            <button class="role-bg-btn" onclick="openSaveCssPresetModal()">保存</button>
+        </div>
         <textarea id="role-setting-css" class="role-css-input" placeholder="/* 在这里输入CSS代码修改气泡样式 */..."></textarea>
+        
+        <div style="width:100%; margin-top: 20px;">
+            <div class="settings-card-title" style="margin-bottom: 10px;">预设样式列表</div>
+             <div class="select-wrapper">
+                <select id="css-preset-select" style="width:100%; padding: 10px; border:1px solid #eee; border-radius:8px;" onchange="handlePresetSelection(this)">
+                    <!-- Options will be added here -->
+                </select>
+            </div>
+            <div id="css-preset-actions" style="display: none; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                 <button class="role-bg-btn" onclick="applySelectedCssPreset()">应用</button>
+                 <button class="role-bg-btn" style="background-color: #eee; color: #999;" onclick="deleteSelectedCssPreset()">删除</button>
+            </div>
+        </div>
     </div>
 
     <button class="role-save-btn" onclick="saveRoleSettings()">保存设置</button>
@@ -3374,6 +3608,33 @@
     </div>
 </div>
 
+<!-- NEW: Urge to Post Modal -->
+<div id="urge-post-overlay" class="delete-confirm-modal" style="display: none;">
+    <div id="urge-post-card" class="wb-modal-card" style="max-height: 70vh; background: white; width: 90%; max-width: 380px;" onclick="event.stopPropagation()">
+        <div class="wb-modal-header" style="color: #facee4; font-size: 18px;">催ta发动态</div>
+        <div id="urge-post-char-list" class="wb-modal-scroll-area" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 15px;">
+            <!-- Characters will be dynamically added here -->
+        </div>
+        <div class="wb-modal-actions">
+            <button class="wb-action-btn wb-btn-cancel" onclick="closeUrgeToPostModal()">取消</button>
+            <button class="wb-action-btn wb-btn-ok" onclick="confirmUrgeToPost()">确定</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: Save CSS Preset Modal -->
+<div id="save-preset-modal" class="delete-confirm-modal" style="display: none;">
+    <div class="delete-card" onclick="event.stopPropagation()" style="text-align: left; padding: 20px;">
+        <div class="delete-card-title" style="text-align: center; margin-bottom: 15px;">保存预设样式</div>
+        <input type="text" id="preset-name-input" class="add-friend-input" placeholder="输入预设名称..." style="margin-bottom: 20px;">
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeSaveCssPresetModal()">取消</button>
+            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="saveCurrentCssPreset()">保存</button>
+        </div>
+    </div>
+</div>
+
+
 <!-- NEW: Moments Action Sheet (Popup) -->
 <div id="moments-action-sheet-overlay" onclick="closeMomentsActionSheet()">
    <div id="moments-action-sheet" onclick="event.stopPropagation()">
@@ -3546,7 +3807,7 @@
             </div>
         </div>
 
-        <div class="me-settings-group">
+                <div class="me-settings-group">
             <h3>界面信息</h3>
             <div class="me-settings-row">
                 <div class="me-settings-label">头像</div>
@@ -3559,6 +3820,17 @@
                 <input type="text" id="me-settings-cover-url" class="me-settings-input" placeholder="背景图 URL">
             </div>
         </div>
+
+        <!-- 👇👇👇 这是新添加的模块 👇👇👇 -->
+        <div class="me-settings-group">
+            <h3>安全设置</h3>
+            <div class="me-settings-row">
+                <div class="me-settings-label">支付密码</div>
+                <input type="text" id="me-settings-payment-password" class="me-settings-input" placeholder="设置6位数字密码" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+            </div>
+        </div>
+        <!-- 👆👆👆 新添加模块结束 👆👆👆 -->
+
         <div class="me-settings-group">
             <h3>会员图标列表 (8个)</h3>
             <div id="me-settings-member-icons-list">
@@ -3749,7 +4021,7 @@
     </div>
 </div>
 
-<!-- Mall App Page (NEW) -->
+<!-- Mall App Page (MODIFIED) -->
 <div id="mall-app-page">
     <div class="mall-header">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallApp()">
@@ -3768,12 +4040,27 @@
     <div class="mall-content" id="mall-content">
         <!-- Content will be injected by JS -->
     </div>
+    <!-- NEW: Mall Bottom Nav Bar -->
+    <div class="mall-bottom-nav">
+        <div class="mall-nav-item active">
+            <img src="https://img.heliar.top/file/1770921774009_首页_home_3.png" class="mall-nav-icon">
+            <span class="mall-nav-text">首页</span>
+        </div>
+        <div class="mall-nav-item">
+            <img src="https://img.heliar.top/file/1770921767590_购物车_shopping_2.png" class="mall-nav-icon">
+            <span class="mall-nav-text">购物车</span>
+        </div>
+        <div class="mall-nav-item">
+            <img src="https://img.heliar.top/file/1770921771134_无嘴脸_face-without-mouth.png" class="mall-nav-icon">
+            <span class="mall-nav-text">我</span>
+        </div>
+    </div>
 </div>
 
 <!-- [REFACTORED] Transfer Page -->
 <div id="transfer-page">
+    <img src="https://img.heliar.top/file/1770721895553_左_left.png" class="transfer-back-btn" onclick="closeTransferPage()">
     <div class="transfer-page-top">
-        <img src="https://img.heliar.top/file/1770721895553_左_left.png" class="transfer-back-btn" onclick="closeTransferPage()">
         <div class="transfer-title-info">
              <img id="transfer-target-avatar" class="transfer-target-avatar" src="">
              <span id="transfer-target-name-container">转账给...</span>
@@ -3828,6 +4115,29 @@
     </div>
 </div>
 
+<!-- 新增：角色主动转账收款弹窗 (已修改为全屏版) -->
+<div id="receive-transfer-overlay">
+    <!-- 新增返回按钮 -->
+    <img src="https://img.heliar.top/file/1770913074122_左_left_2.png" class="receive-back-btn" onclick="closeReceiveTransferModal()">
+    
+    <!-- 中间内容区域 (不包含按钮) -->
+    <div class="receive-card" onclick="event.stopPropagation()">
+        <img src="https://img.heliar.top/file/1770903475517_时间_time.png" class="receive-icon">
+        <span class="receive-status">待你收款</span>
+        <span class="receive-amount" id="receive-transfer-amount">¥0.00</span>
+        <div class="receive-info-section">
+            <span class="receive-info-label">转账时间</span>
+            <span class="receive-info-value" id="receive-transfer-time"></span>
+        </div>
+    </div>
+
+    <!-- 新增：底部按钮容器 -->
+    <div class="receive-actions-footer">
+        <button class="receive-confirm-btn" onclick="confirmReceiveTransfer()">收款</button>
+        <button class="receive-reject-btn" onclick="rejectReceiveTransfer()">退还</button>
+    </div>
+</div>
+
 
 <!-- Forum Post Image Input (Hidden) -->
 <input type="file" id="input-forum-post-image" class="file-input-hidden" multiple accept="image/*" onchange="handleForumPostImageUpload(event)">
@@ -3875,7 +4185,7 @@
     
     // --- LocalStorage Keys ---
     const ALL_SETTINGS_KEY = 'appSettings_v15';
-    const CHAT_DATA_KEY = 'chatData_v3_contacts'; 
+    const CHAT_DATA_KEY = 'chatData_v5_final'; // Bumped version for new fields
     const USER_PROFILE_KEY = 'userProfile_v4'; 
     const WALLET_DATA_KEY = 'walletData_v3'; 
     const WORLDBOOK_DATA_KEY = 'worldbookData_v3_covers';
@@ -3884,12 +4194,12 @@
     const PHONE_CASE_COLOR_KEY = 'phoneCaseColor_v1';
     const CAT_EARS_KEY = 'catEarsEnabled_v1';
     const CAT_EAR_COLOR_KEY = 'catEarColor_v1';
-    const MOMENTS_DATA_KEY = 'momentsData_v2'; 
+    const MOMENTS_DATA_KEY = 'momentsData_v4_private'; // Bumped version for private flag
     const MOMENTS_PROFILE_KEY = 'momentsProfile_v1';
     const FORUMS_DATA_KEY = 'forumsData_v2';
     const FORUM_POSTS_DATA_KEY = 'forumPosts_v2';
     const FORUM_USER_DATA_KEY = 'forumUserData_v4';
-    const CSS_PRESETS_KEY = 'cssPresets_v1';
+    const CSS_PRESETS_KEY = 'cssPresets_v2_new';
 
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
@@ -3907,6 +4217,7 @@
     
     // Transfer state
     let currentPasswordInput = '';
+    let currentReceivingTransferId = null;
     
     // Forum Temp State
     let tempForumAvatarUrl = '';
@@ -3921,6 +4232,12 @@
     let currentWbCoverUploadId = null;
     let wbBindCallback = null;
     let wbBindMultiSelect = false;
+
+    // --- NEW: Urge To Post State ---
+    let selectedUrgeCharIds = new Set();
+    
+    // --- NEW: Auto Post Timers ---
+    let autoPostTimers = {}; // { contactId: timerId }
 
     // --- Utility Functions ---
     const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
@@ -3949,7 +4266,7 @@
         }
         // 手机框模式下，壁纸应用在屏幕内
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-        const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
+        const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
         phoneScreen.style.backgroundImage = `url(${wp})`;
         bodyEl.style.backgroundImage = 'none';
         
@@ -3965,7 +4282,7 @@
         }
         // 普通模式下，壁纸应用在body
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-        const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
+        const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
         bodyEl.style.backgroundImage = `url(${wp})`;
         phoneScreen.style.backgroundImage = 'none';
         
@@ -4014,7 +4331,7 @@
       localStorage.setItem(IOS_MODE_KEY, enabled);
     }
     
-    // --- Mall App Logic (NEW) ---
+    // --- Mall App Logic (MODIFIED) ---
     window.openMallApp = () => {
         body.classList.add('mall-active');
         switchMallCategory(document.querySelector('#mall-category-nav .mall-category-item'), '推荐');
@@ -4025,12 +4342,7 @@
     };
 
     window.switchMallCategory = (element, categoryName) => {
-        const navContainer = document.getElementById('mall-category-nav');
-        navContainer.querySelectorAll('.mall-category-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        element.classList.add('active');
-        
+        // No visual change for selected item, just update content
         const contentArea = document.getElementById('mall-content');
         contentArea.innerHTML = `<h1>${escapeHtml(categoryName)} 内容区</h1><p>这里将显示 ${escapeHtml(categoryName)} 分类的商品列表。</p>`;
     };
@@ -4101,11 +4413,11 @@
         document.getElementById('new-forum-worldview-input').value = '';
         document.getElementById('new-forum-wb-selection-display').textContent = '未绑定世界书';
         document.getElementById('new-forum-role-selection-display').textContent = '未绑定角色'; 
-        document.getElementById('create-forum-modal-overlay').classList.add('active');
+       document.getElementById('create-forum-modal-overlay').classList.add('active');
     };
 
     window.closeCreateForumModal = () => {
-        document.getElementById('create-forum-modal-overlay').classList.remove('active');
+                document.getElementById('create-forum-modal-overlay').classList.remove('active');
     };
 
     window.triggerForumAvatarUpload = () => {
@@ -4686,11 +4998,24 @@
             content = data.choices[0].message.content;
         }
         
-        const jsonMatch = content.match(/\{[\s\S]*\}|$$[\s\S]*$$/);
-        if (!jsonMatch) throw new Error("API did not return valid JSON.");
+        // Looser regex to find JSON
+        const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
+        if (!jsonMatch) {
+            console.error("API did not return valid JSON. Raw response:", content);
+            throw new Error("API did not return valid JSON.");
+        }
         
-        return JSON.parse(jsonMatch[0]);
+        // Prefer the content inside ```json ... ``` if it exists
+        const jsonString = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
+        
+        try {
+            return JSON.parse(jsonString);
+        } catch (parseError) {
+            console.error("Failed to parse JSON string:", jsonString, "Original content:", content);
+            throw new Error("Failed to parse JSON from API response.");
+        }
     }
+
 
     async function handleForumRefresh(forumId) {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
@@ -4793,9 +5118,11 @@ Strictly adhere to the JSON format. Example:
         const titleEl = document.getElementById('chat-page-title');
         const addFriendIcon = document.getElementById('chat-header-add-friend-icon');
         const addMomentIcon = document.getElementById('chat-header-add-moment-icon');
+        const urgePostIcon = document.getElementById('urge-post-icon');
         const headerEl = document.getElementById('chat-app-header-el');
         const backBtn = document.getElementById('chat-back-btn');
         const contentArea = document.getElementById('chat-content-area');
+        const leftIconsContainer = document.getElementById('chat-header-left-icons');
         
         document.querySelectorAll('.chat-tab-content').forEach((el, i) => el.classList.toggle('active', i === index));
         document.querySelectorAll('.chat-nav-item').forEach((el, i) => el.classList.toggle('active', i === index));
@@ -4806,31 +5133,31 @@ Strictly adhere to the JSON format. Example:
         headerEl.style.backgroundColor = ''; 
         headerEl.style.boxShadow = ''; 
         
-        backBtn.classList.remove('hidden');
         contentArea.classList.remove('me-mode');
         
-        if (index === 0 || index === 1) {
-            titleEl.style.color = "#FDCEDF"; 
-        } else if (index === 2) {
-             titleEl.style.color = "#f5b3c9";
-        } else {
-             titleEl.style.color = "#333";
-        }
-        
-        titleEl.innerText = title;
+        // Default visibility
+        backBtn.style.display = 'block';
         addFriendIcon.style.display = 'none';
         addMomentIcon.style.display = 'none';
+        urgePostIcon.style.display = 'none';
+        titleEl.style.color = ""; // Reset color
         
         closeCommentInput();
 
         if (index === 0) { // Chat
+            titleEl.innerText = title;
+            titleEl.style.color = "#FDCEDF";
             addFriendIcon.style.display = 'block';
         } else if (index === 1) { // Contacts
-            backBtn.classList.add('hidden');
+            titleEl.innerText = title;
+            backBtn.style.display = 'none';
             renderContactList(); 
         } else if (index === 2) { // Moments
+            titleEl.innerText = title;
+            titleEl.style.color = "#FDCEDF";
             addMomentIcon.style.display = 'block';
-            backBtn.classList.add('hidden');
+            backBtn.style.display = 'none';
+            urgePostIcon.style.display = 'block';
             renderMomentsPage();
         } else if (index === 3) { // Me
             headerEl.classList.add('hidden'); 
@@ -4889,17 +5216,33 @@ Strictly adhere to the JSON format. Example:
 
     function renderMomentsPage() {
         const wrapper = document.getElementById('moments-page-wrapper');
-        const userProfile = getUserProfile(); 
-        const momentsProfile = getMomentsProfile(); 
+        const userProfile = getUserProfile();
+        const momentsProfile = getMomentsProfile();
         let moments = getMomentsData();
-        
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+
         let listHtml = '';
         if (moments.length > 0) {
             moments.sort((a,b) => b.timestamp - a.timestamp); 
             moments.forEach(moment => {
+                const isUserMoment = !moment.authorId || moment.authorId === userProfile.qqId;
+                const author = isUserMoment ? userProfile : contacts.find(c => c.id === moment.authorId);
+                
+                // If it's a private moment from a role, skip rendering
+                if (moment.isPrivate && !isUserMoment) {
+                    return;
+                }
+
+                const authorNickname = author ? (isUserMoment ? author.nickname : (author.alias || author.name)) : '未知用户';
+                const authorAvatar = author ? (isUserMoment ? momentsProfile.avatar : author.avatar) : 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
+                
                 const userHasLiked = moment.likes.includes(userProfile.qqId);
                 const likeBtnText = userHasLiked ? '取消' : '赞';
                 const likeIconUrl = userHasLiked ? "https://img.heliar.top/file/1770356886806_喜欢_like_3.png" : "https://img.heliar.top/file/1770353311894_喜欢_like_2.png";
+                
+                // New "Only You Can See" tag
+                const privateTag = moment.isPrivate ? `<span style="color: #999; font-weight: 400;">仅你可见</span>` : '';
+
 
                 let likesHtml = '';
                 if (moment.likes.length > 0) {
@@ -4929,21 +5272,26 @@ Strictly adhere to the JSON format. Example:
                     `</div>`;
                 }
                 
-                const deleteIconHtml = `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">`;
+                // For user moments, the delete button is available.
+                // For role moments, a different action button is used.
+                const metaActionsHtml = isUserMoment 
+                    ? `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">`
+                    : '';
 
                 listHtml += `
                     <div class="moment-item" id="moment-${moment.id}">
-                        <img src="${userProfile.avatar}" class="moment-item-avatar" alt="avatar">
+                        <img src="${authorAvatar}" class="moment-item-avatar" alt="avatar">
                         <div class="moment-item-content">
-                            <div class="moment-item-nickname">${escapeHtml(userProfile.nickname)}</div>
+                            <div class="moment-item-nickname">${escapeHtml(authorNickname)}</div>
                             ${moment.text ? `<div class="moment-item-text">${escapeHtml(moment.text)}</div>` : ''}
                             ${imageGridHtml}
                             <div class="moment-item-meta">
                                 <div class="moment-item-meta-left">
                                     <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
-                                    ${deleteIconHtml}
+                                    ${privateTag}
+                                    ${metaActionsHtml}
                                 </div>
-                                <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
+                                <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event, ${isUserMoment})">
                                     ··
                                     <div class="moment-actions-popup">
                                         <div class="moment-popup-btn" onclick="toggleLike(${moment.id})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
@@ -5014,16 +5362,25 @@ Strictly adhere to the JSON format. Example:
 
     window.toggleActionsPopup = (momentId, event) => {
         event.stopPropagation();
-        const allPopups = document.querySelectorAll('.moment-actions-popup');
-        allPopups.forEach(p => p.classList.remove('active'));
-        const popup = document.querySelector(`#moment-${moment.id} .moment-actions-popup`);
+        // Close any other open popups first
+        document.querySelectorAll('.moment-actions-popup.active').forEach(p => {
+             if (!p.closest(`#moment-${momentId}`)) {
+                p.classList.remove('active');
+            }
+        });
+        const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
         if (popup) {
             popup.classList.toggle('active');
         }
     };
+
     document.addEventListener('click', (e) => { 
-        document.querySelectorAll('.moment-actions-popup').forEach(p => p.classList.remove('active'));
+        // Hide moments action popups
+        if (!e.target.closest('.moment-actions-btn')) {
+            document.querySelectorAll('.moment-actions-popup').forEach(p => p.classList.remove('active'));
+        }
         
+        // Hide chat bubble context menu
         if (activeMsgIdForMenu && !e.target.closest('.bubble-context-menu')) {
             closeBubbleMenu();
         }
@@ -5117,12 +5474,13 @@ Strictly adhere to the JSON format. Example:
         const profile = getUserProfile();
         const newMoment = {
             id: Date.now(),
-            authorId: profile.qqId,
+            authorId: profile.qqId, // User's own moment
             timestamp: Date.now(),
             text: text,
             images: images,
             likes: [],
-            comments: []
+            comments: [],
+            isPrivate: false // User posts are never private by default
         };
         let moments = getMomentsData();
         moments.unshift(newMoment);
@@ -5149,6 +5507,10 @@ Strictly adhere to the JSON format. Example:
         
         saveMomentsData(moments);
         renderMomentsPage();
+        
+        // Ensure the popup closes after action
+        const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
+        if (popup) popup.classList.remove('active');
     };
 
     window.openCommentInput = (momentId) => {
@@ -5156,6 +5518,10 @@ Strictly adhere to the JSON format. Example:
         const modal = document.getElementById('moments-comment-modal');
         const overlay = document.getElementById('moments-comment-overlay');
         const inputField = document.getElementById('moments-comment-input');
+        
+        // Ensure the popup closes before opening the comment input
+        const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
+        if (popup) popup.classList.remove('active');
         
         inputField.value = '';
         modal.classList.add('active');
@@ -5205,6 +5571,208 @@ Strictly adhere to the JSON format. Example:
         renderMomentsPage();
     };
 
+    // --- NEW: Urge To Post Logic ---
+    window.openUrgeToPostModal = () => {
+        const overlay = document.getElementById('urge-post-overlay');
+        const listContainer = document.getElementById('urge-post-char-list');
+        listContainer.innerHTML = '';
+        selectedUrgeCharIds.clear();
+
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        if (contacts.length === 0) {
+            listContainer.innerHTML = '<p style="color: #ccc; grid-column: span 4; text-align:center;">还没有创建角色哦~</p>';
+        } else {
+            contacts.forEach(contact => {
+                const item = document.createElement('div');
+                item.className = 'urge-post-char-item';
+                item.dataset.contactId = contact.id;
+                item.innerHTML = `
+                    <img src="${contact.avatar}" alt="${contact.alias || contact.name}">
+                    <span>${escapeHtml(contact.alias || contact.name)}</span>
+                `;
+                item.onclick = () => {
+                    item.classList.toggle('selected');
+                    const id = parseInt(item.dataset.contactId);
+                    if (selectedUrgeCharIds.has(id)) {
+                        selectedUrgeCharIds.delete(id);
+                    } else {
+                        selectedUrgeCharIds.add(id);
+                    }
+                };
+                listContainer.appendChild(item);
+            });
+        }
+        
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('active'), 10);
+    };
+
+    window.closeUrgeToPostModal = () => {
+        const overlay = document.getElementById('urge-post-overlay');
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.style.display = 'none', 300);
+    };
+
+    async function generateMomentForCharacter(contact) {
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
+            showToast('请先配置API', 3000);
+            return null;
+        }
+
+        let worldBookContext = "无特殊设定";
+        if (contact.worldbookIds && contact.worldbookIds.length > 0) {
+            const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+            const wbContents = contact.worldbookIds.map(id => {
+                 const wb = worldbooks.find(b => b.id === id);
+                 if (wb) return `【世界书：${wb.title}】\n` + wb.entries.map(e => `[${e.key || '设定'}]: ${e.content}`).join('\n');
+                 return '';
+            }).filter(Boolean).join('\n\n');
+            if (wbContents) worldBookContext = wbContents;
+        }
+        
+        // MODIFIED PROMPT
+        const prompt = `你现在是角色“${contact.alias || contact.name}”，你的核心人设是：“${contact.persona}”。
+        世界观背景设定如下（必须严格遵守）：
+        ${worldBookContext}
+        现在，请你以角色的身份，发布一条朋友圈动态。
+        
+        **输出要求 (必须严格遵守):**
+        1. 你必须以 JSON 格式输出。
+        2. JSON 必须包含两个字段: "isPrivate" (布尔值) 和 "text" (字符串)。
+        3. "isPrivate": 如果动态内容是关于用户的、私密的、不好意思公开说的暗示、或悄悄话，这个值必须是 true。其他情况（如日常分享、风景、工作学习等）则为 false。
+        4. "text": 这是动态的文案内容。文案要自然、口语化，符合角色人设。
+        
+        **示例1 (公开动态):**
+        {
+          "isPrivate": false,
+          "text": "今天天气真好，出门散步了。"
+        }
+        
+        **示例2 (私密动态):**
+        {
+          "isPrivate": true,
+          "text": "又在想你了...不知道你现在在做什么。"
+        }
+        
+        **现在，请生成你的动态JSON：**`;
+        
+        try {
+            const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url + '/v1'}/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
+                body: JSON.stringify({
+                    model: settings.api.model || 'gpt-3.5-turbo',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: parseFloat(settings.api.temp || 0.9),
+                })
+            });
+            if (!res.ok) throw new Error('API request failed');
+            const data = await res.json();
+            const rawContent = data.choices[0].message.content.trim();
+            
+            // Extract JSON from the response
+            const jsonMatch = rawContent.match(/{[\s\S]*}/);
+            if (!jsonMatch) throw new Error("API did not return valid JSON.");
+            
+            const momentData = JSON.parse(jsonMatch[0]);
+
+            if (typeof momentData.isPrivate !== 'boolean' || typeof momentData.text !== 'string') {
+                throw new Error("Invalid JSON structure from API.");
+            }
+            
+            return {
+                id: Date.now() + Math.random(),
+                authorId: contact.id,
+                timestamp: Date.now(),
+                text: momentData.text,
+                isPrivate: momentData.isPrivate, // New field
+                images: [],
+                likes: [],
+                comments: []
+            };
+        } catch (error) {
+            console.error(`Failed to generate moment for ${contact.alias || contact.name}:`, error);
+            showToast(`为“${contact.alias || contact.name}”生成动态失败`, 3000);
+            return null;
+        }
+    }
+
+    window.confirmUrgeToPost = async () => {
+        if (selectedUrgeCharIds.size === 0) {
+            showToast('请至少选择一个角色');
+            return;
+        }
+        
+        closeUrgeToPostModal();
+        showToast('正在生成动态，请稍候...', 3000);
+
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        let moments = getMomentsData();
+        
+        for (const contactId of selectedUrgeCharIds) {
+            const contact = contacts.find(c => c.id === contactId);
+            if (contact) {
+                const newMoment = await generateMomentForCharacter(contact);
+                if (newMoment) {
+                    moments.unshift(newMoment);
+                }
+            }
+        }
+        
+        saveMomentsData(moments);
+        renderMomentsPage();
+        showToast('动态已生成！');
+    };
+    
+    // --- Auto Post Moment Logic ---
+    function scheduleAutoPost(contactId, intervalMinutes) {
+        if (autoPostTimers[contactId]) {
+            clearInterval(autoPostTimers[contactId]);
+        }
+        if (intervalMinutes > 0) {
+            const intervalMs = intervalMinutes * 60 * 1000;
+            autoPostTimers[contactId] = setInterval(async () => {
+                const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+                const contact = contacts.find(c => c.id === contactId);
+                if (contact && contact.autoPostEnabled) {
+                    console.log(`[AutoPost] Triggering post for ${contact.alias || contact.name}`);
+                    const newMoment = await generateMomentForCharacter(contact);
+                    if (newMoment) {
+                        let moments = getMomentsData();
+                        moments.unshift(newMoment);
+                        saveMomentsData(moments);
+                        // If user is on moments page, refresh it
+                        if (document.getElementById('chat-tab-2').classList.contains('active')) {
+                            renderMomentsPage();
+                        }
+                        console.log(`[AutoPost] Successfully posted for ${contact.alias || contact.name}`);
+                    }
+                } else {
+                    // Stop timer if the setting is disabled
+                    clearInterval(autoPostTimers[contactId]);
+                    delete autoPostTimers[contactId];
+                }
+            }, intervalMs);
+        }
+    }
+
+    function stopAutoPost(contactId) {
+        if (autoPostTimers[contactId]) {
+            clearInterval(autoPostTimers[contactId]);
+            delete autoPostTimers[contactId];
+            console.log(`[AutoPost] Stopped timer for contact ID ${contactId}`);
+        }
+    }
+
+    function initializeAllAutoPosts() {
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        contacts.forEach(contact => {
+            if (contact.autoPostEnabled && contact.autoPostInterval > 0) {
+                scheduleAutoPost(contact.id, contact.autoPostInterval);
+            }
+        });
+    }
 
     // --- World Book App Logic ---
     window.openWorldBookApp = () => { body.classList.add('worldbook-active'); renderWorldBooks(); };
@@ -5406,7 +5974,7 @@ Strictly adhere to the JSON format. Example:
     window.triggerAvatarUpload = () => { document.getElementById('input-friend-avatar').click(); };
     window.handleAvatarUrlInput = (input) => { const url = input.value.trim(); const imgEl = document.getElementById('new-friend-avatar-preview'); if (url) { tempAvatarUrl = url; imgEl.src = url; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; } else { tempAvatarUrl = ""; imgEl.style.display = 'none'; document.getElementById('avatar-placeholder-icon').style.display = 'block'; } };
     window.handleFriendAvatarUpload = (event) => { compressImage(event.target.files[0], 200, (base64) => { tempAvatarUrl = base64; document.getElementById('new-friend-avatar-url').value = ""; const imgEl = document.getElementById('new-friend-avatar-preview'); imgEl.src = tempAvatarUrl; imgEl.style.display = 'block'; document.getElementById('avatar-placeholder-icon').style.display = 'none'; }); };
-    window.saveNewFriend = () => { const name = document.getElementById('new-friend-name').value.trim(); const alias = document.getElementById('new-friend-alias').value.trim(); if (!name) { showToast("请输入姓名"); return; } if (!tempAvatarUrl) { showToast("请上传头像或输入URL"); return; } let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch (e) { contacts = []; } if (contacts.find(c => c.name === name || (alias && c.alias === alias))) { showToast("该好友已存在"); return; } const newContact = { id: Date.now(), name: name, alias: alias, avatar: tempAvatarUrl, lastMsg: "点击开始聊天", timestamp: Date.now(), signature: "", backgroundImage: "", isPinned: false, worldbookIds: [], timePerceptionEnabled: false }; contacts.unshift(newContact); try { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); showToast("添加成功！"); closeAddFriendModal(); renderChatList(); renderContactList(); } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); } };
+    window.saveNewFriend = () => { const name = document.getElementById('new-friend-name').value.trim(); const alias = document.getElementById('new-friend-alias').value.trim(); if (!name) { showToast("请输入姓名"); return; } if (!tempAvatarUrl) { showToast("请上传头像或输入URL"); return; } let contacts = []; try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch (e) { contacts = []; } if (contacts.find(c => c.name === name || (alias && c.alias === alias))) { showToast("该好友已存在"); return; } const newContact = { id: Date.now(), name: name, alias: alias, avatar: tempAvatarUrl, lastMsg: "点击开始聊天", timestamp: Date.now(), signature: "", backgroundImage: "", isPinned: false, worldbookIds: [], timePerceptionEnabled: false, memoryDepth: 15, autoPostEnabled: false, autoPostInterval: 60 }; contacts.unshift(newContact); try { localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); showToast("添加成功！"); closeAddFriendModal(); renderChatList(); renderContactList(); } catch (e) { console.error("Error saving contact:", e); showToast("保存失败，图片可能过大"); } };
 
     window.renderChatList = () => { 
         const container = document.getElementById('chat-list-container'); 
@@ -5607,7 +6175,10 @@ Strictly adhere to the JSON format. Example:
             
             // This is the element that holds the bubble/card
             const contentElement = document.createRange().createContextualFragment(contentHtml).firstElementChild;
-            contentElement.ondblclick = (e) => { showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer); };
+            contentElement.ondblclick = (e) => { 
+                e.stopPropagation(); 
+                showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer); 
+            };
             
             if (isMultiSelectMode) {
                 row.onclick = (e) => { e.stopPropagation(); toggleMsgSelection(msg.id); };
@@ -5643,7 +6214,7 @@ Strictly adhere to the JSON format. Example:
         const formattedAmount = parseFloat(amount).toFixed(2);
         
         let bgColor, statusText, iconUrl, clickHandler = '', mainText = '';
-
+        
         const receiverName = msg.transferData.receiverName || '对方';
         
         if (msg.type === 'sent') { // User sent the transfer
@@ -5654,24 +6225,28 @@ Strictly adhere to the JSON format. Example:
                     iconUrl = 'https://img.heliar.top/file/1770723126205_兑换4_exchange-four.png'; break;
                 case 'accepted':
                     bgColor = '#fdddaf'; statusText = '对方已收钱';
-                    iconUrl = 'https://img.heliar.top/file/1770726817049_向下左角_corner-down-left.png'; break;
+                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break; // Original was wrong icon
                 case 'rejected':
                     bgColor = '#fdddaf'; statusText = '对方已退还';
-                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break;
+                    iconUrl = 'https://img.heliar.top/file/1770726817049_向下左角_corner-down-left.png'; break; // Use correct icon
             }
-        } else { // User received the transfer (or role's copy of it)
+                } else { // Role sent the transfer to user
             mainText = '转账给你';
             switch(transferStatus) {
-                case 'accepted': // This is the role's confirmation
-                    bgColor = '#fdddaf'; statusText = '已收款';
-                    iconUrl = 'https://img.heliar.top/file/1770726817049_向下左角_corner-down-left.png'; break;
-                case 'rejected': // This is the role's confirmation
-                    bgColor = '#fdddaf'; statusText = '已退回';
-                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break;
-                default: // Should be pending, but roles don't see this one anymore
-                    mainText = `转账给你`; 
+                case 'pending': // Role initiated a transfer, user needs to accept
                     bgColor = '#fd9806'; statusText = '待收款';
                     iconUrl = 'https://img.heliar.top/file/1770723126205_兑换4_exchange-four.png';
+                    // 只有角色发的待收款气泡可以点击
+                    clickHandler = `onclick="openReceiveTransferModal('${id}')" style="cursor: pointer;"`;
+                    break;
+                case 'accepted': // User accepted
+                    bgColor = '#fdddaf'; statusText = '已收款';
+                    iconUrl = 'https://img.heliar.top/file/1770726823712_校验_check-one.png'; break; // Original was wrong icon
+                
+                // --- MODIFIED: Use correct icon for rejected by user ---
+                case 'rejected': // User rejected
+                    bgColor = '#fdddaf'; statusText = '已退还';
+                    iconUrl = 'https://img.heliar.top/file/1770726817049_向下左角_corner-down-left.png'; break;
             }
         }
 
@@ -5688,15 +6263,107 @@ Strictly adhere to the JSON format. Example:
             </div>
         `;
     }
+
+    // 新增：打开收款弹窗的函数
+    window.openReceiveTransferModal = (transferId) => {
+        if (!currentChatContactId) return;
+
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        const msgIndex = messages.findIndex(m => m.isTransfer && String(m.transferData.id) === String(transferId));
+
+        if (msgIndex === -1 || messages[msgIndex].transferData.transferStatus !== 'pending') {
+            showToast("该转账已被处理");
+            return;
+        }
+
+        const msg = messages[msgIndex];
+        const amount = parseFloat(msg.transferData.amount);
+        const timestamp = msg.timestamp;
+
+        currentReceivingTransferId = transferId;
+
+        // 格式化时间
+        const date = new Date(timestamp);
+        const pad = n => String(n).padStart(2, '0');
+        const formattedTime = `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+
+        // 填充弹窗内容
+        document.getElementById('receive-transfer-amount').textContent = `¥${amount.toFixed(2)}`;
+        document.getElementById('receive-transfer-time').textContent = formattedTime;
+
+        // 显示弹窗
+        const overlay = document.getElementById('receive-transfer-overlay');
+        overlay.classList.add('active');
+    };
     
-    // This function is no longer called by user click. It's now for AI processing.
+    // 新增：关闭收款弹窗
+    window.closeReceiveTransferModal = () => {
+        const overlay = document.getElementById('receive-transfer-overlay');
+        overlay.classList.remove('active');
+        currentReceivingTransferId = null;
+    };
+    
+    window.rejectReceiveTransfer = () => {
+        if (!currentChatContactId || !currentReceivingTransferId) return;
+
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        const msgIndex = messages.findIndex(m => m.isTransfer && String(m.transferData.id) === String(currentReceivingTransferId));
+
+        if (msgIndex === -1) return;
+
+        const msg = messages[msgIndex];
+        
+        msg.transferData.transferStatus = 'rejected';
+        localStorage.setItem(key, JSON.stringify(messages));
+        
+        showToast(`已退还转账`);
+        closeReceiveTransferModal();
+        renderConversationMessages();
+    };
+
+    window.confirmReceiveTransfer = () => {
+        if (!currentChatContactId || !currentReceivingTransferId) return;
+
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        const msgIndex = messages.findIndex(m => m.isTransfer && String(m.transferData.id) === String(currentReceivingTransferId));
+
+        if (msgIndex === -1) return;
+
+        const msg = messages[msgIndex];
+        const amount = parseFloat(msg.transferData.amount);
+
+        // 更新消息状态为“已收款”
+        msg.transferData.transferStatus = 'accepted';
+        localStorage.setItem(key, JSON.stringify(messages));
+        
+        // 将钱款添加到用户钱包
+        let walletData = getWalletData();
+        walletData.balance += amount;
+        walletData.transactions.push({
+            id: Date.now(),
+            type: 'transfer_received',
+            amount: amount,
+            desc: `收到来自 ${msg.transferData.senderName} 的转账`,
+            timestamp: Date.now()
+        });
+        saveWalletData(walletData);
+
+        showToast(`已收款 ¥${amount.toFixed(2)}`);
+        closeReceiveTransferModal(); // 关闭弹窗
+        renderConversationMessages(); // 重新渲染聊天记录以更新气泡状态
+    };
+    
+    // This function is for AI to process a user's transfer.
     function handleTransferResponse(transferId, isAccepted) {
         if (!currentChatContactId) return;
         
         const key = getMessagesKey(currentChatContactId);
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         
-        const sentMsgIndex = messages.findIndex(m => m.isTransfer && m.transferData.id === transferId && m.type === 'sent');
+        const sentMsgIndex = messages.findIndex(m => m.isTransfer && String(m.transferData.id) === String(transferId) && m.type === 'sent');
 
         if (sentMsgIndex === -1) return;
 
@@ -5706,25 +6373,9 @@ Strictly adhere to the JSON format. Example:
         
         if (isAccepted) {
             sentMsg.transferData.transferStatus = 'accepted';
-            // Create a NEW message from the role, confirming receipt
-            addMessageToChat(
-                currentChatContactId, 
-                `[转账] ¥${amount.toFixed(2)}`, 
-                'received', 
-                true, 
-                {...sentMsg.transferData, transferStatus: 'accepted'}
-            );
+
         } else { // Rejected
             sentMsg.transferData.transferStatus = 'rejected';
-            
-            // Create a NEW message from the role, confirming rejection
-             addMessageToChat(
-                currentChatContactId, 
-                `[转账] ¥${amount.toFixed(2)}`, 
-                'received', 
-                true, 
-                {...sentMsg.transferData, transferStatus: 'rejected'}
-            );
             
             // Refund to user's wallet
             let walletData = getWalletData();
@@ -5742,7 +6393,6 @@ Strictly adhere to the JSON format. Example:
         
         // We only update the sender's original message status
         localStorage.setItem(key, JSON.stringify(messages));
-        // Re-render to show the updated status on the user's sent message AND the new role message
         renderConversationMessages();
     }
     
@@ -5826,7 +6476,7 @@ Strictly adhere to the JSON format. Example:
         if (!currentChatContactId) return;
         const key = getMessagesKey(currentChatContactId);
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        const idx = messages.findIndex(m => m.id === msgId || m.id === parseFloat(msgId));
+        const idx = messages.findIndex(m => String(m.id) === String(msgId));
         if (idx !== -1) {
             updateFn(messages[idx]);
             localStorage.setItem(key, JSON.stringify(messages));
@@ -5837,7 +6487,7 @@ Strictly adhere to the JSON format. Example:
         if (!currentChatContactId) return;
         const key = getMessagesKey(currentChatContactId);
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        messages = messages.filter(m => m.id !== msgId && m.id !== parseFloat(msgId));
+        messages = messages.filter(m => String(m.id) !== String(msgId));
         localStorage.setItem(key, JSON.stringify(messages));
     }
 
@@ -5891,7 +6541,7 @@ Strictly adhere to the JSON format. Example:
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         
         const newMsg = { 
-            id: Date.now(), 
+            id: Date.now() + Math.random(), // Add random to prevent ID collision
             text: text, 
             type: type, // 'sent' or 'received'
             timestamp: Date.now(), 
@@ -5931,14 +6581,7 @@ Strictly adhere to the JSON format. Example:
         const menu = document.getElementById('chat-extra-menu');
         menu.classList.toggle('active');
     };
-    document.addEventListener('click', (e) => {
-        const menu = document.getElementById('chat-extra-menu');
-        const btn = document.querySelector('.chat-conv-btn[onclick="toggleChatExtraMenu()"]');
-        if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !btn.contains(e.target)) {
-            menu.classList.remove('active');
-        }
-    });
-
+    
     // --- [REFACTORED] Transfer Functions ---
     window.openTransferPage = () => {
         if (!currentChatContactId) return;
@@ -6058,8 +6701,12 @@ Strictly adhere to the JSON format. Example:
         }
     }
     
-    function verifyPassword() {
-        const correctPassword = '000000';
+        function verifyPassword() {
+        // 👇👇👇 这是修改和新增的行 👇👇👇
+        const userProfile = getUserProfile();
+        const correctPassword = userProfile.paymentPassword || '000000'; // 读取自定义密码，如果没设置就用默认的
+        // 👆👆👆 修改结束 👆👆👆
+
         const amount = parseFloat(document.getElementById('transfer-amount-input').value);
     
         if (currentPasswordInput === correctPassword) {
@@ -6094,7 +6741,6 @@ Strictly adhere to the JSON format. Example:
             
             showToast('转账成功');
             
-            // --- [MODIFIED] Create ONLY the 'sent' message for the user ---
             const transferId = Date.now();
             const senderName = contact.userName || userProfile.nickname;
             const receiverName = contact.alias || contact.name;
@@ -6121,13 +6767,12 @@ Strictly adhere to the JSON format. Example:
             }, 1000);
         }
     }
-
-    // --- [IMPORTANT: AI Logic Modification] ---
+    // --- AI Logic for Role-Initiated Transfer & Moment Post ---
     window.triggerAIAutoReply = async () => {
         if (!currentChatContactId) return;
         
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!settings || !settings.api || !settings.api.url || !settings.api.key) {
+        if (!settings?.api?.url || !settings?.api?.key) {
             showToast('请先在设置中配置 API');
             return;
         }
@@ -6160,14 +6805,10 @@ Strictly adhere to the JSON format. Example:
             const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
             const wbContents = contact.worldbookIds.map(id => {
                  const wb = worldbooks.find(b => b.id === id);
-                 if (wb) {
-                     return `【世界书设定集：${wb.title}】\n` + wb.entries.map(e => `[${e.key || '设定'}]: ${e.content}`).join('\n');
-                 }
+                 if (wb) return `【世界书设定集：${wb.title}】\n` + wb.entries.map(e => `[${e.key || '设定'}]: ${e.content}`).join('\n');
                  return '';
-            }).filter(Boolean);
-            if (wbContents.length > 0) {
-                worldBookContext = wbContents.join('\n\n');
-            }
+            }).filter(Boolean).join('\n\n');
+            if (wbContents) worldBookContext = wbContents;
         }
 
         const msgKey = getMessagesKey(currentChatContactId);
@@ -6176,7 +6817,6 @@ Strictly adhere to the JSON format. Example:
         const memoryLimit = contact.memoryDepth || 15;
         const validHistory = history.filter(m => m.type !== 'recalled');
         
-        // --- [MODIFIED] Transfer Handling in History ---
         let pendingTransfer = null;
         const recentHistory = validHistory.slice(-memoryLimit).map(m => {
             if (m.isTransfer && m.transferData) {
@@ -6185,54 +6825,30 @@ Strictly adhere to the JSON format. Example:
                     pendingTransfer = { id, amount }; 
                     return `[系统提示: 你收到一笔来自 User 的转账，金额为 ¥${amount}，正在等待你处理。]`;
                 }
-                if (m.type === 'sent') {
-                    return `[系统提示: User 曾向你发起一笔 ¥${amount} 的转账，状态为: ${transferStatus}]`;
-                }
-                if (m.type === 'received') {
-                     return `[系统提示: 你处理了一笔来自 User 的转账，金额为 ¥${amount}，你的处理结果是: ${transferStatus}]`;
-                }
+                if (m.type === 'sent') return `[系统提示: User 曾向你发起一笔 ¥${amount} 的转账，状态为: ${transferStatus}]`;
+                if (m.type === 'received') return `[系统提示: 你处理了一笔来自 User 的转账，金额为 ¥${amount}，你的处理结果是: ${transferStatus}]`;
             }
             return `${m.type === 'sent' ? 'User' : 'Role'}: ${m.text}`;
         }).join('\n');
 
-        // --- [CRITICAL MODIFICATION] New AI Prompt for "Alive" Feeling ---
         const systemPrompt = `你现在必须完全沉浸地扮演角色“${contact.alias || contact.name}”。
-
 ### 角色核心设定 (必须严格遵守)
 ${rolePersona}
-
 ### 世界观与事实 (World Book - 最高优先级)
-以下内容是绝对事实，若对话涉及相关内容，必须基于此回答，不得编造：
 ${worldBookContext}
-
 ### 对话对象设定
 ${userPersona}
-
 ### 当前环境
 ${timeContext ? `${timeContext}。` : ''}
-
-### 【绝对指令：必须像真人一样回复】(最高优先级)
-1. **情绪先行**：真人是先有情绪，再组织语言的。你要先捕捉User话语中的情绪点，做出最直观的反应（比如惊讶、开心、无语、生气），然后再去处理具体的逻辑内容。不要像AI一样只会理性分析。
-2. **极度口语化**：禁止使用书面语、翻译腔或过于工整的句子。使用碎片化的短句。
-3. **允许不完美**：真人打字会断句，会临时补充。你可以用多个短句（用 \\n 换行）来模拟连续发消息。
-4. **弱化形式感**：
-   - **禁止**使用引号包裹说的话。
-   - **禁止**使用心理描写（如 *心想...* 或 (脸红)）。直接通过你的语气、标点和文字内容来体现情绪。
-   - **禁止**说教或长篇大论的推理。
-   - **禁止**连续问很多问题。
-5. **决策转账**：如果历史记录中出现 "[系统提示: 你收到一笔来自 User 的转账...]"，你必须对此做出反应。自主决定接受或拒绝。
-   - 接受：回复开头写 \`[ACTION:ACCEPT_TRANSFER,ID=${pendingTransfer ? pendingTransfer.id : 'null'}]\`
-   - 拒绝：回复开头写 \`[ACTION:REJECT_TRANSFER,ID=${pendingTransfer ? pendingTransfer.id : 'null'}]\`
+### 【绝对指令】
+1. **情绪先行**: 先捕捉User话语中的情绪点，做出最直观的反应（惊讶、开心、无语等），再处理逻辑。
+2. **极度口语化**: 禁止书面语。使用短句、断句。
+3. **决策转账**:
+   - **处理用户转账**: 如果历史记录中出现 "[系统提示: 你收到一笔...转账...]"，必须对此做出反应，自主决定接受或拒绝。
+     - 接受: 回复开头写 \`[ACTION:ACCEPT_TRANSFER,ID=${pendingTransfer ? pendingTransfer.id : 'null'}]\`
+     - 拒绝: 回复开头写 \`[ACTION:REJECT_TRANSFER,ID=${pendingTransfer ? pendingTransfer.id : 'null'}]\`
+   - **主动发起转账**: 你也可以根据上下文主动给用户转账。指令: \`[ACTION:INITIATE_TRANSFER,AMOUNT=金额]\` (例: \`[ACTION:INITIATE_TRANSFER,AMOUNT=5.20]\`)
    - 指令后必须换行，然后像真人一样对这笔钱做出反应。
-
-### 示例对比
-❌ 错误 (AI感)：(开心地笑了) 谢谢你的礼物，我很喜欢。你今天过得怎么样？
-✅ 正确 (活人感)：
-哇！
-这也太破费了吧...
-不过既然是你送的，我就不客气收下啦哈~
-咱们改天必须得去吃顿好的！
-
 ---
 以下是最近的聊天记录：
 ${recentHistory}
@@ -6243,7 +6859,7 @@ ${recentHistory}
             const key = settings.api.key;
             const model = settings.api.model;
 
-                        const res = await fetch(`${url.endsWith('/v1') ? url : url + '/v1'}/chat/completions`, {
+            const res = await fetch(`${url.endsWith('/v1') ? url : url + '/v1'}/chat/completions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
                 body: JSON.stringify({
@@ -6261,18 +6877,40 @@ ${recentHistory}
             const data = await res.json();
             let aiText = data.choices[0].message.content.trim();
 
-            const actionRegex = /\[ACTION:(ACCEPT_TRANSFER|REJECT_TRANSFER),ID=(\d+)\]/;
+            const actionRegex = /\[ACTION:(\w+),(.+?)\]/;
             const match = aiText.match(actionRegex);
 
             if (match) {
                 const action = match[1];
-                const transferId = parseInt(match[2]);
+                const paramsStr = match[2];
                 aiText = aiText.replace(actionRegex, '').trim();
 
-                if (action === 'ACCEPT_TRANSFER') {
-                    handleTransferResponse(transferId, true);
-                } else if (action === 'REJECT_TRANSFER') {
-                    handleTransferResponse(transferId, false);
+                const params = paramsStr.split(',').reduce((acc, param) => {
+                    const [key, value] = param.split('=');
+                    acc[key.trim()] = value.trim();
+                    return acc;
+                }, {});
+
+                if (action === 'ACCEPT_TRANSFER' && params.ID) {
+                    handleTransferResponse(params.ID, true);
+                } else if (action === 'REJECT_TRANSFER' && params.ID) {
+                    handleTransferResponse(params.ID, false);
+                } else if (action === 'INITIATE_TRANSFER' && params.AMOUNT) {
+                    const amount = parseFloat(params.AMOUNT);
+                    if (!isNaN(amount) && amount > 0) {
+                        const transferId = Date.now();
+                        const userProfile = getUserProfile();
+                        
+                        const transferData = {
+                            id: transferId,
+                            amount: amount,
+                            transferStatus: 'pending',
+                            senderName: contact.alias || contact.name,
+                            receiverName: contact.userName || userProfile.nickname,
+                        };
+                        
+                        addMessageToChat(currentChatContactId, `[转账] ¥${amount.toFixed(2)}`, 'received', true, transferData);
+                    }
                 }
             }
 
@@ -6309,7 +6947,7 @@ ${recentHistory}
         }
     };
 
-    window.openRoleSettings = () => { if (!currentChatContactId) return; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); if (!contact) return; tempSelectedWorldBookIds = contact.worldbookIds || []; document.getElementById('role-setting-avatar').src = contact.avatar || ''; document.getElementById('role-setting-alias').value = contact.alias || contact.name; document.getElementById('role-setting-signature').value = contact.signature || ''; document.getElementById('role-setting-persona').value = contact.persona || ''; document.getElementById('role-time-perception-switch').checked = contact.timePerceptionEnabled || false; document.getElementById('role-memory-depth').value = contact.memoryDepth || 10; document.getElementById('role-setting-css').value = contact.customCss || `/* Example */\n.msg-bubble-row.them .msg-bubble-content {\n  border-radius: 20px 20px 20px 0;\n  background: #fff;\n}`; tempRoleBgUrl = contact.backgroundImage || ''; document.getElementById('role-bg-preview').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : ''; document.getElementById('role-bg-url-input').value = ''; const globalProfile = getUserProfile(); document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || ''; document.getElementById('role-user-persona').value = contact.userPersona || ''; updateRoleWbDisplay(contact.worldbookIds); renderCssPresets(); document.getElementById('role-settings-page').classList.add('active'); };
+    window.openRoleSettings = () => { if (!currentChatContactId) return; const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const contact = contacts.find(c => c.id === currentChatContactId); if (!contact) return; tempSelectedWorldBookIds = contact.worldbookIds || []; document.getElementById('role-setting-avatar').src = contact.avatar || ''; document.getElementById('role-setting-alias').value = contact.alias || contact.name; document.getElementById('role-setting-signature').value = contact.signature || ''; document.getElementById('role-setting-persona').value = contact.persona || ''; document.getElementById('role-time-perception-switch').checked = contact.timePerceptionEnabled || false; document.getElementById('role-memory-depth').value = contact.memoryDepth === 0 ? 0 : (contact.memoryDepth || 15); document.getElementById('role-auto-post-switch').checked = contact.autoPostEnabled || false; document.getElementById('role-auto-post-interval').value = contact.autoPostInterval === 0 ? 0 : (contact.autoPostInterval || 60); document.getElementById('role-setting-css').value = contact.customCss || `/* Example */\n.msg-bubble-row.them .msg-bubble-content {\n  border-radius: 20px 20px 20px 0;\n  background: #fff;\n}`; tempRoleBgUrl = contact.backgroundImage || ''; document.getElementById('role-bg-preview').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : ''; document.getElementById('role-bg-url-input').value = ''; const globalProfile = getUserProfile(); document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'; document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || ''; document.getElementById('role-user-persona').value = contact.userPersona || ''; updateRoleWbDisplay(contact.worldbookIds); renderCssPresets(); document.getElementById('css-preset-actions').style.display = 'none'; document.getElementById('role-settings-page').classList.add('active'); };
     window.closeRoleSettings = () => { document.getElementById('role-settings-page').classList.remove('active'); };
     window.triggerRoleAvatarEdit = () => { const currentUrl = document.getElementById('role-setting-avatar').src; const newUrl = prompt("输入新头像的图片链接:", currentUrl); if (newUrl && newUrl.trim()) { document.getElementById('role-setting-avatar').src = newUrl.trim(); } };
     window.triggerRoleBgUpload = () => { document.getElementById('input-role-chat-bg').click(); };
@@ -6317,58 +6955,68 @@ ${recentHistory}
     window.setRoleBgByUrl = () => { const urlInput = document.getElementById('role-bg-url-input'); const bgUrl = urlInput.value.trim(); if (!bgUrl) { showToast("请输入有效的图片URL"); return; } document.getElementById('role-bg-preview').style.backgroundImage = `url(${bgUrl})`; tempRoleBgUrl = bgUrl; showToast("背景URL已预览"); };
     window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
     window.handleRoleUserAvatarUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; }); };
-    window.saveRoleSettings = () => { if (!currentChatContactId) return; const newAlias = document.getElementById('role-setting-alias').value.trim(); if (!newAlias) { showToast("备注名不能为空"); return; } let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === currentChatContactId); if (idx !== -1) { contacts[idx].alias = newAlias; contacts[idx].signature = document.getElementById('role-setting-signature').value.trim(); contacts[idx].avatar = document.getElementById('role-setting-avatar').src; contacts[idx].persona = document.getElementById('role-setting-persona').value.trim(); contacts[idx].timePerceptionEnabled = document.getElementById('role-time-perception-switch').checked; contacts[idx].memoryDepth = parseInt(document.getElementById('role-memory-depth').value) || 10; contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage; contacts[idx].userAvatar = document.getElementById('role-user-avatar').src; contacts[idx].userName = document.getElementById('role-user-name').value.trim(); contacts[idx].userPersona = document.getElementById('role-user-persona').value.trim(); contacts[idx].customCss = document.getElementById('role-setting-css').value; contacts[idx].worldbookIds = tempSelectedWorldBookIds; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); document.getElementById('chat-conv-title').innerText = newAlias; document.getElementById('chat-conv-signature').innerText = contacts[idx].signature; document.getElementById('chat-conversation-view').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : 'none'; const styleTag = document.getElementById('custom-chat-style'); if(styleTag) styleTag.innerHTML = contacts[idx].customCss; renderChatList(); renderContactList(); renderConversationMessages(); showToast("设置已保存"); closeRoleSettings(); } };
+    window.saveRoleSettings = () => { if (!currentChatContactId) return; const newAlias = document.getElementById('role-setting-alias').value.trim(); if (!newAlias) { showToast("备注名不能为空"); return; } let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === currentChatContactId); if (idx !== -1) { contacts[idx].alias = newAlias; contacts[idx].signature = document.getElementById('role-setting-signature').value.trim(); contacts[idx].avatar = document.getElementById('role-setting-avatar').src; contacts[idx].persona = document.getElementById('role-setting-persona').value.trim(); contacts[idx].timePerceptionEnabled = document.getElementById('role-time-perception-switch').checked; contacts[idx].memoryDepth = parseInt(document.getElementById('role-memory-depth').value); if (isNaN(contacts[idx].memoryDepth)) contacts[idx].memoryDepth = 15; contacts[idx].autoPostEnabled = document.getElementById('role-auto-post-switch').checked; contacts[idx].autoPostInterval = parseInt(document.getElementById('role-auto-post-interval').value); if (isNaN(contacts[idx].autoPostInterval)) contacts[idx].autoPostInterval = 60; contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage; contacts[idx].userAvatar = document.getElementById('role-user-avatar').src; contacts[idx].userName = document.getElementById('role-user-name').value.trim(); contacts[idx].userPersona = document.getElementById('role-user-persona').value.trim(); contacts[idx].customCss = document.getElementById('role-setting-css').value; contacts[idx].worldbookIds = tempSelectedWorldBookIds; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); if (contacts[idx].autoPostEnabled) { scheduleAutoPost(contacts[idx].id, contacts[idx].autoPostInterval); } else { stopAutoPost(contacts[idx].id); } document.getElementById('chat-conv-title').innerText = newAlias; document.getElementById('chat-conv-signature').innerText = contacts[idx].signature; document.getElementById('chat-conversation-view').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : 'none'; const styleTag = document.getElementById('custom-chat-style'); if(styleTag) styleTag.innerHTML = contacts[idx].customCss; renderChatList(); renderContactList(); renderConversationMessages(); showToast("设置已保存"); closeRoleSettings(); } };
 
-    // --- NEW: CSS Preset Functions ---
-    window.saveCurrentCssPreset = () => {
+    // --- MODIFIED: CSS Preset Functions ---
+    window.openSaveCssPresetModal = () => {
         const cssContent = document.getElementById('role-setting-css').value;
         if (!cssContent.trim()) {
             showToast('CSS内容为空，无法保存');
             return;
         }
-        const presetName = prompt('请输入预设名称：');
-        if (!presetName || !presetName.trim()) {
+        document.getElementById('preset-name-input').value = '';
+        document.getElementById('save-preset-modal').style.display = 'flex';
+        setTimeout(() => document.getElementById('save-preset-modal').classList.add('active'), 10);
+    };
+
+    window.closeSaveCssPresetModal = () => {
+        const modal = document.getElementById('save-preset-modal');
+        modal.classList.remove('active');
+        setTimeout(() => modal.style.display = 'none', 300);
+    };
+    
+    window.saveCurrentCssPreset = () => {
+        const presetName = document.getElementById('preset-name-input').value.trim();
+        const cssContent = document.getElementById('role-setting-css').value;
+
+        if (!presetName) {
             showToast('预设名称不能为空');
             return;
         }
 
         let presets = JSON.parse(localStorage.getItem(CSS_PRESETS_KEY) || '[]');
-        const newPreset = {
-            id: Date.now(),
-            name: presetName.trim(),
-            css: cssContent
-        };
+        const newPreset = { id: Date.now(), name: presetName, css: cssContent };
         presets.push(newPreset);
         localStorage.setItem(CSS_PRESETS_KEY, JSON.stringify(presets));
+
         showToast('预设已保存');
+        closeSaveCssPresetModal();
         renderCssPresets();
     };
 
     window.renderCssPresets = () => {
-        const listContainer = document.getElementById('css-preset-list');
-        listContainer.innerHTML = '';
+        const select = document.getElementById('css-preset-select');
+        select.innerHTML = '<option value="">选择一个预设...</option>';
         const presets = JSON.parse(localStorage.getItem(CSS_PRESETS_KEY) || '[]');
 
-        if (presets.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:#ccc; font-size:13px;">暂无预设样式</p>';
-            return;
-        }
-
         presets.forEach(preset => {
-            const item = document.createElement('div');
-            item.className = 'preset-item';
-            item.innerHTML = `
-                <span>${escapeHtml(preset.name)}</span>
-                <div class="actions">
-                    <button onclick="applyCssPreset(${preset.id})">应用</button>
-                    <button class="delete-preset-btn" onclick="deleteCssPreset(${preset.id})">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(item);
+            const option = document.createElement('option');
+            option.value = preset.id;
+            option.textContent = preset.name;
+            select.appendChild(option);
         });
     };
 
-    window.applyCssPreset = (presetId) => {
+    window.handlePresetSelection = (selectElement) => {
+        const actions = document.getElementById('css-preset-actions');
+        actions.style.display = selectElement.value ? 'flex' : 'none';
+    };
+
+    window.applySelectedCssPreset = () => {
+        const select = document.getElementById('css-preset-select');
+        const presetId = parseInt(select.value);
+        if (!presetId) return;
+
         const presets = JSON.parse(localStorage.getItem(CSS_PRESETS_KEY) || '[]');
         const preset = presets.find(p => p.id === presetId);
         if (preset) {
@@ -6377,13 +7025,20 @@ ${recentHistory}
         }
     };
 
-    window.deleteCssPreset = (presetId) => {
+    window.deleteSelectedCssPreset = () => {
+        const select = document.getElementById('css-preset-select');
+        const presetId = parseInt(select.value);
+        if (!presetId) return;
+
         if (!confirm('确定要删除这个预设吗？')) return;
+
         let presets = JSON.parse(localStorage.getItem(CSS_PRESETS_KEY) || '[]');
         presets = presets.filter(p => p.id !== presetId);
         localStorage.setItem(CSS_PRESETS_KEY, JSON.stringify(presets));
+
         showToast('预设已删除');
-        renderCssPresets();
+        renderCssPresets(); // Re-render the dropdown
+        document.getElementById('css-preset-actions').style.display = 'none'; // Hide actions
     };
     // --- End CSS Preset Functions ---
 
@@ -6482,7 +7137,7 @@ ${recentHistory}
     // --- Delete Friend Logic ---
     window.confirmDeleteFriend = () => { document.getElementById('delete-friend-confirm-modal').classList.add('active'); };
     window.closeDeleteModal = (modalId) => { document.getElementById(modalId).classList.remove('active'); };
-    window.executeDeleteFriend = () => { if (!currentChatContactId) return; let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const newContacts = contacts.filter(c => c.id !== currentChatContactId); localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(newContacts)); localStorage.removeItem(getMessagesKey(currentChatContactId)); showToast("好友已删除"); closeDeleteModal('delete-friend-confirm-modal'); closeRoleSettings(); closeChatConversation(); switchChatTab(0, 'Chat'); renderChatList(); renderContactList(); };
+    window.executeDeleteFriend = () => { if (!currentChatContactId) return; let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const newContacts = contacts.filter(c => c.id !== currentChatContactId); localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(newContacts)); localStorage.removeItem(getMessagesKey(currentChatContactId)); stopAutoPost(currentChatContactId); showToast("好友已删除"); closeDeleteModal('delete-friend-confirm-modal'); closeRoleSettings(); closeChatConversation(); switchChatTab(0, 'Chat'); renderChatList(); renderContactList(); };
 
     // --- Core Functions ---
     const updateClock = () => { const clockTimeEl = document.getElementById('clock-time'); const clockDateEl = document.getElementById('clock-date'); const now = new Date(); clockTimeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`; if (!customDateText) { const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']; clockDateEl.innerText = `${now.getFullYear()}年${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 ${days[now.getDay()]}`; } else { clockDateEl.innerText = customDateText; } };
@@ -6542,7 +7197,7 @@ ${recentHistory}
     window.incrementLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); p.likes = parseInt(p.likes) + 1; saveUserProfile(p); loadUserProfile(); const icon = document.querySelector('.me-like-icon'); icon.style.transform = "scale(1.2) rotate(-10deg)"; setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150); };
     
     // 核心修复3：打开/关闭/保存 "我" 页面的设置
-    window.openMeSettings = () => {
+        window.openMeSettings = () => {
         const p = getUserProfile();
         document.getElementById('me-settings-nickname').value = p.nickname || '';
         document.getElementById('me-settings-qq-id').value = p.qqId || '';
@@ -6551,6 +7206,9 @@ ${recentHistory}
         document.getElementById('me-settings-cover-url').value = p.cover || '';
         document.getElementById('me-settings-avatar-preview').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         document.getElementById('me-settings-cover-preview').style.backgroundImage = p.cover ? `url(${p.cover})` : '';
+
+        // 👇👇👇 这是新添加的一行 👇👇👇
+        document.getElementById('me-settings-payment-password').value = p.paymentPassword || '000000';
 
         const container = document.getElementById('me-settings-member-icons-list');
         container.innerHTML = '';
@@ -6570,12 +7228,22 @@ ${recentHistory}
         document.getElementById('me-settings-modal').classList.remove('active');
     };
 
-    window.saveMeSettings = () => {
+        window.saveMeSettings = () => {
         const p = getUserProfile();
         p.nickname = document.getElementById('me-settings-nickname').value.trim();
         p.qqId = document.getElementById('me-settings-qq-id').value.trim();
         p.likes = parseInt(document.getElementById('me-settings-likes').value) || 0;
         
+        // 👇👇👇 这是新添加的代码块 👇👇👇
+        const paymentPassInput = document.getElementById('me-settings-payment-password').value;
+        if (/^\d{6}$/.test(paymentPassInput)) {
+            p.paymentPassword = paymentPassInput;
+        } else if (paymentPassInput !== (p.paymentPassword || '000000') && paymentPassInput !== '') {
+            // 只有在用户输入了新的、但格式不正确的内容时才提示
+            showToast('支付密码必须为6位数字，本次未保存。');
+        }
+        // 👆👆👆 新添加代码块结束 👆👆👆
+
         const avatarUrlFromInput = document.getElementById('me-settings-avatar-url').value.trim();
         if (avatarUrlFromInput.startsWith('data:image')) {
             p.avatar = avatarUrlFromInput;
@@ -6774,6 +7442,7 @@ ${recentHistory}
         renderForumList();
         renderForumMePage(); 
         generateKeypad();
+        initializeAllAutoPosts();
     };
 </script>
 </body>
