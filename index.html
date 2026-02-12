@@ -7478,7 +7478,7 @@ ${recentHistory}
         }
     };
     // --- NEW: Backup and Restore Functions ---
-    function exportBackup() {
+        function exportBackup() {
         showToast('正在准备备份文件...', 2000);
 
         // 定义所有需要备份的核心数据键
@@ -7490,6 +7490,7 @@ ${recentHistory}
         ];
 
         const backupData = {};
+//... 后续代码省略
 
         // 备份核心数据
         keysToBackup.forEach(key => {
