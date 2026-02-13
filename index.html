@@ -5257,9 +5257,11 @@ Strictly adhere to the JSON format. Example:
 
 
                 let likesHtml = '';
-                if (moment.likes.length > 0) {
-                    likesHtml = `<div class="moment-likes"><img src="https://img.heliar.top/file/1770356881218_喜欢_like_4.png" style="width:14px;height:14px;object-fit:contain;"> ${moment.likes.length}</div>`;
-                }
+if (moment.likes.length > 0) {
+    // 显示点赞用户的昵称，而非数字
+    const likeUserNickname = userProfile.nickname; // 当前只有用户自己能点赞
+    likesHtml = `<div class="moment-likes"><img src="https://img.heliar.top/file/1770356881218_喜欢_like_4.png" style="width:14px;height:14px;object-fit:contain;"> ${escapeHtml(likeUserNickname)}</div>`;
+}
 
                 let commentsHtml = '';
                 if (moment.comments.length > 0) {
@@ -5499,26 +5501,29 @@ Strictly adhere to the JSON format. Example:
     };
     
     window.toggleLike = (momentId) => {
-        let moments = getMomentsData();
-        const momentIndex = moments.findIndex(m => m.id === momentId);
-        if (momentIndex === -1) return;
-        
-        const profile = getUserProfile();
-        const myId = profile.qqId;
-        const likeIndex = moments[momentIndex].likes.indexOf(myId);
+    let moments = getMomentsData();
+    const momentIndex = moments.findIndex(m => m.id === momentId);
+    if (momentIndex === -1) return;
+    
+    const profile = getUserProfile();
+    const myId = profile.qqId;
+    const likeIndex = moments[momentIndex].likes.indexOf(myId);
 
-        if (likeIndex > -1) {
-            moments[momentIndex].likes.splice(likeIndex, 1);
-        } else {
-            moments[momentIndex].likes.push(myId);
-        }
-        
-        saveMomentsData(moments);
-        renderMomentsPage();
-        
-        const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
-        if (popup) popup.classList.remove('active');
-    };
+    if (likeIndex > -1) {
+        // 取消点赞：移除用户ID
+        moments[momentIndex].likes.splice(likeIndex, 1);
+    } else {
+        // 点赞：添加用户ID
+        moments[momentIndex].likes.push(myId);
+    }
+    
+    saveMomentsData(moments);
+    renderMomentsPage();
+    
+    // 关闭弹出菜单
+    const popup = document.querySelector(`#moment-${momentId} .moment-actions-popup`);
+    if (popup) popup.classList.remove('active');
+};
 
     window.openCommentInput = (momentId) => {
         currentCommentMomentId = momentId;
@@ -5704,37 +5709,42 @@ Strictly adhere to the JSON format. Example:
     }
 
     window.confirmUrgeToPost = async () => {
-        if (selectedUrgeCharIds.size === 0) {
-            showToast('请至少选择一个角色');
-            return;
-        }
+    if (selectedUrgeCharIds.size === 0) {
+        showToast('请至少选择一个角色');
+        return;
+    }
 
-        closeUrgeToPostModal();
-        showToast('正在生成动态，请稍候...', 5000);
+    closeUrgeToPostModal();
+    showToast('正在生成动态，请稍候...', 5000);
 
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        let moments = getMomentsData();
-        const newMoments = [];
+    const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+    let moments = getMomentsData();
+    const newMoments = [];
 
-        for (const contactId of selectedUrgeCharIds) {
-            const contact = contacts.find(c => c.id === contactId);
-            if (contact) {
-                const newMoment = await generateMomentForCharacter(contact);
-                if (newMoment) {
-                    newMoments.push(newMoment);
-                }
+    let delayOffset = 0; // 添加延迟偏移量，确保每个动态的时间戳不同
+    for (const contactId of selectedUrgeCharIds) {
+        const contact = contacts.find(c => c.id === contactId);
+        if (contact) {
+            const newMoment = await generateMomentForCharacter(contact);
+            if (newMoment) {
+                // 为每个动态添加不同的时间戳偏移，避免ID冲突
+                newMoment.id = newMoment.id + delayOffset;
+                newMoment.timestamp = newMoment.timestamp + delayOffset;
+                newMoments.push(newMoment);
+                delayOffset += 100; // 每个动态间隔100毫秒
             }
         }
+    }
 
-        if (newMoments.length > 0) {
-            moments.unshift(...newMoments);
-            saveMomentsData(moments);
-            renderMomentsPage();
-            showToast(`成功生成 ${newMoments.length} 条动态！`);
-        } else {
-            showToast('未能生成任何动态，请检查API或稍后重试。');
-        }
-    };
+    if (newMoments.length > 0) {
+        moments.unshift(...newMoments);
+        saveMomentsData(moments);
+        renderMomentsPage();
+        showToast(`成功生成 ${newMoments.length} 条动态！`);
+    } else {
+        showToast('未能生成任何动态，请检查API或稍后重试。');
+    }
+};
     
     // --- Auto Post Moment Logic ---
     function scheduleAutoPost(contactId, intervalMinutes) {
