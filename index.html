@@ -3662,7 +3662,7 @@
                 <label for="ios-mode-switch">iOS 模式 (刘海屏适配)</label>
                 <label class="ios-switch">
                     <input type="checkbox" id="ios-mode-switch">
-                    <span class="slider round"></span>
+                                        <span class="slider round"></span>
                 </label>
             </div>
             <div class="settings-row-with-switch" style="margin-top: 10px;">
@@ -5680,10 +5680,11 @@ Strictly adhere to the JSON format. Example:
                 throw new Error("Invalid JSON structure from API.");
             }
             
+            const currentTime = Date.now();
             return {
-                id: Date.now() + Math.random(),
+                id: currentTime,
                 authorId: contact.id,
-                timestamp: Date.now(),
+                timestamp: currentTime,
                 text: momentData.text,
                 isPrivate: momentData.isPrivate,
                 images: [],
@@ -5697,7 +5698,7 @@ Strictly adhere to the JSON format. Example:
         }
     }
 
-        window.confirmUrgeToPost = async () => {
+    window.confirmUrgeToPost = async () => {
         if (selectedUrgeCharIds.size === 0) {
             showToast('请至少选择一个角色');
             return;
@@ -5708,16 +5709,17 @@ Strictly adhere to the JSON format. Example:
 
         const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         let moments = getMomentsData();
+        const newMoments = [];
 
-        const generationPromises = Array.from(selectedUrgeCharIds).map(contactId => {
+        for (const contactId of selectedUrgeCharIds) {
             const contact = contacts.find(c => c.id === contactId);
             if (contact) {
-                return generateMomentForCharacter(contact);
+                const newMoment = await generateMomentForCharacter(contact);
+                if (newMoment) {
+                    newMoments.push(newMoment);
+                }
             }
-            return Promise.resolve(null);
-        });
-
-        const newMoments = (await Promise.all(generationPromises)).filter(Boolean);
+        }
 
         if (newMoments.length > 0) {
             moments.unshift(...newMoments);
