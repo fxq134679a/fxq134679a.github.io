@@ -59,6 +59,7 @@
         body.wallet-active #home-screen,
         body.worldbook-active #home-screen,
         body.forum-active #home-screen,
+        body.recollection-active #home-screen,
         body.mall-active #home-screen {
              opacity: 0;
              transform: scale(0.95);
@@ -770,7 +771,6 @@
             background-size: cover;
             background-position: center;
             position: relative;
-            cursor: pointer;
         }
         
         .moments-user-info {
@@ -798,7 +798,6 @@
             object-fit: cover;
             border: 3px solid white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            cursor: pointer;
             flex-shrink: 0;
         }
 
@@ -1182,10 +1181,10 @@
         .me-settings-group { background-color: white; border-radius: 20px; padding: 15px; box-shadow: 0 4px 15px rgba(229, 138, 171, 0.1); }
         .me-settings-group h3 { font-size: 14px; color: #333; margin-bottom: 12px; font-weight: 600; }
         .me-settings-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .me-settings-label { width: 50px; font-size: 13px; color: #555; font-weight: 500; flex-shrink: 0; }
+        .me-settings-label { width: 80px; font-size: 13px; color: #555; font-weight: 500; flex-shrink: 0; }
         .me-settings-preview-wrapper { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .me-settings-preview { background-color: #f9f9f9; border: 1px solid #eee; background-size: cover; background-position: center; object-fit: contain; }
-        .me-settings-preview.avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .me-settings-preview.avatar { width: 40px; height: 40px; border-radius: 12px; }
         .me-settings-preview.cover { width: 60px; height: 40px; border-radius: 6px; object-fit: cover; }
         .me-settings-preview.icon { width: 30px; height: 30px; border-radius: 6px; }
         .me-settings-input { flex: 1; padding: 10px 12px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 10px; font-size: 13px; outline: none; transition: border-color 0.2s; color: #555; min-width: 0; }
@@ -1428,6 +1427,8 @@
         body.ios-mode-active #forum-detail-header,
         body.ios-mode-active .forum-post-top-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.ios-mode-active #mall-app-page .mall-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.ios-mode-active .recollection-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.ios-mode-active .recollection-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         
                 /* --- 修复：转账页返回按钮位置更靠上 --- */
         .transfer-back-btn {
@@ -2373,7 +2374,7 @@
             color: #333;
         }
 
-        /* --- Mall App Styles (MODIFIED) --- */
+        /* --- Mall App Styles (MODIFIED & NEW) --- */
         #mall-app-page {
             position: fixed;
             top: 0;
@@ -2467,6 +2468,22 @@
             position: relative;
             flex-shrink: 0;
             margin: 0 5px;
+            user-select: text; /* Allow text selection for double click */
+        }
+        .mall-category-item.active {
+            font-weight: 700;
+            color: var(--theme-pink-text);
+        }
+        .mall-category-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background-color: var(--theme-pink-btn);
+            border-radius: 1.5px;
         }
         
         .mall-content {
@@ -2475,12 +2492,91 @@
             background-color: var(--theme-pink-bg-soft); /* 柔和粉色系背景 */
             padding: 20px;
             color: #333; /* 深灰色常规文字 */
-            padding-bottom: 80px; /* MODIFIED: Space for bottom nav */
+            padding-bottom: 80px;
         }
-        .mall-content h1 { color: #333; }
-        .mall-content p { color: #888; } /* 浅灰色次要文字 */
         
-        /* NEW: Mall Bottom Nav Bar */
+        /* NEW: Mall Product Grid */
+        .mall-product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .mall-product-item {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px; /* For Emoji */
+        }
+        .product-details {
+            padding: 10px;
+        }
+        .product-name {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-price-info {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+        .product-price {
+            color: #ff952f;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .product-price::before {
+            content: '¥';
+            font-size: 14px;
+            margin-right: 2px;
+        }
+        .product-price-extra {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+        .product-coupon-tag {
+            font-size: 11px;
+            color: #ff952f;
+        }
+        .product-sales {
+            font-size: 12px;
+            color: #a19f9b;
+        }
+
+        /* NEW: Mall Modals */
+        #mall-category-modal .wb-entry-input.val,
+        #mall-category-desc-input {
+            background-color: #ffffff;
+            border: 1px solid #FADBE6;
+        }
+
+        #new-mall-category-roles-display,
+        #edit-mall-category-roles-display {
+            background: #fff;
+            border: 1px solid #FADBE6;
+        }
+        #new-mall-category-roles-display.unbound,
+        #edit-mall-category-roles-display.unbound {
+            color: #aaa;
+            font-style: italic;
+        }
+        
         .mall-bottom-nav {
             background-color: #ffffff;
             border-top: 1px solid #f0f0f0;
@@ -2857,6 +2953,8 @@
         body.phone-frame-active #worldbook-color-page > .wb-color-header,
         body.phone-frame-active #add-moment-modal > .add-moment-header,
         body.phone-frame-active #role-settings-page > .role-setting-close-area,
+        body.phone-frame-active #recollection-app-page .recollection-header,
+        body.phone-frame-active #recollection-detail-page .recollection-detail-header,
         body.phone-frame-active #chat-conversation-view > .chat-conv-header {
             padding-top: calc(15px + var(--status-bar-height));
         }
@@ -3078,7 +3176,7 @@
             cursor: pointer;
             margin-top: 20px;
         }
-        /* --- NEW: Styles for Urge Post Modal --- */
+                /* --- NEW: Styles for Urge Post Modal --- */
         .urge-post-char-item {
             display: flex;
             flex-direction: column;
@@ -3108,6 +3206,322 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        
+        /* --- NEW: Recollection App Styles (MODIFIED) --- */
+        #recollection-app-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #ffffff; /* MODIFIED: White background */
+            z-index: 570;
+            display: flex; flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        body.recollection-active #recollection-app-page { transform: translateY(0); }
+
+        .recollection-header {
+            padding: 35px 20px 15px;
+            background: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            flex-shrink: 0; z-index: 10;
+            position: relative;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .recollection-header-title {
+            font-size: 18px; font-weight: 600; color: #ffd6e7; /* MODIFIED: Pink title */
+            text-shadow: none;
+        }
+        .recollection-back-btn {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            width: 30px; height: 30px; object-fit: contain; cursor: pointer;
+        }
+
+        .recollection-content {
+            flex: 1; overflow-y: auto; padding: 30px 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px 20px;
+            align-content: flex-start;
+        }
+
+        .crystal-ball-item {
+            display: flex; flex-direction: column; align-items: center; cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .crystal-ball-item:active { transform: scale(0.95); }
+        
+        /* --- MODIFIED: Crystal Ball 🔮 Styles (Cute & 3D) --- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .crystal-ball-container {
+            width: 100%;
+            aspect-ratio: 1 / 1.1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            filter: drop-shadow(0px 10px 15px rgba(138, 43, 226, 0.3)); /* Default shadow, will be overridden by JS */
+            animation: float 6s ease-in-out infinite;
+            transition: filter 0.3s ease;
+        }
+
+        .crystal-ball-sphere {
+            width: 85%;
+            aspect-ratio: 1/1;
+            background: radial-gradient(circle at 65% 35%, #e1d4ff 0%, #c39dff 30%, #7b42f5 100%); /* Default background */
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset -10px -10px 25px rgba(0,0,0,0.25), 
+                        inset 12px 12px 25px rgba(255, 255, 255, 0.15),
+                        0 0 50px rgba(200, 160, 255, 0.5), /* Default outer glow */
+                        0 15px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .crystal-ball-sphere::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.3) 100%);
+            opacity: 0.7;
+        }
+        .crystal-ball-sphere::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: 10%;
+            width: 80%;
+            height: 40%;
+            background: radial-gradient(ellipse, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .crystal-ball-highlight {
+            position: absolute;
+            top: 5%;
+            left: 15%;
+            width: 60%;
+            height: 30%;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%);
+            border-radius: 50%;
+            transform: rotate(-30deg);
+        }
+        
+        .crystal-ball-base {
+            width: 60%;
+            height: 25%;
+            background: linear-gradient(180deg, #f0e2b6 0%, #c9a967 10%, #ab8a4a 50%, #95753c 100%);
+            position: relative;
+            border-radius: 2px 2px 50% 50% / 2px 2px 100% 100%;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            margin-top: -12%;
+            z-index: -1;
+        }
+        .crystal-ball-base::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110%;
+            height: 10px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+            border-radius: 50%;
+        }
+
+        .crystal-ball-stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        .star.s1 { width: 3px; height: 3px; top: 20%; left: 30%; animation-delay: 0s; }
+        .star.s2 { width: 2px; height: 2px; top: 40%; left: 70%; animation-delay: 0.5s; }
+        .star.s3 { width: 2px; height: 2px; top: 75%; left: 25%; animation-delay: 1s; }
+        .star.s4 { width: 1px; height: 1px; top: 60%; left: 50%; animation-delay: 1.5s; }
+        .star.main-star { 
+            width: 15px; height: 15px; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(ellipse at center, white, rgba(255,255,255,0));
+            animation-duration: 2s;
+        }
+        
+        .crystal-ball-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+            z-index: 5;
+            position: absolute;
+            top: 40%; /* Adjust vertical position inside sphere */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 5px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* --- NEW: Recollection Detail Page (MODIFIED) --- */
+        #recollection-detail-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #ffffff; /* MODIFIED: White background */
+            z-index: 571;
+            display: none;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+        }
+        #recollection-detail-page.active { 
+            display: flex;
+            transform: translateX(0);
+        }
+
+        .recollection-detail-header {
+            padding: 35px 20px 15px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .recollection-detail-title { /* NEW */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+        }
+        .recollection-detail-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .recollection-detail-add-icon {
+            font-size: 30px; font-weight: 300; line-height: 1; color: #888;
+            cursor: pointer;
+        }
+        .recollection-detail-cheese-icon {
+            width: 28px; height: 28px; object-fit: contain; cursor: pointer;
+        }
+        .recollection-detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .recollection-item-wrapper {
+            position: relative;
+            overflow: hidden; /* Important for swipe */
+            border-radius: 12px;
+        }
+        .recollection-item-swipe-actions {
+            position: absolute;
+            top: 0;
+            right: 0; /* Actions are on the right for left swipe */
+            width: 180px; /* MODIFIED: Width for three buttons */
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .swipe-action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .swipe-action-btn.edit { background-color: #ffc107; }
+        .swipe-action-btn.delete { background-color: #f44336; }
+        .swipe-action-btn.custom { background-color: #03a9f4; } /* NEW */
+
+        .recollection-item {
+            background-color: #fffaf0; /* Softer yellow */
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #fdf2d0;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+            position: relative;
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+            touch-action: pan-y; /* Allow vertical scroll */
+            min-height: 100px; /* Ensure a minimum height for bg images */
+            overflow: hidden; /* For bg image clipping */
+        }
+        .recollection-item::after {
+            content: '📎';
+            position: absolute;
+            top: 2px;
+            right: 10px;
+            font-size: 24px;
+            transform: rotate(10deg);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .recollection-item.summary-item {
+            background-color: #f0f8ff;
+            border-color: #d1e2f0;
+        }
+
+        .recollection-item-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-word;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .recollection-item-text.truncated {
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .recollection-item-timestamp {
+            font-size: 12px;
+            color: #aaa;
+            text-align: right;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
         }
     </style>
 </head>
@@ -3150,7 +3564,7 @@
                 </div>
                 <div class="app-item" onclick="openWorldBookApp()"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
                 <div class="app-item" onclick="openForumApp()"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="论坛">论坛</span></div>
-                <div class="app-item"><div class="app-icon" id="icon-app4">📸</div><span class="app-name" data-app-name="相册">相册</span></div>
+                <div class="app-item" onclick="openRecollectionApp()"><div class="app-icon" id="icon-app4">🔮</div><span class="app-name" data-app-name="回忆">回忆</span></div>
             </div>
         </div>
         <div class="grid-quadrant">
@@ -3193,7 +3607,7 @@
         <div class="chat-header-title" id="chat-page-title">Chat</div>
         <!-- 右上角图标容器 -->
         <div id="chat-header-right-icons" style="display: flex; gap: 15px; z-index: 2;">
-            <img id="chat-header-add-friend-icon" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png" class="header-right-icon" onclick="openAddFriendModal()">
+                        <img id="chat-header-add-friend-icon" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png" class="header-right-icon" onclick="openAddFriendModal()">
             <img id="chat-header-add-moment-icon" src="https://img.heliar.top/file/1770345149331_相机_camera.png" class="header-right-icon" onclick="openMomentsActionSheet()" style="display: none;">
         </div>
     </div>
@@ -3448,7 +3862,7 @@
 <!-- NEW: Moments Comment MODAL (Updated Layout) -->
 <div id="moments-comment-overlay" onclick="closeCommentInput()"></div>
 <div id="moments-comment-modal">
-    <input type="text" id="moments-comment-input" placeholder="发表评论:" onkeypress="handleCommentKey(event)">
+        <input type="text" id="moments-comment-input" placeholder="发表评论:" onkeypress="handleCommentKey(event)">
     <img src="https://img.heliar.top/file/1770357295773_笑脸_smiling-face_2.png" class="moments-emoji-btn">
     <button id="moments-comment-submit-btn" onclick="submitComment()">发送</button>
 </div>
@@ -3565,7 +3979,7 @@
 <div id="add-friend-modal">
     <div class="add-friend-card">
         <div class="add-friend-close" onclick="closeAddFriendModal()">✕</div>
-        <img src="https://img.heliar.top/file/1770069003752_保存_save.png" class="add-friend-save" onclick="saveNewFriend()">
+                <img src="https://img.heliar.top/file/1770069003752_保存_save.png" class="add-friend-save" onclick="saveNewFriend()">
         <div class="add-friend-avatar-upload" onclick="triggerAvatarUpload()">
             <span id="avatar-placeholder-icon">+</span>
             <img id="new-friend-avatar-preview" class="add-friend-avatar-preview">
@@ -3803,7 +4217,6 @@
         <button class="me-settings-save-btn" onclick="saveMeSettings()">保存</button>
     </div>
     <div class="me-settings-scroll-content">
-        <!-- 核心修复3：整合 昵称 QQ 点赞数 等功能到此 -->
         <div class="me-settings-group">
             <h3>个人资料</h3>
             <div class="me-settings-row">
@@ -3820,11 +4233,11 @@
             </div>
         </div>
 
-                <div class="me-settings-group">
+        <div class="me-settings-group">
             <h3>界面信息</h3>
             <div class="me-settings-row">
                 <div class="me-settings-label">头像</div>
-                <div class="me-settings-preview-wrapper" onclick="triggerProfileAvatarUpload()"><img id="me-settings-avatar-preview" class="me-settings-preview avatar" style="cursor:pointer;"></div>
+                <div class="me-settings-preview-wrapper" onclick="triggerProfileAvatarUpload()"><img id="me-settings-avatar-preview" class="me-settings-preview avatar" style="border-radius:50%; cursor:pointer;"></div>
                 <input type="text" id="me-settings-avatar-url" class="me-settings-input" placeholder="头像 URL">
             </div>
             <div class="me-settings-row">
@@ -3833,8 +4246,21 @@
                 <input type="text" id="me-settings-cover-url" class="me-settings-input" placeholder="背景图 URL">
             </div>
         </div>
+        
+        <div class="me-settings-group">
+            <h3>朋友圈</h3>
+             <div class="me-settings-row">
+                <div class="me-settings-label">朋友圈头像</div>
+                <div class="me-settings-preview-wrapper" onclick="triggerMomentsAvatarUpload()"><img id="me-settings-moments-avatar-preview" class="me-settings-preview avatar" style="cursor:pointer;"></div>
+                <input type="text" id="me-settings-moments-avatar-url" class="me-settings-input" placeholder="朋友圈头像 URL">
+            </div>
+            <div class="me-settings-row">
+                <div class="me-settings-label">朋友圈背景</div>
+                <div class="me-settings-preview-wrapper"><img id="me-settings-moments-cover-preview" class="me-settings-preview cover"></div>
+                <input type="text" id="me-settings-moments-cover-url" class="me-settings-input" placeholder="朋友圈背景图 URL">
+            </div>
+        </div>
 
-        <!-- 👇👇👇 这是新添加的模块 👇👇👇 -->
         <div class="me-settings-group">
             <h3>安全设置</h3>
             <div class="me-settings-row">
@@ -3842,7 +4268,6 @@
                 <input type="text" id="me-settings-payment-password" class="me-settings-input" placeholder="设置6位数字密码" maxlength="6" inputmode="numeric" pattern="[0-9]*">
             </div>
         </div>
-        <!-- 👆👆👆 新添加模块结束 👆👆👆 -->
 
         <div class="me-settings-group">
             <h3>会员图标列表 (8个)</h3>
@@ -3981,7 +4406,7 @@
     <div id="create-forum-modal-card">
         <h2 class="create-forum-title">创建新论坛</h2>
         <div class="create-forum-content">
-            <div class="create-forum-avatar-upload" onclick="triggerForumAvatarUpload()">
+                        <div class="create-forum-avatar-upload" onclick="triggerForumAvatarUpload()">
                 <span id="forum-avatar-placeholder">+</span>
                 <img id="new-forum-avatar-preview" src="">
             </div>
@@ -4040,20 +4465,16 @@
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallApp()">
         <div class="mall-header-title">商城</div>
         <div class="mall-header-actions">
-            <img src="https://img.heliar.top/file/1770580892666_刷新_refresh.png" class="refresh-btn">
-            <button class="mall-add-btn">+</button>
+            <img src="https://img.heliar.top/file/1770580892666_刷新_refresh.png" class="refresh-btn" id="mall-refresh-btn">
+            <button class="mall-add-btn" id="mall-add-category-btn">+</button>
         </div>
     </div>
     <div class="mall-category-nav" id="mall-category-nav">
-        <div class="mall-category-item active" onclick="switchMallCategory(this, '推荐')">推荐</div>
-        <div class="mall-category-item" onclick="switchMallCategory(this, '男装')">男装</div>
-        <div class="mall-category-item" onclick="switchMallCategory(this, '零食')">零食</div>
-        <div class="mall-category-item" onclick="switchMallCategory(this, '医药')">医药</div>
+        <!-- Categories will be generated by JS -->
     </div>
     <div class="mall-content" id="mall-content">
         <!-- Content will be injected by JS -->
     </div>
-    <!-- NEW: Mall Bottom Nav Bar -->
     <div class="mall-bottom-nav">
         <div class="mall-nav-item active">
             <img src="https://img.heliar.top/file/1770921774009_首页_home_3.png" class="mall-nav-icon">
@@ -4066,6 +4487,24 @@
         <div class="mall-nav-item">
             <img src="https://img.heliar.top/file/1770921771134_无嘴脸_face-without-mouth.png" class="mall-nav-icon">
             <span class="mall-nav-text">我</span>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: Mall Add/Edit Category Modal -->
+<div id="mall-category-modal" class="delete-confirm-modal">
+    <div class="wb-modal-card" onclick="event.stopPropagation()">
+        <div id="mall-category-modal-title" class="wb-modal-header">添加商品种类</div>
+        <div class="wb-modal-scroll-area">
+             <div class="wb-input-label">分类名称</div>
+             <input type="text" id="mall-category-name-input" class="wb-main-input" placeholder="输入分类名称">
+             <div class="wb-input-label">补充说明</div>
+             <textarea id="mall-category-desc-input" class="wb-entry-input val" placeholder="补充说明(可选)" style="min-height: 80px; width:100%; margin-bottom: 15px;"></textarea>
+             <button class="wb-action-btn wb-btn-ok" style="width: 100%; margin-top: 5px;" onclick="openMallCategoryRoleBindModal()">绑定角色</button>
+        </div>
+        <div id="mall-category-modal-actions" class="wb-modal-actions">
+            <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
+            <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
         </div>
     </div>
 </div>
@@ -4151,9 +4590,62 @@
     </div>
 </div>
 
+<!-- NEW: Recollection App Page -->
+<div id="recollection-app-page">
+    <div class="recollection-header">
+        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="closeRecollectionApp()">
+        <h1 class="recollection-header-title">回忆</h1>
+    </div>
+    <div class="recollection-content" id="recollection-grid">
+        <!-- Crystal balls will be injected here -->
+    </div>
+</div>
+
+<!-- NEW: Recollection Detail Page (MODIFIED) -->
+<div id="recollection-detail-page">
+     <div class="recollection-detail-header">
+        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="closeRecollectionDetail()">
+        <h2 class="recollection-detail-title">回忆总结</h2>
+        <div class="recollection-detail-actions">
+            <img src="https://img.heliar.top/file/1771063920986_奶酪_cheese.png" class="recollection-detail-cheese-icon" onclick="openSummarizeRecollectionModal()">
+            <span class="recollection-detail-add-icon" onclick="openAddRecollectionModal()">+</span>
+        </div>
+     </div>
+     <div class="recollection-detail-content" id="recollection-detail-content">
+        <!-- Detail content will go here -->
+     </div>
+</div>
+
+<!-- NEW: Add/Edit Recollection Modal (MODIFIED) -->
+<div id="recollection-edit-modal" class="delete-confirm-modal">
+    <div class="wb-modal-card" style="width: 90%; max-width: 380px; background: #fff;" onclick="event.stopPropagation()">
+        <h3 id="recollection-modal-title" class="wb-modal-header">新增回忆</h3>
+        <textarea id="recollection-text-input" class="role-persona-input" style="height: 180px; width: 100%; margin-bottom: 20px; background: #f9f9f9;"></textarea>
+        <div class="wb-modal-actions">
+            <button class="wb-action-btn wb-btn-cancel" onclick="closeRecollectionEditModal()">取消</button>
+            <button class="wb-action-btn wb-btn-ok" onclick="saveRecollection()">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: Summarize Recollection Modal -->
+<div id="recollection-summary-modal" class="delete-confirm-modal">
+    <div class="delete-card">
+        <h3 class="delete-card-title">自动总结</h3>
+        <p id="recollection-summary-info" style="margin-bottom: 25px; color: #666; font-size: 14px;">你还有 0 条聊天记录未总结。</p>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeRecollectionSummaryModal()">取消</button>
+            <button id="recollection-summary-confirm-btn" class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="executeRecollectionSummary()">总结</button>
+        </div>
+    </div>
+</div>
+
 
 <!-- Forum Post Image Input (Hidden) -->
 <input type="file" id="input-forum-post-image" class="file-input-hidden" multiple accept="image/*" onchange="handleForumPostImageUpload(event)">
+<input type="file" id="input-recollection-bg" class="file-input-hidden" accept="image/*" onchange="handleRecollectionItemBgUpload(event)">
+<input type="color" id="input-recollection-color" class="file-input-hidden" onchange="handleRecollectionItemColorChange(event)">
+<input type="color" id="input-crystal-color" class="file-input-hidden" oninput="handleCrystalBallColorChange(event)">
 
 <input type="file" id="input-wallpaper" class="file-input-hidden" accept="image/*" onchange="handleWallpaperUpload(event)">
 <input type="file" id="input-app-icon" class="file-input-hidden" accept="image/*" onchange="handleIconUpload(event)">
@@ -4168,6 +4660,8 @@
 <input type="file" id="input-wb-cover" class="file-input-hidden" accept="image/*" onchange="handleWbCoverUpload(event)">
 <input type="file" id="input-forum-me-avatar" class="file-input-hidden" accept="image/*" onchange="handleForumMeAvatarUpload(event)">
 <input type="file" id="input-forum-me-bg" class="file-input-hidden" accept="image/*" onchange="handleForumMeBgUpload(event)">
+<input type="file" id="input-moments-avatar" class="file-input-hidden" accept="image/*" onchange="handleMomentsAvatarUpload(event)">
+<input type="file" id="input-moments-cover" class="file-input-hidden" accept="image/*" onchange="handleMomentsCoverUpload(event)">
 </div> <!-- 闭合 app-wrapper -->
 <input type="file" id="import-backup-input" class="file-input-hidden" accept=".json" onchange="importBackup(event)">
 
@@ -4209,11 +4703,15 @@
     const CAT_EARS_KEY = 'catEarsEnabled_v1';
     const CAT_EAR_COLOR_KEY = 'catEarColor_v1';
     const MOMENTS_DATA_KEY = 'momentsData_v4_private'; // Bumped version for private flag
-    const MOMENTS_PROFILE_KEY = 'momentsProfile_v1';
+    const MOMENTS_PROFILE_KEY = 'momentsProfile_v2'; // MODIFIED v2 for new settings
     const FORUMS_DATA_KEY = 'forumsData_v2';
     const FORUM_POSTS_DATA_KEY = 'forumPosts_v2';
     const FORUM_USER_DATA_KEY = 'forumUserData_v4';
     const CSS_PRESETS_KEY = 'cssPresets_v2_new';
+    const RECOLLECTION_DATA_KEY_PREFIX = 'recollections_v3_style'; // NEW: Bumped for style
+    const MALL_CATEGORIES_KEY = 'mallCategories_v3_fix'; // NEW: Mall categories key, bumped for fix
+    const MALL_PRODUCTS_CACHE_KEY = 'mallProductsCache_v1'; // NEW: Mall products cache key
+
 
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
@@ -4247,8 +4745,22 @@
     let wbBindCallback = null;
     let wbBindMultiSelect = false;
 
+    // --- NEW: Mall App State ---
+    let currentMallCategoryId = null; 
+    let tempMallCategoryRoleIds = [];
+    let isEditingMallCategory = false;
+
+
+    // --- NEW: Recollection State ---
+    let currentRecollectionContactId = null;
+    let currentEditingRecollectionId = null;
+    let activeSwipeItem = null;
+    let currentRecollectionItemCustomizingId = null;
+    let currentCrystalBallEditingId = null;
+
     // --- NEW: Urge To Post State ---
     let selectedUrgeCharIds = new Set();
+    let isUrgeInProgress = false; // Add a flag to prevent multiple triggers
     
     // --- NEW: Auto Post Timers ---
     let autoPostTimers = {}; // { contactId: timerId }
@@ -4344,23 +4856,845 @@
       }
       localStorage.setItem(IOS_MODE_KEY, enabled);
     }
+
+    // --- Recollection App Logic (REWORKED & MODIFIED) ---
+    function getRecollectionStorageKey(contactId) {
+        return `${RECOLLECTION_DATA_KEY_PREFIX}${contactId}`;
+    }
+
+    function getRecollections(contactId) {
+        try {
+            const data = localStorage.getItem(getRecollectionStorageKey(contactId));
+            return data ? JSON.parse(data) : { lastSummaryIndex: -1, items: [], crystalColor: null };
+        } catch (e) {
+            return { lastSummaryIndex: -1, items: [], crystalColor: null };
+        }
+    }
+
+    function saveRecollections(contactId, data) {
+        localStorage.setItem(getRecollectionStorageKey(contactId), JSON.stringify(data));
+    }
     
-    // --- Mall App Logic (MODIFIED) ---
+    function hexToRgb(hex) {
+        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    window.openRecollectionApp = () => {
+        body.classList.add('recollection-active');
+        const grid = document.getElementById('recollection-grid');
+        grid.innerHTML = '';
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        
+        if (contacts.length === 0) {
+            grid.innerHTML = '<p style="color: #9f8a8a; grid-column: span 3; text-align:center;">还没有创建任何角色哦</p>';
+            return;
+        }
+
+        contacts.forEach(contact => {
+            const recollectionData = getRecollections(contact.id);
+            const customColor = recollectionData.crystalColor;
+            
+            const item = document.createElement('div');
+            item.className = 'crystal-ball-item';
+            item.dataset.contactId = contact.id;
+            item.onclick = () => openRecollectionDetail(contact.id);
+            item.ondblclick = () => editCrystalBallColor(contact.id);
+
+            let sphereStyle = '';
+            let containerStyle = '';
+            
+            if (customColor) {
+                const rgb = hexToRgb(customColor);
+                if (rgb) {
+                    const { r, g, b } = rgb;
+                    sphereStyle = `
+                        background: radial-gradient(circle at 65% 35%, rgba(${r+30},${g+30},${b+30},1) 0%, rgba(${r},${g},${b},1) 40%, rgba(${r-40},${g-40},${b-40},1) 100%);
+                        box-shadow: inset -10px -10px 25px rgba(0,0,0,0.25), 
+                                    inset 12px 12px 25px rgba(255, 255, 255, 0.15),
+                                    0 0 50px rgba(${r},${g},${b},0.6),
+                                    0 15px 25px rgba(0,0,0,0.1);
+                    `;
+                    containerStyle = `filter: drop-shadow(0px 10px 15px rgba(${r}, ${g}, ${b}, 0.35));`;
+                }
+            }
+
+            item.innerHTML = `
+                <div class="crystal-ball-container" style="${containerStyle}">
+                    <div class="crystal-ball-sphere" style="${sphereStyle}">
+                        <div class="crystal-ball-highlight"></div>
+                        <div class="crystal-ball-stars">
+                            <div class="star s1"></div><div class="star s2"></div><div class="star s3"></div><div class="star s4"></div>
+                        </div>
+                         <div class="crystal-ball-name">${escapeHtml(contact.alias || contact.name)}</div>
+                    </div>
+                    <div class="crystal-ball-base"></div>
+                </div>
+            `;
+            grid.appendChild(item);
+        });
+    };
+    
+    window.editCrystalBallColor = (contactId) => {
+        event.stopPropagation();
+        currentCrystalBallEditingId = contactId;
+        const colorInput = document.getElementById('input-crystal-color');
+        const recollectionData = getRecollections(contactId);
+        colorInput.value = recollectionData.crystalColor || '#7b42f5'; // Default color
+        colorInput.click();
+    };
+
+    window.handleCrystalBallColorChange = (event) => {
+        if (!currentCrystalBallEditingId) return;
+        
+        const newColor = event.target.value;
+        const recollectionData = getRecollections(currentCrystalBallEditingId);
+        recollectionData.crystalColor = newColor;
+        saveRecollections(currentCrystalBallEditingId, recollectionData);
+        
+        // Live update UI
+        const item = document.querySelector(`.crystal-ball-item[data-contact-id="${currentCrystalBallEditingId}"]`);
+        if (item) {
+            const sphere = item.querySelector('.crystal-ball-sphere');
+            const container = item.querySelector('.crystal-ball-container');
+            const rgb = hexToRgb(newColor);
+            if (rgb) {
+                const { r, g, b } = rgb;
+                sphere.style.background = `radial-gradient(circle at 65% 35%, rgba(${r+30},${g+30},${b+30},1) 0%, rgba(${r},${g},${b},1) 40%, rgba(${r-40},${g-40},${b-40},1) 100%)`;
+                sphere.style.boxShadow = `inset -10px -10px 25px rgba(0,0,0,0.25), 
+                                          inset 12px 12px 25px rgba(255, 255, 255, 0.15),
+                                          0 0 50px rgba(${r},${g},${b},0.6),
+                                          0 15px 25px rgba(0,0,0,0.1)`;
+                container.style.filter = `drop-shadow(0px 10px 15px rgba(${r}, ${g}, ${b}, 0.35))`;
+            }
+        }
+    };
+
+
+    window.closeRecollectionApp = () => {
+        body.classList.remove('recollection-active');
+    };
+
+    window.openRecollectionDetail = (contactId) => {
+        currentRecollectionContactId = contactId;
+        document.getElementById('recollection-detail-page').classList.add('active');
+        renderRecollectionItems(contactId);
+    };
+
+    window.closeRecollectionDetail = () => {
+        document.getElementById('recollection-detail-page').classList.remove('active');
+        currentRecollectionContactId = null;
+    };
+    
+    function renderRecollectionItems(contactId) {
+        const contentArea = document.getElementById('recollection-detail-content');
+        contentArea.innerHTML = '';
+        const recollectionData = getRecollections(contactId);
+        const items = recollectionData.items || [];
+
+        if (items.length === 0) {
+            contentArea.innerHTML = `<div style="text-align:center; color:#ccc; padding:50px 20px;">空空如也，点击右上角 + 新增第一条回忆吧</div>`;
+            return;
+        }
+        
+        items.sort((a,b) => b.timestamp - a.timestamp).forEach(item => {
+            const itemWrapper = document.createElement('div');
+            itemWrapper.className = 'recollection-item-wrapper';
+
+            const itemEl = document.createElement('div');
+            itemEl.className = `recollection-item ${item.isSummary ? 'summary-item' : ''}`;
+            itemEl.dataset.id = item.id;
+            
+            // Apply custom styles
+            if (item.bgColor) {
+                itemEl.style.backgroundColor = item.bgColor;
+            }
+            if (item.bgImage) {
+                itemEl.style.backgroundImage = `url(${item.bgImage})`;
+                itemEl.style.backgroundSize = 'cover';
+                itemEl.style.backgroundPosition = 'center';
+            }
+            
+            const textEl = document.createElement('div');
+            textEl.className = 'recollection-item-text truncated';
+            textEl.textContent = item.text;
+            textEl.onclick = () => textEl.classList.toggle('truncated');
+            
+            if (item.bgImage) {
+                textEl.style.color = 'white';
+                textEl.style.textShadow = '0 1px 3px rgba(0,0,0,0.5)';
+            }
+
+            const timestampEl = document.createElement('div');
+            timestampEl.className = 'recollection-item-timestamp';
+            timestampEl.textContent = formatTimestamp(item.timestamp);
+            if (item.bgImage) {
+                timestampEl.style.color = 'white';
+                timestampEl.style.textShadow = '0 1px 3px rgba(0,0,0,0.5)';
+            }
+            
+            itemEl.appendChild(textEl);
+            itemEl.appendChild(timestampEl);
+            
+            const actionsEl = document.createElement('div');
+            actionsEl.className = 'recollection-item-swipe-actions';
+            actionsEl.innerHTML = `
+                <button class="swipe-action-btn edit" onclick="editRecollection(${item.id})">编辑</button>
+                <button class="swipe-action-btn delete" onclick="deleteRecollection(${item.id})">删除</button>
+                <button class="swipe-action-btn custom" onclick="customizeRecollectionItem(${item.id})">自定义</button>
+            `;
+            
+            itemWrapper.appendChild(itemEl);
+            itemWrapper.appendChild(actionsEl); // Swapped order for right-side actions
+            contentArea.appendChild(itemWrapper);
+
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+
+            itemEl.addEventListener('touchstart', (e) => {
+                if (activeSwipeItem && activeSwipeItem !== itemEl) {
+                    activeSwipeItem.style.transform = 'translateX(0)';
+                }
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+            }, { passive: true });
+            
+            itemEl.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                currentX = e.touches[0].clientX - startX;
+                if (currentX < 0) { // Allow swiping right-to-left
+                   itemEl.style.transform = `translateX(${Math.max(currentX, -180)}px)`;
+                } else {
+                   itemEl.style.transform = 'translateX(0)';
+                }
+            }, { passive: true });
+
+            itemEl.addEventListener('touchend', () => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                if (currentX < -60) {
+                    itemEl.style.transform = 'translateX(-180px)';
+                    activeSwipeItem = itemEl;
+                } else {
+                    itemEl.style.transform = 'translateX(0)';
+                }
+                currentX = 0;
+            });
+        });
+    }
+
+    // Modal for adding/editing recollections
+    window.openAddRecollectionModal = () => {
+        currentEditingRecollectionId = null;
+        document.getElementById('recollection-modal-title').textContent = '新增回忆';
+        document.getElementById('recollection-text-input').value = '';
+        document.getElementById('recollection-edit-modal').classList.add('active');
+    };
+
+    window.closeRecollectionEditModal = () => {
+        document.getElementById('recollection-edit-modal').classList.remove('active');
+    };
+
+    window.saveRecollection = () => {
+        const text = document.getElementById('recollection-text-input').value.trim();
+        if (!text) {
+            showToast('内容不能为空');
+            return;
+        }
+
+        const recollectionData = getRecollections(currentRecollectionContactId);
+        
+        if (currentEditingRecollectionId) { // Editing existing one
+            const index = recollectionData.items.findIndex(item => item.id === currentEditingRecollectionId);
+            if (index !== -1) {
+                recollectionData.items[index].text = text;
+            }
+        } else { // Adding new one
+            const newRecollection = {
+                id: Date.now(),
+                text: text,
+                timestamp: Date.now(),
+                isSummary: false,
+                bgColor: null,
+                bgImage: null
+            };
+            recollectionData.items.push(newRecollection);
+        }
+
+        saveRecollections(currentRecollectionContactId, recollectionData);
+        renderRecollectionItems(currentRecollectionContactId);
+        closeRecollectionEditModal();
+        showToast('已保存');
+    };
+
+    window.editRecollection = (id) => {
+        const recollectionData = getRecollections(currentRecollectionContactId);
+        const item = recollectionData.items.find(i => i.id === id);
+        if (item) {
+            currentEditingRecollectionId = id;
+            document.getElementById('recollection-modal-title').textContent = '编辑回忆';
+            document.getElementById('recollection-text-input').value = item.text;
+            document.getElementById('recollection-edit-modal').classList.add('active');
+        }
+    };
+    
+    window.deleteRecollection = (id) => {
+        if (confirm('确定要删除这条回忆吗？')) {
+            const recollectionData = getRecollections(currentRecollectionContactId);
+            recollectionData.items = recollectionData.items.filter(item => item.id !== id);
+            saveRecollections(currentRecollectionContactId, recollectionData);
+            renderRecollectionItems(currentRecollectionContactId);
+            showToast('已删除');
+        }
+    };
+    
+    window.customizeRecollectionItem = (id) => {
+        currentRecollectionItemCustomizingId = id;
+        const choice = prompt("要修改背景颜色还是上传背景图片？\n输入 '颜色' 或 '图片'");
+        if (choice === null) return;
+
+        if (choice.toLowerCase() === '颜色') {
+            const colorInput = document.getElementById('input-recollection-color');
+            colorInput.click();
+        } else if (choice.toLowerCase() === '图片') {
+            const fileInput = document.getElementById('input-recollection-bg');
+            fileInput.click();
+        } else {
+            showToast("无效的选择");
+        }
+    };
+    
+    window.handleRecollectionItemColorChange = (event) => {
+        if (!currentRecollectionItemCustomizingId) return;
+        const newColor = event.target.value;
+        updateRecollectionItemStyle(currentRecollectionItemCustomizingId, { bgColor: newColor, bgImage: null });
+    };
+
+    window.handleRecollectionItemBgUpload = (event) => {
+        if (!currentRecollectionItemCustomizingId) return;
+        const file = event.target.files[0];
+        if (!file) return;
+
+        compressImage(file, 800, (base64) => {
+            updateRecollectionItemStyle(currentRecollectionItemCustomizingId, { bgImage: base64, bgColor: null });
+        });
+        event.target.value = ''; // Reset input
+    };
+
+    function updateRecollectionItemStyle(itemId, styles) {
+        const recollectionData = getRecollections(currentRecollectionContactId);
+        const itemIndex = recollectionData.items.findIndex(i => i.id === itemId);
+        if (itemIndex > -1) {
+            recollectionData.items[itemIndex] = { ...recollectionData.items[itemIndex], ...styles };
+            saveRecollections(currentRecollectionContactId, recollectionData);
+            renderRecollectionItems(currentRecollectionContactId);
+            showToast("便签样式已更新");
+        }
+    }
+
+
+    // Modal for summarizing recollections
+    window.openSummarizeRecollectionModal = () => {
+        const chatKey = getMessagesKey(currentRecollectionContactId);
+        const allMessages = JSON.parse(localStorage.getItem(chatKey) || '[]');
+        const recollectionData = getRecollections(currentRecollectionContactId);
+        const unsummarizedCount = allMessages.length - (recollectionData.lastSummaryIndex + 1);
+
+        document.getElementById('recollection-summary-info').textContent = `你还有 ${unsummarizedCount} 条聊天记录未总结。`;
+        const confirmBtn = document.getElementById('recollection-summary-confirm-btn');
+        confirmBtn.disabled = unsummarizedCount <= 0;
+        confirmBtn.style.opacity = unsummarizedCount <= 0 ? 0.5 : 1;
+        
+        document.getElementById('recollection-summary-modal').classList.add('active');
+    };
+
+    window.closeRecollectionSummaryModal = () => {
+        document.getElementById('recollection-summary-modal').classList.remove('active');
+    };
+
+    async function executeRecollectionSummary() {
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        if (!settings?.api?.url || !settings?.api?.key) {
+            showToast('请先在设置中配置 API');
+            return;
+        }
+
+        const chatKey = getMessagesKey(currentRecollectionContactId);
+        const allMessages = JSON.parse(localStorage.getItem(chatKey) || '[]');
+        const recollectionData = getRecollections(currentRecollectionContactId);
+        const unsummarizedMessages = allMessages.slice(recollectionData.lastSummaryIndex + 1);
+
+        if (unsummarizedMessages.length === 0) {
+            showToast('没有新的聊天记录需要总结');
+            closeRecollectionSummaryModal();
+            return;
+        }
+
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contact = contacts.find(c => c.id === currentRecollectionContactId);
+        const roleName = contact ? (contact.alias || contact.name) : '角色';
+        const userName = contact ? (contact.userName || '你') : '你';
+        
+        const historyText = unsummarizedMessages.map(msg => {
+             if (msg.isTransfer) return `[系统消息：一笔转账]`;
+             if (msg.type === 'recalled') return `[系统消息：撤回了一条消息]`;
+             return `${msg.type === 'sent' ? userName : roleName}: ${msg.text}`;
+        }).join('\n');
+
+        const prompt = `请以第三人称、客观、不带感情的口吻总结以下聊天记录。总结成一段连贯的文字，像是在记录一件已经发生过的事。
+        
+聊天记录如下:
+---
+${historyText}
+---
+
+请开始总结:`;
+
+        const confirmBtn = document.getElementById('recollection-summary-confirm-btn');
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = '总结中...';
+
+        try {
+            const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url + '/v1'}/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
+                body: JSON.stringify({
+                    model: settings.api.model || 'gpt-3.5-turbo',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.2, // Low temperature for objective summary
+                })
+            });
+
+            if (!res.ok) {
+                 const errorData = await res.json();
+                 throw new Error(`API: ${res.status} - ${errorData.error.message}`);
+            }
+
+            const data = await res.json();
+            const summaryText = data.choices[0].message.content.trim();
+            
+            if (summaryText) {
+                const newSummary = {
+                    id: Date.now(),
+                    text: summaryText,
+                    timestamp: Date.now(),
+                    isSummary: true
+                };
+                recollectionData.items.push(newSummary);
+                recollectionData.lastSummaryIndex = allMessages.length - 1; // Update index
+                saveRecollections(currentRecollectionContactId, recollectionData);
+                renderRecollectionItems(currentRecollectionContactId);
+                showToast('总结完成！');
+            } else {
+                showToast('API未能生成有效总结');
+            }
+
+        } catch(e) {
+            showToast('总结失败: ' + e.message, 4000);
+            console.error(e);
+        } finally {
+            closeRecollectionSummaryModal();
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = '总结';
+        }
+    }
+
+
+    const originalCloseChatApp = window.closeChatApp || (() => {});
+    window.closeChatApp = () => {
+        body.classList.remove('recollection-active');
+        closeRecollectionDetail();
+        originalCloseChatApp(); // Call the original function
+    };
+    
+    // --- Mall App Logic (NEW & MODIFIED) ---
+    function getMallProductsCache() {
+        try {
+            const data = localStorage.getItem(MALL_PRODUCTS_CACHE_KEY);
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveMallProductsCache(cache) {
+        localStorage.setItem(MALL_PRODUCTS_CACHE_KEY, JSON.stringify(cache));
+    }
+
+
+    function getMallCategories() {
+        try {
+            let data = localStorage.getItem(MALL_CATEGORIES_KEY);
+            let categories = data ? JSON.parse(data) : [];
+            
+            const defaultCategory = {
+                id: 'default-recommend',
+                name: '推荐',
+                deletable: false,
+                description: '这个种类里面包含服饰鞋包 美妆个护 数码家电 家居家装 母婴用品 食品保健 图书音像 珠宝配饰 宠物生活 虚拟/服务。'
+            };
+    
+            if (!categories.some(cat => cat.id === defaultCategory.id)) {
+                categories.unshift(defaultCategory);
+            }
+            
+            categories.forEach(cat => {
+                if (cat.id === 'default-recommend') {
+                    cat.deletable = false;
+                    if (!cat.description) cat.description = defaultCategory.description;
+                } else {
+                    cat.deletable = true;
+                    if (!cat.hasOwnProperty('description')) cat.description = '';
+                    if (!cat.hasOwnProperty('boundRoleIds')) cat.boundRoleIds = [];
+                }
+            });
+    
+            saveMallCategories(categories);
+            return categories;
+        } catch (e) {
+            console.error("Error getting mall categories:", e);
+            const defaultCategory = {
+                id: 'default-recommend',
+                name: '推荐',
+                deletable: false,
+                description: '这个种类里面包含服饰鞋包 美妆个护 数码家电 家居家装 母婴用品 食品保健 图书音像 珠宝配饰 宠物生活 虚拟/服务。'
+            };
+            saveMallCategories([defaultCategory]);
+            return [defaultCategory];
+        }
+    }
+
+    function saveMallCategories(categories) {
+        localStorage.setItem(MALL_CATEGORIES_KEY, JSON.stringify(categories));
+    }
+
+    function renderMallCategories() {
+        const nav = document.getElementById('mall-category-nav');
+        nav.innerHTML = '';
+        const categories = getMallCategories();
+        
+        categories.forEach(cat => {
+            const item = document.createElement('div');
+            item.className = 'mall-category-item';
+            item.textContent = cat.name;
+            item.dataset.id = cat.id;
+            item.onclick = () => switchMallCategory(item);
+            item.ondblclick = () => {
+                openMallCategoryModal(true, cat.id);
+            };
+            nav.appendChild(item);
+        });
+
+        // Set active category
+        const activeItem = nav.querySelector(`[data-id="${currentMallCategoryId}"]`) || nav.firstChild;
+        if(activeItem) {
+            switchMallCategory(activeItem);
+        } else if (nav.firstChild) {
+            switchMallCategory(nav.firstChild);
+        }
+    }
+
     window.openMallApp = () => {
         body.classList.add('mall-active');
-        switchMallCategory(document.querySelector('#mall-category-nav .mall-category-item'), '推荐');
+        currentMallCategoryId = 'default-recommend';
+        renderMallCategories();
+        
+        // Setup button listeners
+        document.getElementById('mall-add-category-btn').onclick = () => openMallCategoryModal(false);
+        document.getElementById('mall-refresh-btn').onclick = () => generateMallProducts(true); // Force refresh
     };
 
     window.closeMallApp = () => {
         body.classList.remove('mall-active');
     };
 
-    window.switchMallCategory = (element, categoryName) => {
-        // No visual change for selected item, just update content
+    window.switchMallCategory = (element) => {
+        if (!element) return;
+        document.querySelectorAll('#mall-category-nav .mall-category-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        currentMallCategoryId = element.dataset.id;
+
         const contentArea = document.getElementById('mall-content');
-        contentArea.innerHTML = `<h1>${escapeHtml(categoryName)} 内容区</h1><p>这里将显示 ${escapeHtml(categoryName)} 分类的商品列表。</p>`;
+        contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div>`;
+        
+        const cache = getMallProductsCache();
+        if (cache[currentMallCategoryId]) {
+            renderMallProducts(cache[currentMallCategoryId]);
+        } else {
+            generateMallProducts(false); // Generate only if not cached
+        }
     };
     
+    // Modal for adding/editing a category
+    function openMallCategoryModal(isEditing = false, categoryId = null) {
+        const modal = document.getElementById('mall-category-modal');
+        const titleEl = document.getElementById('mall-category-modal-title');
+        const nameInput = document.getElementById('mall-category-name-input');
+        const descInput = document.getElementById('mall-category-desc-input');
+        const actionsContainer = document.getElementById('mall-category-modal-actions');
+        
+        isEditingMallCategory = isEditing;
+        currentMallCategoryId = categoryId;
+        
+        const categories = getMallCategories();
+        const category = categories.find(c => c.id === categoryId);
+
+        if (isEditing && category) {
+            titleEl.textContent = '编辑商品种类';
+            nameInput.value = category.name;
+            descInput.value = category.description || '';
+            tempMallCategoryRoleIds = [...(category.boundRoleIds || [])];
+            
+            // Default category cannot be deleted
+            if (category.deletable) {
+                actionsContainer.innerHTML = `
+                    <button class="wb-action-btn btn-confirm-delete" onclick="deleteMallCategory()">删除</button>
+                    <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
+                    <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
+                `;
+            } else {
+                actionsContainer.innerHTML = `
+                    <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
+                    <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
+                `;
+            }
+        } else {
+            isEditingMallCategory = false; // Force add mode if no category found
+            titleEl.textContent = '添加商品种类';
+            nameInput.value = '';
+            descInput.value = '';
+            tempMallCategoryRoleIds = [];
+            
+            actionsContainer.innerHTML = `
+                <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
+                <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
+            `;
+        }
+        
+        modal.classList.add('active');
+    }
+
+    function closeMallCategoryModal() {
+        document.getElementById('mall-category-modal').classList.remove('active');
+    }
+
+    
+    function openMallCategoryRoleBindModal() {
+        wbBindMultiSelect = true;
+        document.getElementById('wb-bind-modal-title').textContent = '绑定角色';
+        
+        wbBindCallback = (selectedIds) => {
+            tempMallCategoryRoleIds = selectedIds;
+            // No display update needed as the element is removed
+        };
+
+        openWorldBookBindModal('roles');
+    }
+
+    function saveMallCategory() {
+        const name = document.getElementById('mall-category-name-input').value.trim();
+        const description = document.getElementById('mall-category-desc-input').value.trim();
+        
+        if (!name) {
+            showToast('分类名称不能为空');
+            return;
+        }
+
+        let categories = getMallCategories();
+        
+        if (isEditingMallCategory) {
+            const index = categories.findIndex(c => c.id === currentMallCategoryId);
+            if (index !== -1) {
+                categories[index].name = name;
+                categories[index].description = description;
+                categories[index].boundRoleIds = tempMallCategoryRoleIds;
+            }
+        } else {
+            const newCategory = {
+                id: `custom-${Date.now()}`,
+                name: name,
+                description: description,
+                boundRoleIds: tempMallCategoryRoleIds,
+                deletable: true
+            };
+            categories.push(newCategory);
+        }
+
+        saveMallCategories(categories);
+        renderMallCategories();
+        closeMallCategoryModal();
+        showToast('保存成功');
+    }
+    
+    function deleteMallCategory() {
+        if (!isEditingMallCategory || !currentMallCategoryId) return;
+        
+        let categories = getMallCategories();
+        const categoryToDelete = categories.find(c => c.id === currentMallCategoryId);
+        if (!categoryToDelete || !categoryToDelete.deletable) {
+            showToast("默认分类不可删除");
+            return;
+        }
+
+        categories = categories.filter(c => c.id !== currentMallCategoryId);
+        saveMallCategories(categories);
+        
+        let cache = getMallProductsCache();
+        delete cache[currentMallCategoryId];
+        saveMallProductsCache(cache);
+        
+        currentMallCategoryId = 'default-recommend'; // Fallback to recommend
+        renderMallCategories();
+        closeMallCategoryModal();
+        showToast('分类已删除');
+    }
+    
+    // Generate mall products via AI
+    async function generateMallProducts(forceRefresh = false) {
+        const grid = document.getElementById('mall-product-grid');
+        if (!grid) return; 
+
+        let cache = getMallProductsCache();
+        if (!forceRefresh && cache[currentMallCategoryId]) {
+            renderMallProducts(cache[currentMallCategoryId]);
+            return;
+        }
+        
+        grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">正在生成商品...</p>';
+        
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
+            grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">请先在设置中配置 API</p>';
+            return;
+        }
+        
+        const categories = getMallCategories();
+        const currentCategory = categories.find(c => c.id === currentMallCategoryId);
+        if (!currentCategory) {
+            grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">无法找到当前分类</p>';
+            return;
+        }
+        
+        const categoryName = currentCategory.name;
+        const categoryDesc = currentCategory.description || '无';
+        
+        let roleContext = "无";
+        if (currentCategory.boundRoleIds && currentCategory.boundRoleIds.length > 0) {
+            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+            const allWorldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+            
+            const roleDetails = currentCategory.boundRoleIds.map(roleId => {
+                const contact = allContacts.find(c => c.id === roleId);
+                if (!contact) return '';
+                
+                let wbContent = (contact.worldbookIds || []).map(wbId => {
+                    const book = allWorldbooks.find(b => b.id === wbId);
+                    return book ? `[${book.title}]\n${book.entries.map(e => e.content).join('\n')}` : '';
+                }).join('\n\n');
+
+                return `角色: ${contact.alias || contact.name}\n人设: ${contact.persona || '无'}\n世界书: ${wbContent || '无'}`;
+            }).filter(Boolean).join('\n---\n');
+            
+            if (roleDetails) roleContext = roleDetails;
+        }
+
+        const prompt = `你是一个商品生成AI。请根据以下信息，生成一个包含10个商品的JSON数组。
+商品种类: ${categoryName}
+补充说明: ${categoryDesc}
+绑定的角色信息 (请参考他们的喜好和世界观来生成商品):
+---
+${roleContext}
+---
+每个商品对象必须包含以下字段:
+1. "name": (string) 商品名称，要生动有趣，符合角色设定。
+2. "emoji": (string) 一个最能代表该商品的emoji表情。
+3. "price": (number) "券后价", 一个在1到1000之间的数字。
+4. "sales": (number) "已售"数量，一个在0到100000之间的随机整数。
+严格按照JSON格式输出，不要包含任何其他文字。
+示例:
+[
+    { "name": "便携式魔法修复药水", "emoji": "🧪", "price": 29.9, "sales": 8567 },
+    { "name": "暗影潜行者专用夜视镜", "emoji": "🕶️", "price": 499, "sales": 234 }
+]`;
+        
+        try {
+            const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url + '/v1'}/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
+                body: JSON.stringify({
+                    model: settings.api.model,
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: parseFloat(settings.api.temp || 0.8),
+                    ...( (settings.api.url || '').includes('openai') && { response_format: { "type": "json_object" } } )
+                })
+            });
+            
+            if (!res.ok) throw new Error(`API Error: ${res.status}`);
+
+            const data = await res.json();
+            let content = data.choices[0].message.content;
+            
+            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
+            if (jsonMatch) { content = jsonMatch[1]; }
+            
+            const products = JSON.parse(content);
+            if (!Array.isArray(products)) throw new Error("API did not return an array.");
+            
+            cache[currentMallCategoryId] = products;
+            saveMallProductsCache(cache);
+            renderMallProducts(products);
+
+        } catch (error) {
+            console.error("Error generating mall products:", error);
+            grid.innerHTML = `<p style="color:#cc0000; text-align:center; grid-column: span 2;">商品生成失败: ${error.message}</p>`;
+        }
+    }
+    
+    function formatSales(num) {
+        if (num >= 10000) {
+            return (num / 10000).toFixed(1).replace(/\.0$/, '') + '万+';
+        }
+        return num + '+';
+    }
+
+    function renderMallProducts(products) {
+        const grid = document.getElementById('mall-product-grid');
+        grid.innerHTML = '';
+
+        if (!products || products.length === 0) {
+            grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">这个分类下还没有商品哦~</p>';
+            return;
+        }
+
+        products.forEach(p => {
+            const item = document.createElement('div');
+            item.className = 'mall-product-item';
+            
+            const price = parseFloat(p.price) || 0;
+            const sales = parseInt(p.sales) || 0;
+            
+            item.innerHTML = `
+                <div class="product-image">${p.emoji || '📦'}</div>
+                <div class="product-details">
+                    <div class="product-name">${escapeHtml(p.name)}</div>
+                    <div class="product-price-info">
+                        <span class="product-price">${price.toFixed(2)}</span>
+                        <div class="product-price-extra">
+                            <span class="product-coupon-tag">券后价</span>
+                            <span class="product-sales">已售 ${formatSales(sales)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(item);
+        });
+    }
+
     // --- Forum App Logic ---
     window.openForumApp = () => {
         body.classList.add('forum-active');
@@ -5127,7 +6461,7 @@ Strictly adhere to the JSON format. Example:
 
     // --- Chat App Logic ---
     window.openChatApp = () => { body.classList.add('chat-active'); switchChatTab(0, 'Chat'); renderChatList(); };
-    window.closeChatApp = () => { body.classList.remove('chat-active'); closeChatConversation(); };
+    window.closeChatApp = () => { body.classList.remove('chat-active'); closeChatConversation(); body.classList.remove('recollection-active'); };
     window.switchChatTab = (index, title) => {
         const titleEl = document.getElementById('chat-page-title');
         const addFriendIcon = document.getElementById('chat-header-add-friend-icon');
@@ -5246,25 +6580,25 @@ Strictly adhere to the JSON format. Example:
                     return;
                 }
 
-                const authorNickname = author ? (isUserMoment ? author.nickname : (author.alias || author.name)) : '未知用户';
+                const authorNickname = author ? (isUserMoment ? userProfile.nickname : (author.alias || author.name)) : '未知用户';
                 const authorAvatar = author ? (isUserMoment ? momentsProfile.avatar : author.avatar) : 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
                 
                 const userHasLiked = moment.likes.includes(userProfile.qqId);
                 const likeBtnText = userHasLiked ? '取消' : '赞';
                 const likeIconUrl = userHasLiked ? "https://img.heliar.top/file/1770356886806_喜欢_like_3.png" : "https://img.heliar.top/file/1770353311894_喜欢_like_2.png";
                 
-                const privateTag = moment.isPrivate ? `<span style="color: #999; font-weight: 400;">仅你可见</span>` : '';
+                const privateTag = moment.isPrivate ? `<span style="color: #999; font-weight: 400; margin-left: 8px;">仅你可见</span>` : '';
 
 
                 let likesHtml = '';
-if (moment.likes.length > 0) {
-    // 显示点赞用户的昵称，而非数字
-    const likeUserNickname = userProfile.nickname; // 当前只有用户自己能点赞
-    likesHtml = `<div class="moment-likes"><img src="https://img.heliar.top/file/1770356881218_喜欢_like_4.png" style="width:14px;height:14px;object-fit:contain;"> ${escapeHtml(likeUserNickname)}</div>`;
-}
+                if (moment.likes && moment.likes.length > 0) {
+                    const likerProfile = getUserProfile(); // In this version, only the main user can like
+                    const likerName = likerProfile.nickname || "User";
+                    likesHtml = `<div class="moment-likes"><img src="https://img.heliar.top/file/1770356881218_喜欢_like_4.png" style="width:14px;height:14px;object-fit:contain;"> ${escapeHtml(likerName)}</div>`;
+                }
 
                 let commentsHtml = '';
-                if (moment.comments.length > 0) {
+                if (moment.comments && moment.comments.length > 0) {
                     commentsHtml = `<div class="moment-comments-list">` +
                         moment.comments.map(c => 
                             `<div class="moment-comment-item"><span class="user">${escapeHtml(c.user)}:</span> <span class="text">${escapeHtml(c.text)}</span></div>`
@@ -5286,12 +6620,11 @@ if (moment.likes.length > 0) {
                     `</div>`;
                 }
                 
-                const metaActionsHtml = isUserMoment 
-                    ? `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">`
-                    : '';
+                const showDeleteBtn = isUserMoment || (author && author.id);
 
                 listHtml += `
                     <div class="moment-item" id="moment-${moment.id}">
+                        ${showDeleteBtn ? `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">` : ''}
                         <img src="${authorAvatar}" class="moment-item-avatar" alt="avatar">
                         <div class="moment-item-content">
                             <div class="moment-item-nickname">${escapeHtml(authorNickname)}</div>
@@ -5299,15 +6632,16 @@ if (moment.likes.length > 0) {
                             ${imageGridHtml}
                             <div class="moment-item-meta">
                                 <div class="moment-item-meta-left">
-                                    <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
                                     ${privateTag}
-                                    ${metaActionsHtml}
                                 </div>
-                                <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
-                                    ··
-                                    <div class="moment-actions-popup">
-                                        <div class="moment-popup-btn" onclick="toggleLike(${moment.id})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
-                                        <div class="moment-popup-btn" onclick="openCommentInput(${moment.id})"><img src="https://img.heliar.top/file/1770353307524_评论_comment.png"> 评论</div>
+                                <div style="display:flex; align-items:center; gap: 8px;">
+                                     <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
+                                    <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
+                                        ··
+                                        <div class="moment-actions-popup">
+                                            <div class="moment-popup-btn" onclick="toggleLike(${moment.id})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
+                                            <div class="moment-popup-btn" onclick="openCommentInput(${moment.id})"><img src="https://img.heliar.top/file/1770353307524_评论_comment.png"> 评论</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -5322,10 +6656,10 @@ if (moment.likes.length > 0) {
         
         wrapper.innerHTML = `
             <div class="moments-header">
-                <div class="moments-cover-img" style="background-image: url('${momentsProfile.cover}')" onclick="editMomentsCover()"></div>
+                <div class="moments-cover-img" style="background-image: url('${momentsProfile.cover}')"></div>
                 <div class="moments-user-info">
                     <span class="moments-user-nickname">${escapeHtml(userProfile.nickname)}</span>
-                    <img src="${momentsProfile.avatar}" class="moments-user-avatar" alt="avatar" onclick="editMomentsAvatar()">
+                    <img src="${momentsProfile.avatar}" class="moments-user-avatar" alt="avatar">
                 </div>
             </div>
             <div id="moments-list">
@@ -5350,28 +6684,6 @@ if (moment.likes.length > 0) {
         currentDeleteMomentId = null;
     };
 
-
-    window.editMomentsAvatar = () => {
-        const p = getMomentsProfile();
-        const newUrl = prompt("请输入朋友圈头像图片链接:", p.avatar);
-        if (newUrl && newUrl.trim() !== '') {
-            p.avatar = newUrl.trim();
-            saveMomentsProfile(p);
-            renderMomentsPage();
-            showToast("朋友圈头像已更新");
-        }
-    };
-    
-    window.editMomentsCover = () => {
-        const p = getMomentsProfile();
-        const newUrl = prompt("请输入朋友圈背景图片链接:", p.cover);
-        if (newUrl && newUrl.trim() !== '') {
-            p.cover = newUrl.trim();
-            saveMomentsProfile(p);
-            renderMomentsPage();
-            showToast("朋友圈背景已更新");
-        }
-    };
 
     window.toggleActionsPopup = (momentId, event) => {
         event.stopPropagation();
@@ -5507,6 +6819,11 @@ if (moment.likes.length > 0) {
     
     const profile = getUserProfile();
     const myId = profile.qqId;
+    
+    if (!moments[momentIndex].likes) {
+        moments[momentIndex].likes = [];
+    }
+    
     const likeIndex = moments[momentIndex].likes.indexOf(myId);
 
     if (likeIndex > -1) {
@@ -5575,13 +6892,16 @@ if (moment.likes.length > 0) {
             text: commentText
         };
         
+        if (!moments[momentIndex].comments) {
+            moments[momentIndex].comments = [];
+        }
         moments[momentIndex].comments.push(newComment);
         saveMomentsData(moments);
         
         closeCommentInput();
         renderMomentsPage();
     };
-
+    
     // --- NEW: Urge To Post Logic ---
     window.openUrgeToPostModal = () => {
         const overlay = document.getElementById('urge-post-overlay');
@@ -5624,127 +6944,14 @@ if (moment.likes.length > 0) {
         setTimeout(() => overlay.style.display = 'none', 300);
     };
 
-    async function generateMomentForCharacter(contact) {
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
-            showToast('请先配置API', 3000);
-            return null;
+    window.confirmUrgeToPost = () => {
+        if (selectedUrgeCharIds.size === 0) {
+            showToast('请至少选择一个角色');
+            return;
         }
-
-        let worldBookContext = "无特殊设定";
-        if (contact.worldbookIds && contact.worldbookIds.length > 0) {
-            const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-            const wbContents = contact.worldbookIds.map(id => {
-                 const wb = worldbooks.find(b => b.id === id);
-                 if (wb) return `【世界书：${wb.title}】\n` + wb.entries.map(e => `[${e.key || '设定'}]: ${e.content}`).join('\n');
-                 return '';
-            }).filter(Boolean).join('\n\n');
-            if (wbContents) worldBookContext = wbContents;
-        }
-        
-        const prompt = `你现在是角色“${contact.alias || contact.name}”，你的核心人设是：“${contact.persona}”。
-        世界观背景设定如下（必须严格遵守）：
-        ${worldBookContext}
-        现在，请你以角色的身份，发布一条朋友圈动态。
-        
-        **输出要求 (必须严格遵守):**
-        1. 你必须以 JSON 格式输出。
-        2. JSON 必须包含两个字段: "isPrivate" (布尔值) 和 "text" (字符串)。
-        3. "isPrivate": 如果动态内容是关于用户的、私密的、不好意思公开说的暗示、或悄悄话，这个值必须是 true。其他情况（如日常分享、风景、工作学习等）则为 false。
-        4. "text": 这是动态的文案内容。文案要自然、口语化，符合角色人设。
-        
-        **示例1 (公开动态):**
-        {
-          "isPrivate": false,
-          "text": "今天天气真好，出门散步了。"
-        }
-        
-        **示例2 (私密动态):**
-        {
-          "isPrivate": true,
-          "text": "又在想你了...不知道你现在在做什么。"
-        }
-        
-        **现在，请生成你的动态JSON：**`;
-        
-        try {
-            const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url + '/v1'}/chat/completions`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
-                body: JSON.stringify({
-                    model: settings.api.model || 'gpt-3.5-turbo',
-                    messages: [{ role: 'user', content: prompt }],
-                    temperature: parseFloat(settings.api.temp || 0.9),
-                })
-            });
-            if (!res.ok) throw new Error('API request failed');
-            const data = await res.json();
-            const rawContent = data.choices[0].message.content.trim();
-            
-            const jsonMatch = rawContent.match(/{[\s\S]*}/);
-            if (!jsonMatch) throw new Error("API did not return valid JSON.");
-            
-            const momentData = JSON.parse(jsonMatch[0]);
-
-            if (typeof momentData.isPrivate !== 'boolean' || typeof momentData.text !== 'string') {
-                throw new Error("Invalid JSON structure from API.");
-            }
-            
-            const currentTime = Date.now();
-            return {
-                id: currentTime,
-                authorId: contact.id,
-                timestamp: currentTime,
-                text: momentData.text,
-                isPrivate: momentData.isPrivate,
-                images: [],
-                likes: [],
-                comments: []
-            };
-        } catch (error) {
-            console.error(`Failed to generate moment for ${contact.alias || contact.name}:`, error);
-            showToast(`为“${contact.alias || contact.name}”生成动态失败`, 3000);
-            return null;
-        }
-    }
-
-    window.confirmUrgeToPost = async () => {
-    if (selectedUrgeCharIds.size === 0) {
-        showToast('请至少选择一个角色');
-        return;
-    }
-
-    closeUrgeToPostModal();
-    showToast('正在生成动态，请稍候...', 5000);
-
-    const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-    let moments = getMomentsData();
-    const newMoments = [];
-
-    let delayOffset = 0; // 添加延迟偏移量，确保每个动态的时间戳不同
-    for (const contactId of selectedUrgeCharIds) {
-        const contact = contacts.find(c => c.id === contactId);
-        if (contact) {
-            const newMoment = await generateMomentForCharacter(contact);
-            if (newMoment) {
-                // 为每个动态添加不同的时间戳偏移，避免ID冲突
-                newMoment.id = newMoment.id + delayOffset;
-                newMoment.timestamp = newMoment.timestamp + delayOffset;
-                newMoments.push(newMoment);
-                delayOffset += 100; // 每个动态间隔100毫秒
-            }
-        }
-    }
-
-    if (newMoments.length > 0) {
-        moments.unshift(...newMoments);
-        saveMomentsData(moments);
-        renderMomentsPage();
-        showToast(`成功生成 ${newMoments.length} 条动态！`);
-    } else {
-        showToast('未能生成任何动态，请检查API或稍后重试。');
-    }
-};
+        closeUrgeToPostModal();
+        showToast('已成功催促！');
+    };
     
     // --- Auto Post Moment Logic ---
     function scheduleAutoPost(contactId, intervalMinutes) {
@@ -6871,7 +8078,7 @@ ${recentHistory}
             const data = await res.json();
             let aiText = data.choices[0].message.content.trim();
 
-            const actionRegex = /\[ACTION:(\w+),(.+?)\]/;
+            const actionRegex = /$$ACTION:(\w+),(.+?)$$/;
             const match = aiText.match(actionRegex);
 
             if (match) {
@@ -6949,7 +8156,7 @@ ${recentHistory}
     window.setRoleBgByUrl = () => { const urlInput = document.getElementById('role-bg-url-input'); const bgUrl = urlInput.value.trim(); if (!bgUrl) { showToast("请输入有效的图片URL"); return; } document.getElementById('role-bg-preview').style.backgroundImage = `url(${bgUrl})`; tempRoleBgUrl = bgUrl; showToast("背景URL已预览"); };
     window.triggerRoleUserAvatarEdit = () => { document.getElementById('input-role-user-avatar').click(); };
     window.handleRoleUserAvatarUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, (base64) => { document.getElementById('role-user-avatar').src = base64; }); };
-    window.saveRoleSettings = () => { if (!currentChatContactId) return; const newAlias = document.getElementById('role-setting-alias').value.trim(); if (!newAlias) { showToast("备注名不能为空"); return; } let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === currentChatContactId); if (idx !== -1) { contacts[idx].alias = newAlias; contacts[idx].signature = document.getElementById('role-setting-signature').value.trim(); contacts[idx].avatar = document.getElementById('role-setting-avatar').src; contacts[idx].persona = document.getElementById('role-setting-persona').value.trim(); contacts[idx].timePerceptionEnabled = document.getElementById('role-time-perception-switch').checked; contacts[idx].memoryDepth = parseInt(document.getElementById('role-memory-depth').value); if (isNaN(contacts[idx].memoryDepth)) contacts[idx].memoryDepth = 15; contacts[idx].autoPostEnabled = document.getElementById('role-auto-post-switch').checked; contacts[idx].autoPostInterval = parseInt(document.getElementById('role-auto-post-interval').value); if (isNaN(contacts[idx].autoPostInterval)) contacts[idx].autoPostInterval = 60; contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage; contacts[idx].userAvatar = document.getElementById('role-user-avatar').src; contacts[idx].userName = document.getElementById('role-user-name').value.trim(); contacts[idx].userPersona = document.getElementById('role-user-persona').value.trim(); contacts[idx].customCss = document.getElementById('role-setting-css').value; contacts[idx].worldbookIds = tempSelectedWorldBookIds; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); if (contacts[idx].autoPostEnabled) { scheduleAutoPost(contacts[idx].id, contacts[idx].autoPostInterval); } else { stopAutoPost(contacts[idx].id); } document.getElementById('chat-conv-title').innerText = newAlias; document.getElementById('chat-conv-signature').innerText = contacts[idx].signature; document.getElementById('chat-conversation-view').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : 'none'; const styleTag = document.getElementById('custom-chat-style'); if(styleTag) styleTag.innerHTML = contacts[idx].customCss; renderChatList(); renderContactList(); renderConversationMessages(); showToast("设置已保存"); closeRoleSettings(); } };
+        window.saveRoleSettings = () => { if (!currentChatContactId) return; const newAlias = document.getElementById('role-setting-alias').value.trim(); if (!newAlias) { showToast("备注名不能为空"); return; } let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); const idx = contacts.findIndex(c => c.id === currentChatContactId); if (idx !== -1) { contacts[idx].alias = newAlias; contacts[idx].signature = document.getElementById('role-setting-signature').value.trim(); contacts[idx].avatar = document.getElementById('role-setting-avatar').src; contacts[idx].persona = document.getElementById('role-setting-persona').value.trim(); contacts[idx].timePerceptionEnabled = document.getElementById('role-time-perception-switch').checked; contacts[idx].memoryDepth = parseInt(document.getElementById('role-memory-depth').value); if (isNaN(contacts[idx].memoryDepth)) contacts[idx].memoryDepth = 15; contacts[idx].autoPostEnabled = document.getElementById('role-auto-post-switch').checked; contacts[idx].autoPostInterval = parseInt(document.getElementById('role-auto-post-interval').value); if (isNaN(contacts[idx].autoPostInterval)) contacts[idx].autoPostInterval = 60; contacts[idx].backgroundImage = tempRoleBgUrl || contacts[idx].backgroundImage; contacts[idx].userAvatar = document.getElementById('role-user-avatar').src; contacts[idx].userName = document.getElementById('role-user-name').value.trim(); contacts[idx].userPersona = document.getElementById('role-user-persona').value.trim(); contacts[idx].customCss = document.getElementById('role-setting-css').value; contacts[idx].worldbookIds = tempSelectedWorldBookIds; localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts)); if (contacts[idx].autoPostEnabled) { scheduleAutoPost(contacts[idx].id, contacts[idx].autoPostInterval); } else { stopAutoPost(contacts[idx].id); } document.getElementById('chat-conv-title').innerText = newAlias; document.getElementById('chat-conv-signature').innerText = contacts[idx].signature; document.getElementById('chat-conversation-view').style.backgroundImage = tempRoleBgUrl ? `url(${tempRoleBgUrl})` : 'none'; const styleTag = document.getElementById('custom-chat-style'); if(styleTag) styleTag.innerHTML = contacts[idx].customCss; renderChatList(); renderContactList(); renderConversationMessages(); showToast("设置已保存"); closeRoleSettings(); } };
 
     // --- MODIFIED: CSS Preset Functions ---
     window.openSaveCssPresetModal = () => {
@@ -7077,7 +8284,12 @@ ${recentHistory}
 
         if (type === 'roles') {
             items = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-            tempSelectedIds = tempForumBoundRoleIds;
+            // Distinguish source of role binding request
+            if(document.getElementById('mall-category-modal').classList.contains('active')) {
+                tempSelectedIds = tempMallCategoryRoleIds;
+            } else {
+                tempSelectedIds = tempForumBoundRoleIds;
+            }
         } else { 
             items = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
             let currentContactWB = tempSelectedWorldBookIds.length > 0 ? tempSelectedWorldBookIds : [];
@@ -7143,14 +8355,14 @@ ${recentHistory}
     window.hideSettingsPage = () => {
         body.classList.remove('settings-active');
         const phoneFrameEnabled = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
-        applyPhoneFrame(phoneFrameEnabled);
+                applyPhoneFrame(phoneFrameEnabled);
     };
 
     
     function handleUrlInput(inputEl, previewEl, callback) { const url = inputEl.value.trim(); if (url) { const img = new Image(); img.onload = () => { previewEl.style.backgroundImage = `url(${url})`; if (callback) callback(url); }; img.onerror = () => { previewEl.style.backgroundImage = ''; }; img.src = url; } else { previewEl.style.backgroundImage = ''; } }
     function handleImgSrcInput(inputEl, imgEl) { const url = inputEl.value.trim(); if (url) { imgEl.src = url; imgEl.onerror = () => {imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }; } else { imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; } }
-    const applyIconToUI = (appId, url) => { const el = document.getElementById(appId); if (!el) return; if (url && (url.startsWith('http') || url.startsWith('data:'))) { el.innerHTML = ''; el.style.backgroundImage = `url(${url})`; } else { el.style.backgroundImage = ''; const defaults = { 'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '📸', 'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '📅', 'icon-app8': '💰', 'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️' }; if (defaults[appId]) el.innerHTML = defaults[appId]; } };
-    const populateSettingsList = () => { const container = document.getElementById('settings-app-list-container'); container.innerHTML = ''; const appIcons = [ { id: 'icon-app1', name: 'Chat', default: '☁️' }, { id: 'icon-app2', name: '世界书', default: '🎵' }, { id: 'icon-app3', name: '论坛', default: '💬' }, { id: 'icon-app4', name: '相册', default: '📸' }, { id: 'icon-app5', name: 'HUshhh', default: '🧭' }, { id: 'icon-app6', name: '商城', default: '🎮' }, { id: 'icon-app7', name: '日历', default: '📅' }, { id: 'icon-app8', name: 'Wallet', default: '💰' }, { id: 'icon-dock-settings', name: 'Dock-设置', default: '⚙️' }, { id: 'icon-dock-ai', name: 'Dock-AI', default: '🤖' }, { id: 'icon-dock-safari', name: 'Dock-指南针', default: '🧭' }, { id: 'icon-dock-messages', name: 'Dock-信息', default: '✉️' } ]; appIcons.forEach(app => { const item = document.createElement('div'); item.className = 'app-icon-item'; const cur = document.getElementById(app.id); const bg = cur.style.backgroundImage; item.innerHTML = `<div class="app-icon-preview" id="preview-${app.id}" style="${bg ? `background-image:${bg}` : ''}">${!bg ? app.default : ''}</div><div class="app-icon-info"><div class="app-icon-name">${app.name}</div><div class="app-icon-input"><input type="text" id="url-${app.id}" placeholder="图片 URL" value="${bg ? bg.slice(5, -2).replace(/['"]/g, '') : ''}"><button onclick="triggerIconUpload('${app.id}')">上传</button></div></div>`; container.appendChild(item); const inp = document.getElementById(`url-${app.id}`); inp.addEventListener('input', () => { if (inp.value.trim()) handleUrlInput(inp, document.getElementById(`preview-${app.id}`), (u) => applyIconToUI(app.id, u)); else { applyIconToUI(app.id, ''); document.getElementById(`preview-${app.id}`).style.backgroundImage = ''; document.getElementById(`preview-${app.id}`).innerHTML = app.default; } }); }); };
+    const applyIconToUI = (appId, url) => { const el = document.getElementById(appId); if (!el) return; if (url && (url.startsWith('http') || url.startsWith('data:'))) { el.innerHTML = ''; el.style.backgroundImage = `url(${url})`; } else { el.style.backgroundImage = ''; const defaults = { 'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '🔮', 'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '📅', 'icon-app8': '💰', 'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️' }; if (defaults[appId]) el.innerHTML = defaults[appId]; } };
+    const populateSettingsList = () => { const container = document.getElementById('settings-app-list-container'); container.innerHTML = ''; const appIcons = [ { id: 'icon-app1', name: 'Chat', default: '☁️' }, { id: 'icon-app2', name: '世界书', default: '🎵' }, { id: 'icon-app3', name: '论坛', default: '💬' }, { id: 'icon-app4', name: '回忆', default: '🔮' }, { id: 'icon-app5', name: 'HUshhh', default: '🧭' }, { id: 'icon-app6', name: '商城', default: '🎮' }, { id: 'icon-app7', name: '日历', default: '📅' }, { id: 'icon-app8', name: 'Wallet', default: '💰' }, { id: 'icon-dock-settings', name: 'Dock-设置', default: '⚙️' }, { id: 'icon-dock-ai', name: 'Dock-AI', default: '🤖' }, { id: 'icon-dock-safari', name: 'Dock-指南针', default: '🧭' }, { id: 'icon-dock-messages', name: 'Dock-信息', default: '✉️' } ]; appIcons.forEach(app => { const item = document.createElement('div'); item.className = 'app-icon-item'; const cur = document.getElementById(app.id); const bg = cur.style.backgroundImage; item.innerHTML = `<div class="app-icon-preview" id="preview-${app.id}" style="${bg ? `background-image:${bg}` : ''}">${!bg ? app.default : ''}</div><div class="app-icon-info"><div class="app-icon-name">${app.name}</div><div class="app-icon-input"><input type="text" id="url-${app.id}" placeholder="图片 URL" value="${bg ? bg.slice(5, -2).replace(/['"]/g, '') : ''}"><button onclick="triggerIconUpload('${app.id}')">上传</button></div></div>`; container.appendChild(item); const inp = document.getElementById(`url-${app.id}`); inp.addEventListener('input', () => { if (inp.value.trim()) handleUrlInput(inp, document.getElementById(`preview-${app.id}`), (u) => applyIconToUI(app.id, u)); else { applyIconToUI(app.id, ''); document.getElementById(`preview-${app.id}`).style.backgroundImage = ''; document.getElementById(`preview-${app.id}`).innerHTML = app.default; } }); }); };
     window.triggerIconUpload = (id) => { const i = document.getElementById('input-app-icon'); i.dataset.target = id; i.click(); };
     window.handleIconUpload = (e) => { const f = e.target.files[0]; const id = e.target.dataset.target; if (!f || !id) return; const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; applyIconToUI(id, d); document.getElementById(`preview-${id}`).style.backgroundImage = `url(${d})`; document.getElementById(`preview-${id}`).innerHTML = ''; document.getElementById(`url-${id}`).value = d; }; r.readAsDataURL(f); };
     window.handleWallpaperUpload = (e) => { 
@@ -7176,7 +8388,7 @@ ${recentHistory}
     window.handlePhotoWidgetUpload = (e) => { const file = e.target.files[0]; if(!file) return; const r = new FileReader(); r.onload = (ev) => { const d = ev.target.result; const img = document.getElementById('photo-widget-img'); const ph = document.getElementById('photo-widget-placeholder'); img.src = d; img.style.display = 'block'; ph.style.display = 'none'; saveAllSettings(); showToast("小组件图片已更新!"); }; r.readAsDataURL(file); };
 
     // --- Profile (Me) Page Functions ---
-        function getUserProfile() {
+    function getUserProfile() {
         try {
             const p = localStorage.getItem(USER_PROFILE_KEY);
             const profile = p ? JSON.parse(p) : {};
@@ -7215,8 +8427,17 @@ ${recentHistory}
     window.editQQID = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); const newID = prompt("请输入QQ号:", p.qqId); if (newID && newID.trim()) { p.qqId = newID.trim(); saveUserProfile(p); loadUserProfile(); } };
     window.incrementLikeCount = (e) => { if(e) e.stopPropagation(); const p = getUserProfile(); p.likes = parseInt(p.likes) + 1; saveUserProfile(p); loadUserProfile(); const icon = document.querySelector('.me-like-icon'); icon.style.transform = "scale(1.2) rotate(-10deg)"; setTimeout(() => icon.style.transform = "scale(1) rotate(0deg)", 150); };
     
-        window.openMeSettings = () => {
+    // --- Moments Settings (New) ---
+    window.triggerMomentsAvatarUpload = () => document.getElementById('input-moments-avatar').click();
+    window.handleMomentsAvatarUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 200, (base64) => { document.getElementById('me-settings-moments-avatar-preview').src = base64; document.getElementById('me-settings-moments-avatar-url').value = '(已上传本地图片)'; }); };
+    window.triggerMomentsCoverUpload = () => document.getElementById('input-moments-cover').click();
+    window.handleMomentsCoverUpload = (event) => { const file = event.target.files[0]; if (!file) return; compressImage(file, 800, (base64) => { document.getElementById('me-settings-moments-cover-preview').style.backgroundImage = `url(${base64})`; document.getElementById('me-settings-moments-cover-url').value = '(已上传本地图片)'; }); };
+
+
+    window.openMeSettings = () => {
         const p = getUserProfile();
+        const mp = getMomentsProfile();
+
         document.getElementById('me-settings-nickname').value = p.nickname || '';
         document.getElementById('me-settings-qq-id').value = p.qqId || '';
         document.getElementById('me-settings-likes').value = p.likes || 0;
@@ -7224,6 +8445,12 @@ ${recentHistory}
         document.getElementById('me-settings-cover-url').value = p.cover || '';
         document.getElementById('me-settings-avatar-preview').src = p.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         document.getElementById('me-settings-cover-preview').style.backgroundImage = p.cover ? `url(${p.cover})` : '';
+
+        // Load Moments settings
+        document.getElementById('me-settings-moments-avatar-preview').src = mp.avatar;
+        document.getElementById('me-settings-moments-avatar-url').value = mp.avatar;
+        document.getElementById('me-settings-moments-cover-preview').style.backgroundImage = `url(${mp.cover})`;
+        document.getElementById('me-settings-moments-cover-url').value = mp.cover;
 
         document.getElementById('me-settings-payment-password').value = p.paymentPassword || '000000';
 
@@ -7245,7 +8472,8 @@ ${recentHistory}
         document.getElementById('me-settings-modal').classList.remove('active');
     };
 
-        window.saveMeSettings = () => {
+    window.saveMeSettings = () => {
+        // Save Profile Data
         const p = getUserProfile();
         p.nickname = document.getElementById('me-settings-nickname').value.trim();
         p.qqId = document.getElementById('me-settings-qq-id').value.trim();
@@ -7270,9 +8498,24 @@ ${recentHistory}
         for (let i = 0; i < 8; i++) {
             p.memberUrls[i] = document.getElementById(`me-input-m${i+1}`).value.trim();
         }
-        
         saveUserProfile(p);
         loadUserProfile();
+
+        // Save Moments Data
+        const mp = getMomentsProfile();
+        const momentsAvatarUrl = document.getElementById('me-settings-moments-avatar-url').value.trim();
+        if (momentsAvatarUrl.startsWith('data:image') || momentsAvatarUrl.startsWith('http')) {
+            mp.avatar = momentsAvatarUrl;
+        }
+        const momentsCoverUrl = document.getElementById('me-settings-moments-cover-url').value.trim();
+         if (momentsCoverUrl.startsWith('data:image') || momentsCoverUrl.startsWith('http')) {
+            mp.cover = momentsCoverUrl;
+        }
+        saveMomentsProfile(mp);
+        if (document.getElementById('chat-tab-2').classList.contains('active')) {
+            renderMomentsPage();
+        }
+
         showToast('个人主页设置已保存');
         closeMeSettings();
     };
@@ -7312,7 +8555,7 @@ ${recentHistory}
         if(v.chatAvatar1) document.getElementById('chat-avatar-1').style.backgroundImage = `url(${v.chatAvatar1})`;
         if(v.chatAvatar2) document.getElementById('chat-avatar-2').style.backgroundImage = `url(${v.chatAvatar2})`;
         const i1 = document.querySelector('.chat-bubble-input.left-bubble'); const i2 = document.querySelector('.chat-bubble-input.right-bubble');
-        if(i1 && v.chatText1) { i1.value = v.chatText1; adjustInputWidth(i1); }
+                if(i1 && v.chatText1) { i1.value = v.chatText1; adjustInputWidth(i1); }
         if(i2 && v.chatText2) { i2.value = v.chatText2; adjustInputWidth(i2); }
         const pImg = document.getElementById('photo-widget-img'); const pPh = document.getElementById('photo-widget-placeholder');
         if (v.photoWidgetUrl && v.photoWidgetUrl.length > 20 && !v.photoWidgetUrl.includes('null')) { pImg.src = v.photoWidgetUrl; pImg.style.display = 'block'; pPh.style.display = 'none'; } else { pImg.style.display = 'none'; pPh.style.display = 'flex'; }
@@ -7441,7 +8684,8 @@ ${recentHistory}
             ALL_SETTINGS_KEY, CHAT_DATA_KEY, USER_PROFILE_KEY, WALLET_DATA_KEY,
             WORLDBOOK_DATA_KEY, IOS_MODE_KEY, PHONE_FRAME_KEY, PHONE_CASE_COLOR_KEY,
             CAT_EARS_KEY, CAT_EAR_COLOR_KEY, MOMENTS_DATA_KEY, MOMENTS_PROFILE_KEY,
-            FORUMS_DATA_KEY, FORUM_POSTS_DATA_KEY, FORUM_USER_DATA_KEY, CSS_PRESETS_KEY
+            FORUMS_DATA_KEY, FORUM_POSTS_DATA_KEY, FORUM_USER_DATA_KEY, CSS_PRESETS_KEY,
+            MALL_CATEGORIES_KEY, MALL_PRODUCTS_CACHE_KEY
         ];
 
         const backupData = {};
@@ -7455,7 +8699,7 @@ ${recentHistory}
 
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key.startsWith('chat_msgs_')) {
+            if (key.startsWith('chat_msgs_') || key.startsWith(RECOLLECTION_DATA_KEY_PREFIX)) {
                 backupData[key] = localStorage.getItem(key);
             }
         }
@@ -7534,7 +8778,7 @@ ${recentHistory}
         loadSettings();
         renderChatList();
         loadUserProfile();
-        renderForumList();
+                renderForumList();
         renderForumMePage(); 
         generateKeypad();
         initializeAllAutoPosts();
