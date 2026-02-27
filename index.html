@@ -8808,8 +8808,8 @@ Strictly adhere to the JSON format. Example:
             document.getElementById('custom-image-url').value = settings.visual.widget2 || '';
             if(settings.visual.widget2) document.getElementById('custom-image-preview').style.backgroundImage = `url(${settings.visual.widget2})`;
         }
-        renderSettingsAppList(settings.apps || {});
-        document.getElementById('settings-page').classList.add('active');
+                renderSettingsAppList(settings.apps || {});
+        body.classList.add('settings-active'); // 修改了这里
         
         const frameSettingsModule = document.getElementById('phone-frame-settings-module');
         if (localStorage.getItem(PHONE_FRAME_KEY) === 'true') {
@@ -8819,7 +8819,8 @@ Strictly adhere to the JSON format. Example:
         }
     };
     
-    window.hideSettingsPage = () => { document.getElementById('settings-page').classList.remove('active'); };
+    window.hideSettingsPage = () => { body.classList.remove('settings-active'); }; // 修改了这里
+
     
     window.triggerPhotoWidgetUpload = () => { document.getElementById('input-photo-widget').click(); };
     window.handlePhotoWidgetUpload = (event) => {
