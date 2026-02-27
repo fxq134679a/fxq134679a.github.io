@@ -5415,7 +5415,7 @@
         });
     };
     
-            window.openRecollectionColorSettings = () => {
+                window.openRecollectionColorSettings = () => {
         const page = document.getElementById('recollection-color-page');
         const list = document.getElementById('recollection-color-list');
         list.innerHTML = '';
@@ -5426,13 +5426,31 @@
         } else {
             contacts.forEach(contact => {
                 const recollectionData = getRecollections(contact.id);
-                const color = recollectionData.crystalColor || '#7b42f5'; // 默认颜色
+                const color = recollectionData.crystalColor || '#7b42f5'; 
+                
                 const item = document.createElement('div');
                 item.className = 'wb-color-item';
+                // 改用输入框，并加一个小圆点预览颜色
                 item.innerHTML = `
                     <span class="wb-color-item-name">${escapeHtml(contact.alias || contact.name)}</span>
-                    <input type="color" class="wb-color-input" data-contact-id="${contact.id}" value="${color}">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="color-preview" style="width: 20px; height: 20px; border-radius: 50%; background-color: ${color}; border: 1px solid #ddd; flex-shrink: 0;"></div>
+                        <input type="text" class="wb-color-input" data-contact-id="${contact.id}" value="${color}" placeholder="#HEX码" style="width: 80px; padding: 6px; border: 1px solid #eee; border-radius: 8px; font-size: 13px; outline: none; text-align: center;">
+                    </div>
                 `;
+                
+                // 实时预览输入的颜色
+                const textInput = item.querySelector('.wb-color-input');
+                const previewBox = item.querySelector('.color-preview');
+                textInput.addEventListener('input', (e) => {
+                    let val = e.target.value.trim();
+                    if(!val.startsWith('#') && val.length > 0) val = '#' + val; // 自动补齐 #
+                    const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/i;
+                    if(hexRegex.test(val)){
+                        previewBox.style.backgroundColor = val;
+                    }
+                });
+
                 list.appendChild(item);
             });
         }
@@ -5444,26 +5462,39 @@
     window.closeRecollectionColorSettings = () => {
         const page = document.getElementById('recollection-color-page');
         page.classList.remove('active');
-        // 等待动画结束后再隐藏，避免闪烁
         setTimeout(() => page.style.display = 'none', 400); 
     };
 
     window.saveRecollectionColorSettings = () => {
         const colorInputs = document.querySelectorAll('#recollection-color-list .wb-color-input');
+        let hasError = false;
+
         colorInputs.forEach(input => {
             const contactId = parseInt(input.dataset.contactId);
-            const newColor = input.value;
-            if (contactId) {
-                const recollectionData = getRecollections(contactId);
-                recollectionData.crystalColor = newColor;
-                saveRecollections(contactId, recollectionData);
+            let newColor = input.value.trim();
+            
+            if (newColor !== "") {
+                if (!newColor.startsWith('#')) newColor = '#' + newColor; // 容错，自动补#
+                
+                // 验证是否是合法的HEX颜色码
+                const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/i;
+                if (contactId && hexRegex.test(newColor)) {
+                    const recollectionData = getRecollections(contactId);
+                    recollectionData.crystalColor = newColor;
+                    saveRecollections(contactId, recollectionData);
+                } else {
+                    hasError = true;
+                }
             }
         });
         
-        showToast('水晶球颜色已保存');
-        closeRecollectionColorSettings();
-        // 刷新备忘录主页以显示新颜色
-        openRecollectionApp(); 
+        if (hasError) {
+            showToast('部分颜色码格式错误未保存，请输入类似 #FF0000 的格式');
+        } else {
+            showToast('水晶球颜色已保存');
+            closeRecollectionColorSettings();
+            openRecollectionApp(); 
+        }
     };
 
 
@@ -5658,23 +5689,33 @@
         }
     };
     
-        window.customizeRecollectionItem = (id) => {
-        currentRecollectionItemCustomizingId = id;
-        const colorInput = document.getElementById('input-recollection-color');
+            window.customizeRecollectionItem = (id) => {
+        // 获取当前便签原有的颜色，方便展示在输入框里
+        const recollectionData = getRecollections(currentRecollectionContactId);
+        const item = recollectionData.items.find(i => i.id === id);
+        const defaultColor = (item && item.bgColor) ? item.bgColor : "#";
+
+        // 弹出一个系统输入框让用户输入
+        const newColor = prompt("请输入十六进制颜色码\n(例如: #FFB6C1、#FFFFFF):", defaultColor);
         
-        // 修复：确保色盘在手机浏览器中强制顺利弹出
-        colorInput.style.display = 'block'; 
-        colorInput.style.opacity = '0';
-        colorInput.style.position = 'absolute';
-        colorInput.style.top = '-9999px';
-        
-        colorInput.click();
-    };
-    
-    window.handleRecollectionItemColorChange = (event) => {
-        if (!currentRecollectionItemCustomizingId) return;
-        const newColor = event.target.value;
-        updateRecollectionItemStyle(currentRecollectionItemCustomizingId, { bgColor: newColor, bgImage: null });
+        // 用户点击了确定并且输入了内容
+        if (newColor !== null && newColor.trim() !== "") {
+            let colorCode = newColor.trim();
+            
+            // 简单的容错：如果用户忘了打#，帮他加上
+            if (!colorCode.startsWith('#')) {
+                colorCode = '#' + colorCode;
+            }
+            
+            // 校验格式是否正确
+            const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/i;
+            if (hexRegex.test(colorCode)) {
+                // 格式正确，应用颜色并清除可能存在的背景图片
+                updateRecollectionItemStyle(id, { bgColor: colorCode, bgImage: null });
+            } else {
+                showToast("颜色格式不正确，请输入有效的十六进制HEX码");
+            }
+        }
     };
 
     window.handleRecollectionItemBgUpload = (event) => {
