@@ -4768,8 +4768,9 @@
 <!-- NEW: 备忘录便签操作弹窗 -->
 <div id="recollection-action-sheet-overlay" class="delete-confirm-modal" onclick="closeRecollectionActionSheet()">
     <div id="recollection-action-sheet" class="wb-modal-card" style="width: 90%; max-width: 300px; padding: 0; background: #fff; overflow: hidden; transform: scale(0.95); transition: transform 0.2s;" onclick="event.stopPropagation()">
-        <div class="action-sheet-option" id="btn-recollection-edit" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">编辑</div>
-        <div class="action-sheet-option" id="btn-recollection-custom" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">自定义</div>
+        <div class="action-sheet-option" id="btn-recollection-edit" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">编辑内容</div>
+        <div class="action-sheet-option" id="btn-recollection-custom-color" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">修改背景颜色</div>
+        <div class="action-sheet-option" id="btn-recollection-custom-bg" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">上传背景图片</div>
         <div class="action-sheet-option" id="btn-recollection-delete" style="padding: 15px; text-align: center; color: #F44336; font-weight: 500; cursor: pointer;">删除</div>
     </div>
 </div>
@@ -5436,10 +5437,17 @@
         });
     };
     
-    window.editCrystalBallColor = (contactId) => {
-        event.stopPropagation();
+        window.editCrystalBallColor = (contactId) => {
+        // 修复：删除 event.stopPropagation() 防止长按定时器报错卡死
         currentCrystalBallEditingId = contactId;
         const colorInput = document.getElementById('input-crystal-color');
+        
+        // 修复：苹果/手机浏览器彻底隐藏的 input 无法唤起色盘的问题
+        colorInput.style.display = 'block'; 
+        colorInput.style.opacity = '0';
+        colorInput.style.position = 'absolute';
+        colorInput.style.top = '-9999px';
+
         const recollectionData = getRecollections(contactId);
         colorInput.value = recollectionData.crystalColor || '#7b42f5'; 
         colorInput.click();
@@ -5486,10 +5494,11 @@
         currentRecollectionContactId = null;
     };
     
-    window.openRecollectionActionSheet = (id) => {
+        window.openRecollectionActionSheet = (id) => {
         currentActionRecollectionId = id;
         document.getElementById('btn-recollection-edit').onclick = () => { closeRecollectionActionSheet(); editRecollection(id); };
-        document.getElementById('btn-recollection-custom').onclick = () => { closeRecollectionActionSheet(); customizeRecollectionItem(id); };
+        document.getElementById('btn-recollection-custom-color').onclick = () => { closeRecollectionActionSheet(); customizeRecollectionItem(id); };
+        document.getElementById('btn-recollection-custom-bg').onclick = () => { closeRecollectionActionSheet(); document.getElementById('input-recollection-bg').click(); };
         document.getElementById('btn-recollection-delete').onclick = () => { closeRecollectionActionSheet(); deleteRecollection(id); };
         
         const overlay = document.getElementById('recollection-action-sheet-overlay');
@@ -5639,9 +5648,16 @@
         }
     };
     
-    window.customizeRecollectionItem = (id) => {
+        window.customizeRecollectionItem = (id) => {
         currentRecollectionItemCustomizingId = id;
         const colorInput = document.getElementById('input-recollection-color');
+        
+        // 修复：确保色盘在手机浏览器中强制顺利弹出
+        colorInput.style.display = 'block'; 
+        colorInput.style.opacity = '0';
+        colorInput.style.position = 'absolute';
+        colorInput.style.top = '-9999px';
+        
         colorInput.click();
     };
     
