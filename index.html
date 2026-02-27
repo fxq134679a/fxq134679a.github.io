@@ -5364,11 +5364,43 @@
             const recollectionData = getRecollections(contact.id);
             const customColor = recollectionData.crystalColor;
             
-            const item = document.createElement('div');
+                        const item = document.createElement('div');
             item.className = 'crystal-ball-item';
             item.dataset.contactId = contact.id;
-            item.onclick = () => openRecollectionDetail(contact.id);
-            item.ondblclick = () => editCrystalBallColor(contact.id);
+            
+            // --- 新增长按触发水晶球颜色的逻辑 ---
+            let pressTimer;
+            let isLongPress = false;
+
+            // 手机端触摸事件
+            item.addEventListener('touchstart', (e) => {
+                isLongPress = false;
+                pressTimer = setTimeout(() => {
+                    isLongPress = true;
+                    editCrystalBallColor(contact.id);
+                }, 600); // 600毫秒算作长按
+            });
+            item.addEventListener('touchend', () => clearTimeout(pressTimer));
+            item.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
+            // 电脑端鼠标事件（为了兼容性）
+            item.addEventListener('mousedown', (e) => {
+                isLongPress = false;
+                pressTimer = setTimeout(() => {
+                    isLongPress = true;
+                    editCrystalBallColor(contact.id);
+                }, 600);
+            });
+            item.addEventListener('mouseup', () => clearTimeout(pressTimer));
+            item.addEventListener('mousemove', () => clearTimeout(pressTimer));
+
+            // 原本的点击事件，如果是长按则不触发进入详情页
+            item.onclick = (e) => {
+                if (!isLongPress) {
+                    openRecollectionDetail(contact.id);
+                }
+            };
+            // ------------------------------------
 
             let sphereStyle = '';
             let containerStyle = '';
@@ -5513,7 +5545,7 @@
             const timestampEl = document.createElement('div');
             timestampEl.className = 'recollection-item-timestamp';
             timestampEl.textContent = formatTimestamp(item.timestamp);
-            if (item.bgImage) {
+                        if (item.bgImage) {
                 timestampEl.style.color = 'white';
                 timestampEl.style.textShadow = '0 1px 3px rgba(0,0,0,0.5)';
             }
@@ -5521,7 +5553,22 @@
             itemEl.appendChild(textEl);
             itemEl.appendChild(timestampEl);
             
+            // 兼容电脑端双击
             itemEl.ondblclick = () => openRecollectionActionSheet(item.id);
+            
+            // --- 修复手机端新增便签双击不灵敏的问题 ---
+            let lastTapTime = 0;
+            itemEl.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTapTime;
+                // 如果两次点击间隔小于 400 毫秒，判定为双击
+                if (tapLength < 400 && tapLength > 0) {
+                    openRecollectionActionSheet(item.id);
+                    e.preventDefault(); // 阻止浏览器可能发生的双击放大页面行为
+                }
+                lastTapTime = currentTime;
+            });
+            // ----------------------------------------
             
             itemWrapper.appendChild(itemEl);
             contentArea.appendChild(itemWrapper);
