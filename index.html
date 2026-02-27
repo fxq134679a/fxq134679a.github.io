@@ -4733,13 +4733,12 @@
 
 <!-- Recollection App Page -->
 <div id="recollection-app-page">
-    <div class="recollection-header">
-        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="closeRecollectionApp()">
+    <div class="recollection-header" onclick="openRecollectionColorSettings()">
+        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="event.stopPropagation(); closeRecollectionApp();">
         <h1 class="recollection-header-title">备忘录</h1>
     </div>
     <div class="recollection-content" id="recollection-grid"></div>
 </div>
-
 <!-- Recollection Detail Page -->
 <div id="recollection-detail-page">
      <div class="recollection-detail-header">
@@ -4776,6 +4775,15 @@
 </div>
 
 <!-- Summarize Recollection Modal -->
+<!-- NEW: Recollection Color Settings Page -->
+<div id="recollection-color-page" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--theme-pink-bg-light); z-index: 700; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);">
+    <div class="wb-color-header">
+        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="wb-back-btn-img" onclick="closeRecollectionColorSettings()">
+        <div class="wb-color-title">水晶球颜色设置</div>
+        <button class="wb-color-save-btn" onclick="saveRecollectionColorSettings()">保存</button>
+    </div>
+    <div class="wb-color-content" id="recollection-color-list"></div>
+</div>
 <div id="recollection-summary-modal" class="delete-confirm-modal">
     <div class="delete-card">
         <h3 class="delete-card-title">自动总结</h3>
@@ -5369,40 +5377,10 @@
             item.className = 'crystal-ball-item';
             item.dataset.contactId = contact.id;
             
-            // --- 新增长按触发水晶球颜色的逻辑 ---
-            let pressTimer;
-            let isLongPress = false;
-
-            // 手机端触摸事件
-            item.addEventListener('touchstart', (e) => {
-                isLongPress = false;
-                pressTimer = setTimeout(() => {
-                    isLongPress = true;
-                    editCrystalBallColor(contact.id);
-                }, 600); // 600毫秒算作长按
-            });
-            item.addEventListener('touchend', () => clearTimeout(pressTimer));
-            item.addEventListener('touchmove', () => clearTimeout(pressTimer));
-
-            // 电脑端鼠标事件（为了兼容性）
-            item.addEventListener('mousedown', (e) => {
-                isLongPress = false;
-                pressTimer = setTimeout(() => {
-                    isLongPress = true;
-                    editCrystalBallColor(contact.id);
-                }, 600);
-            });
-            item.addEventListener('mouseup', () => clearTimeout(pressTimer));
-            item.addEventListener('mousemove', () => clearTimeout(pressTimer));
-
-            // 原本的点击事件，如果是长按则不触发进入详情页
+                        // 点击水晶球直接进入详情页
             item.onclick = (e) => {
-                if (!isLongPress) {
-                    openRecollectionDetail(contact.id);
-                }
+                openRecollectionDetail(contact.id);
             };
-            // ------------------------------------
-
             let sphereStyle = '';
             let containerStyle = '';
             
@@ -5437,45 +5415,55 @@
         });
     };
     
-        window.editCrystalBallColor = (contactId) => {
-        // 修复：删除 event.stopPropagation() 防止长按定时器报错卡死
-        currentCrystalBallEditingId = contactId;
-        const colorInput = document.getElementById('input-crystal-color');
+            window.openRecollectionColorSettings = () => {
+        const page = document.getElementById('recollection-color-page');
+        const list = document.getElementById('recollection-color-list');
+        list.innerHTML = '';
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         
-        // 修复：苹果/手机浏览器彻底隐藏的 input 无法唤起色盘的问题
-        colorInput.style.display = 'block'; 
-        colorInput.style.opacity = '0';
-        colorInput.style.position = 'absolute';
-        colorInput.style.top = '-9999px';
+        if (contacts.length === 0) {
+            list.innerHTML = '<p style="text-align:center; color:#999; padding: 20px;">还没有创建任何角色哦</p>';
+        } else {
+            contacts.forEach(contact => {
+                const recollectionData = getRecollections(contact.id);
+                const color = recollectionData.crystalColor || '#7b42f5'; // 默认颜色
+                const item = document.createElement('div');
+                item.className = 'wb-color-item';
+                item.innerHTML = `
+                    <span class="wb-color-item-name">${escapeHtml(contact.alias || contact.name)}</span>
+                    <input type="color" class="wb-color-input" data-contact-id="${contact.id}" value="${color}">
+                `;
+                list.appendChild(item);
+            });
+        }
 
-        const recollectionData = getRecollections(contactId);
-        colorInput.value = recollectionData.crystalColor || '#7b42f5'; 
-        colorInput.click();
+        page.style.display = 'flex';
+        setTimeout(() => page.classList.add('active'), 10);
     };
 
-    window.handleCrystalBallColorChange = (event) => {
-        if (!currentCrystalBallEditingId) return;
-        
-        const newColor = event.target.value;
-        const recollectionData = getRecollections(currentCrystalBallEditingId);
-        recollectionData.crystalColor = newColor;
-        saveRecollections(currentCrystalBallEditingId, recollectionData);
-        
-        const item = document.querySelector(`.crystal-ball-item[data-contact-id="${currentCrystalBallEditingId}"]`);
-        if (item) {
-            const sphere = item.querySelector('.crystal-ball-sphere');
-            const container = item.querySelector('.crystal-ball-container');
-            const rgb = hexToRgb(newColor);
-            if (rgb) {
-                const { r, g, b } = rgb;
-                sphere.style.background = `radial-gradient(circle at 65% 35%, rgba(${r+30},${g+30},${b+30},1) 0%, rgba(${r},${g},${b},1) 40%, rgba(${r-40},${g-40},${b-40},1) 100%)`;
-                sphere.style.boxShadow = `inset -10px -10px 25px rgba(0,0,0,0.25), 
-                                          inset 12px 12px 25px rgba(255, 255, 255, 0.15),
-                                          0 0 50px rgba(${r},${g},${b},0.6),
-                                          0 15px 25px rgba(0,0,0,0.1)`;
-                container.style.filter = `drop-shadow(0px 10px 15px rgba(${r}, ${g}, ${b}, 0.35))`;
+    window.closeRecollectionColorSettings = () => {
+        const page = document.getElementById('recollection-color-page');
+        page.classList.remove('active');
+        // 等待动画结束后再隐藏，避免闪烁
+        setTimeout(() => page.style.display = 'none', 400); 
+    };
+
+    window.saveRecollectionColorSettings = () => {
+        const colorInputs = document.querySelectorAll('#recollection-color-list .wb-color-input');
+        colorInputs.forEach(input => {
+            const contactId = parseInt(input.dataset.contactId);
+            const newColor = input.value;
+            if (contactId) {
+                const recollectionData = getRecollections(contactId);
+                recollectionData.crystalColor = newColor;
+                saveRecollections(contactId, recollectionData);
             }
-        }
+        });
+        
+        showToast('水晶球颜色已保存');
+        closeRecollectionColorSettings();
+        // 刷新备忘录主页以显示新颜色
+        openRecollectionApp(); 
     };
 
 
@@ -5494,18 +5482,40 @@
         currentRecollectionContactId = null;
     };
     
-        window.openRecollectionActionSheet = (id) => {
-        currentActionRecollectionId = id;
-        document.getElementById('btn-recollection-edit').onclick = () => { closeRecollectionActionSheet(); editRecollection(id); };
-        document.getElementById('btn-recollection-custom-color').onclick = () => { closeRecollectionActionSheet(); customizeRecollectionItem(id); };
-        document.getElementById('btn-recollection-custom-bg').onclick = () => { closeRecollectionActionSheet(); document.getElementById('input-recollection-bg').click(); };
-        document.getElementById('btn-recollection-delete').onclick = () => { closeRecollectionActionSheet(); deleteRecollection(id); };
+            window.openRecollectionActionSheet = (id) => {
+        currentActionRecollectionId = id; // 保存当前操作的便签ID
+
+        // 为“编辑内容”按钮绑定事件
+        document.getElementById('btn-recollection-edit').onclick = () => { 
+            closeRecollectionActionSheet(); 
+            editRecollection(id); 
+        };
+
+        // 为“修改背景颜色”按钮绑定事件
+        document.getElementById('btn-recollection-custom-color').onclick = () => { 
+            closeRecollectionActionSheet(); 
+            customizeRecollectionItem(id); 
+        };
+
+        // 为“上传背景图片”按钮绑定事件 (重要修复)
+        document.getElementById('btn-recollection-custom-bg').onclick = () => { 
+            closeRecollectionActionSheet(); 
+            // 在点击文件上传按钮前，先把要修改的便签ID存起来
+            currentRecollectionItemCustomizingId = id; 
+            document.getElementById('input-recollection-bg').click(); 
+        };
+
+        // 为“删除”按钮绑定事件
+        document.getElementById('btn-recollection-delete').onclick = () => { 
+            closeRecollectionActionSheet(); 
+            deleteRecollection(id); 
+        };
         
+        // 显示弹窗
         const overlay = document.getElementById('recollection-action-sheet-overlay');
         overlay.style.display = 'flex';
         setTimeout(() => overlay.classList.add('active'), 10);
     };
-
     window.closeRecollectionActionSheet = () => {
         const overlay = document.getElementById('recollection-action-sheet-overlay');
         overlay.classList.remove('active');
