@@ -5503,7 +5503,7 @@
             const textEl = document.createElement('div');
             textEl.className = 'recollection-item-text truncated';
             textEl.textContent = item.text;
-            textEl.onclick = (e) => { e.stopPropagation(); textEl.classList.toggle('truncated'); };
+                        textEl.onclick = (e) => { textEl.classList.toggle('truncated'); };
             
             if (item.bgImage) {
                 textEl.style.color = 'white';
@@ -5668,20 +5668,27 @@
         const roleName = contact ? (contact.alias || contact.name) : '角色';
         const userName = contact ? (contact.userName || '你') : '你';
         
+                const firstMessageDate = new Date(unsummarizedMessages[0].timestamp);
+        const eventDateStr = `${firstMessageDate.getFullYear()}年${firstMessageDate.getMonth() + 1}月${firstMessageDate.getDate()}日`;
+
         const historyText = unsummarizedMessages.map(msg => {
              if (msg.isTransfer) return `[系统消息：一笔转账]`;
              if (msg.type === 'recalled') return `[系统消息：撤回了一条消息]`;
              return `${msg.type === 'sent' ? userName : roleName}: ${msg.text}`;
         }).join('\n');
 
-        const prompt = `请以第三人称、客观、不带感情的口吻总结以下聊天记录。总结成一段连贯的文字，像是在记录一件已经发生过的事。
-        
+         const prompt = `请以第三人称、客观、不带感情的口吻，总结以下聊天记录，记录一件已经发生过的事。
+
+**总结要求**：
+1.  在总结的开头或结尾，必须明确提及事件发生的具体日期是：“${eventDateStr}”。
+2.  总结内容中，绝对不要出现“根据该聊天记录”、“事件的经过如下”或类似的引导性语句。直接开始陈述事件本身。
+
 聊天记录如下:
 ---
 ${historyText}
 ---
 
-请开始总结:`;
+请根据以上要求，开始总结事件:`;
 
         const confirmBtn = document.getElementById('recollection-summary-confirm-btn');
         confirmBtn.disabled = true;
@@ -5704,7 +5711,9 @@ ${historyText}
             }
 
             const data = await res.json();
-            const summaryText = data.choices[0].message.content.trim();
+                        let summaryText = data.choices[0].message.content.trim();
+            // 增加一道保险，强制删除AI可能生成的多余引导语
+            summaryText = summaryText.replace(/根据该聊天记录，事件的经过如下[：；]?\s*/, '');
             
             if (summaryText) {
                 const newSummary = {
