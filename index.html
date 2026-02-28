@@ -6345,7 +6345,7 @@ ${historyText}
         showToast('分类已删除');
     }
     
-    async function generateMallProducts() {
+        async function generateMallProducts() {
         const contentArea = document.getElementById('mall-content');
         if (!contentArea) return;
         
@@ -6391,7 +6391,8 @@ ${historyText}
             if (roleDetails) roleContext = roleDetails;
         }
 
-                const prompt = `你是一个专业的电商平台商品文案专家。请根据以下信息，生成一个包含10个商品的JSON数组。
+        // 我在这里也优化了给AI的指令，让它更明确地返回带 "products" 键的盒子
+        const prompt = `你是一个专业的电商平台商品文案专家。请根据以下信息，生成一个包含10个商品的JSON数组，并封装在一个名为 "products" 的键中。
 
 **商品分类**: ${categoryName}
 **分类补充说明**: ${categoryDesc}
@@ -6408,21 +6409,23 @@ ${roleContext}
 4.  **销量 (sales)**: 一个在0到100000之间的随机整数。
 5.  **商品评价 (reviews)**: 一个包含3到6条评价对象的数组。每条评价对象包含: 'nickname' (一个随机的买家昵称), 'content' (评价内容), 'rating' (一个1-5的数字，代表星级)。请确保评价内容和风格多样，有好评，有中性评价，也有抱怨的差评。
 
-**输出格式**: 严格按照JSON数组格式输出，不要包含任何markdown标记或解释性文字。
+**输出格式**: 严格按照JSON对象格式输出，不要包含任何markdown标记或解释性文字。
 **示例**:
-[
-  { 
-    "name": "【月销10w+】熬夜党狂喜！XX同款一秒隐匿黑眼圈遮瑕液", 
-    "emoji": "👁️", 
-    "price": 39.9, 
-    "sales": 128567,
-    "reviews": [
-        { "nickname": "小熊不吃糖", "content": "真的绝了，黑眼圈瞬间消失，而且很水润，不会卡粉！姐妹们快冲！", "rating": 5 },
-        { "nickname": "匿名用户", "content": "还可以吧，遮瑕力是不错，就是感觉有点干。", "rating": 3 },
-        { "nickname": "泡泡龙", "content": "什么垃圾东西，闷痘！一生黑！", "rating": 1 }
-    ]
-  }
-]`;
+{
+  "products": [
+    { 
+      "name": "【月销10w+】熬夜党狂喜！XX同款一秒隐匿黑眼圈遮瑕液", 
+      "emoji": "👁️", 
+      "price": 39.9, 
+      "sales": 128567,
+      "reviews": [
+          { "nickname": "小熊不吃糖", "content": "真的绝了，黑眼圈瞬间消失，而且很水润，不会卡粉！姐妹们快冲！", "rating": 5 },
+          { "nickname": "匿名用户", "content": "还可以吧，遮瑕力是不错，就是感觉有点干。", "rating": 3 },
+          { "nickname": "泡泡龙", "content": "什么垃圾东西，闷痘！一生黑！", "rating": 1 }
+      ]
+    }
+  ]
+}`;
         
         try {
             const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url + '/v1'}/chat/completions`, {
@@ -6442,17 +6445,19 @@ ${roleContext}
             }
 
             const data = await res.json();
-            let content = data.choices[0].message.content;
+            const content = data.choices[0].message.content;
             
-            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```|(\[[\s\S]*\])/);
-             if (jsonMatch) {
-                content = jsonMatch[1] || jsonMatch[2];
+            // --- 核心修复点在这里 ---
+            const responseObject = JSON.parse(content);
+            const products = responseObject.products; // 我们现在先打开"盒子"，再拿出里面的"products"列表
+
+            if (!Array.isArray(products)) {
+                // 如果打开盒子后发现里面不是列表，就报错
+                console.error("Parsed response from AI is not the expected format. Response:", responseObject);
+                throw new Error("AI did not return a valid object with a 'products' array.");
             }
             
-                        const products = JSON.parse(content);
-            if (!Array.isArray(products)) throw new Error("API did not return an array.");
-
-            // 修正步骤：先给每个商品分配好ID
+            // 先给每个商品分配好ID
             products.forEach((p, index) => {
                 p.id = `prod-${currentMallCategoryId}-${index}`;
             });
