@@ -6026,14 +6026,26 @@ ${historyText}
         body.classList.remove('mall-active');
     };
 
-    window.switchMallCategory = (element) => {
+        window.switchMallCategory = (element) => {
         if (!element) return;
         document.querySelectorAll('#mall-category-nav .mall-category-item').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
         currentMallCategoryId = element.dataset.id;
 
+        const cache = getMallProductsCache();
+        const cachedProducts = cache[currentMallCategoryId];
         const contentArea = document.getElementById('mall-content');
-        contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div><p style="text-align:center; color:#ccc; padding-top: 50px;">点击右上角刷新按钮为“${escapeHtml(element.textContent)}”分类生成商品</p>`;
+        
+        // 先准备好商品网格的容器
+        contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div>`;
+        
+        if (cachedProducts && cachedProducts.length > 0) {
+            // 如果缓存里有这个分类的商品，就直接渲染出来
+            renderMallProducts(cachedProducts);
+        } else {
+            // 如果缓存里没有，才显示提示信息
+            contentArea.innerHTML += `<p style="text-align:center; color:#ccc; padding-top: 50px;">点击右上角刷新按钮为“${escapeHtml(element.textContent)}”分类生成商品</p>`;
+        }
     };
     
     function openMallCategoryModal(isEditing = false, categoryId = null) {
