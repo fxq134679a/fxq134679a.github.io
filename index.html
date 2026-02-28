@@ -3283,14 +3283,14 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        .crystal-ball-container {
+                .crystal-ball-container {
             width: 100%;
             aspect-ratio: 1 / 1.1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            filter: drop-shadow(0px 10px 15px rgba(138, 43, 226, 0.3)); /* Default shadow, will be overridden by JS */
+            filter: drop-shadow(0px 10px 15px rgba(255, 128, 166, 0.35)); /* 浅粉色阴影 */
             animation: float 6s ease-in-out infinite;
             transition: filter 0.3s ease;
         }
@@ -3298,18 +3298,18 @@
         .crystal-ball-sphere {
             width: 85%;
             aspect-ratio: 1/1;
-            background: radial-gradient(circle at 65% 35%, #e1d4ff 0%, #c39dff 30%, #7b42f5 100%); /* Default background */
+            /* 浅粉色渐变背景 */
+            background: radial-gradient(circle at 65% 35%, #fff0f5 0%, #ffb6c1 40%, #ff80a6 100%); 
             border-radius: 50%;
             position: relative;
-            box-shadow: inset -10px -10px 25px rgba(0,0,0,0.25), 
-                        inset 12px 12px 25px rgba(255, 255, 255, 0.15),
-                        0 0 50px rgba(200, 160, 255, 0.5), /* Default outer glow */
+            box-shadow: inset -10px -10px 25px rgba(0,0,0,0.2), 
+                        inset 12px 12px 25px rgba(255, 255, 255, 0.4),
+                        0 0 50px rgba(255, 182, 193, 0.6), /* 浅粉色外发光 */
                         0 15px 25px rgba(0,0,0,0.1);
             overflow: hidden;
-            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
             transition: background 0.3s ease, box-shadow 0.3s ease;
         }
-
         .crystal-ball-sphere::before {
             content: '';
             position: absolute;
@@ -4733,49 +4733,12 @@
 
 <!-- Recollection App Page -->
 <div id="recollection-app-page">
-    <div class="recollection-header" onclick="openRecollectionColorSettings()">
-        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="event.stopPropagation(); closeRecollectionApp();">
+    <div class="recollection-header">
+        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="closeRecollectionApp()">
         <h1 class="recollection-header-title">备忘录</h1>
     </div>
     <div class="recollection-content" id="recollection-grid"></div>
 </div>
-<!-- Recollection Detail Page -->
-<div id="recollection-detail-page">
-     <div class="recollection-detail-header">
-        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="closeRecollectionDetail()">
-        <h2 class="recollection-detail-title">回忆总结</h2>
-        <div class="recollection-detail-actions">
-            <img src="https://img.heliar.top/file/1771063920986_奶酪_cheese.png" class="recollection-detail-cheese-icon" onclick="openSummarizeRecollectionModal()">
-            <span class="recollection-detail-add-icon" onclick="openAddRecollectionModal()">+</span>
-        </div>
-     </div>
-     <div class="recollection-detail-content" id="recollection-detail-content"></div>
-</div>
-
-<!-- Add/Edit Recollection Modal -->
-<div id="recollection-edit-modal" class="delete-confirm-modal">
-    <div class="wb-modal-card" style="width: 90%; max-width: 380px; background: #fff;" onclick="event.stopPropagation()">
-        <h3 id="recollection-modal-title" class="wb-modal-header">新增回忆</h3>
-        <textarea id="recollection-text-input" class="role-persona-input" style="height: 180px; width: 100%; margin-bottom: 20px; background: #f9f9f9;"></textarea>
-        <div class="wb-modal-actions">
-            <button class="wb-action-btn wb-btn-cancel" onclick="closeRecollectionEditModal()">取消</button>
-            <button class="wb-action-btn wb-btn-ok" onclick="saveRecollection()">保存</button>
-        </div>
-    </div>
-</div>
-
-<!-- NEW: 备忘录便签操作弹窗 -->
-<div id="recollection-action-sheet-overlay" class="delete-confirm-modal" onclick="closeRecollectionActionSheet()">
-    <div id="recollection-action-sheet" class="wb-modal-card" style="width: 90%; max-width: 300px; padding: 0; background: #fff; overflow: hidden; transform: scale(0.95); transition: transform 0.2s;" onclick="event.stopPropagation()">
-        <div class="action-sheet-option" id="btn-recollection-edit" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">编辑内容</div>
-        <div class="action-sheet-option" id="btn-recollection-custom-color" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">修改背景颜色</div>
-        <div class="action-sheet-option" id="btn-recollection-custom-bg" style="padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #333; font-weight: 500; cursor: pointer;">上传背景图片</div>
-        <div class="action-sheet-option" id="btn-recollection-delete" style="padding: 15px; text-align: center; color: #F44336; font-weight: 500; cursor: pointer;">删除</div>
-    </div>
-</div>
-
-<!-- Summarize Recollection Modal -->
-<!-- NEW: Recollection Color Settings Page -->
 <div id="recollection-color-page" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--theme-pink-bg-light); z-index: 700; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);">
     <div class="wb-color-header">
         <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="wb-back-btn-img" onclick="closeRecollectionColorSettings()">
@@ -5358,7 +5321,7 @@
         } : null;
     }
 
-    window.openRecollectionApp = () => {
+        window.openRecollectionApp = () => {
         body.classList.add('recollection-active');
         const grid = document.getElementById('recollection-grid');
         grid.innerHTML = '';
@@ -5370,38 +5333,19 @@
         }
 
         contacts.forEach(contact => {
-            const recollectionData = getRecollections(contact.id);
-            const customColor = recollectionData.crystalColor;
-            
-                        const item = document.createElement('div');
+            const item = document.createElement('div');
             item.className = 'crystal-ball-item';
             item.dataset.contactId = contact.id;
             
-                        // 点击水晶球直接进入详情页
+            // 点击直接进入回忆便签详情
             item.onclick = (e) => {
                 openRecollectionDetail(contact.id);
             };
-            let sphereStyle = '';
-            let containerStyle = '';
-            
-            if (customColor) {
-                const rgb = hexToRgb(customColor);
-                if (rgb) {
-                    const { r, g, b } = rgb;
-                    sphereStyle = `
-                        background: radial-gradient(circle at 65% 35%, rgba(${r+30},${g+30},${b+30},1) 0%, rgba(${r},${g},${b},1) 40%, rgba(${r-40},${g-40},${b-40},1) 100%);
-                        box-shadow: inset -10px -10px 25px rgba(0,0,0,0.25), 
-                                    inset 12px 12px 25px rgba(255, 255, 255, 0.15),
-                                    0 0 50px rgba(${r},${g},${b},0.6),
-                                    0 15px 25px rgba(0,0,0,0.1);
-                    `;
-                    containerStyle = `filter: drop-shadow(0px 10px 15px rgba(${r}, ${g}, ${b}, 0.35));`;
-                }
-            }
 
+            // HTML 结构（去掉所有内联 style 颜色，完全依赖第一步修改的 CSS）
             item.innerHTML = `
-                <div class="crystal-ball-container" style="${containerStyle}">
-                    <div class="crystal-ball-sphere" style="${sphereStyle}">
+                <div class="crystal-ball-container">
+                    <div class="crystal-ball-sphere">
                         <div class="crystal-ball-highlight"></div>
                         <div class="crystal-ball-stars">
                             <div class="star s1"></div><div class="star s2"></div><div class="star s3"></div><div class="star s4"></div>
