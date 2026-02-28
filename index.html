@@ -9265,6 +9265,7 @@ Strictly adhere to the JSON format. Example:
             return `${sender}: ${m.text}`;
         }).join('\n');
 
+        // ▼▼▼▼▼【 修改核心：更新给AI的指令 (Prompt) 】▼▼▼▼▼
         let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
 ${worldbookContext ? `\n背景设定(世界书)：\n${worldbookContext}\n` : ''}
@@ -9274,19 +9275,36 @@ ${recollectionContext ? `\n回忆总结(曾发生过的事)：\n${recollectionCo
 用户的设定：${uPersona}
 ${timeContext}
 
-请根据以上设定和历史聊天记录，用符合角色设定的口吻回复用户。只输出回复的话语内容，不要带有任何动作描写、内心独白、或额外的格式，只需要像在真实聊天软件中一样发送纯文字。`;
+**重要规则**:
+1.  你必须以符合角色设定的口吻和性格进行回复。
+2.  **你的回复必须被分割成多个小的、自然的对话气泡。**
+3.  **最终输出格式必须是一个JSON对象**，其中包含一个名为 "reply" 的键，其值是一个字符串数组。数组中的每个字符串都将成为一个独立的聊天气泡。
+4.  根据对话的自然节奏，将你的完整回复拆分成2到8个句子或短语，放入数组中。
+
+**输出格式示例**:
+{
+  "reply": [
+    "你好啊！",
+    "今天天气真不错。",
+    "让我想起我们去年在湖边散步的日子。",
+    "对了，你带那把旧伞了吗？"
+  ]
+}`;
+        // ▲▲▲▲▲【 指令更新结束 】▲▲▲▲▲
+
 
         if (isTransferEvent) {
-             sysPrompt += `\n\n【系统提示】刚才 ${uName} 向你转账了 ¥${transferAmount}。根据你的性格，决定是否要收下这笔钱。如果接受转账，回复格式为“<ACCEPT_TRANSFER> 你的回复文字”；如果拒绝退回，回复格式为“<REJECT_TRANSFER> 你的回复文字”。必须包含这些前缀标签！`;
+             sysPrompt += `\n\n【特殊事件】刚才 ${uName} 向你转账了 ¥${transferAmount}。根据你的性格，决定是否要收下这笔钱。如果接受转账，请在JSON的 "reply" 数组的第一个元素前加上特殊标记 <ACCEPT_TRANSFER>；如果拒绝退回，则加上 <REJECT_TRANSFER>。例如: { "reply": ["<ACCEPT_TRANSFER>谢谢你的钱！", "我正好需要呢。"] }`;
         }
 
         const payload = {
             model: settings.api.model || 'gpt-3.5-turbo',
             messages: [
                 { role: "system", content: sysPrompt },
-                { role: "user", content: `历史记录:\n${historyStr}\n\n请给出你的最新回复:` }
+                { role: "user", content: `历史聊天记录:\n${historyStr}\n\n请严格按照JSON格式要求给出你的回复:` }
             ],
-            temperature: parseFloat(settings.api.temp || 0.8)
+            temperature: parseFloat(settings.api.temp || 0.8),
+            response_format: { "type": "json_object" } // 请求API强制返回JSON
         };
         
         signatureEl.textContent = '对方正在输入中...';
@@ -9298,84 +9316,93 @@ ${timeContext}
             let bodyData, headers = { 'Content-Type': 'application/json' };
             
             if (isGemini) {
+                // Gemini 需要不同的 payload 格式
                 fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
-                bodyData = JSON.stringify({ contents: [{ parts: [{ text: sysPrompt + "\n\n历史记录:\n" + historyStr + "\n\n请回复:" }] }], generationConfig: { temperature: payload.temperature } });
+                bodyData = JSON.stringify({ contents: [{ parts: [{ text: sysPrompt + "\n\n历史聊天记录:\n" + historyStr + "\n\n请严格按照JSON格式要求给出你的回复:" }] }], generationConfig: { temperature: payload.temperature, response_mime_type: "application/json" } });
             } else {
                 headers['Authorization'] = `Bearer ${settings.api.key}`;
                 bodyData = JSON.stringify(payload);
             }
 
             const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
-            if (!res.ok) throw new Error(`API Error: ${res.status}`);
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`API Error: ${res.status} - ${errText}`);
+            }
             const data = await res.json();
             
-            let reply = "";
-            if(isGemini) reply = data.candidates[0].content.parts[0].text;
-            else reply = data.choices[0].message.content;
-            
-            reply = reply.trim();
-
-            if (isTransferEvent) {
-                let action = null;
-                if (reply.includes("<ACCEPT_TRANSFER>")) {
-                    action = 'accept';
-                    reply = reply.replace("<ACCEPT_TRANSFER>", "").trim();
-                } else if (reply.includes("<REJECT_TRANSFER>")) {
-                    action = 'reject';
-                    reply = reply.replace("<REJECT_TRANSFER>", "").trim();
-                } else {
-                    action = 'accept'; 
-                }
-                handleTransferResponse(transferId, action === 'accept');
+            let replyContent = "";
+            if(isGemini) {
+                replyContent = data.candidates[0].content.parts[0].text;
+            } else {
+                replyContent = data.choices[0].message.content;
             }
 
-            // ▼▼▼▼▼▼▼▼▼▼【 修改核心部分从这里开始 】▼▼▼▼▼▼▼▼▼▼
-            if (reply) {
-                // 1. 将AI回复按标点符号分割成句子数组
-                const sentences = reply.match(/[^，。,.?!]+[，。,.?!]?/g) || [reply];
+            // ▼▼▼▼▼【 修改核心：解析AI返回的JSON并分句发送 】▼▼▼▼▼
+            let sentences = [];
+            try {
+                const parsedReply = JSON.parse(replyContent);
+                if (Array.isArray(parsedReply.reply)) {
+                    sentences = parsedReply.reply;
+                } else {
+                    throw new Error("AI返回的JSON中没有找到reply数组。");
+                }
+            } catch (jsonError) {
+                // 如果AI没有按要求返回JSON，就退回到原来的分割方式
+                console.error("AI未返回标准JSON，回退至手动分割:", jsonError);
+                sentences = replyContent.match(/[^，。,.?!]+[，。,.?!]?/g) || [replyContent];
+            }
+            
+            if (sentences.length > 0) {
+                 // 检查第一句是否包含转账指令
+                if (isTransferEvent) {
+                    let firstSentence = sentences[0];
+                    let action = null;
+                    if (firstSentence.includes("<ACCEPT_TRANSFER>")) {
+                        action = 'accept';
+                        sentences[0] = firstSentence.replace("<ACCEPT_TRANSFER>", "").trim();
+                    } else if (firstSentence.includes("<REJECT_TRANSFER>")) {
+                        action = 'reject';
+                        sentences[0] = firstSentence.replace("<REJECT_TRANSFER>", "").trim();
+                    } else {
+                        action = 'accept'; 
+                    }
+                    handleTransferResponse(transferId, action === 'accept');
+                }
 
-                // 2. 循环遍历这个句子数组
+                // 循环发送每一句话
                 for (const sentence of sentences) {
                     const trimmedSentence = sentence.trim();
                     if (!trimmedSentence) continue;
 
-                    // 3. 读取最新的消息列表
                     messages = JSON.parse(localStorage.getItem(key) || '[]');
-                    
-                    // 4. 将当前句子作为一条新消息添加进去
                     messages.push({
-                        id: Date.now() + Math.random(), // 加一点随机数防止ID重复
+                        id: Date.now() + Math.random(),
                         type: 'received',
                         text: trimmedSentence,
                         timestamp: Date.now()
                     });
                     localStorage.setItem(key, JSON.stringify(messages));
                     
-                    // 5. 更新联系人列表的最后一条消息
                     contacts[contactIndex].lastMsg = trimmedSentence;
                     contacts[contactIndex].timestamp = Date.now();
                     localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
 
-                    // 6. 渲染聊天界面，显示新气泡
                     renderConversationMessages();
 
-                    // 7. 停顿一下，制造打字效果 (600到1200毫秒的随机延迟)
-                    await sleep(Math.random() * 600 + 600);
+                    await sleep(Math.random() * 600 + 800); // 随机延迟0.8到1.4秒
                 }
             }
-            // ▲▲▲▲▲▲▲▲▲▲【 修改核心部分到这里结束 】▲▲▲▲▲▲▲▲▲▲
-            
-            // 旧的renderConversationMessages()调用被放到了循环内部，这里不再需要
-            // renderConversationMessages(); 
+            // ▲▲▲▲▲【 新逻辑结束 】▲▲▲▲▲
 
         } catch (e) {
-            showToast("AI 回复失败: " + e.message); // 优化错误提示
+            showToast("AI 回复失败: " + e.message, 4000);
+            console.error("AI Reply Error:", e);
         } finally {
             signatureEl.textContent = originalSignature;
             signatureEl.classList.remove('typing-anim');
         }
     };
-
     async function generateMomentForCharacter(contact) {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
         if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
