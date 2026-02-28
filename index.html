@@ -3542,7 +3542,7 @@
         }
         .recollection-item-timestamp {
             font-size: 12px;
-            color: #aaa;
+            color: #ffffff;
             text-align: right;
             margin-top: 10px;
             position: relative;
@@ -4794,9 +4794,9 @@
 <!-- ================= 补回：回忆详情页 ================= -->
 <div id="recollection-detail-page">
     <div class="recollection-detail-header">
-        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="closeRecollectionDetail()" style="position:absolute; left:20px; z-index:10; width: 30px; height: 30px; object-fit: contain; cursor: pointer;">
-        <div class="recollection-detail-title" style="position:absolute; left:50%; transform:translateX(-50%); font-size:17px; font-weight:600; color:#ffd6e7;">回忆总结</div>
-        <div class="recollection-detail-actions" style="position:absolute; right:20px; display:flex; gap:15px; align-items:center;">
+        <img src="https://img.heliar.top/file/1771104670050_左_left_3.png" class="recollection-back-btn" onclick="closeRecollectionDetail()" style="width: 30px; height: 30px; object-fit: contain; cursor: pointer; z-index: 10;">
+        <div class="recollection-detail-title" style="position:absolute; left:50%; transform:translateX(-50%); font-size:18px; font-weight:600; color:#ffd6e7;">回忆总结</div>
+        <div class="recollection-detail-actions" style="display:flex; gap:15px; align-items:center; z-index: 10;">
             <div class="recollection-detail-add-icon" onclick="openAddRecollectionModal()" style="font-size:30px; font-weight:300; line-height:1; color:#888; cursor:pointer;">+</div>
             <img src="https://img.heliar.top/file/1772289026084_奶酪_cheese_2.png" class="recollection-detail-cheese-icon" onclick="openSummarizeRecollectionModal()" style="width:28px; height:28px; object-fit:contain; cursor:pointer;">
         </div>
@@ -5580,11 +5580,11 @@
             itemEl.className = `recollection-item ${item.isSummary ? 'summary-item' : ''}`;
             itemEl.dataset.id = item.id;
             
-            if (item.bgColor) {
+                        if (item.bgColor) {
                 itemEl.style.backgroundColor = item.bgColor;
+                itemEl.style.borderColor = item.bgColor; // 让边框和背景颜色一并改变
             }
-            if (item.bgImage) {
-                itemEl.style.backgroundImage = `url(${item.bgImage})`;
+            if (item.bgImage) {itemEl.style.backgroundImage = `url(${item.bgImage})`;
                 itemEl.style.backgroundSize = 'cover';
                 itemEl.style.backgroundPosition = 'center';
             }
