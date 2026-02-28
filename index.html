@@ -3283,34 +3283,38 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-                        .crystal-ball-container {
+                .crystal-ball-container {
             width: 100%;
             aspect-ratio: 1 / 1.1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            /* 外部投影也改成纯粉色，去掉任何黑色成分 */
-            filter: drop-shadow(0px 10px 15px rgba(255, 182, 193, 0.4)); 
+            filter: drop-shadow(0px 10px 15px rgba(255, 182, 193, 0.5)); /* 纯粉色外部阴影 */
             animation: float 6s ease-in-out infinite;
             transition: filter 0.3s ease;
-            cursor: pointer; /* 鼠标放上去变成小手，提示可点击 */
+            cursor: pointer; /* 确保鼠标放上去有小手提示 */
         }
 
         .crystal-ball-sphere {
             width: 85%;
             aspect-ratio: 1/1;
-            /* 纯净的浅粉色渐变，左上角(35% 25%)有强烈的纯白色高光过渡 */
-            background: radial-gradient(circle at 35% 25%, #ffffff 0%, #fff0f5 25%, #ffb6c1 65%, #ff80a6 100%); 
+            /* 全浅粉色渐变，去掉了所有白色过渡 */
+            background: radial-gradient(circle at 50% 50%, #ffe4e1 0%, #ffb6c1 100%); 
             border-radius: 50%;
             position: relative;
-            /* 彻底删除了 rgba(0,0,0) 的黑色阴影！换成了纯白和深粉色 */
-            box-shadow: inset -10px -10px 25px rgba(255, 105, 180, 0.3), /* 底部用深粉色制造立体感，绝对不发灰 */
-                        inset 12px 12px 25px rgba(255, 255, 255, 0.9),   /* 顶部强烈的纯白色反光 */
-                        0 0 40px rgba(255, 182, 193, 0.5);               /* 外部浅粉色柔和发光 */
+            /* 阴影全部改为粉色系，去掉所有白色高光内发光 */
+            box-shadow: inset -10px -10px 20px rgba(255, 105, 180, 0.2), 
+                        0 0 30px rgba(255, 182, 193, 0.4); 
             overflow: hidden;
-            border: 1.5px solid rgba(255, 255, 255, 0.7); /* 清晰的白色高光边缘 */
+            /* 边沿也改成纯浅粉色 */
+            border: 2px solid #ffb6c1; 
             transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* 隐藏原本的白色高光图层 */
+        .crystal-ball-highlight {
+            display: none !important; 
         }
         .crystal-ball-sphere::before {
             content: '';
@@ -5323,7 +5327,7 @@
         } : null;
     }
 
-            window.openRecollectionApp = () => {
+                window.openRecollectionApp = () => {
         body.classList.add('recollection-active');
         const grid = document.getElementById('recollection-grid');
         grid.innerHTML = '';
@@ -5338,12 +5342,22 @@
             const item = document.createElement('div');
             item.className = 'crystal-ball-item';
             
-            // 将点击事件 onclick="openRecollectionDetail(...)" 直接绑在容器上
-            // 注意：如果您原代码中打开总结便签的函数不叫 openRecollectionDetail，请把这行改成对应的名字
+            // 【修复点击问题】：安全地绑定点击事件
+            item.onclick = function() {
+                console.log("准备打开回忆总结，ID:", contact.id);
+                // 注意：这里假设你打开总结页面的函数名叫 openRecollectionDetail
+                // 如果你的原代码里不叫这个名字，请把下面这行改成正确的函数名！
+                if (typeof openRecollectionDetail === "function") {
+                    openRecollectionDetail(contact.id); 
+                } else {
+                    alert("错误：未找到 openRecollectionDetail 函数，请检查原代码中的跳转函数名！");
+                }
+            };
+
+            // HTML结构（已经去掉了里面的 onclick 和高光 div）
             item.innerHTML = `
-                <div class="crystal-ball-container" onclick="openRecollectionDetail(${contact.id})">
+                <div class="crystal-ball-container">
                     <div class="crystal-ball-sphere">
-                        <div class="crystal-ball-highlight"></div>
                         <div class="crystal-ball-stars">
                             <div class="star s1"></div><div class="star s2"></div><div class="star s3"></div><div class="star s4"></div>
                         </div>
