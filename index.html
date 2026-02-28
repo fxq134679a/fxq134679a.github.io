@@ -6449,12 +6449,20 @@ ${roleContext}
                 content = jsonMatch[1] || jsonMatch[2];
             }
             
-            const products = JSON.parse(content);
+                        const products = JSON.parse(content);
             if (!Array.isArray(products)) throw new Error("API did not return an array.");
+
+            // 修正步骤：先给每个商品分配好ID
+            products.forEach((p, index) => {
+                p.id = `prod-${currentMallCategoryId}-${index}`;
+            });
             
+            // 然后再把带有ID的商品存入缓存
             let cache = getMallProductsCache();
             cache[currentMallCategoryId] = products;
             saveMallProductsCache(cache);
+            
+            // 最后才渲染页面
             renderMallProducts(products);
 
         } catch (error) {
@@ -6470,7 +6478,7 @@ ${roleContext}
         return num + '+';
     }
 
-        function renderMallProducts(products) {
+            function renderMallProducts(products) {
         const grid = document.getElementById('mall-product-grid');
         grid.innerHTML = '';
 
@@ -6479,14 +6487,11 @@ ${roleContext}
             return;
         }
 
-        products.forEach((p, index) => {
-            // 为每个商品创建一个唯一的ID
-            if (!p.id) p.id = `prod-${currentMallCategoryId}-${index}`;
-
+        products.forEach(p => {
+            // 这里不再需要创建ID，因为传进来的商品已经有ID了
             const item = document.createElement('div');
             item.className = 'mall-product-item';
-            // 添加点击事件，打开详情页
-            item.onclick = () => openMallDetail(p.id);
+            item.onclick = () => openMallDetail(p.id); // 直接使用已有的ID
             
             const price = parseFloat(p.price) || 0;
             const sales = parseInt(p.sales) || 0;
@@ -6507,7 +6512,6 @@ ${roleContext}
             grid.appendChild(item);
         });
     }
-
     // --- Forum App Logic ---
     window.openForumApp = () => {
         body.classList.add('forum-active');
