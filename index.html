@@ -3429,17 +3429,38 @@
             display: flex;
             transform: translateX(0);
         }
-        /* MODIFIED: Detail Header Layout */
+                /* MODIFIED: Detail Header Layout (变圆滑) */
         .recollection-detail-header {
             padding: 35px 20px 15px;
             background: #fff;
-            border-bottom: 1px solid #f0f0f0;
             display: flex; 
             justify-content: space-between; 
             align-items: center;
             flex-shrink: 0;
             position: relative;
+            /* 下面两行是让顶栏变圆滑、加一点阴影的代码 */
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.15);
         }
+
+        /* 修复：回忆便签长按/双击操作菜单的样式 */
+        #recollection-action-sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); z-index: 1000;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+        #recollection-action-sheet-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        #recollection-action-sheet {
+            background-color: var(--theme-pink-bg-soft);
+            width: 95%; max-width: 400px; margin: 0 auto 15px; 
+            border-radius: 20px; overflow: hidden;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        #recollection-action-sheet-overlay.active #recollection-action-sheet { transform: translateY(0); }
         .recollection-detail-title { /* MODIFIED */
             position: absolute;
             left: 50%;
@@ -4797,14 +4818,14 @@
     </div>
 </div>
 
-<!-- ================= 补回：回忆便签操作菜单 ================= -->
-<div id="recollection-action-sheet-overlay" onclick="closeRecollectionActionSheet()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:900; align-items:flex-end; opacity:0; transition:opacity 0.3s;">
-    <div id="recollection-action-sheet" onclick="event.stopPropagation()" style="background:#fff; width:100%; border-radius:20px 20px 0 0; padding-bottom:calc(env(safe-area-inset-bottom) + 15px); display:flex; flex-direction:column; transform:translateY(100%); transition:transform 0.3s;">
+<!-- ================= 修复后：回忆便签操作菜单 ================= -->
+<div id="recollection-action-sheet-overlay" onclick="closeRecollectionActionSheet()">
+    <div id="recollection-action-sheet" onclick="event.stopPropagation()">
         <div class="action-sheet-option" id="btn-recollection-edit">编辑内容</div>
         <div class="action-sheet-option" id="btn-recollection-custom-color">修改背景颜色</div>
         <div class="action-sheet-option" id="btn-recollection-custom-bg">上传背景图片</div>
-        <div class="action-sheet-option" id="btn-recollection-delete" style="color:#F44336;">删除</div>
-        <div class="action-sheet-cancel" onclick="closeRecollectionActionSheet()" style="border-top:8px solid #f0f0f0;">取消</div>
+        <div class="action-sheet-option" id="btn-recollection-delete" style="color: #F44336;">删除</div>
+        <div class="action-sheet-cancel" onclick="closeRecollectionActionSheet()">取消</div>
     </div>
 </div>
 <input type="file" id="input-forum-post-image" class="file-input-hidden" multiple accept="image/*" onchange="handleForumPostImageUpload(event)">
@@ -9402,41 +9423,20 @@ ${recollectionContext ? `\n近期经历(回忆)：\n${recollectionContext}\n` : 
         container.scrollTop = container.scrollHeight;
     }
 
-    // --- Backup & Restore ---
+        // --- Backup & Restore (终极完全备份版) ---
     window.exportBackup = () => {
-        const data = {
-            settings: localStorage.getItem(ALL_SETTINGS_KEY),
-            chatData: localStorage.getItem(CHAT_DATA_KEY),
-            profile: localStorage.getItem(USER_PROFILE_KEY),
-            wallet: localStorage.getItem(WALLET_DATA_KEY),
-            worldbooks: localStorage.getItem(WORLDBOOK_DATA_KEY),
-            iosMode: localStorage.getItem(IOS_MODE_KEY),
-            phoneFrame: localStorage.getItem(PHONE_FRAME_KEY),
-            moments: localStorage.getItem(MOMENTS_DATA_KEY),
-            momentsProfile: localStorage.getItem(MOMENTS_PROFILE_KEY),
-            forums: localStorage.getItem(FORUMS_DATA_KEY),
-            forumPosts: localStorage.getItem(FORUM_POSTS_DATA_KEY),
-            forumUser: localStorage.getItem(FORUM_USER_DATA_KEY),
-            cssPresets: localStorage.getItem(CSS_PRESETS_KEY),
-            mallCategories: localStorage.getItem(MALL_CATEGORIES_KEY),
-            mallCache: localStorage.getItem(MALL_PRODUCTS_CACHE_KEY),
-            takeout: localStorage.getItem(TAKEOUT_APP_DATA_KEY),
-            phoneCaseColor: localStorage.getItem(PHONE_CASE_COLOR_KEY),
-            catEars: localStorage.getItem(CAT_EARS_KEY),
-            catEarColor: localStorage.getItem(CAT_EAR_COLOR_KEY)
-        };
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        contacts.forEach(c => {
-            const k = getMessagesKey(c.id);
-            data[k] = localStorage.getItem(k);
-            const rk = getRecollectionStorageKey(c.id);
-            data[rk] = localStorage.getItem(rk);
-        });
+        const data = {};
+        // 自动遍历并打包所有的本地数据，一行不漏
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            data[key] = localStorage.getItem(key);
+        }
         const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = `OS_Backup_${new Date().getTime()}.json`;
+        a.href = url; a.download = `OS_Backup_Full_${new Date().getTime()}.json`;
         a.click(); URL.revokeObjectURL(url);
+        showToast("全量数据导出成功！");
     };
 
     window.importBackup = (e) => {
@@ -9446,12 +9446,17 @@ ${recollectionContext ? `\n近期经历(回忆)：\n${recollectionContext}\n` : 
         reader.onload = (ev) => {
             try {
                 const data = JSON.parse(ev.target.result);
+                // 覆盖写入所有导入的数据
                 Object.keys(data).forEach(k => {
-                    if(data[k] !== null && data[k] !== undefined) localStorage.setItem(k, data[k]);
+                    if(data[k] !== null && data[k] !== undefined) {
+                        localStorage.setItem(k, data[k]);
+                    }
                 });
-                showToast("导入成功，即将刷新页面", 2000);
+                showToast("全量数据恢复成功，即将刷新页面", 2000);
                 setTimeout(() => location.reload(), 2000);
-            } catch(err) { showToast("备份文件格式错误"); }
+            } catch(err) { 
+                showToast("备份文件格式错误"); 
+            }
         };
         reader.readAsText(file);
         e.target.value = '';
