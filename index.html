@@ -211,7 +211,14 @@
              transition: transform 0.1s, filter 0.1s;
              background-size: cover; background-position: center; background-color: rgba(255, 255, 255, 0.2);
         }
-        .app-name { font-size: 11px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.4); white-space: nowrap; }
+                .app-name { font-size: 11px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.4); white-space: nowrap; }
+        
+        /* --- 新增的代码 --- */
+        body.light-mode-icons-active .app-name {
+            color: black;
+            text-shadow: none;
+        }
+        /* --- 新增结束 --- */
                 
         /* 底栏样式 */
         #dock-area {
@@ -4366,7 +4373,7 @@
                 </div>
             </div>
         </div>
-        <div class="settings-module">
+                <div class="settings-module">
             <h3>界面美化</h3>
             <div class="settings-row">
                 <label for="wallpaper-url">主屏幕壁纸 URL</label>
@@ -4375,6 +4382,17 @@
                     <div class="url-preview" id="wallpaper-preview"></div>
                 </div>
             </div>
+
+            <!-- --- 新增的代码 --- -->
+            <div class="settings-row-with-switch" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
+                <label for="icon-font-color-switch">开关灯💡</label>
+                <label class="ios-switch">
+                    <input type="checkbox" id="icon-font-color-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <!-- --- 新增结束 --- -->
+            
         </div>
         <div class="settings-module">
             <h3>组件图片</h3>
@@ -4914,9 +4932,12 @@
     const CSS_PRESETS_KEY = 'cssPresets_v2_new';
     const RECOLLECTION_DATA_KEY_PREFIX = 'recollections_v3_style_fix'; 
     const MALL_CATEGORIES_KEY = 'mallCategories_v3_fix'; 
-    const MALL_PRODUCTS_CACHE_KEY = 'mallProductsCache_v2'; 
+        const MALL_PRODUCTS_CACHE_KEY = 'mallProductsCache_v2'; 
     const TAKEOUT_APP_DATA_KEY = 'couple_order_data_v2'; 
 
+    /* --- 新增的代码 --- */
+    const ICON_FONT_LIGHT_MODE_KEY = 'iconFontLightMode_v1';
+    /* --- 新增结束 --- */
 
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
@@ -5027,11 +5048,22 @@
         localStorage.setItem(PHONE_CASE_COLOR_KEY, color);
     }
     
-    function setCatEarColor(color) {
+        function setCatEarColor(color) {
         document.documentElement.style.setProperty('--cat-ear-color', color);
         localStorage.setItem(CAT_EAR_COLOR_KEY, color);
     }
-
+    
+    /* --- 新增的代码 --- */
+    function applyIconFontLightMode(enabled) {
+      if (enabled) {
+        document.body.classList.add('light-mode-icons-active');
+      } else {
+        document.body.classList.remove('light-mode-icons-active');
+      }
+      localStorage.setItem(ICON_FONT_LIGHT_MODE_KEY, enabled);
+    }
+    /* --- 新增结束 --- */
+    
     function updatePhoneTime(){
       const now = new Date();
       const h = String(now.getHours()).padStart(2, '0');
@@ -8929,11 +8961,15 @@ Strictly adhere to the JSON format. Example:
 
 
     // --- Global Settings & OS Features ---
-    window.showSettingsPage = () => {
+        window.showSettingsPage = () => {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
         document.getElementById('ios-mode-switch').checked = localStorage.getItem(IOS_MODE_KEY) === 'true';
         document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
         document.getElementById('cat-ears-switch').checked = localStorage.getItem(CAT_EARS_KEY) === 'true';
+
+        /* --- 新增的代码 --- */
+        document.getElementById('icon-font-color-switch').checked = localStorage.getItem(ICON_FONT_LIGHT_MODE_KEY) === 'true';
+        /* --- 新增结束 --- */
         
         document.getElementById('phone-case-color-input').value = localStorage.getItem(PHONE_CASE_COLOR_KEY) || '#ffffff';
         document.getElementById('cat-ear-color-input').value = localStorage.getItem(CAT_EAR_COLOR_KEY) || '#ffffff';
@@ -9175,14 +9211,19 @@ Strictly adhere to the JSON format. Example:
     });
 
     // --- AI Auto Reply Logic ---
-    window.triggerAIAutoReply = async (isTransferEvent = false, transferAmount = 0, transferId = null) => {
+        window.triggerAIAutoReply = async (isTransferEvent = false, transferAmount = 0, transferId = null) => {
         if (!currentChatContactId) return;
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
         if (!settings?.api?.url || !settings?.api?.key) { showToast("请先配置API"); return; }
         
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contact = contacts.find(c => c.id === currentChatContactId);
-        if (!contact) return;
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contactIndex = contacts.findIndex(c => c.id === currentChatContactId);
+        if (contactIndex === -1) return;
+        const contact = contacts[contactIndex];
+
+        // [修复问题1 & 2] 获取顶栏备注元素，并保存原始值
+        const signatureEl = document.getElementById('chat-conv-signature');
+        const originalSignature = contact.signature || '';
 
         const globalProfile = getUserProfile();
         const uName = contact.userName || globalProfile.nickname || "User";
@@ -9197,22 +9238,6 @@ Strictly adhere to the JSON format. Example:
         const recollectionData = getRecollections(currentChatContactId);
         const recollectionContext = recollectionData.items.map(item => item.text).join('\n');
 
-        let historyStr = recentMsgs.map(m => {
-            let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
-            if (m.isTransfer) {
-                if (m.type === 'sent') return `[${sender}向${contact.alias || contact.name}转账了 ¥${m.transferData.amount}]`;
-                else return `[${sender}向${uName}转账了 ¥${m.transferData.amount}]`;
-            }
-            if (m.type === 'recalled') return `[系统消息：撤回了一条消息]`;
-            return `${sender}: ${m.text}`;
-        }).join('\n');
-
-        let timeContext = "";
-        if (contact.timePerceptionEnabled) {
-            const now = new Date();
-            timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
-        }
-
         let worldbookContext = "";
         if (contact.worldbookIds && contact.worldbookIds.length > 0) {
             const allWb = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
@@ -9222,6 +9247,22 @@ Strictly adhere to the JSON format. Example:
                 wb.entries.forEach(e => { worldbookContext += `${e.key ? e.key+': ' : ''}${e.content}\n`; });
             });
         }
+
+        let timeContext = "";
+        if (contact.timePerceptionEnabled) {
+            const now = new Date();
+            timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
+        }
+
+        let historyStr = recentMsgs.map(m => {
+            let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
+            if (m.isTransfer) {
+                if (m.type === 'sent') return `[${sender}向${contact.alias || contact.name}转账了 ¥${m.transferData.amount}]`;
+                else return `[${sender}向${uName}转账了 ¥${m.transferData.amount}]`;
+            }
+            if (m.type === 'recalled') return `[系统消息：撤回了一条消息]`;
+            return `${sender}: ${m.text}`;
+        }).join('\n');
 
         let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
@@ -9246,13 +9287,12 @@ ${timeContext}
             ],
             temperature: parseFloat(settings.api.temp || 0.8)
         };
+        
+        // [修复问题1] 显示“对方正在输入中”
+        signatureEl.textContent = '对方正在输入中...';
+        signatureEl.classList.add('typing-anim');
 
-        const typingIndicator = document.createElement('div');
-        typingIndicator.className = 'msg-bubble-row them';
-        typingIndicator.id = 'ai-typing';
-        typingIndicator.innerHTML = `<img src="${contact.avatar}" class="msg-bubble-avatar"><div class="msg-bubble-content typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
-        document.getElementById('chat-conv-messages').appendChild(typingIndicator);
-        document.getElementById('chat-conv-messages').scrollTop = document.getElementById('chat-conv-messages').scrollHeight;
+        // [修复问题2] 删除了创建空白色气泡的代码
 
         try {
             let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
@@ -9288,29 +9328,33 @@ ${timeContext}
                 } else {
                     action = 'accept'; 
                 }
-                
                 handleTransferResponse(transferId, action === 'accept');
             }
 
-            messages = JSON.parse(localStorage.getItem(key) || '[]'); 
-            messages.push({
-                id: Date.now(),
-                type: 'received',
-                text: reply,
-                timestamp: Date.now()
-            });
-            localStorage.setItem(key, JSON.stringify(messages));
-            
-            contacts[idx].lastMsg = reply;
-            contacts[idx].timestamp = Date.now();
-            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+            // [修复问题2] 只有当AI真的回复了内容时，才添加新消息
+            if (reply) {
+                messages = JSON.parse(localStorage.getItem(key) || '[]'); 
+                messages.push({
+                    id: Date.now(),
+                    type: 'received',
+                    text: reply,
+                    timestamp: Date.now()
+                });
+                localStorage.setItem(key, JSON.stringify(messages));
+                
+                // [修复潜在错误] 使用正确的 contactIndex 更新聊天列表
+                contacts[contactIndex].lastMsg = reply;
+                contacts[contactIndex].timestamp = Date.now();
+                localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+            }
             
             renderConversationMessages();
         } catch (e) {
             showToast("AI 回复失败");
         } finally {
-            const typingEl = document.getElementById('ai-typing');
-            if (typingEl) typingEl.remove();
+            // [修复问题1] 无论成功失败，都恢复顶栏的备注
+            signatureEl.textContent = originalSignature;
+            signatureEl.classList.remove('typing-anim');
         }
     };
 
@@ -9502,10 +9546,21 @@ ${recollectionContext ? `\n近期经历(回忆)：\n${recollectionContext}\n` : 
         const hasCatEars = localStorage.getItem(CAT_EARS_KEY) === 'true';
         applyCatEars(hasCatEars);
 
-        const earColor = localStorage.getItem(CAT_EAR_COLOR_KEY);
+                const earColor = localStorage.getItem(CAT_EAR_COLOR_KEY);
         if (earColor) setCatEarColor(earColor);
 
+        /* --- 新增的代码 --- */
+        // 1. 页面加载时应用“开关灯”设置
+        const isIconFontLightMode = localStorage.getItem(ICON_FONT_LIGHT_MODE_KEY) === 'true';
+        applyIconFontLightMode(isIconFontLightMode);
+
         applyVisualSettings();
+
+        // 2. 监听“开关灯”按钮的点击，立即生效
+        document.getElementById('icon-font-color-switch').addEventListener('change', (e) => {
+            applyIconFontLightMode(e.target.checked);
+        });
+        /* --- 新增结束 --- */
         
         setInterval(updatePhoneTime, 1000);
         updatePhoneTime();
