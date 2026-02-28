@@ -2595,7 +2595,164 @@
             color: #aaa;
             font-style: italic;
         }
-        
+                /* --- NEW: Mall Detail Page Styles --- */
+        #mall-detail-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f7f7f7;
+            z-index: 556;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+        }
+        #mall-detail-page.active {
+            transform: translateX(0);
+        }
+        .mall-detail-header {
+            padding: 35px 20px 15px;
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            flex-shrink: 0;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+        }
+        body.ios-mode-active #mall-detail-page .mall-detail-header {
+             padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
+        }
+         body.phone-frame-active #mall-detail-page .mall-detail-header {
+            padding-top: calc(15px + var(--status-bar-height));
+        }
+        .mall-detail-header .back-btn {
+            width: 30px; height: 30px; object-fit: contain; cursor: pointer;
+        }
+        .mall-detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px; /* 为底部按钮留出空间 */
+        }
+        .mall-detail-img-container {
+            background-color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 120px;
+        }
+        .mall-detail-info-card {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        .mall-detail-price {
+            color: #ff5000;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .mall-detail-price::before {
+            content: '¥';
+            font-size: 16px;
+            margin-right: 4px;
+        }
+        .mall-detail-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.4;
+            margin-top: 10px;
+        }
+        .mall-detail-sales {
+            font-size: 13px;
+            color: #999;
+            margin-top: 8px;
+        }
+        .mall-detail-reviews-card {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        .mall-detail-reviews-card h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--theme-pink-btn);
+            padding-left: 10px;
+        }
+        .review-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        .review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .review-nickname {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .review-stars {
+            font-size: 14px;
+            color: #ffd700; /* 星星颜色 */
+        }
+        .review-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+        .mall-detail-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: calc(60px + env(safe-area-inset-bottom, 0));
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            background-color: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            padding-top: 5px;
+            z-index: 10;
+        }
+        .mall-detail-footer .footer-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 60px;
+        }
+        .mall-detail-footer .footer-btn.favorite img {
+            width: 24px;
+            height: 24px;
+            margin-top: 4px;
+            object-fit: contain;
+        }
+        .mall-detail-footer .footer-btn span {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .mall-detail-footer .footer-btn.buy {
+            flex: 1;
+            background-color: var(--theme-pink-btn);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 20px;
+            margin: 8px;
+            height: 44px;
+        }
+        .mall-detail-footer .footer-btn.buy span {
+            color: white;
+            font-size: 16px;
+            margin: 0;
+        }
         .mall-bottom-nav {
             background-color: #ffffff;
             border-top: 1px solid #f0f0f0;
@@ -4708,6 +4865,25 @@
         </div>
     </div>
 </div>
+<!-- Mall Detail Page (NEW) -->
+<div id="mall-detail-page">
+    <div class="mall-detail-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallDetail()">
+        <div class="mall-header-title">商品详情</div>
+    </div>
+    <div class="mall-detail-content" id="mall-detail-content">
+        <!-- 商品详情将动态渲染到这里 -->
+    </div>
+    <div class="mall-detail-footer">
+        <div class="footer-btn favorite" id="mall-detail-fav-btn">
+            <img src="https://img.heliar.top/file/1770353311894_喜欢_like_2.png" alt="Favorite">
+            <span>收藏</span>
+        </div>
+        <div class="footer-btn buy">
+            <span>立即购买</span>
+        </div>
+    </div>
+</div>
 
 <!-- Mall Add/Edit Category Modal -->
 <div id="mall-category-modal" class="delete-confirm-modal">
@@ -6215,7 +6391,7 @@ ${historyText}
             if (roleDetails) roleContext = roleDetails;
         }
 
-        const prompt = `你是一个专业的电商平台商品文案专家。请根据以下信息，生成一个包含10个商品的JSON数组。
+                const prompt = `你是一个专业的电商平台商品文案专家。请根据以下信息，生成一个包含10个商品的JSON数组。
 
 **商品分类**: ${categoryName}
 **分类补充说明**: ${categoryDesc}
@@ -6230,12 +6406,22 @@ ${roleContext}
 2.  **Emoji (emoji)**: 一个最能代表该商品的emoji表情。
 3.  **价格 (price)**: 一个在1到1000之间的数字。
 4.  **销量 (sales)**: 一个在0到100000之间的随机整数。
+5.  **商品评价 (reviews)**: 一个包含3到6条评价对象的数组。每条评价对象包含: 'nickname' (一个随机的买家昵称), 'content' (评价内容), 'rating' (一个1-5的数字，代表星级)。请确保评价内容和风格多样，有好评，有中性评价，也有抱怨的差评。
 
 **输出格式**: 严格按照JSON数组格式输出，不要包含任何markdown标记或解释性文字。
 **示例**:
 [
-  { "name": "【月销10w+】熬夜党狂喜！XX同款一秒隐匿黑眼圈遮瑕液", "emoji": "👁️", "price": 39.9, "sales": 128567 },
-  { "name": "官方正品！XX代言·赛博龙裔定制款便携式充能魔方", "emoji": "🐉", "price": 899, "sales": 1234 }
+  { 
+    "name": "【月销10w+】熬夜党狂喜！XX同款一秒隐匿黑眼圈遮瑕液", 
+    "emoji": "👁️", 
+    "price": 39.9, 
+    "sales": 128567,
+    "reviews": [
+        { "nickname": "小熊不吃糖", "content": "真的绝了，黑眼圈瞬间消失，而且很水润，不会卡粉！姐妹们快冲！", "rating": 5 },
+        { "nickname": "匿名用户", "content": "还可以吧，遮瑕力是不错，就是感觉有点干。", "rating": 3 },
+        { "nickname": "泡泡龙", "content": "什么垃圾东西，闷痘！一生黑！", "rating": 1 }
+    ]
+  }
 ]`;
         
         try {
@@ -6284,7 +6470,7 @@ ${roleContext}
         return num + '+';
     }
 
-    function renderMallProducts(products) {
+        function renderMallProducts(products) {
         const grid = document.getElementById('mall-product-grid');
         grid.innerHTML = '';
 
@@ -6293,9 +6479,14 @@ ${roleContext}
             return;
         }
 
-        products.forEach(p => {
+        products.forEach((p, index) => {
+            // 为每个商品创建一个唯一的ID
+            if (!p.id) p.id = `prod-${currentMallCategoryId}-${index}`;
+
             const item = document.createElement('div');
             item.className = 'mall-product-item';
+            // 添加点击事件，打开详情页
+            item.onclick = () => openMallDetail(p.id);
             
             const price = parseFloat(p.price) || 0;
             const sales = parseInt(p.sales) || 0;
@@ -9624,6 +9815,95 @@ ${recollectionContext ? `\n近期经历(回忆)：\n${recollectionContext}\n` : 
 
         setTimeout(() => {
              initializeAllAutoPosts();
+       // --- NEW: Mall Detail Page Functions ---
+    function renderReviewStars(rating) {
+        const fullStar = '★';
+        const emptyStar = '☆';
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            stars += (i <= rating) ? fullStar : emptyStar;
+        }
+        return stars;
+    }
+
+    window.openMallDetail = (productId) => {
+        const cache = getMallProductsCache();
+        const products = cache[currentMallCategoryId];
+        if (!products) return;
+
+        const product = products.find(p => p.id === productId);
+        if (!product) {
+            showToast("找不到该商品");
+            return;
+        }
+
+        const contentEl = document.getElementById('mall-detail-content');
+        
+        const reviewsHtml = (product.reviews && product.reviews.length > 0)
+            ? product.reviews.map(review => `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-nickname">${escapeHtml(review.nickname)}</span>
+                        <span class="review-stars">${renderReviewStars(review.rating)}</span>
+                    </div>
+                    <p class="review-content">${escapeHtml(review.content)}</p>
+                </div>
+            `).join('')
+            : '<p style="color:#ccc; text-align:center; padding: 20px 0;">暂无评价</p>';
+
+        contentEl.innerHTML = `
+            <div class="mall-detail-img-container">${product.emoji || '📦'}</div>
+            <div class="mall-detail-info-card">
+                <div class="mall-detail-price">${(parseFloat(product.price) || 0).toFixed(2)}</div>
+                <h2 class="mall-detail-name">${escapeHtml(product.name)}</h2>
+                <p class="mall-detail-sales">已售 ${formatSales(parseInt(product.sales) || 0)}</p>
+            </div>
+            <div class="mall-detail-reviews-card">
+                <h3>商品评价 (${product.reviews?.length || 0})</h3>
+                ${reviewsHtml}
+            </div>
+        `;
+        
+        const favBtn = document.getElementById('mall-detail-fav-btn');
+        const favIcon = favBtn.querySelector('img');
+        
+        if (product.isFavorited) {
+            favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮状态
+        } else {
+            favIcon.src = "https://img.heliar.top/file/1770353311894_喜欢_like_2.png"; // 默认状态
+        }
+        favBtn.onclick = () => toggleMallProductFavorite(productId);
+
+        document.getElementById('mall-detail-page').classList.add('active');
+    };
+
+    window.closeMallDetail = () => {
+        document.getElementById('mall-detail-page').classList.remove('active');
+    };
+
+    window.toggleMallProductFavorite = (productId) => {
+        const cache = getMallProductsCache();
+        const products = cache[currentMallCategoryId];
+        if (!products) return;
+
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+
+        product.isFavorited = !product.isFavorited;
+        
+        saveMallProductsCache(cache);
+
+        const favBtn = document.getElementById('mall-detail-fav-btn');
+        const favIcon = favBtn.querySelector('img');
+
+        if (product.isFavorited) {
+            favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮
+            showToast("已收藏");
+        } else {
+            favIcon.src = "https://img.heliar.top/file/1770353311894_喜欢_like_2.png"; // 熄灭
+            showToast("已取消收藏");
+        }
+    };
         }, 2000);
     });
 
