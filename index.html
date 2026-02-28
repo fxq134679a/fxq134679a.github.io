@@ -2998,7 +2998,7 @@
           display: flex;
         }
         
-        .phone{
+                .phone{
           width: 390px;
           height: 780px;
           background: #050505;
@@ -3006,35 +3006,53 @@
           border-radius: 48px;
           padding: 6px;
           position: relative;
-          box-shadow: 0 0 40px rgba(0,0,0,0.5);
+          /* 【关键修改】：将第一个 0 改为 0，第二个 0 改为 20px。让阴影只往下掉，不往上扩散 */
+          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
           border: 6px solid var(--phone-case-color);
           transition: border-color 0.3s;
         }
         
+                /* 优化：更可爱立体的果冻猫耳朵 */
+                /* 移除原本绑定在手机壳上的伪元素猫耳，防止重叠冲突 */
         body.cat-ears-active .phone::before,
         body.cat-ears-active .phone::after {
-            content: '';
+            display: none !important;
+        }
+
+                /* --- 绝对对称、纯净无阴影、加宽版猫耳 --- */
+                /* --- 绝对对称、纯净无阴影、超宽版猫耳 --- */
+        .cute-cat-ear {
             position: absolute;
-            top: -20px;
-            width: 50px;
-            height: 50px;
-            background-color: var(--cat-ear-color);
+            width: 58px;  
+            height: 58px;
+            background: var(--cat-ear-color);
             z-index: -1;
-            transition: background-color 0.3s;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center;
+
+            border-radius: 15px 0 0 0;
+            box-shadow: none; 
+
+            top: 20px;
+            opacity: 0;
+            
+            /* 【关键修改】：scaleX 改为 0.85，底座更宽更稳 */
+            transform: scaleX(0.85) rotate(45deg);
         }
 
-        body.cat-ears-active .phone::before {
-            left: 30px;
-            transform: rotate(-45deg);
+        body.cat-ears-active .cute-cat-ear.left {
+            opacity: 1;
+            top: -24px; 
+            left: 30px; /* 微调位置，适应更宽的底座 */
+            transform: scaleX(0.85) rotate(45deg); 
         }
 
-        body.cat-ears-active .phone::after {
-            right: 30px;
-            transform: rotate(45deg);
+        body.cat-ears-active .cute-cat-ear.right {
+            opacity: 1;
+            top: -24px;
+            right: 30px; /* 保持绝对对称 */
+            transform: scaleX(0.85) rotate(45deg);
         }
-
         .screen{
           width: 100%;
           height: 100%;
@@ -4854,6 +4872,10 @@
 <!-- 手机外框结构 -->
 <div class="phone-container" id="phone-container">
   <div class="phone" id="phone-frame">
+    <!-- 插入独立的猫耳朵元素 -->
+    <div class="cute-cat-ear left"></div>
+    <div class="cute-cat-ear right"></div>
+    
     <div class="screen" id="phone-screen-content"></div>
     <div class="notch"></div>
     <div class="status-bar">
