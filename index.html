@@ -6729,24 +6729,24 @@ window.closeMallDetail = () => {
     document.getElementById('mall-detail-page').classList.remove('active');
 };
 
-window.toggleMallProductFavorite = (productId) => {
-    const cache = getMallProductsCache();
-    const products = cache[currentMallCategoryId];
-    if (!products) return;
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    product.isFavorited = !product.isFavorited;
-    saveMallProductsCache(cache);
-    const favBtn = document.getElementById('mall-detail-fav-btn');
-    const favIcon = favBtn.querySelector('img');
-    if (product.isFavorited) {
-        favIcon.src = "https://img.heliar.top/file/1770356886806_like_3.png";
-        showToast("已收藏");
-    } else {
-        favIcon.src = "https://img.heliar.top/file/1772373425318_like_5.png";
-        showToast("已取消收藏");
-    }
-};
+    window.toggleMallProductFavorite = (productId) => {
+        const cache = getMallProductsCache();
+        const products = cache[currentMallCategoryId];
+        if (!products) return;
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        product.isFavorited = !product.isFavorited;
+        saveMallProductsCache(cache);
+        const favBtn = document.getElementById('mall-detail-fav-btn');
+        const favIcon = favBtn.querySelector('img');
+        if (product.isFavorited) {
+            favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 修改了链接
+            showToast("已收藏");
+        } else {
+            favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png"; // 修改了链接
+            showToast("已取消收藏");
+        }
+    };
 
 
     // --- Forum App Logic ---
@@ -10054,58 +10054,8 @@ ${recollectionContext ? `\n近期经历(回忆)：\n${recollectionContext}\n` : 
         setInterval(updatePhoneTime, 1000);
         updatePhoneTime();
 
-        setTimeout(() => {
+                setTimeout(() => {
              initializeAllAutoPosts();
-       // --- NEW: Mall Detail Page Functions ---
-    function renderReviewStars(rating) {
-        const fullStar = '★';
-        const emptyStar = '☆';
-        let stars = '';
-        for (let i = 1; i <= 5; i++) {
-            stars += (i <= rating) ? fullStar : emptyStar;
-        }
-        return stars;
-    }
-
-    //【修改后】
-window.openMallDetail = (productId) => {
-    //... (中间代码省略) ...
-    const favBtn = document.getElementById('mall-detail-fav-btn');
-    const favIcon = favBtn.querySelector('img');
-    
-    if (product.isFavorited) {
-        favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮状态
-    } else {
-        // --- 修改点：这里换成了你提供的新图标链接 ---
-        favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png"; // 默认状态
-    }
-    favBtn.onclick = () => toggleMallProductFavorite(productId);
-
-    // --- 新增：给“立即购买”按钮添加点击事件 ---
-    const buyBtn = document.querySelector('#mall-detail-page .footer-btn.buy');
-    if (buyBtn) {
-        buyBtn.onclick = () => openPurchasePanel(productId);
-    }
-
-    document.getElementById('mall-detail-page').classList.add('active');
-};
-
-    window.closeMallDetail = () => {
-        document.getElementById('mall-detail-page').classList.remove('active');
-    };
-
-    //【修改后】
-window.toggleMallProductFavorite = (productId) => {
-    //... (中间代码省略) ...
-    if (product.isFavorited) {
-        favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮
-        showToast("已收藏");
-    } else {
-        // --- 修改点：这里也换成了你提供的新图标链接 ---
-        favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png"; // 熄灭
-        showToast("已取消收藏");
-    }
-};
         }, 2000);
     });
 
