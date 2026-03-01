@@ -6297,36 +6297,30 @@ ${historyText}
 // --- Mall App Logic (NEW & MODIFIED) ---
 
 // ========================= 购买弹窗相关JS =========================
-// 用一个全局变量来存储当前弹窗里的商品信息、数量和选择的款式
 let currentPurchaseInfo = {
     productId: null,
     quantity: 1,
     selectedStyle: null
 };
 
-// 打开购买弹窗的函数
 window.openPurchasePanel = (productId) => {
     const cache = getMallProductsCache();
     const products = cache[currentMallCategoryId];
     if (!products) return;
-
     const product = products.find(p => p.id === productId);
     if (!product) {
         showToast("找不到该商品");
         return;
     }
 
-    // 1. 重置并存储当前商品信息
     currentPurchaseInfo.productId = productId;
     currentPurchaseInfo.quantity = 1;
     currentPurchaseInfo.selectedStyle = null;
 
-    // 2. 填充弹窗顶部的 Emoji 和价格
     document.getElementById('mall-purchase-product-emoji').textContent = product.emoji || '📦';
     document.getElementById('mall-purchase-product-price').textContent = `¥${(parseFloat(product.price) || 0).toFixed(2)}`;
     document.getElementById('mall-purchase-quantity').textContent = currentPurchaseInfo.quantity;
     
-    // 3. 根据商品数据，动态生成“款式”按钮
     const stylesGrid = document.getElementById('mall-purchase-styles-grid');
     stylesGrid.innerHTML = '';
     if (product.styles && product.styles.length > 0) {
@@ -6349,7 +6343,6 @@ window.openPurchasePanel = (productId) => {
         currentPurchaseInfo.selectedStyle = '默认';
     }
 
-    // 4. 给加减号按钮绑定事件
     const quantityEl = document.getElementById('mall-purchase-quantity');
     document.querySelector('#mall-purchase-quantity-selector .plus').onclick = () => {
         currentPurchaseInfo.quantity++;
@@ -6362,7 +6355,6 @@ window.openPurchasePanel = (productId) => {
         }
     };
     
-    // 5. 给最下面的“确定”按钮绑定事件
     document.getElementById('mall-purchase-confirm-btn').onclick = () => {
         if (!currentPurchaseInfo.selectedStyle) {
             showToast('请选择一个款式');
@@ -6372,11 +6364,9 @@ window.openPurchasePanel = (productId) => {
         closePurchasePanel();
     };
 
-    // 6. 显示弹窗
     document.getElementById('mall-purchase-overlay').classList.add('active');
 };
 
-// 关闭购买弹窗的函数
 window.closePurchasePanel = () => {
     document.getElementById('mall-purchase-overlay').classList.remove('active');
 };
@@ -6750,14 +6740,13 @@ window.toggleMallProductFavorite = (productId) => {
     const favBtn = document.getElementById('mall-detail-fav-btn');
     const favIcon = favBtn.querySelector('img');
     if (product.isFavorited) {
-        favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png";
+        favIcon.src = "https://img.heliar.top/file/1770356886806_like_3.png";
         showToast("已收藏");
     } else {
-        favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png";
+        favIcon.src = "https://img.heliar.top/file/1772373425318_like_5.png";
         showToast("已取消收藏");
     }
 };
-
 
 
     // --- Forum App Logic ---
