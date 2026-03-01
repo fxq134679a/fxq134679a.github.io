@@ -5037,17 +5037,20 @@
     <div class="mall-detail-content" id="mall-detail-content">
         <!-- 商品详情将动态渲染到这里 -->
     </div>
-    <div class="mall-detail-footer">
+        <div class="mall-detail-footer">
         <div class="footer-btn favorite" id="mall-detail-fav-btn">
             <img src="https://img.heliar.top/file/1770353311894_喜欢_like_2.png" alt="Favorite">
             <span>收藏</span>
+        </div>
+        <!-- 新增：加购物车按钮 -->
+        <div class="footer-btn cart" id="mall-detail-add-cart-btn">
+            <img src="https://img.heliar.top/file/1770921767590_购物车_shopping_2.png" alt="Cart">
+            <span>加购物车</span>
         </div>
         <div class="footer-btn buy">
             <span>立即购买</span>
         </div>
     </div>
-</div>
-
 <!-- ========================= 新增：商品购买弹窗 ========================= -->
 <div id="mall-purchase-overlay" onclick="closePurchasePanel()">
     <div id="mall-purchase-panel" onclick="event.stopPropagation()">
@@ -6297,10 +6300,12 @@ ${historyText}
 // --- Mall App Logic (NEW & MODIFIED) ---
 
 // ========================= 购买弹窗相关JS =========================
+// ========================= 购买弹窗相关JS =========================
 let currentPurchaseInfo = {
     productId: null,
     quantity: 1,
-    selectedStyle: null
+    selectedStyle: null,
+    basePrice: 0 // 新增：保存商品单价
 };
 
 window.openPurchasePanel = (productId) => {
@@ -6316,9 +6321,10 @@ window.openPurchasePanel = (productId) => {
     currentPurchaseInfo.productId = productId;
     currentPurchaseInfo.quantity = 1;
     currentPurchaseInfo.selectedStyle = null;
+    currentPurchaseInfo.basePrice = parseFloat(product.price) || 0; // 记录单价
 
     document.getElementById('mall-purchase-product-emoji').textContent = product.emoji || '📦';
-    document.getElementById('mall-purchase-product-price').textContent = `¥${(parseFloat(product.price) || 0).toFixed(2)}`;
+    document.getElementById('mall-purchase-product-price').textContent = `¥${currentPurchaseInfo.basePrice.toFixed(2)}`;
     document.getElementById('mall-purchase-quantity').textContent = currentPurchaseInfo.quantity;
     
     const stylesGrid = document.getElementById('mall-purchase-styles-grid');
@@ -6344,14 +6350,24 @@ window.openPurchasePanel = (productId) => {
     }
 
     const quantityEl = document.getElementById('mall-purchase-quantity');
+    const priceEl = document.getElementById('mall-purchase-product-price');
+
+    // 新增：更新总价的内部函数
+    const updateTotalPrice = () => {
+        const total = currentPurchaseInfo.basePrice * currentPurchaseInfo.quantity;
+        priceEl.textContent = `¥${total.toFixed(2)}`;
+    };
+
     document.querySelector('#mall-purchase-quantity-selector .plus').onclick = () => {
         currentPurchaseInfo.quantity++;
         quantityEl.textContent = currentPurchaseInfo.quantity;
+        updateTotalPrice(); // 点击+号更新总价
     };
     document.querySelector('#mall-purchase-quantity-selector .minus').onclick = () => {
         if (currentPurchaseInfo.quantity > 1) {
             currentPurchaseInfo.quantity--;
             quantityEl.textContent = currentPurchaseInfo.quantity;
+            updateTotalPrice(); // 点击-号更新总价
         }
     };
     
@@ -6366,6 +6382,22 @@ window.openPurchasePanel = (productId) => {
 
     document.getElementById('mall-purchase-overlay').classList.add('active');
 };
+
+window.closePurchasePanel = () => {
+    document.getElementById('mall-purchase-overlay').classList.remove('active');
+};
+
+// ========================= 顺便在这里补全“加购物车”的点击事件 =========================
+// 寻找下方的 window.openMallDetail = (productId) => { ... } 函数，在给 buyBtn 绑定点击事件的下方增加 cartBtn
+document.addEventListener('DOMContentLoaded', () => {
+    // 使用事件委托处理加购物车，防止每次打开详情页重复绑定
+    document.body.addEventListener('click', (e) => {
+        const cartBtn = e.target.closest('#mall-detail-add-cart-btn');
+        if (cartBtn) {
+            showToast("已加入购物车");
+        }
+    });
+});
 
 window.closePurchasePanel = () => {
     document.getElementById('mall-purchase-overlay').classList.remove('active');
@@ -8892,7 +8924,7 @@ Strictly adhere to the JSON format. Example:
         document.getElementById('numeric-keypad').style.display = 'grid';
     }
 
-    function renderNumericKeypad() {
+        function renderNumericKeypad() {
         const keypad = document.getElementById('numeric-keypad');
         keypad.innerHTML = '';
         const keys = ['1','2','3','4','5','6','7','8','9','','0','del'];
@@ -8900,9 +8932,9 @@ Strictly adhere to the JSON format. Example:
             const btn = document.createElement('div');
             btn.className = 'keypad-btn';
             if (key === '') {
-                btn.classList.add('empty');
+                btn.classList.add('blank'); // 修复：匹配CSS中的 .blank
             } else if (key === 'del') {
-                btn.classList.add('del');
+                btn.classList.add('delete'); // 修复：匹配CSS中的 .delete
                 btn.innerHTML = '⌫';
                 btn.onclick = () => {
                     if (currentPasswordInput.length > 0) {
