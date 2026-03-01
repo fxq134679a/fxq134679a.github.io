@@ -5340,9 +5340,7 @@
 <input type="file" id="input-recollection-bg" class="file-input-hidden" accept="image/*" onchange="handleRecollectionItemBgUpload(event)">
 <input type="color" id="input-recollection-color" class="file-input-hidden" onchange="handleRecollectionItemColorChange(event)">
 <input type="color" id="input-crystal-color" class="file-input-hidden" oninput="handleCrystalBallColorChange(event)">
-
 <input type="file" id="input-wallpaper" class="file-input-hidden" accept="image/*" onchange="handleWallpaperUpload(event)">
-<input type="file" id="input-app-icon" class="file-input-hidden" accept="image/*" onchange="handleIconUpload(event)">
 <input type="file" id="input-time-bg" class="file-input-hidden" accept="image/*" onchange="handleTimeBgUpload(event)">
 <input type="file" id="input-friend-avatar" class="file-input-hidden" accept="image/*" onchange="handleFriendAvatarUpload(event)">
 <input type="file" id="input-profile-avatar" class="file-input-hidden" accept="image/*" onchange="handleProfileAvatarUpload(event)">
@@ -9609,23 +9607,20 @@ Strictly adhere to the JSON format. Example:
         });
     };
 
-        window.handleIconUpload = (event) => {
-        const file = event.target.files[0];
-        if(!file) return;
-        const appId = currentEditAppId;
-        compressImage(file, 300, (base64) => { // <-- 【修改】尺寸限制提高到 300px
-            const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-            if(!settings.apps) settings.apps = {};
-            if(!settings.apps[appId]) settings.apps[appId] = {};
-            settings.apps[appId].icon = base64;
-            localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
-            // 【重要】上传后需要重新渲染设置列表以更新预览
-            const updatedSettings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-            renderSettingsAppList(updatedSettings.apps || {});
-            applyVisualSettings();
-            showToast("图标已更新");
-        });
-        event.target.value = '';
+            window.saveAppIconUrl = (appId, newUrl) => {
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
+        if(!settings.apps) settings.apps = {};
+        if(!settings.apps[appId]) settings.apps[appId] = {};
+        settings.apps[appId].icon = newUrl.trim();
+        localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
+        
+        // 重新渲染设置列表以更新预览
+        const updatedSettings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
+        renderSettingsAppList(updatedSettings.apps || {});
+        applyVisualSettings();
+        if (newUrl.trim() !== '') {
+            showToast("图标 URL 已应用");
+        }
     };
 
     document.getElementById('save-settings-btn').addEventListener('click', () => {
@@ -9671,7 +9666,6 @@ Strictly adhere to the JSON format. Example:
     document.getElementById('cat-ear-color-input').addEventListener('input', (e) => setCatEarColor(e.target.value));
     document.getElementById('temp-slider').addEventListener('input', (e) => { document.getElementById('temp-value-display').innerText = e.target.value; });
 
-    let currentEditAppId = null;
         function renderSettingsAppList(appSettings) {
         const container = document.getElementById('settings-app-list-container');
         container.innerHTML = '';
@@ -9683,29 +9677,29 @@ Strictly adhere to the JSON format. Example:
             // [修改] 如果用户没自定义名称，则显示默认名称
             const currentName = appSettings[appId]?.name || '';
             const placeholderName = appSettings[appId]?.name || defaultName;
+            const currentIconUrl = appSettings[appId]?.icon || '';
             
             const row = document.createElement('div');
-            // [修改] 应用我们新的CSS class
             row.className = 'settings-app-icon-item'; 
-            // [修改] 使用新的、更清晰的HTML结构
+            // [修改] 移除了点击上传的功能，增加了 URL 输入框
             row.innerHTML = `
-                <div class="app-icon-preview-new" onclick="triggerIconUpload('${appId}')">
+                <div class="app-icon-preview-new">
                     ${appSettings[appId]?.icon ? `<img src="${appSettings[appId].icon}">` : '🖼️'}
                 </div>
                 <div class="app-icon-info">
                     <span class="app-icon-name">${defaultName}</span>
                     <div class="app-icon-input-group">
                         <input type="text" value="${currentName}" placeholder="自定义名称: ${placeholderName}" onchange="saveAppName('${appId}', this.value)">
-                        <button onclick="triggerIconUpload('${appId}')">上传</button>
                         <button class="reset" onclick="resetAppSetting('${appId}')">重置</button>
+                    </div>
+                    <div class="app-icon-input-group" style="margin-top: 5px;">
+                        <input type="text" value="${currentIconUrl}" placeholder="输入图标 URL" onchange="saveAppIconUrl('${appId}', this.value)">
                     </div>
                 </div>
             `;
             container.appendChild(row);
         });
     }
-
-    window.triggerIconUpload = (appId) => { currentEditAppId = appId; document.getElementById('input-app-icon').click(); };
     window.saveAppName = (appId, newName) => {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
         if(!settings.apps) settings.apps = {};
@@ -9813,7 +9807,7 @@ Strictly adhere to the JSON format. Example:
         document.documentElement.style.setProperty('--clock-text-color', clockColor);
     }
 
-    // [修改] 同时更新 renderSettingsAppList 和 resetAppSetting 以使用图标ID
+        // [修改] 同时更新 renderSettingsAppList 和 resetAppSetting 以使用图标ID
     function renderSettingsAppList(appSettings) {
         const container = document.getElementById('settings-app-list-container');
         container.innerHTML = '';
@@ -9830,26 +9824,29 @@ Strictly adhere to the JSON format. Example:
             const appId = iconEl.id; // 使用ID
             const currentName = appSettings[appId]?.name || '';
             const placeholderName = appSettings[appId]?.name || defaultName;
+            const currentIconUrl = appSettings[appId]?.icon || '';
 
             const row = document.createElement('div');
             row.className = 'settings-app-icon-item';
+            // [修改] 移除了点击上传的功能，增加了 URL 输入框
             row.innerHTML = `
-                <div class="app-icon-preview-new" onclick="triggerIconUpload('${appId}')">
+                <div class="app-icon-preview-new">
                     ${appSettings[appId]?.icon ? `<img src="${appSettings[appId].icon}">` : '🖼️'}
                 </div>
                 <div class="app-icon-info">
                     <span class="app-icon-name">${defaultName}</span>
                     <div class="app-icon-input-group">
                         <input type="text" value="${currentName}" placeholder="自定义名称: ${placeholderName}" onchange="saveAppName('${appId}', this.value)">
-                        <button onclick="triggerIconUpload('${appId}')">上传</button>
                         <button class="reset" onclick="resetAppSetting('${appId}')">重置</button>
+                    </div>
+                    <div class="app-icon-input-group" style="margin-top: 5px;">
+                        <input type="text" value="${currentIconUrl}" placeholder="输入图标 URL" onchange="saveAppIconUrl('${appId}', this.value)">
                     </div>
                 </div>
             `;
             container.appendChild(row);
         });
     }
-
 
     // --- API Logic ---
     document.getElementById('test-api-btn').addEventListener('click', async () => {
