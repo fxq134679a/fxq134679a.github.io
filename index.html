@@ -8,7 +8,8 @@
     <title>iOS Home Screen</title>
     <style>
         /* --- 全局重置与基础样式 --- */
-        :root {
+                :root {
+             --clock-text-color: #FFFFFF; /* 新增：时间字体颜色变量 */
              --theme-pink-bg-light: #FFF0F5;
              --theme-pink-bg-med: rgba(229, 138, 171, 0.15);
              --theme-pink-bg-soft: #FFF8FA;
@@ -99,16 +100,16 @@
         #time-container:active {
             transform: scale(0.98);
         }
-        #clock-time {
+                #clock-time {
              font-size: 5.2rem;
              font-weight: 300;
-             color: white;
+             color: var(--clock-text-color);
              text-shadow: 0 2px 10px rgba(0,0,0,0.1);
             line-height: 1.1;
         }
         #clock-date {
             font-size: 0.95rem;
-             color: white;
+             color: var(--clock-text-color);
             font-weight: 500;
             margin-top: 2px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -4719,7 +4720,7 @@
                 </div>
             </div>
 
-            <!-- --- 新增的代码 --- -->
+                        <!-- --- 新增的代码 --- -->
             <div class="settings-row-with-switch" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
                 <label for="icon-font-color-switch">开关灯💡</label>
                 <label class="ios-switch">
@@ -4728,6 +4729,11 @@
                 </label>
             </div>
             <!-- --- 新增结束 --- -->
+            
+            <div class="settings-row-with-switch" style="margin-top:10px;">
+                <label for="clock-color-input">时间字体颜色</label>
+                <input type="color" id="clock-color-input" value="#FFFFFF" style="width: 50px; height: 30px; border: 1px solid #ddd; padding: 2px; border-radius: 6px; cursor: pointer; background-color: transparent;">
+            </div>
             
         </div>
                 <div class="settings-module">
@@ -9491,13 +9497,14 @@ Strictly adhere to the JSON format. Example:
                 document.getElementById('api-status').className = 'api-status connected';
             }
         }
-                if(settings.visual) {
+                        if(settings.visual) {
             document.getElementById('wallpaper-url').value = settings.visual.wallpaper || '';
             if(settings.visual.wallpaper) document.getElementById('wallpaper-preview').style.backgroundImage = `url(${settings.visual.wallpaper})`;
             document.getElementById('main-avatar1-url').value = settings.visual.mainAvatar1 || '';
             if(settings.visual.mainAvatar1) document.getElementById('main-avatar1-preview').style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
             document.getElementById('main-avatar2-url').value = settings.visual.mainAvatar2 || '';
             if(settings.visual.mainAvatar2) document.getElementById('main-avatar2-preview').style.backgroundImage = `url(${settings.visual.mainAvatar2})`;
+            document.getElementById('clock-color-input').value = settings.visual.clockColor || '#FFFFFF';
         }
                 renderSettingsAppList(settings.apps || {});
         body.classList.add('settings-active'); // 修改了这里
@@ -9550,10 +9557,11 @@ Strictly adhere to the JSON format. Example:
             model: document.getElementById('model-select').value,
             temp: parseFloat(document.getElementById('temp-slider').value)
         };
-                settings.visual = settings.visual || {};
+                        settings.visual = settings.visual || {};
         settings.visual.wallpaper = document.getElementById('wallpaper-url').value.trim();
         settings.visual.mainAvatar1 = document.getElementById('main-avatar1-url').value.trim();
         settings.visual.mainAvatar2 = document.getElementById('main-avatar2-url').value.trim();
+        settings.visual.clockColor = document.getElementById('clock-color-input').value.trim();
         
         localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
         
@@ -9673,11 +9681,14 @@ Strictly adhere to the JSON format. Example:
             }
         });
 
-        if (settings.visual?.photoWidget) {
+                if (settings.visual?.photoWidget) {
             document.getElementById('photo-widget-img').src = settings.visual.photoWidget;
             document.getElementById('photo-widget-img').style.display = 'block';
             document.getElementById('photo-widget-placeholder').style.display = 'none';
         }
+
+        const clockColor = settings.visual?.clockColor || '#FFFFFF';
+        document.documentElement.style.setProperty('--clock-text-color', clockColor);
     }
 
     // --- API Logic ---
