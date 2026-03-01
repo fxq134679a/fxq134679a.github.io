@@ -5460,8 +5460,8 @@
     // --- Utility Functions ---
     const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
     function escapeHtml(text) { if(typeof text !== 'string') return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-    function compressImage(file, maxSize, callback) {
-        if (!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let width = img.width; let height = img.height; if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } } canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/jpeg', 0.7)); }; img.src = e.target.result; }; reader.readAsDataURL(file);
+        function compressImage(file, maxSize, callback) {
+        if (!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let width = img.width; let height = img.height; if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } } canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/png')); }; img.src = e.target.result; }; reader.readAsDataURL(file); // <-- 【修改】使用无损的PNG格式
     }
     
     // --- 手机框与猫耳朵功能 ---
@@ -9609,16 +9609,19 @@ Strictly adhere to the JSON format. Example:
         });
     };
 
-    window.handleIconUpload = (event) => {
+        window.handleIconUpload = (event) => {
         const file = event.target.files[0];
         if(!file) return;
         const appId = currentEditAppId;
-        compressImage(file, 120, (base64) => {
+        compressImage(file, 300, (base64) => { // <-- 【修改】尺寸限制提高到 300px
             const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
             if(!settings.apps) settings.apps = {};
             if(!settings.apps[appId]) settings.apps[appId] = {};
             settings.apps[appId].icon = base64;
             localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
+            // 【重要】上传后需要重新渲染设置列表以更新预览
+            const updatedSettings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
+            renderSettingsAppList(updatedSettings.apps || {});
             applyVisualSettings();
             showToast("图标已更新");
         });
