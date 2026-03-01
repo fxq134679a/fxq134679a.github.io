@@ -1444,14 +1444,22 @@
         body.ios-mode-active .takeout-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); } /* <-- 新增外卖App */
         
                 /* --- 修复：转账页返回按钮位置更靠上 --- */
+                /* --- 修复：转账页返回按钮位置下移 --- */
         .transfer-back-btn {
             position: absolute;
-            /* 原来是 calc(env(...) + 20px)，现在直接改为 10px，让它贴近边缘 */
-            top: 13px; 
+            top: 50px; /* 【修改】再往下移一点 */
             left: 20px;
             width: 30px; height: 30px;
             object-fit: contain; cursor: pointer;
-            z-index: 900; /* 提高层级，防止被遮挡 */
+            z-index: 900; 
+            transition: top 0.3s ease;
+        }
+        /* 【新增】确保在开启“手机框”或“刘海屏”时，返回按钮也能对齐下移 */
+        body.ios-mode-active .transfer-back-btn {
+            top: calc(env(safe-area-inset-top, 20px) + 50px);
+        }
+        body.phone-frame-active .transfer-back-btn {
+            top: calc(50px + var(--status-bar-height));
         }
 
         #toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background-color: rgba(255, 230, 240, 0.98); color: #E58AAB; padding: 15px 25px; border-radius: 20px; font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; max-width: 80%; }
@@ -2962,14 +2970,14 @@
         #transfer-page.active {
             transform: translateX(0);
         }
-        .transfer-page-top {
-            height: 15vh; /* [FIXED] Reduced height */
-            min-height: 130px; /* [FIXED] Reduced min-height */
+                .transfer-page-top {
+            height: 30vh; /* 【修改】高度加大到30vh，把白色输入区域往下挤 */
+            min-height: 220px; 
             background-color: #ffabce;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 0 20px 20px;
+            padding: 0 20px 40px; 
             position: relative;
             flex-shrink: 0;
         }
@@ -2984,13 +2992,16 @@
         }
         .transfer-title-info {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            align-items: flex-end; /* 底部对齐 */
+            justify-content: space-between; /* 【修改】两端对齐，左边文字，右边头像 */
+            flex-direction: row-reverse; /* 【修改】反转顺序，让头像跑到最右边去 */
+            width: 100%;
         }
         #transfer-target-name-container {
-            font-size: 18px;
+            font-size: 19px; /* 字体稍微调大一点点 */
             color: #333;
             font-weight: 600;
+            margin-bottom: 5px; /* 让文字跟头像底部看起来更协调 */
         }
         .transfer-target-avatar {
             width: 60px; height: 60px;
@@ -3161,7 +3172,7 @@
             background-color: #f6f2f4;
             padding-bottom: env(safe-area-inset-bottom, 0);
         }
-        .keypad-btn {
+                .keypad-btn {
             padding: 15px 0;
             font-size: 24px;
             border: none;
@@ -3172,6 +3183,10 @@
             transition: background-color 0.2s;
             -webkit-tap-highlight-color: rgba(0,0,0,0.1);
             color: #000;
+            /* 【新增】让里面的数字和删除图标绝对居中 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .keypad-btn:active {
             background-color: #d1d5db;
@@ -8846,14 +8861,21 @@ Strictly adhere to the JSON format. Example:
     }
 
     // --- Transfer Functions ---
-    window.openTransferPage = () => {
+        window.openTransferPage = () => {
         if (!currentChatContactId) return;
         const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         const contact = contacts.find(c => c.id === currentChatContactId);
         if (!contact) return;
         
         document.getElementById('transfer-target-avatar').src = contact.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        document.getElementById('transfer-target-name-container').textContent = `转账给 ${escapeHtml(contact.alias || contact.name)}`;
+        
+        // --- 修改：提取角色原名最后一个字和显示名称 ---
+        const rawName = contact.name || "未知";
+        const displayName = escapeHtml(contact.alias || rawName);
+        const lastChar = escapeHtml(rawName.slice(-1));
+        document.getElementById('transfer-target-name-container').textContent = `转账给 ${displayName} (**${lastChar})`;
+        // ---------------------------------------------
+        
         document.getElementById('transfer-amount-input').value = '';
         
         document.getElementById('transfer-page').classList.add('active');
