@@ -9345,65 +9345,97 @@ Strictly adhere to the JSON format. Example:
     };
 
     window.openWorldBookBindModal = (type = 'worldbook') => {
-        const listContainer = document.getElementById('worldbook-bind-list');
-        listContainer.innerHTML = '';
-        
-        if (type === 'worldbook') {
-            const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-            if (worldbooks.length === 0) { listContainer.innerHTML = '<div style="color:#999;text-align:center;padding:20px;">暂无世界书</div>'; }
-            worldbooks.forEach(wb => {
-                const item = document.createElement('div');
-                item.className = 'wb-bind-item';
-                const isSelected = wbBindMultiSelect ? (tempSelectedWorldBookIds && tempSelectedWorldBookIds.includes(wb.id)) : false;
-                if (isSelected) item.classList.add('selected');
-                item.innerText = wb.title;
-                item.onclick = () => {
-                    if (wbBindMultiSelect) {
-                        if (item.classList.contains('selected')) {
-                            item.classList.remove('selected');
-                            tempSelectedWorldBookIds = tempSelectedWorldBookIds.filter(id => id !== wb.id);
-                        } else {
-                            item.classList.add('selected');
-                            tempSelectedWorldBookIds.push(wb.id);
-                        }
-                    } else {
-                        document.querySelectorAll('.wb-bind-item').forEach(el => el.classList.remove('selected'));
-                        item.classList.add('selected');
-                        currentWorldBookId = wb.id;
-                    }
-                };
-                listContainer.appendChild(item);
-            });
-        } else if (type === 'roles') {
-            const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-            if (contacts.length === 0) { listContainer.innerHTML = '<div style="color:#999;text-align:center;padding:20px;">暂无角色</div>'; }
-            let tempSelectedRoles = [];
-            if(wbBindCallback && wbBindCallback.name === 'wbBindCallback') { 
-                 if(document.getElementById('wb-bind-modal-title').textContent.includes('论坛')) tempSelectedRoles = tempForumBoundRoleIds;
-                 else if (document.getElementById('wb-bind-modal-title').textContent.includes('种类')) tempSelectedRoles = tempMallCategoryRoleIds;
+    const listContainer = document.getElementById('worldbook-bind-list');
+    listContainer.innerHTML = '';
+    
+    if (type === 'worldbook') {
+        const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+        if (worldbooks.length === 0) { listContainer.innerHTML = '<div class="wb-bind-list-empty">暂无世界书</div>'; } // 使用了正确的样式类
+        worldbooks.forEach(wb => {
+            const item = document.createElement('div');
+            item.className = 'wb-bind-list-item'; // 【修复】这里就是笔误的地方，改为了正确的样式名
+            const isSelected = wbBindMultiSelect ? (tempSelectedWorldBookIds && tempSelectedWorldBookIds.includes(wb.id)) : false;
+            if (isSelected) {
+                // 对于多选，我们用JS来添加一个视觉上的选中标记，例如复选框
+                item.innerHTML = `<div class="wb-bind-checkbox checked"></div>` + item.innerText;
+                item.classList.add('multi');
             }
-
-            contacts.forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'wb-bind-item';
-                if (tempSelectedRoles.includes(c.id)) item.classList.add('selected');
-                item.innerText = c.alias || c.name;
-                item.onclick = () => {
-                    if (item.classList.contains('selected')) {
-                        item.classList.remove('selected');
-                        tempSelectedRoles = tempSelectedRoles.filter(id => id !== c.id);
+            item.innerText = wb.title;
+            item.onclick = () => {
+                if (wbBindMultiSelect) {
+                    // 多选逻辑
+                    const wasSelected = tempSelectedWorldBookIds.includes(wb.id);
+                    if (wasSelected) {
+                        tempSelectedWorldBookIds = tempSelectedWorldBookIds.filter(id => id !== wb.id);
+                        item.classList.remove('selected'); // 只是一个概念上的class，主要靠样式
                     } else {
+                        tempSelectedWorldBookIds.push(wb.id);
                         item.classList.add('selected');
-                        tempSelectedRoles.push(c.id);
                     }
-                };
-                listContainer.appendChild(item);
-            });
-            tempSelectedWorldBookIds = tempSelectedRoles; 
+                    // 重新渲染列表以更新选中状态
+                    openWorldBookBindModal(type);
+                } else {
+                    // 单选逻辑
+                    if (wbBindCallback) wbBindCallback(wb.id);
+                    closeWorldBookBindModal();
+                }
+            };
+             // 如果是多选模式，并且当前项被选中，添加视觉提示
+            if (wbBindMultiSelect && tempSelectedWorldBookIds && tempSelectedWorldBookIds.includes(wb.id)) {
+                item.style.backgroundColor = '#FFF0F5'; // 比如给个淡粉色背景
+                item.style.fontWeight = 'bold';
+            }
+            listContainer.appendChild(item);
+        });
+    } else if (type === 'roles') {
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        if (contacts.length === 0) { listContainer.innerHTML = '<div class="wb-bind-list-empty">暂无角色</div>'; }
+        let tempSelectedRoles = [];
+        // 根据不同的弹窗标题，获取当前已选中的角色列表
+        const modalTitle = document.getElementById('wb-bind-modal-title').textContent;
+        if (modalTitle.includes('论坛')) {
+            tempSelectedRoles = tempForumBoundRoleIds || [];
+        } else if (modalTitle.includes('种类')) {
+            tempSelectedRoles = tempMallCategoryRoleIds || [];
         }
 
-        document.getElementById('worldbook-bind-modal').classList.add('active');
-    };
+        contacts.forEach(c => {
+            const item = document.createElement('div');
+            item.className = 'wb-bind-list-item multi'; // 【修复】这里也同步修复了
+            item.innerHTML = `
+                <div class="wb-bind-checkbox ${tempSelectedRoles.includes(c.id) ? 'checked' : ''}"></div>
+                <span>${escapeHtml(c.alias || c.name)}</span>
+            `;
+            item.onclick = () => {
+                const checkbox = item.querySelector('.wb-bind-checkbox');
+                if (checkbox.classList.contains('checked')) {
+                    checkbox.classList.remove('checked');
+                    tempForumBoundRoleIds = tempForumBoundRoleIds.filter(id => id !== c.id);
+                    tempMallCategoryRoleIds = tempMallCategoryRoleIds.filter(id => id !== c.id);
+                } else {
+                    checkbox.classList.add('checked');
+                    if (modalTitle.includes('论坛')) tempForumBoundRoleIds.push(c.id);
+                    if (modalTitle.includes('种类')) tempMallCategoryRoleIds.push(c.id);
+                }
+                // 更新总的回调ID列表
+                tempSelectedWorldBookIds = modalTitle.includes('论坛') ? tempForumBoundRoleIds : tempMallCategoryRoleIds;
+            };
+            listContainer.appendChild(item);
+        });
+        // 同步一下，确保 tempSelectedWorldBookIds 是最新的
+        tempSelectedWorldBookIds = modalTitle.includes('论坛') ? tempForumBoundRoleIds : tempMallCategoryRoleIds;
+    }
+    
+    // 根据是否是多选模式，决定是否显示“确定”按钮
+    const modalCard = document.querySelector('#worldbook-bind-modal .wb-bind-modal-card');
+    if (wbBindMultiSelect) {
+        modalCard.classList.add('multi-select-mode');
+    } else {
+        modalCard.classList.remove('multi-select-mode');
+    }
+
+    document.getElementById('worldbook-bind-modal').classList.add('active');
+};
 
     window.closeWorldBookBindModal = () => { document.getElementById('worldbook-bind-modal').classList.remove('active'); };
     window.confirmWbBinding = () => {
