@@ -8888,10 +8888,17 @@ Strictly adhere to the JSON format. Example:
         }
     };
 
-            window.openTransferConfirmPopup = (amount) => {
+                window.openTransferConfirmPopup = (amount) => {
         const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         const contact = contacts.find(c => c.id === currentChatContactId);
-        document.getElementById('confirm-transfer-target').textContent = `向 ${escapeHtml(contact.alias || contact.name)} 转账`;
+        
+        // --- 修改：提取角色原名最后一个字和显示名称 ---
+        const rawName = contact.name || "未知";
+        const displayName = escapeHtml(contact.alias || rawName);
+        const lastChar = escapeHtml(rawName.slice(-1));
+        document.getElementById('confirm-transfer-target').textContent = `向 ${displayName} (**${lastChar}) 转账`;
+        // ---------------------------------------------
+        
         document.getElementById('confirm-transfer-amount').textContent = `¥${amount.toFixed(2)}`;
         
         currentPasswordInput = '';
