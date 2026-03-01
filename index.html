@@ -2784,6 +2784,169 @@
             color: var(--theme-pink-text);
         }
         
+/* ========================= 新增：商品购买弹窗样式 ========================= */
+#mall-purchase-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 557; /* 要比商品详情页的层级高 */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#mall-purchase-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#mall-purchase-panel {
+    background-color: #f7f7f7; /* 浅灰色背景，更有层次感 */
+    width: 100%;
+    height: 55%; /* 占屏幕一半多一点，视觉效果更好 */
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+#mall-purchase-overlay.active #mall-purchase-panel {
+    transform: translateY(0);
+}
+
+.mall-purchase-header {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+    position: relative;
+}
+
+#mall-purchase-product-emoji {
+    font-size: 80px;
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -40px; /* 向上突出一部分，更有立体感 */
+    border: 1px solid #eee;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.mall-purchase-product-info {
+    margin-left: 15px;
+    flex-grow: 1;
+}
+
+#mall-purchase-product-price {
+    color: #ff5000;
+    font-size: 24px;
+    font-weight: bold;
+}
+#mall-purchase-product-price::before {
+    content: '¥';
+    font-size: 14px;
+    margin-right: 2px;
+}
+
+#mall-purchase-quantity-selector {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+}
+#mall-purchase-quantity-selector .quantity-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #555;
+    line-height: 26px;
+}
+#mall-purchase-quantity-selector #mall-purchase-quantity {
+    min-width: 40px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+#mall-purchase-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+}
+
+.mall-purchase-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px 20px;
+}
+
+.mall-purchase-styles-section .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+#mall-purchase-styles-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.style-option-btn {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+.style-option-btn.active {
+    border-color: var(--theme-pink-btn, #F5B3C9);
+    background-color: var(--theme-pink-bg-med, rgba(229, 138, 171, 0.15));
+    color: var(--theme-pink-text, #E58AAB);
+    font-weight: 500;
+}
+
+.mall-purchase-footer {
+    padding: 10px 20px calc(10px + env(safe-area-inset-bottom, 20px));
+    border-top: 1px solid #eee;
+    background-color: #fff;
+    flex-shrink: 0;
+}
+
+#mall-purchase-confirm-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 25px;
+    background-color: var(--theme-pink-btn, #F5B3C9);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+/* ========================= 新增样式结束 ========================= */
         /* --- [REFACTORED] Transfer Page Styles --- */
         #transfer-page {
             position: fixed; top: 0; left: 0;
@@ -4885,6 +5048,36 @@
     </div>
 </div>
 
+<!-- ========================= 新增：商品购买弹窗 ========================= -->
+<div id="mall-purchase-overlay" onclick="closePurchasePanel()">
+    <div id="mall-purchase-panel" onclick="event.stopPropagation()">
+        <div class="mall-purchase-header">
+            <span id="mall-purchase-product-emoji"></span>
+            <div class="mall-purchase-product-info">
+                <div id="mall-purchase-product-price"></div>
+                <div id="mall-purchase-quantity-selector">
+                    <button class="quantity-btn minus">-</button>
+                    <span id="mall-purchase-quantity">1</span>
+                    <button class="quantity-btn plus">+</button>
+                </div>
+            </div>
+            <div id="mall-purchase-close-btn" onclick="closePurchasePanel()">✕</div>
+        </div>
+        <div class="mall-purchase-body">
+            <div class="mall-purchase-styles-section">
+                <h4 class="section-title">款式</h4>
+                <div id="mall-purchase-styles-grid">
+                    <!-- 款式会由JS动态生成到这里 -->
+                </div>
+            </div>
+        </div>
+        <div class="mall-purchase-footer">
+            <button id="mall-purchase-confirm-btn">确定</button>
+        </div>
+    </div>
+</div>
+<!-- ========================= 新增结束 ========================= -->
+
 <!-- Mall Add/Edit Category Modal -->
 <div id="mall-category-modal" class="delete-confirm-modal">
     <div class="wb-modal-card" onclick="event.stopPropagation()">
@@ -6101,298 +6294,389 @@ ${historyText}
         originalCloseChatApp(); 
     };
     
-    // --- Mall App Logic (NEW & MODIFIED) ---
-    function getMallProductsCache() {
-        try {
-            const data = localStorage.getItem(MALL_PRODUCTS_CACHE_KEY);
-            return data ? JSON.parse(data) : {};
-        } catch (e) {
-            return {};
-        }
+// --- Mall App Logic (NEW & MODIFIED) ---
+
+// ========================= 新增：购买弹窗相关JS =========================
+// 用一个全局变量来存储当前弹窗里的商品信息、数量和选择的款式
+let currentPurchaseInfo = {
+    productId: null,
+    quantity: 1,
+    selectedStyle: null
+};
+
+// 打开购买弹窗的函数
+window.openPurchasePanel = (productId) => {
+    const cache = getMallProductsCache();
+    const products = cache[currentMallCategoryId];
+    if (!products) return;
+
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+        showToast("找不到该商品");
+        return;
     }
 
-    function saveMallProductsCache(cache) {
-        localStorage.setItem(MALL_PRODUCTS_CACHE_KEY, JSON.stringify(cache));
-    }
+    // 1. 重置并存储当前商品信息
+    currentPurchaseInfo.productId = productId;
+    currentPurchaseInfo.quantity = 1;
+    currentPurchaseInfo.selectedStyle = null;
 
-
-    function getMallCategories() {
-        try {
-            let data = localStorage.getItem(MALL_CATEGORIES_KEY);
-            let categories = data ? JSON.parse(data) : [];
-            
-            const defaultCategory = {
-                id: 'default-recommend',
-                name: '推荐',
-                deletable: false,
-                description: '这个种类里面包含服饰鞋包 美妆个护 数码家电 家居家装 母婴用品 食品保健 图书音像 珠宝配饰 宠物生活 虚拟/服务。'
-            };
+    // 2. 填充弹窗顶部的 Emoji 和价格
+    document.getElementById('mall-purchase-product-emoji').textContent = product.emoji || '📦';
+    document.getElementById('mall-purchase-product-price').textContent = `¥${(parseFloat(product.price) || 0).toFixed(2)}`;
+    document.getElementById('mall-purchase-quantity').textContent = currentPurchaseInfo.quantity;
     
-            if (!categories.some(cat => cat.id === defaultCategory.id)) {
-                categories.unshift(defaultCategory);
-            }
-            
-            categories.forEach(cat => {
-                if (cat.id === 'default-recommend') {
-                    cat.deletable = false;
-                    if (!cat.description) cat.description = defaultCategory.description;
-                } else {
-                    cat.deletable = true;
-                    if (!cat.hasOwnProperty('description')) cat.description = '';
-                    if (!cat.hasOwnProperty('boundRoleIds')) cat.boundRoleIds = [];
-                }
-            });
-    
-            saveMallCategories(categories);
-            return categories;
-        } catch (e) {
-            console.error("Error getting mall categories:", e);
-            const defaultCategory = {
-                id: 'default-recommend',
-                name: '推荐',
-                deletable: false,
-                description: '这个种类里面包含服饰鞋包 美妆个护 数码家电 家居家装 母婴用品 食品保健 图书音像 珠宝配饰 宠物生活 虚拟/服务。'
+    // 3. 根据商品数据，动态生成“款式”按钮
+    const stylesGrid = document.getElementById('mall-purchase-styles-grid');
+    stylesGrid.innerHTML = '';
+    if (product.styles && product.styles.length > 0) {
+        product.styles.forEach(styleName => {
+            const btn = document.createElement('button');
+            btn.className = 'style-option-btn';
+            btn.textContent = escapeHtml(styleName);
+            btn.onclick = () => {
+                // 点击时，先把所有按钮变回普通样式
+                stylesGrid.querySelectorAll('.style-option-btn').forEach(b => b.classList.remove('active'));
+                // 再把当前点击的这个按钮设为“选中”状态
+                btn.classList.add('active');
+                currentPurchaseInfo.selectedStyle = styleName;
             };
-            saveMallCategories([defaultCategory]);
-            return [defaultCategory];
+            stylesGrid.appendChild(btn);
+        });
+        // 默认选中第一个款式
+        if (stylesGrid.firstChild) {
+            stylesGrid.firstChild.click();
         }
+    } else {
+        stylesGrid.innerHTML = '<p style="color:#999; font-size: 14px;">暂无可选款式</p>';
+        currentPurchaseInfo.selectedStyle = '默认'; // 如果没款式，就给个默认值
     }
 
-    function saveMallCategories(categories) {
-        localStorage.setItem(MALL_CATEGORIES_KEY, JSON.stringify(categories));
-    }
+    // 4. 给加减号按钮绑定事件
+    const quantityEl = document.getElementById('mall-purchase-quantity');
+    document.querySelector('#mall-purchase-quantity-selector .plus').onclick = () => {
+        currentPurchaseInfo.quantity++;
+        quantityEl.textContent = currentPurchaseInfo.quantity;
+    };
+    document.querySelector('#mall-purchase-quantity-selector .minus').onclick = () => {
+        if (currentPurchaseInfo.quantity > 1) { // 保证数量最少是1
+            currentPurchaseInfo.quantity--;
+            quantityEl.textContent = currentPurchaseInfo.quantity;
+        }
+    };
+    
+    // 5. 给最下面的“确定”按钮绑定事件
+    document.getElementById('mall-purchase-confirm-btn').onclick = () => {
+        if (!currentPurchaseInfo.selectedStyle) {
+            showToast('请选择一个款式');
+            return;
+        }
+        showToast(`成功购买 ${currentPurchaseInfo.selectedStyle} x ${currentPurchaseInfo.quantity}`);
+        closePurchasePanel(); // 购买成功后关闭弹窗
+    };
 
-    function renderMallCategories() {
-        const nav = document.getElementById('mall-category-nav');
-        nav.innerHTML = '';
-        const categories = getMallCategories();
+    // 6. 显示弹窗
+    const overlay = document.getElementById('mall-purchase-overlay');
+    overlay.classList.add('active');
+};
+
+// 关闭购买弹窗的函数
+window.closePurchasePanel = () => {
+    document.getElementById('mall-purchase-overlay').classList.remove('active');
+};
+// ========================= 新增JS结束 =========================
+
+
+function getMallProductsCache() {
+    try {
+        const data = localStorage.getItem(MALL_PRODUCTS_CACHE_KEY);
+        return data ? JSON.parse(data) : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function saveMallProductsCache(cache) {
+    localStorage.setItem(MALL_PRODUCTS_CACHE_KEY, JSON.stringify(cache));
+}
+
+
+function getMallCategories() {
+    try {
+        let data = localStorage.getItem(MALL_CATEGORIES_KEY);
+        let categories = data ? JSON.parse(data) : [];
+        
+        const defaultCategory = {
+            id: 'default-recommend',
+            name: '推荐',
+            deletable: false,
+            description: '这个种类里面包含服饰鞋包 美妆个护 数码家电 家居家装 母婴用品 食品保健 图书音像 珠宝配饰 宠物生活 虚拟/服务。'
+        };
+
+        if (!categories.some(cat => cat.id === defaultCategory.id)) {
+            categories.unshift(defaultCategory);
+        }
         
         categories.forEach(cat => {
-            const item = document.createElement('div');
-            item.className = 'mall-category-item';
-            item.textContent = cat.name;
-            item.dataset.id = cat.id;
-            item.onclick = () => switchMallCategory(item);
-            item.ondblclick = () => {
-                openMallCategoryModal(true, cat.id);
-            };
-            nav.appendChild(item);
+            if (cat.id === 'default-recommend') {
+                cat.deletable = false;
+                if (!cat.description) cat.description = defaultCategory.description;
+            } else {
+                cat.deletable = true;
+                if (!cat.hasOwnProperty('description')) cat.description = '';
+                if (!cat.hasOwnProperty('boundRoleIds')) cat.boundRoleIds = [];
+            }
         });
 
-        const activeItem = nav.querySelector(`[data-id="${currentMallCategoryId}"]`) || nav.firstChild;
-        if(activeItem) {
-            switchMallCategory(activeItem);
-        } else if (nav.firstChild) {
-            switchMallCategory(nav.firstChild);
-        }
+        saveMallCategories(categories);
+        return categories;
+    } catch (e) {
+        console.error("Error getting mall categories:", e);
+        const defaultCategory = {
+            id: 'default-recommend',
+            name: '推荐',
+            deletable: false,
+            description: '这个种类里面包含服饰鞋包 美妆个护 数码家电 家居家装 母婴用品 食品保健 图书音像 珠宝配饰 宠物生活 虚拟/服务。'
+        };
+        saveMallCategories([defaultCategory]);
+        return [defaultCategory];
     }
+}
 
-    window.openMallApp = () => {
-        body.classList.add('mall-active');
-        currentMallCategoryId = 'default-recommend';
-        renderMallCategories();
-        const contentArea = document.getElementById('mall-content');
-        contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div><p style="text-align:center; color:#ccc; padding-top: 50px;">点击右上角刷新按钮生成商品</p>`;
+function saveMallCategories(categories) {
+    localStorage.setItem(MALL_CATEGORIES_KEY, JSON.stringify(categories));
+}
 
-        document.getElementById('mall-add-category-btn').onclick = () => openMallCategoryModal(false);
-        document.getElementById('mall-refresh-btn').onclick = () => generateMallProducts();
-    };
-
-    window.closeMallApp = () => {
-        body.classList.remove('mall-active');
-    };
-
-        window.switchMallCategory = (element) => {
-        if (!element) return;
-        document.querySelectorAll('#mall-category-nav .mall-category-item').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
-        currentMallCategoryId = element.dataset.id;
-
-        const cache = getMallProductsCache();
-        const cachedProducts = cache[currentMallCategoryId];
-        const contentArea = document.getElementById('mall-content');
-        
-        // 先准备好商品网格的容器
-        contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div>`;
-        
-        if (cachedProducts && cachedProducts.length > 0) {
-            // 如果缓存里有这个分类的商品，就直接渲染出来
-            renderMallProducts(cachedProducts);
-        } else {
-            // 如果缓存里没有，才显示提示信息
-            contentArea.innerHTML += `<p style="text-align:center; color:#ccc; padding-top: 50px;">点击右上角刷新按钮为“${escapeHtml(element.textContent)}”分类生成商品</p>`;
-        }
-    };
+function renderMallCategories() {
+    const nav = document.getElementById('mall-category-nav');
+    nav.innerHTML = '';
+    const categories = getMallCategories();
     
-    function openMallCategoryModal(isEditing = false, categoryId = null) {
-        const modal = document.getElementById('mall-category-modal');
-        const titleEl = document.getElementById('mall-category-modal-title');
-        const nameInput = document.getElementById('mall-category-name-input');
-        const descInput = document.getElementById('mall-category-desc-input');
-        const actionsContainer = document.getElementById('mall-category-modal-actions');
-        
-        isEditingMallCategory = isEditing;
-        currentMallCategoryId = categoryId;
-        
-        const categories = getMallCategories();
-        const category = categories.find(c => c.id === categoryId);
+    categories.forEach(cat => {
+        const item = document.createElement('div');
+        item.className = 'mall-category-item';
+        item.textContent = cat.name;
+        item.dataset.id = cat.id;
+        item.onclick = () => switchMallCategory(item);
+        item.ondblclick = () => {
+            openMallCategoryModal(true, cat.id);
+        };
+        nav.appendChild(item);
+    });
 
-        if (isEditing && category) {
-            titleEl.textContent = '编辑商品种类';
-            nameInput.value = category.name;
-            descInput.value = category.description || '';
-            tempMallCategoryRoleIds = [...(category.boundRoleIds || [])];
-            
-            if (category.deletable) {
-                actionsContainer.innerHTML = `
-                    <button class="wb-action-btn btn-confirm-delete" onclick="deleteMallCategory()">删除</button>
-                    <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
-                    <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
-                `;
-            } else {
-                actionsContainer.innerHTML = `
-                    <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
-                    <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
-                `;
-            }
+    const activeItem = nav.querySelector(`[data-id="${currentMallCategoryId}"]`) || nav.firstChild;
+    if(activeItem) {
+        switchMallCategory(activeItem);
+    } else if (nav.firstChild) {
+        switchMallCategory(nav.firstChild);
+    }
+}
+
+window.openMallApp = () => {
+    body.classList.add('mall-active');
+    currentMallCategoryId = 'default-recommend';
+    renderMallCategories();
+    const contentArea = document.getElementById('mall-content');
+    contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div><p style="text-align:center; color:#ccc; padding-top: 50px;">点击右上角刷新按钮生成商品</p>`;
+
+    document.getElementById('mall-add-category-btn').onclick = () => openMallCategoryModal(false);
+    document.getElementById('mall-refresh-btn').onclick = () => generateMallProducts();
+};
+
+window.closeMallApp = () => {
+    body.classList.remove('mall-active');
+};
+
+    window.switchMallCategory = (element) => {
+    if (!element) return;
+    document.querySelectorAll('#mall-category-nav .mall-category-item').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    currentMallCategoryId = element.dataset.id;
+
+    const cache = getMallProductsCache();
+    const cachedProducts = cache[currentMallCategoryId];
+    const contentArea = document.getElementById('mall-content');
+    
+    // 先准备好商品网格的容器
+    contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div>`;
+    
+    if (cachedProducts && cachedProducts.length > 0) {
+        // 如果缓存里有这个分类的商品，就直接渲染出来
+        renderMallProducts(cachedProducts);
+    } else {
+        // 如果缓存里没有，才显示提示信息
+        contentArea.innerHTML += `<p style="text-align:center; color:#ccc; padding-top: 50px;">点击右上角刷新按钮为“${escapeHtml(element.textContent)}”分类生成商品</p>`;
+    }
+};
+
+function openMallCategoryModal(isEditing = false, categoryId = null) {
+    const modal = document.getElementById('mall-category-modal');
+    const titleEl = document.getElementById('mall-category-modal-title');
+    const nameInput = document.getElementById('mall-category-name-input');
+    const descInput = document.getElementById('mall-category-desc-input');
+    const actionsContainer = document.getElementById('mall-category-modal-actions');
+    
+    isEditingMallCategory = isEditing;
+    currentMallCategoryId = categoryId;
+    
+    const categories = getMallCategories();
+    const category = categories.find(c => c.id === categoryId);
+
+    if (isEditing && category) {
+        titleEl.textContent = '编辑商品种类';
+        nameInput.value = category.name;
+        descInput.value = category.description || '';
+        tempMallCategoryRoleIds = [...(category.boundRoleIds || [])];
+        
+        if (category.deletable) {
+            actionsContainer.innerHTML = `
+                <button class="wb-action-btn btn-confirm-delete" onclick="deleteMallCategory()">删除</button>
+                <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
+                <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
+            `;
         } else {
-            isEditingMallCategory = false; 
-            titleEl.textContent = '添加商品种类';
-            nameInput.value = '';
-            descInput.value = '';
-            tempMallCategoryRoleIds = [];
-            
             actionsContainer.innerHTML = `
                 <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
                 <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
             `;
         }
+    } else {
+        isEditingMallCategory = false; 
+        titleEl.textContent = '添加商品种类';
+        nameInput.value = '';
+        descInput.value = '';
+        tempMallCategoryRoleIds = [];
         
-        modal.classList.add('active');
+        actionsContainer.innerHTML = `
+            <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
+            <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
+        `;
     }
-
-    function closeMallCategoryModal() {
-        document.getElementById('mall-category-modal').classList.remove('active');
-    }
-
     
-    function openMallCategoryRoleBindModal() {
-        wbBindMultiSelect = true;
-        document.getElementById('wb-bind-modal-title').textContent = '绑定角色';
-        
-        wbBindCallback = (selectedIds) => {
-            tempMallCategoryRoleIds = selectedIds;
+    modal.classList.add('active');
+}
+
+function closeMallCategoryModal() {
+    document.getElementById('mall-category-modal').classList.remove('active');
+}
+
+
+function openMallCategoryRoleBindModal() {
+    wbBindMultiSelect = true;
+    document.getElementById('wb-bind-modal-title').textContent = '绑定角色';
+    
+    wbBindCallback = (selectedIds) => {
+        tempMallCategoryRoleIds = selectedIds;
+    };
+
+    openWorldBookBindModal('roles');
+}
+
+function saveMallCategory() {
+    const name = document.getElementById('mall-category-name-input').value.trim();
+    const description = document.getElementById('mall-category-desc-input').value.trim();
+    
+    if (!name) {
+        showToast('分类名称不能为空');
+        return;
+    }
+
+    let categories = getMallCategories();
+    
+    if (isEditingMallCategory) {
+        const index = categories.findIndex(c => c.id === currentMallCategoryId);
+        if (index !== -1) {
+            categories[index].name = name;
+            categories[index].description = description;
+            categories[index].boundRoleIds = tempMallCategoryRoleIds;
+        }
+    } else {
+        const newCategory = {
+            id: `custom-${Date.now()}`,
+            name: name,
+            description: description,
+            boundRoleIds: tempMallCategoryRoleIds,
+            deletable: true
         };
-
-        openWorldBookBindModal('roles');
+        categories.push(newCategory);
     }
 
-    function saveMallCategory() {
-        const name = document.getElementById('mall-category-name-input').value.trim();
-        const description = document.getElementById('mall-category-desc-input').value.trim();
-        
-        if (!name) {
-            showToast('分类名称不能为空');
-            return;
-        }
+    saveMallCategories(categories);
+    renderMallCategories();
+    closeMallCategoryModal();
+    showToast('保存成功');
+}
 
-        let categories = getMallCategories();
-        
-        if (isEditingMallCategory) {
-            const index = categories.findIndex(c => c.id === currentMallCategoryId);
-            if (index !== -1) {
-                categories[index].name = name;
-                categories[index].description = description;
-                categories[index].boundRoleIds = tempMallCategoryRoleIds;
-            }
-        } else {
-            const newCategory = {
-                id: `custom-${Date.now()}`,
-                name: name,
-                description: description,
-                boundRoleIds: tempMallCategoryRoleIds,
-                deletable: true
-            };
-            categories.push(newCategory);
-        }
+function deleteMallCategory() {
+    if (!isEditingMallCategory || !currentMallCategoryId) return;
+    
+    let categories = getMallCategories();
+    const categoryToDelete = categories.find(c => c.id === currentMallCategoryId);
+    if (!categoryToDelete || !categoryToDelete.deletable) {
+        showToast("默认分类不可删除");
+        return;
+    }
 
-        saveMallCategories(categories);
-        renderMallCategories();
-        closeMallCategoryModal();
-        showToast('保存成功');
+    categories = categories.filter(c => c.id !== currentMallCategoryId);
+    saveMallCategories(categories);
+    
+    let cache = getMallProductsCache();
+    delete cache[currentMallCategoryId];
+    saveMallProductsCache(cache);
+    
+    currentMallCategoryId = 'default-recommend'; 
+    renderMallCategories();
+    closeMallCategoryModal();
+    showToast('分类已删除');
+}
+
+async function generateMallProducts() {
+    const contentArea = document.getElementById('mall-content');
+    if (!contentArea) return;
+    
+    const grid = document.createElement('div');
+    grid.className = 'mall-product-grid';
+    grid.id = 'mall-product-grid';
+    contentArea.innerHTML = '';
+    contentArea.appendChild(grid);
+
+    grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">正在生成商品...</p>';
+    
+    const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+    if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
+        grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">请先在设置中配置 API</p>';
+        return;
     }
     
-    function deleteMallCategory() {
-        if (!isEditingMallCategory || !currentMallCategoryId) return;
-        
-        let categories = getMallCategories();
-        const categoryToDelete = categories.find(c => c.id === currentMallCategoryId);
-        if (!categoryToDelete || !categoryToDelete.deletable) {
-            showToast("默认分类不可删除");
-            return;
-        }
-
-        categories = categories.filter(c => c.id !== currentMallCategoryId);
-        saveMallCategories(categories);
-        
-        let cache = getMallProductsCache();
-        delete cache[currentMallCategoryId];
-        saveMallProductsCache(cache);
-        
-        currentMallCategoryId = 'default-recommend'; 
-        renderMallCategories();
-        closeMallCategoryModal();
-        showToast('分类已删除');
+    const categories = getMallCategories();
+    const currentCategory = categories.find(c => c.id === currentMallCategoryId);
+    if (!currentCategory) {
+        grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">无法找到当前分类</p>';
+        return;
     }
     
-        async function generateMallProducts() {
-        const contentArea = document.getElementById('mall-content');
-        if (!contentArea) return;
+    const categoryName = currentCategory.name;
+    const categoryDesc = currentCategory.description || '无';
+    
+    let roleContext = "无特定角色信息。";
+    if (currentCategory.boundRoleIds && currentCategory.boundRoleIds.length > 0) {
+        const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         
-        const grid = document.createElement('div');
-        grid.className = 'mall-product-grid';
-        grid.id = 'mall-product-grid';
-        contentArea.innerHTML = '';
-        contentArea.appendChild(grid);
+        const roleDetails = currentCategory.boundRoleIds.map(roleId => {
+            const contact = allContacts.find(c => c.id === roleId);
+            if (!contact) return '';
 
-        grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">正在生成商品...</p>';
-        
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
-            grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">请先在设置中配置 API</p>';
-            return;
-        }
-        
-        const categories = getMallCategories();
-        const currentCategory = categories.find(c => c.id === currentMallCategoryId);
-        if (!currentCategory) {
-            grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">无法找到当前分类</p>';
-            return;
-        }
-        
-        const categoryName = currentCategory.name;
-        const categoryDesc = currentCategory.description || '无';
-        
-        let roleContext = "无特定角色信息。";
-        if (currentCategory.boundRoleIds && currentCategory.boundRoleIds.length > 0) {
-            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+            const recollectionData = getRecollections(contact.id);
+            const recollectionText = recollectionData.items.map(item => item.text).join('\n');
             
-            const roleDetails = currentCategory.boundRoleIds.map(roleId => {
-                const contact = allContacts.find(c => c.id === roleId);
-                if (!contact) return '';
+            return `角色: ${contact.alias || contact.name}\n- 角色人设: ${contact.persona || '无'}\n- 回忆总结(发生过的事): ${recollectionText || '无'}`;
 
-                const recollectionData = getRecollections(contact.id);
-                const recollectionText = recollectionData.items.map(item => item.text).join('\n');
-                
-                return `角色: ${contact.alias || contact.name}\n- 角色人设: ${contact.persona || '无'}\n- 回忆总结(发生过的事): ${recollectionText || '无'}`;
+        }).filter(Boolean).join('\n---\n');
+        
+        if (roleDetails) roleContext = roleDetails;
+    }
 
-            }).filter(Boolean).join('\n---\n');
-            
-            if (roleDetails) roleContext = roleDetails;
-        }
-
-        // 我在这里也优化了给AI的指令，让它更明确地返回带 "products" 键的盒子
-        const prompt = `你是一个专业的电商平台商品文案专家。请根据以下信息，生成一个包含10个商品的JSON数组，并封装在一个名为 "products" 的键中。
+    const prompt = `你是一个专业的电商平台商品文案专家。请根据以下信息，生成一个包含10个商品的JSON数组，并封装在一个名为 "products" 的键中。
 
 **商品分类**: ${categoryName}
 **分类补充说明**: ${categoryDesc}
@@ -6408,6 +6692,7 @@ ${roleContext}
 3.  **价格 (price)**: 一个在1到1000之间的数字。
 4.  **销量 (sales)**: 一个在0到100000之间的随机整数。
 5.  **商品评价 (reviews)**: 一个包含3到6条评价对象的数组。每条评价对象包含: 'nickname' (一个随机的买家昵称), 'content' (评价内容), 'rating' (一个1-5的数字，代表星级)。请确保评价内容和风格多样，有好评，有中性评价，也有抱怨的差评。
+6.  **款式 (styles)**: 一个包含3到6个字符串的数组，每个字符串代表一个商品款式或规格。例如：["樱花粉", "天空蓝", "磨砂黑"]。
 
 **输出格式**: 严格按照JSON对象格式输出，不要包含任何markdown标记或解释性文字。
 **示例**:
@@ -6418,6 +6703,7 @@ ${roleContext}
       "emoji": "👁️", 
       "price": 39.9, 
       "sales": 128567,
+      "styles": ["象牙白", "自然色"],
       "reviews": [
           { "nickname": "小熊不吃糖", "content": "真的绝了，黑眼圈瞬间消失，而且很水润，不会卡粉！姐妹们快冲！", "rating": 5 },
           { "nickname": "匿名用户", "content": "还可以吧，遮瑕力是不错，就是感觉有点干。", "rating": 3 },
@@ -6426,97 +6712,92 @@ ${roleContext}
     }
   ]
 }`;
-        
-        try {
-            const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url + '/v1'}/chat/completions`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
-                body: JSON.stringify({
-                    model: settings.api.model,
-                    messages: [{ role: 'user', content: prompt }],
-                    temperature: parseFloat(settings.api.temp || 0.8),
-                    response_format: { "type": "json_object" } 
-                })
-            });
-            
-            if (!res.ok) {
-                 const errorData = await res.json();
-                 throw new Error(`API Error: ${res.status} - ${errorData.error.message}`);
-            }
-
-            const data = await res.json();
-            const content = data.choices[0].message.content;
-            
-            // --- 核心修复点在这里 ---
-            const responseObject = JSON.parse(content);
-            const products = responseObject.products; // 我们现在先打开"盒子"，再拿出里面的"products"列表
-
-            if (!Array.isArray(products)) {
-                // 如果打开盒子后发现里面不是列表，就报错
-                console.error("Parsed response from AI is not the expected format. Response:", responseObject);
-                throw new Error("AI did not return a valid object with a 'products' array.");
-            }
-            
-            // 先给每个商品分配好ID
-            products.forEach((p, index) => {
-                p.id = `prod-${currentMallCategoryId}-${index}`;
-            });
-            
-            // 然后再把带有ID的商品存入缓存
-            let cache = getMallProductsCache();
-            cache[currentMallCategoryId] = products;
-            saveMallProductsCache(cache);
-            
-            // 最后才渲染页面
-            renderMallProducts(products);
-
-        } catch (error) {
-            console.error("Error generating mall products:", error);
-            grid.innerHTML = `<p style="color:#cc0000; text-align:center; grid-column: span 2;">商品生成失败: ${error.message}</p>`;
-        }
-    }
     
-    function formatSales(num) {
-        if (num >= 10000) {
-            return (num / 10000).toFixed(1).replace(/\.0$/, '') + '万+';
+    try {
+        const res = await fetch(`${settings.api.url.endsWith('/v1') ? settings.api.url : settings.api.url + '/v1'}/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.api.key}` },
+            body: JSON.stringify({
+                model: settings.api.model,
+                messages: [{ role: 'user', content: prompt }],
+                temperature: parseFloat(settings.api.temp || 0.8),
+                response_format: { "type": "json_object" } 
+            })
+        });
+        
+        if (!res.ok) {
+             const errorData = await res.json();
+             throw new Error(`API Error: ${res.status} - ${errorData.error.message}`);
         }
-        return num + '+';
+
+        const data = await res.json();
+        const content = data.choices[0].message.content;
+        
+        const responseObject = JSON.parse(content);
+        const products = responseObject.products;
+
+        if (!Array.isArray(products)) {
+            console.error("Parsed response from AI is not the expected format. Response:", responseObject);
+            throw new Error("AI did not return a valid object with a 'products' array.");
+        }
+        
+        products.forEach((p, index) => {
+            p.id = `prod-${currentMallCategoryId}-${Date.now()}-${index}`;
+        });
+        
+        let cache = getMallProductsCache();
+        cache[currentMallCategoryId] = products;
+        saveMallProductsCache(cache);
+        
+        renderMallProducts(products);
+
+    } catch (error) {
+        console.error("Error generating mall products:", error);
+        grid.innerHTML = `<p style="color:#cc0000; text-align:center; grid-column: span 2;">商品生成失败: ${error.message}</p>`;
+    }
+}
+
+function formatSales(num) {
+    if (num >= 10000) {
+        return (num / 10000).toFixed(1).replace(/\.0$/, '') + '万+';
+    }
+    return num + '+';
+}
+
+function renderMallProducts(products) {
+    const grid = document.getElementById('mall-product-grid');
+    grid.innerHTML = '';
+
+    if (!products || products.length === 0) {
+        grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">这个分类下还没有商品哦~</p>';
+        return;
     }
 
-            function renderMallProducts(products) {
-        const grid = document.getElementById('mall-product-grid');
-        grid.innerHTML = '';
-
-        if (!products || products.length === 0) {
-            grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">这个分类下还没有商品哦~</p>';
-            return;
-        }
-
-        products.forEach(p => {
-            // 这里不再需要创建ID，因为传进来的商品已经有ID了
-            const item = document.createElement('div');
-            item.className = 'mall-product-item';
-            item.onclick = () => openMallDetail(p.id); // 直接使用已有的ID
-            
-            const price = parseFloat(p.price) || 0;
-            const sales = parseInt(p.sales) || 0;
-            
-            item.innerHTML = `
-                <div class="product-image">${p.emoji || '📦'}</div>
-                <div class="product-details">
-                    <div class="product-name">${escapeHtml(p.name)}</div>
-                    <div class="product-price-info">
-                        <span class="product-price">${price.toFixed(2)}</span>
-                        <div class="product-price-extra">
-                            <span class="product-coupon-tag">券后价</span>
-                            <span class="product-sales">已售 ${formatSales(sales)}</span>
-                        </div>
+    products.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'mall-product-item';
+        item.onclick = () => openMallDetail(p.id);
+        
+        const price = parseFloat(p.price) || 0;
+        const sales = parseInt(p.sales) || 0;
+        
+        item.innerHTML = `
+            <div class="product-image">${p.emoji || '📦'}</div>
+            <div class="product-details">
+                <div class="product-name">${escapeHtml(p.name)}</div>
+                <div class="product-price-info">
+                    <span class="product-price">${price.toFixed(2)}</span>
+                    <div class="product-price-extra">
+                        <span class="product-coupon-tag">券后价</span>
+                        <span class="product-sales">已售 ${formatSales(sales)}</span>
                     </div>
                 </div>
-            `;
-            grid.appendChild(item);
-        });
-    }
+            </div>
+        `;
+        grid.appendChild(item);
+    });
+}
+
     // --- Forum App Logic ---
     window.openForumApp = () => {
         body.classList.add('forum-active');
@@ -9835,84 +10116,45 @@ ${recollectionContext ? `\n近期经历(回忆)：\n${recollectionContext}\n` : 
         return stars;
     }
 
-    window.openMallDetail = (productId) => {
-        const cache = getMallProductsCache();
-        const products = cache[currentMallCategoryId];
-        if (!products) return;
+    //【修改后】
+window.openMallDetail = (productId) => {
+    //... (中间代码省略) ...
+    const favBtn = document.getElementById('mall-detail-fav-btn');
+    const favIcon = favBtn.querySelector('img');
+    
+    if (product.isFavorited) {
+        favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮状态
+    } else {
+        // --- 修改点：这里换成了你提供的新图标链接 ---
+        favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png"; // 默认状态
+    }
+    favBtn.onclick = () => toggleMallProductFavorite(productId);
 
-        const product = products.find(p => p.id === productId);
-        if (!product) {
-            showToast("找不到该商品");
-            return;
-        }
+    // --- 新增：给“立即购买”按钮添加点击事件 ---
+    const buyBtn = document.querySelector('#mall-detail-page .footer-btn.buy');
+    if (buyBtn) {
+        buyBtn.onclick = () => openPurchasePanel(productId);
+    }
 
-        const contentEl = document.getElementById('mall-detail-content');
-        
-        const reviewsHtml = (product.reviews && product.reviews.length > 0)
-            ? product.reviews.map(review => `
-                <div class="review-item">
-                    <div class="review-header">
-                        <span class="review-nickname">${escapeHtml(review.nickname)}</span>
-                        <span class="review-stars">${renderReviewStars(review.rating)}</span>
-                    </div>
-                    <p class="review-content">${escapeHtml(review.content)}</p>
-                </div>
-            `).join('')
-            : '<p style="color:#ccc; text-align:center; padding: 20px 0;">暂无评价</p>';
-
-        contentEl.innerHTML = `
-            <div class="mall-detail-img-container">${product.emoji || '📦'}</div>
-            <div class="mall-detail-info-card">
-                <div class="mall-detail-price">${(parseFloat(product.price) || 0).toFixed(2)}</div>
-                <h2 class="mall-detail-name">${escapeHtml(product.name)}</h2>
-                <p class="mall-detail-sales">已售 ${formatSales(parseInt(product.sales) || 0)}</p>
-            </div>
-            <div class="mall-detail-reviews-card">
-                <h3>商品评价 (${product.reviews?.length || 0})</h3>
-                ${reviewsHtml}
-            </div>
-        `;
-        
-        const favBtn = document.getElementById('mall-detail-fav-btn');
-        const favIcon = favBtn.querySelector('img');
-        
-        if (product.isFavorited) {
-            favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮状态
-        } else {
-            favIcon.src = "https://img.heliar.top/file/1770353311894_喜欢_like_2.png"; // 默认状态
-        }
-        favBtn.onclick = () => toggleMallProductFavorite(productId);
-
-        document.getElementById('mall-detail-page').classList.add('active');
-    };
+    document.getElementById('mall-detail-page').classList.add('active');
+};
 
     window.closeMallDetail = () => {
         document.getElementById('mall-detail-page').classList.remove('active');
     };
 
-    window.toggleMallProductFavorite = (productId) => {
-        const cache = getMallProductsCache();
-        const products = cache[currentMallCategoryId];
-        if (!products) return;
-
-        const product = products.find(p => p.id === productId);
-        if (!product) return;
-
-        product.isFavorited = !product.isFavorited;
-        
-        saveMallProductsCache(cache);
-
-        const favBtn = document.getElementById('mall-detail-fav-btn');
-        const favIcon = favBtn.querySelector('img');
-
-        if (product.isFavorited) {
-            favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮
-            showToast("已收藏");
-        } else {
-            favIcon.src = "https://img.heliar.top/file/1770353311894_喜欢_like_2.png"; // 熄灭
-            showToast("已取消收藏");
-        }
-    };
+    //【修改后】
+window.toggleMallProductFavorite = (productId) => {
+    //... (中间代码省略) ...
+    if (product.isFavorited) {
+        favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 点亮
+        showToast("已收藏");
+    } else {
+        // --- 修改点：这里也换成了你提供的新图标链接 ---
+        favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png"; // 熄灭
+        showToast("已取消收藏");
+    }
+};
         }, 2000);
     });
 
