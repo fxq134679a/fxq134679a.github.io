@@ -5127,7 +5127,7 @@
             <img src="https://img.heliar.top/file/1770767041294_关闭_close-one_2.png" class="confirm-popup-close" onclick="closeTransferConfirmPopup()">
             <span id="confirm-popup-title">确认付款</span>
         </div>
-        <div id="payment-details-section">
+                <div id="payment-details-section" onclick="showPasswordInputForTransfer()">
             <div class="confirm-popup-content">
                 <div id="confirm-transfer-target">向 ... 转账</div>
                 <div id="confirm-transfer-amount">¥100.00</div>
@@ -8887,7 +8887,7 @@ Strictly adhere to the JSON format. Example:
         }
     };
 
-    window.openTransferConfirmPopup = (amount) => {
+        window.openTransferConfirmPopup = (amount) => {
         const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         const contact = contacts.find(c => c.id === currentChatContactId);
         document.getElementById('confirm-transfer-target').textContent = `向 ${escapeHtml(contact.alias || contact.name)} 转账`;
@@ -8906,21 +8906,18 @@ Strictly adhere to the JSON format. Example:
         
         document.getElementById('transfer-confirm-overlay').classList.add('active');
 
-        setTimeout(() => {
-            showPasswordInputForTransfer();
-        }, 1000); 
+        // 【注意】下面这个导致问题的 setTimeout 已经被删掉了
     };
 
     window.closeTransferConfirmPopup = () => {
         document.getElementById('transfer-confirm-overlay').classList.remove('active');
     };
 
-    function showPasswordInputForTransfer() {
+        function showPasswordInputForTransfer() {
         document.getElementById('payment-details-section').style.display = 'none';
         document.getElementById('password-input-section').style.display = 'block';
         
-        const titleEl = document.getElementById('confirm-popup-title');
-        titleEl.textContent = '请输入支付密码';
+        // 下面这行修改标题的代码被删掉了，让顶部标题始终保持为“确认付款”
         
         renderNumericKeypad();
         document.getElementById('numeric-keypad').style.display = 'grid';
