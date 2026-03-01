@@ -1380,13 +1380,89 @@
         .temp-slider-container { display: flex; align-items: center; width: 100%; gap: 10px; }
         #temp-slider { flex: 1; padding: 0; height: 20px; }
         #temp-value-display { font-size: 14px; color: #555; min-width: 30px; text-align: right; }
-        .app-icon-item { display: flex; align-items: center; margin-bottom: 12px; padding: 10px; border-radius: 12px; background-color: #f9f9f9; }
-        .app-icon-preview { width: 40px; height: 40px; border-radius: 10px; margin-right: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; background-size: cover; background-position: center; background-color: rgba(229, 138, 171, 0.1); }
-        .app-icon-info { flex: 1; min-width: 0; }
-        .app-icon-name { font-weight: 500; margin-bottom: 6px; color: #333; font-size: 13px; }
-        .app-icon-input { display: flex; gap: 8px; }
-        .app-icon-input input { flex: 1; min-width: 0; padding: 6px 8px; font-size: 12px; }
-        .app-icon-input button { padding: 6px 12px; width: auto; font-size: 12px; background-color: var(--theme-pink-bg-med); color: var(--theme-pink-text); border: none; }
+        /* --- [新增/美化] 自定义App图标设置项样式 --- */
+.settings-app-icon-item {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* 图标和信息区的间距 */
+    background-color: #fcfcff; /* 一个非常淡的背景色 */
+    padding: 12px;
+    border-radius: 16px; /* 更圆润的卡片 */
+    margin-bottom: 12px;
+    border: 1px solid #f0e8f0;
+}
+
+.app-icon-preview-new {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px; /* 和主屏幕图标圆角接近 */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    overflow: hidden; /* [关键] 裁剪内部图片，解决预览图溢出问题 */
+    position: relative;
+    border: 1px solid #eee;
+}
+
+.app-icon-preview-new img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 保证图片填满且不变形 */
+}
+
+.app-icon-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* 标题和输入框的间距 */
+}
+
+.app-icon-name {
+    font-weight: 600;
+    color: var(--theme-pink-text); /* 使用主题粉色 */
+    font-size: 14px;
+}
+
+.app-icon-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.app-icon-input-group input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+}
+.app-icon-input-group input:focus {
+    border-color: var(--theme-pink-btn);
+    outline: none;
+}
+
+.app-icon-input-group button {
+    padding: 6px 12px;
+    width: auto;
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: var(--theme-pink-bg-med);
+    color: var(--theme-pink-text);
+}
+
+.app-icon-input-group button.reset {
+    background-color: #eee;
+    color: #888;
+}
         
         /* --- iOS Mode Switch Styles (Generic row with switch) --- */
         .settings-row-with-switch {
@@ -9593,7 +9669,7 @@ Strictly adhere to the JSON format. Example:
     document.getElementById('temp-slider').addEventListener('input', (e) => { document.getElementById('temp-value-display').innerText = e.target.value; });
 
     let currentEditAppId = null;
-    function renderSettingsAppList(appSettings) {
+        function renderSettingsAppList(appSettings) {
         const container = document.getElementById('settings-app-list-container');
         container.innerHTML = '';
         const apps = document.querySelectorAll('.app-item .app-name');
@@ -9601,16 +9677,26 @@ Strictly adhere to the JSON format. Example:
             const defaultName = appEl.dataset.appName;
             if(!defaultName) return;
             const appId = `app_${index}`;
-            const currentName = appSettings[appId]?.name || defaultName;
+            // [修改] 如果用户没自定义名称，则显示默认名称
+            const currentName = appSettings[appId]?.name || '';
+            const placeholderName = appSettings[appId]?.name || defaultName;
             
             const row = document.createElement('div');
-            row.className = 'settings-app-row';
+            // [修改] 应用我们新的CSS class
+            row.className = 'settings-app-icon-item'; 
+            // [修改] 使用新的、更清晰的HTML结构
             row.innerHTML = `
-                <div class="app-icon-preview" style="background:#f0f0f0; border-radius:12px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="triggerIconUpload('${appId}')">
-                    ${appSettings[appId]?.icon ? `<img src="${appSettings[appId].icon}" style="width:100%;height:100%;border-radius:12px;object-fit:cover;">` : '🖼️'}
+                <div class="app-icon-preview-new" onclick="triggerIconUpload('${appId}')">
+                    ${appSettings[appId]?.icon ? `<img src="${appSettings[appId].icon}">` : '🖼️'}
                 </div>
-                <input type="text" class="app-name-input" value="${currentName}" placeholder="${defaultName}" onchange="saveAppName('${appId}', this.value)">
-                <button class="settings-btn" onclick="resetAppSetting('${appId}')">重置</button>
+                <div class="app-icon-info">
+                    <span class="app-icon-name">${defaultName}</span>
+                    <div class="app-icon-input-group">
+                        <input type="text" value="${currentName}" placeholder="自定义名称: ${placeholderName}" onchange="saveAppName('${appId}', this.value)">
+                        <button onclick="triggerIconUpload('${appId}')">上传</button>
+                        <button class="reset" onclick="resetAppSetting('${appId}')">重置</button>
+                    </div>
+                </div>
             `;
             container.appendChild(row);
         });
@@ -9636,7 +9722,7 @@ Strictly adhere to the JSON format. Example:
         }
     };
 
-    function applyVisualSettings() {
+        function applyVisualSettings() {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
         const phoneScreen = document.getElementById('phone-screen-content');
         const wp = settings.visual?.wallpaper || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
@@ -9649,11 +9735,9 @@ Strictly adhere to the JSON format. Example:
             phoneScreen.style.backgroundImage = 'none';
         }
 
-                // 获取主屏幕上的两个圆形头像元素
         const avatar1 = document.getElementById('chat-avatar-1');
         const avatar2 = document.getElementById('chat-avatar-2');
 
-        // 应用设置中保存的 URL 到头像背景
         if (settings.visual?.mainAvatar1) {
             avatar1.style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
         }
@@ -9662,26 +9746,61 @@ Strictly adhere to the JSON format. Example:
         }
         
         const apps = document.querySelectorAll('.app-item');
-        let appIndex = 0;
-        apps.forEach(app => {
+        // [修改] 使用 document.querySelectorAll('.app-item:not(.dock-container .app-item)') 来排除dock栏图标，防止索引错乱
+        const screenApps = document.querySelectorAll('#grid-area .app-item, #dock-area .app-item'); 
+        
+        screenApps.forEach((app, index) => {
             const nameEl = app.querySelector('.app-name');
             const iconEl = app.querySelector('.app-icon');
-            if(nameEl) {
-                const appId = `app_${appIndex}`;
-                if(settings.apps && settings.apps[appId]) {
-                    if(settings.apps[appId].name) nameEl.innerText = settings.apps[appId].name;
-                    if(settings.apps[appId].icon) {
-                        iconEl.innerHTML = `<img src="${settings.apps[appId].icon}" style="width:100%;height:100%;object-fit:cover;">`;
-                        iconEl.style.background = 'transparent';
-                    }
-                } else {
-                    nameEl.innerText = nameEl.dataset.appName;
+            
+            // 为每个图标的appId建立一个稳定的映射，而不是依赖顺序
+            const appId = iconEl.id; // 使用图标的ID作为唯一标识
+
+            // 恢复默认名称
+            if (nameEl && nameEl.dataset.appName) {
+                nameEl.innerText = nameEl.dataset.appName;
+            }
+            
+            // [关键修改]
+            // 如果有自定义设置，则应用
+            if (settings.apps && settings.apps[appId]) {
+                const appSetting = settings.apps[appId];
+                // 应用自定义名称
+                if (nameEl && appSetting.name) {
+                    nameEl.innerText = appSetting.name;
                 }
-                appIndex++;
+                // 应用自定义图标
+                if (appSetting.icon) {
+                    iconEl.innerHTML = ''; // 清空内部的emoji
+                    iconEl.style.backgroundImage = `url(${appSetting.icon})`;
+                    iconEl.style.backgroundSize = 'cover';
+                    iconEl.style.backgroundPosition = 'center';
+                } else {
+                    // 如果只设置了名字没设置图标，需要恢复默认图标内容
+                    iconEl.style.backgroundImage = '';
+                    // 这里需要一种方式恢复默认的emoji，我们假设ID和默认内容有映射
+                    const defaultIcons = {
+                        'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '🔮',
+                        'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '🥡', 'icon-app8': '💰',
+                        'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️'
+                    };
+                    if (defaultIcons[appId]) iconEl.innerHTML = defaultIcons[appId];
+                }
+            } else {
+                 // 如果没有自定义设置，确保恢复默认状态
+                 iconEl.style.backgroundImage = '';
+                 const defaultIcons = {
+                        'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '🔮',
+                        'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '🥡', 'icon-app8': '💰',
+                        'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️'
+                    };
+                 if (defaultIcons[appId] && iconEl.innerHTML.trim().length > 10) { // 检查是否是img标签
+                     iconEl.innerHTML = defaultIcons[appId];
+                 }
             }
         });
 
-                if (settings.visual?.photoWidget) {
+        if (settings.visual?.photoWidget) {
             document.getElementById('photo-widget-img').src = settings.visual.photoWidget;
             document.getElementById('photo-widget-img').style.display = 'block';
             document.getElementById('photo-widget-placeholder').style.display = 'none';
@@ -9690,6 +9809,44 @@ Strictly adhere to the JSON format. Example:
         const clockColor = settings.visual?.clockColor || '#FFFFFF';
         document.documentElement.style.setProperty('--clock-text-color', clockColor);
     }
+
+    // [修改] 同时更新 renderSettingsAppList 和 resetAppSetting 以使用图标ID
+    function renderSettingsAppList(appSettings) {
+        const container = document.getElementById('settings-app-list-container');
+        container.innerHTML = '';
+        // [修改] 使用更稳定的选择器
+        const screenApps = document.querySelectorAll('#grid-area .app-item, #dock-area .app-item');
+
+        screenApps.forEach((app) => {
+            const nameEl = app.querySelector('.app-name');
+            const iconEl = app.querySelector('.app-icon');
+            const defaultName = nameEl ? nameEl.dataset.appName : iconEl.id;
+            
+            if(!defaultName) return;
+
+            const appId = iconEl.id; // 使用ID
+            const currentName = appSettings[appId]?.name || '';
+            const placeholderName = appSettings[appId]?.name || defaultName;
+
+            const row = document.createElement('div');
+            row.className = 'settings-app-icon-item';
+            row.innerHTML = `
+                <div class="app-icon-preview-new" onclick="triggerIconUpload('${appId}')">
+                    ${appSettings[appId]?.icon ? `<img src="${appSettings[appId].icon}">` : '🖼️'}
+                </div>
+                <div class="app-icon-info">
+                    <span class="app-icon-name">${defaultName}</span>
+                    <div class="app-icon-input-group">
+                        <input type="text" value="${currentName}" placeholder="自定义名称: ${placeholderName}" onchange="saveAppName('${appId}', this.value)">
+                        <button onclick="triggerIconUpload('${appId}')">上传</button>
+                        <button class="reset" onclick="resetAppSetting('${appId}')">重置</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
 
     // --- API Logic ---
     document.getElementById('test-api-btn').addEventListener('click', async () => {
