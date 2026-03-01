@@ -5127,7 +5127,8 @@
             <img src="https://img.heliar.top/file/1770767041294_关闭_close-one_2.png" class="confirm-popup-close" onclick="closeTransferConfirmPopup()">
             <span id="confirm-popup-title">确认付款</span>
         </div>
-                <div id="payment-details-section" onclick="showPasswordInputForTransfer()">
+                <!-- 删除了这里的 onclick 属性 -->
+                <div id="payment-details-section">
             <div class="confirm-popup-content">
                 <div id="confirm-transfer-target">向 ... 转账</div>
                 <div id="confirm-transfer-amount">¥100.00</div>
@@ -8887,7 +8888,7 @@ Strictly adhere to the JSON format. Example:
         }
     };
 
-        window.openTransferConfirmPopup = (amount) => {
+            window.openTransferConfirmPopup = (amount) => {
         const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         const contact = contacts.find(c => c.id === currentChatContactId);
         document.getElementById('confirm-transfer-target').textContent = `向 ${escapeHtml(contact.alias || contact.name)} 转账`;
@@ -8896,31 +8897,28 @@ Strictly adhere to the JSON format. Example:
         currentPasswordInput = '';
         updatePasswordDisplay();
         
+        // 【修改】强制三个区域全部同时显示
         document.getElementById('payment-details-section').style.display = 'block';
-        document.getElementById('password-input-section').style.display = 'none';
-        document.getElementById('numeric-keypad').style.display = 'none';
+        document.getElementById('password-input-section').style.display = 'block';
+        document.getElementById('numeric-keypad').style.display = 'grid';
         
         const titleEl = document.getElementById('confirm-popup-title');
         titleEl.textContent = '确认付款';
         titleEl.style.color = '#333';
         
+        // 【修改】在弹出的时候，直接就渲染键盘
+        renderNumericKeypad();
+        
         document.getElementById('transfer-confirm-overlay').classList.add('active');
-
-        // 【注意】下面这个导致问题的 setTimeout 已经被删掉了
     };
 
     window.closeTransferConfirmPopup = () => {
         document.getElementById('transfer-confirm-overlay').classList.remove('active');
     };
 
-        function showPasswordInputForTransfer() {
-        document.getElementById('payment-details-section').style.display = 'none';
-        document.getElementById('password-input-section').style.display = 'block';
-        
-        // 下面这行修改标题的代码被删掉了，让顶部标题始终保持为“确认付款”
-        
-        renderNumericKeypad();
-        document.getElementById('numeric-keypad').style.display = 'grid';
+    // 此函数已被停用，留空避免其他地方报错
+    function showPasswordInputForTransfer() {
+        // 功能已经合并到 openTransferConfirmPopup 中，无需再隐藏顶部内容
     }
 
         function renderNumericKeypad() {
