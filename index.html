@@ -4730,20 +4730,20 @@
             <!-- --- 新增结束 --- -->
             
         </div>
-        <div class="settings-module">
-            <h3>组件图片</h3>
+                <div class="settings-module">
+            <h3>主屏幕头像</h3>
             <div class="settings-row">
-                <label for="widget-square-url">左下组件 URL</label>
+                <label for="main-avatar1-url">左上头像 URL</label>
                 <div class="input-with-preview">
-                    <input type="text" id="widget-square-url" placeholder="输入图片 URL">
-                    <div class="url-preview" id="widget-square-preview"></div>
+                    <input type="text" id="main-avatar1-url" placeholder="输入图片 URL">
+                    <div class="url-preview" id="main-avatar1-preview"></div>
                 </div>
             </div>
             <div class="settings-row">
-                <label for="custom-image-url">右上组件 URL</label>
+                <label for="main-avatar2-url">右上头像 URL</label>
                 <div class="input-with-preview">
-                    <input type="text" id="custom-image-url" placeholder="输入图片 URL">
-                    <div class="url-preview" id="custom-image-preview"></div>
+                    <input type="text" id="main-avatar2-url" placeholder="输入图片 URL">
+                    <div class="url-preview" id="main-avatar2-preview"></div>
                 </div>
             </div>
         </div>
@@ -9491,13 +9491,13 @@ Strictly adhere to the JSON format. Example:
                 document.getElementById('api-status').className = 'api-status connected';
             }
         }
-        if(settings.visual) {
+                if(settings.visual) {
             document.getElementById('wallpaper-url').value = settings.visual.wallpaper || '';
             if(settings.visual.wallpaper) document.getElementById('wallpaper-preview').style.backgroundImage = `url(${settings.visual.wallpaper})`;
-            document.getElementById('widget-square-url').value = settings.visual.widget1 || '';
-            if(settings.visual.widget1) document.getElementById('widget-square-preview').style.backgroundImage = `url(${settings.visual.widget1})`;
-            document.getElementById('custom-image-url').value = settings.visual.widget2 || '';
-            if(settings.visual.widget2) document.getElementById('custom-image-preview').style.backgroundImage = `url(${settings.visual.widget2})`;
+            document.getElementById('main-avatar1-url').value = settings.visual.mainAvatar1 || '';
+            if(settings.visual.mainAvatar1) document.getElementById('main-avatar1-preview').style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
+            document.getElementById('main-avatar2-url').value = settings.visual.mainAvatar2 || '';
+            if(settings.visual.mainAvatar2) document.getElementById('main-avatar2-preview').style.backgroundImage = `url(${settings.visual.mainAvatar2})`;
         }
                 renderSettingsAppList(settings.apps || {});
         body.classList.add('settings-active'); // 修改了这里
@@ -9550,10 +9550,10 @@ Strictly adhere to the JSON format. Example:
             model: document.getElementById('model-select').value,
             temp: parseFloat(document.getElementById('temp-slider').value)
         };
-        settings.visual = settings.visual || {};
+                settings.visual = settings.visual || {};
         settings.visual.wallpaper = document.getElementById('wallpaper-url').value.trim();
-        settings.visual.widget1 = document.getElementById('widget-square-url').value.trim();
-        settings.visual.widget2 = document.getElementById('custom-image-url').value.trim();
+        settings.visual.mainAvatar1 = document.getElementById('main-avatar1-url').value.trim();
+        settings.visual.mainAvatar2 = document.getElementById('main-avatar2-url').value.trim();
         
         localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
         
@@ -9641,8 +9641,17 @@ Strictly adhere to the JSON format. Example:
             phoneScreen.style.backgroundImage = 'none';
         }
 
-        const widget1 = document.getElementById('avatar-quadrant-1');
-        if(settings.visual?.widget1) { widget1.style.backgroundImage = `url(${settings.visual.widget1})`; widget1.innerHTML=''; widget1.style.backgroundSize='cover'; }
+                // 获取主屏幕上的两个圆形头像元素
+        const avatar1 = document.getElementById('chat-avatar-1');
+        const avatar2 = document.getElementById('chat-avatar-2');
+
+        // 应用设置中保存的 URL 到头像背景
+        if (settings.visual?.mainAvatar1) {
+            avatar1.style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
+        }
+        if (settings.visual?.mainAvatar2) {
+            avatar2.style.backgroundImage = `url(${settings.visual.mainAvatar2})`;
+        }
         
         const apps = document.querySelectorAll('.app-item');
         let appIndex = 0;
