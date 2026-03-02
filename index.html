@@ -7184,9 +7184,30 @@ function addToCart(productInfo) {
 }
 
 // ========================= 购买弹窗相关JS =========================
-// ========================= 购买弹窗相关JS =========================
 
-window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
+window.updateCartItemStyle = (productId, oldStyle, newStyle, newQuantity) => {
+    let cart = getCartData();
+    const oldIndex = cart.findIndex(item => item.productId === productId && item.style === oldStyle);
+    if (oldIndex > -1) {
+        if (oldStyle === newStyle) {
+            cart[oldIndex].quantity = newQuantity;
+        } else {
+            const newIndex = cart.findIndex(item => item.productId === productId && item.style === newStyle);
+            if (newIndex > -1 && newIndex !== oldIndex) {
+                cart[newIndex].quantity += newQuantity;
+                cart.splice(oldIndex, 1);
+            } else {
+                cart[oldIndex].style = newStyle;
+                cart[oldIndex].quantity = newQuantity;
+            }
+        }
+        saveCartData(cart);
+        renderShoppingCartPage();
+        showToast("已更新款式");
+    }
+};
+
+window.openPurchasePanel = (productId, mode = 'buy', oldStyle = null) => { // 增加 oldStyle 参数
     // 【关键修复】从 productId 中解析出真正的 categoryId
     const categoryId = productId.split('-').slice(1, -2).join('-');
     const cache = getMallProductsCache();
@@ -7201,10 +7222,17 @@ window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
         return;
     }
 
-
     // 更新全局购买信息
     currentPurchaseInfo.productId = productId;
     currentPurchaseInfo.quantity = 1;
+    
+    // 如果是修改购物车里的款式，回显以前的数量
+    if (mode === 'cart_update' && oldStyle) {
+        const cartData = getCartData();
+        const existingItem = cartData.find(item => item.productId === productId && item.style === oldStyle);
+        if (existingItem) currentPurchaseInfo.quantity = existingItem.quantity;
+    }
+
     currentPurchaseInfo.selectedStyle = null;
     currentPurchaseInfo.basePrice = parseFloat(product.price) || 0;
     currentPurchaseInfo.mode = mode; // 保存当前模式
@@ -7226,10 +7254,19 @@ window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
                 btn.classList.add('active');
                 currentPurchaseInfo.selectedStyle = styleName;
             };
+            
+            // 优先选中旧款式
+            if (mode === 'cart_update' && oldStyle === styleName) {
+                currentPurchaseInfo.selectedStyle = styleName;
+                btn.classList.add('active');
+            }
+            
             stylesGrid.appendChild(btn);
         });
-        if (stylesGrid.firstChild) {
-            stylesGrid.firstChild.click(); // 默认选中第一个
+        
+        // 如果没有匹配到任何款式，默认选中第一个
+        if (!currentPurchaseInfo.selectedStyle && stylesGrid.firstChild) {
+            stylesGrid.firstChild.click();
         }
     } else {
         stylesGrid.innerHTML = '<p style="color:#999; font-size: 14px;">暂无可选款式</p>';
@@ -7243,6 +7280,9 @@ window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
         const total = currentPurchaseInfo.basePrice * currentPurchaseInfo.quantity;
         priceEl.textContent = `¥${total.toFixed(2)}`;
     };
+
+    // 预先更新一下总价（如果是更新模式，数量可能不是1）
+    updateTotal();
 
     document.querySelector('#mall-purchase-quantity-selector .plus').onclick = () => {
         currentPurchaseInfo.quantity++;
@@ -7266,9 +7306,19 @@ window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
                 showToast('请选择一个款式');
                 return;
             }
-            addToCart(currentPurchaseInfo); // 调用新写的加入购物车函数
+            addToCart(currentPurchaseInfo);
         };
-        } else { // 默认是 'buy'
+    } else if (mode === 'cart_update') {
+        confirmBtn.textContent = '确定修改';
+        confirmBtn.onclick = () => {
+            if (!currentPurchaseInfo.selectedStyle) {
+                showToast('请选择一个款式');
+                return;
+            }
+            updateCartItemStyle(productId, oldStyle, currentPurchaseInfo.selectedStyle, currentPurchaseInfo.quantity);
+            closePurchasePanel();
+        };
+    } else { // 默认是 'buy'
         confirmBtn.textContent = '确定';
         confirmBtn.onclick = () => {
             if (!currentPurchaseInfo.selectedStyle) {
@@ -7298,7 +7348,6 @@ window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
             openMallPaymentPopup(totalAmount, purchaseData);
         };
     }
-
 
     // 显示面板
     document.getElementById('mall-purchase-overlay').classList.add('active');
@@ -11321,12 +11370,10 @@ function renderShoppingCartPage() {
     // 动态生成每个商品条目的HTML
     const itemsHtml = cartData.map(item => {
         const originalPrice = (parseFloat(item.price) * 1.2).toFixed(2); // 假设原价是优惠价的1.2倍
-        return `
+                return `
             <div class="cart-item-card" data-product-id="${item.productId}" data-style="${item.style}">
                 <div class="cart-item-select-zone">
                     <div class="cart-item-checkbox ${item.selected ? 'checked' : ''}" onclick="toggleCartItemSelection('${item.productId}', '${item.style}', this)"></div>
-// ...
-
                 </div>
                 <div class="cart-item-info-zone">
                     <div class="cart-info-top-bar">
@@ -11335,8 +11382,9 @@ function renderShoppingCartPage() {
                     <div class="cart-product-core">
                         <div class="cart-product-emoji">${item.emoji || '📦'}</div>
                         <div class="cart-product-spec-wrapper">
-                             <div class="cart-product-spec" onclick="showToast('重选款式功能待开发')">
-                                <span>${escapeHtml(item.style)}</span>
+                             <div style="font-size:14px; font-weight:500; color:#333; margin-bottom:5px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHtml(item.name)}</div>
+                             <div class="cart-product-spec" onclick="openPurchasePanel('${item.productId}', 'cart_update', '${escapeHtml(item.style)}')">
+                                <span>款式: ${escapeHtml(item.style)}</span>
                             </div>
                         </div>
                     </div>
