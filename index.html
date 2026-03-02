@@ -2680,7 +2680,7 @@
             color: #aaa;
             font-style: italic;
         }
-                /* --- NEW: Mall Detail Page Styles --- */
+                 /* --- NEW: Mall Detail Page Styles --- */
         #mall-detail-page {
             position: fixed;
             top: 0;
@@ -2688,12 +2688,13 @@
             width: 100%;
             height: 100%;
             background-color: #f7f7f7;
-            z-index: 556;
+            z-index: 558; /* [提升层级，防止被收藏页遮挡] */
             display: flex;
             flex-direction: column;
             transform: translateX(100%);
             transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
         }
+       
         #mall-detail-page.active {
             transform: translateX(0);
         }
@@ -2878,8 +2879,9 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
-    z-index: 557; /* 要比商品详情页的层级高 */
+    z-index: 559; /* [同步提升购买面板的层级，必须比详情页更高] */
     display: flex;
+
     justify-content: center;
     align-items: flex-end;
     opacity: 0;
@@ -4376,6 +4378,158 @@
     cursor: pointer;
 }
 
+/* ========================= 新增：商城“我的”页面样式 ========================= */
+.mall-me-profile {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.mall-me-profile:active {
+    transform: scale(0.98);
+}
+.mall-me-profile img {
+    width: 65px; 
+    height: 65px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    margin-right: 15px; 
+    border: 2px solid #f0f0f0;
+}
+.mall-me-profile span {
+    font-size: 18px; 
+    font-weight: 600; 
+    color: #333;
+}
+.mall-me-orders {
+    background: white; 
+    padding: 15px 20px 20px; 
+    border-radius: 16px; 
+    margin-bottom: 20px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+.mall-me-orders .orders-title {
+    font-size: 15px; 
+    font-weight: 600; 
+    margin-bottom: 15px; 
+    color: #333; 
+    border-bottom: 1px solid #f5f5f5; 
+    padding-bottom: 10px;
+}
+.mall-me-orders .orders-icons {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+.mall-me-orders .order-icon-item {
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 8px; 
+    cursor: pointer;
+}
+.mall-me-orders .order-icon-item img {
+    width: 32px; 
+    height: 32px; 
+    object-fit: contain;
+}
+.mall-me-orders .order-icon-item span {
+    font-size: 12px; 
+    color: #555;
+}
+.mall-me-recommend-title {
+    font-size: 16px; 
+    font-weight: 600; 
+    color: #333; 
+    margin-bottom: 15px; 
+    padding-left: 5px;
+}
+
+/* ========================= 新增：商品收藏页面样式 ========================= */
+#mall-favorite-page {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #f7f7f7;
+    z-index: 556; /* 和商品详情页同级 */
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+#mall-favorite-page.active {
+    transform: translateX(0);
+}
+.mall-favorite-header {
+    padding: 35px 20px 15px;
+    display: flex; align-items: center; justify-content: space-between;
+    background-color: #fff; flex-shrink: 0; position: relative;
+    border-bottom: 1px solid #f0f0f0;
+}
+body.ios-mode-active #mall-favorite-page .mall-favorite-header {
+    padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
+}
+body.phone-frame-active #mall-favorite-page .mall-favorite-header {
+    padding-top: calc(15px + var(--status-bar-height));
+}
+.mall-favorite-header .back-btn {
+    width: 30px; height: 30px; object-fit: contain; cursor: pointer;
+}
+.mall-favorite-title {
+    font-size: 18px; font-weight: 600; color: #333;
+    position: absolute; left: 50%; transform: translateX(-50%);
+}
+.mall-favorite-manage-btn {
+    font-size: 15px; color: var(--theme-pink-text); cursor: pointer; font-weight: 500;
+}
+.mall-favorite-content {
+    flex: 1; overflow-y: auto; padding: 15px;
+}
+
+/* 收藏项管理模式下的多选框 */
+.fav-item-checkbox {
+    position: absolute; top: 10px; right: 10px;
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd;
+    background: rgba(255,255,255,0.9); z-index: 5;
+    display: none; justify-content: center; align-items: center; transition: all 0.2s;
+}
+.mall-favorite-content.manage-mode .fav-item-checkbox { display: flex; }
+.fav-item-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
+.fav-item-checkbox.checked::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; }
+
+/* 收藏页底部删除栏 */
+.mall-favorite-footer {
+    height: 60px; background: white; border-top: 1px solid #eee;
+    display: none; justify-content: space-between; align-items: center;
+    padding: 0 20px calc(env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0;
+}
+.mall-favorite-footer.active { display: flex; }
+.mall-favorite-footer .select-all-btn { display: flex; align-items: center; gap: 8px; font-size: 15px; color: #333; cursor: pointer; }
+.mall-favorite-footer .delete-btn { background: #ffebee; color: #F44336; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+
+/* ========================= 新增：已购买页面样式 ========================= */
+#mall-purchased-page {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #f7f7f7; z-index: 556;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+#mall-purchased-page.active { transform: translateX(0); }
+body.ios-mode-active #mall-purchased-page .mall-favorite-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top: calc(15px + var(--status-bar-height)); }
+
+.purchased-item-checkbox {
+    display: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd;
+    justify-content: center; align-items: center; transition: all 0.2s; cursor: pointer; background: white;
+}
+.manage-mode .purchased-item-checkbox { display: flex; }
+.purchased-item-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
+.purchased-item-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+
     </style>
 </head>
 <body>
@@ -5374,17 +5528,58 @@
         <div id="mall-home-page" class="mall-page active">
             <div class="mall-product-grid" id="mall-product-grid"></div>
         </div>
-        <!-- 购物车页面 (新增) -->
+                <!-- 购物车页面 (新增) -->
         <div id="mall-cart-page" class="mall-page">
             <!-- 购物车内容会由JS动态生成到这里 -->
         </div>
-        <!-- “我”的页面 (新增占位) -->
+                <!-- “我”的页面 (新增) -->
         <div id="mall-me-page" class="mall-page">
-             <div style="text-align:center; color:#ccc; padding:100px 20px;">“我的”页面待开发...</div>
+            <!-- 个人信息区 (加上了右上角设置图标) -->
+            <div style="position: relative;">
+                <div class="mall-me-profile">
+                    <img id="mall-me-avatar" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png" alt="avatar">
+                    <span id="mall-me-nickname">User Name</span>
+                </div>
+                <!-- 新增的设置图标 -->
+                <img src="https://img.heliar.top/file/1772475392914_设置_setting-two_2.png" style="position: absolute; right: 20px; top: 32px; width: 26px; height: 26px; cursor: pointer;" onclick="openMallProfileModal()">
+            </div>
+            
+            <!-- 我的订单区 -->
+            <div class="mall-me-orders">
+                <div class="orders-title">我的订单</div>
+                <div class="orders-icons">
+                    <!-- 将这里的 onclick 指向新函数 -->
+                    <div class="order-icon-item" onclick="openMallFavoritePage()">
+
+                        <img src="https://img.heliar.top/file/1772473595310_健康认知_healthy-recognition.png">
+                        <span>商品收藏</span>
+                    </div>
+                                        <div class="order-icon-item" onclick="openMallPurchasedPage()">
+                        <img src="https://img.heliar.top/file/1772473595482_微信电商_weixin-market.png">
+                        <span>已购买</span>
+                    </div>
+
+                    <div class="order-icon-item" onclick="showToast('送出的物品待开发')">
+                        <img src="https://img.heliar.top/file/1772473602219_关注_concern.png">
+                        <span>送出的物品</span>
+                    </div>
+                    <div class="order-icon-item" onclick="showToast('收到的礼物待开发')">
+                        <img src="https://img.heliar.top/file/1772473598492_礼物_gift.png">
+                        <span>收到的礼物</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 随机推荐商品区 -->
+            <div class="mall-me-recommend-title">猜你喜欢</div>
+            <div class="mall-product-grid" id="mall-me-recommend-grid">
+                <!-- 随机商品会由JS生成到这里 -->
+            </div>
         </div>
     </div>
 
     <div class="mall-bottom-nav">
+
         <!-- 【关键修改】给每个导航按钮加上 onclick 事件，用于切换页面 -->
         <div class="mall-nav-item active" onclick="switchMallPage('home')">
             <img src="https://img.heliar.top/file/1770921774009_首页_home_3.png" class="mall-nav-icon">
@@ -5466,7 +5661,7 @@
              <div class="wb-input-label">补充说明</div>
              <textarea id="mall-category-desc-input" class="wb-entry-input val" placeholder="补充说明(可选)" style="min-height: 80px; width:100%; margin-bottom: 15px;"></textarea>
              <button class="wb-action-btn wb-btn-ok" style="width: 100%; margin-top: 5px;" onclick="openMallCategoryRoleBindModal()">绑定角色</button>
-        </div>
+                </div>
         <div id="mall-category-modal-actions" class="wb-modal-actions">
             <button class="wb-action-btn wb-btn-cancel" onclick="closeMallCategoryModal()">取消</button>
             <button class="wb-action-btn wb-btn-ok" onclick="saveMallCategory()">OK</button>
@@ -5474,8 +5669,68 @@
     </div>
 </div>
 
+<!-- ========================= 新增：商城个人设置弹窗 ========================= -->
+<div id="mall-profile-setting-modal" class="delete-confirm-modal">
+    <div class="delete-card" onclick="event.stopPropagation()">
+        <div class="delete-card-title">修改个人资料</div>
+        <div class="create-forum-avatar-upload" style="margin: 0 auto 15px;" onclick="document.getElementById('input-mall-avatar').click()">
+            <span id="mall-avatar-placeholder">+</span>
+            <img id="mall-setting-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; position:absolute; top:0; left:0;">
+        </div>
+        <input type="text" id="mall-setting-nickname" class="add-friend-input" placeholder="输入新的商城昵称">
+        <div class="delete-card-actions" style="margin-top: 20px;">
+            <button class="delete-card-btn btn-cancel" onclick="closeMallProfileModal()">取消</button>
+            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="saveMallProfileSettings()">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================= 新增：商品收藏独立页面 ========================= -->
+<div id="mall-favorite-page">
+    <div class="mall-favorite-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallFavoritePage()">
+        <div class="mall-favorite-title">我的收藏</div>
+        <div class="mall-favorite-manage-btn" id="mall-fav-manage-btn" onclick="toggleFavoriteManageMode()">管理</div>
+    </div>
+    <!-- 分类导航栏（复用首页样式） -->
+    <div class="mall-category-nav" id="mall-favorite-category-nav"></div>
+    
+    <div class="mall-favorite-content" id="mall-favorite-content">
+        <div class="mall-product-grid" id="mall-favorite-grid">
+            <!-- 收藏商品渲染在这里 -->
+        </div>
+    </div>
+    
+    <div class="mall-favorite-footer" id="mall-favorite-footer">
+        <div class="select-all-btn" onclick="toggleSelectAllFavorites()">
+            <div class="fav-item-checkbox" id="fav-select-all-checkbox" style="position:static; display:flex;"></div>
+            <span>全选</span>
+        </div>
+        <button class="delete-btn" onclick="deleteSelectedFavorites()">删除</button>
+    </div>
+</div>
+<!-- ========================= 新增：已购买商品页面 ========================= -->
+<div id="mall-purchased-page">
+    <div class="mall-favorite-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallPurchasedPage()">
+        <div class="mall-favorite-title">购买的商品</div>
+        <img src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" style="width:24px; height:24px; cursor:pointer; position:absolute; right:20px;" onclick="togglePurchasedManageMode()">
+    </div>
+    <div class="mall-favorite-content" id="mall-purchased-content">
+        <!-- 购买列表将渲染在这里 -->
+    </div>
+    <div class="mall-favorite-footer" id="mall-purchased-footer">
+        <div class="select-all-btn" onclick="toggleSelectAllPurchased()">
+            <div class="purchased-item-checkbox" id="purchased-select-all-checkbox" style="position:static; display:flex;"></div>
+            <span>全选</span>
+        </div>
+        <button class="delete-btn" onclick="deleteSelectedPurchased()">删除</button>
+    </div>
+</div>
+
 <!-- Transfer Page -->
 <div id="transfer-page">
+
     <img src="https://img.heliar.top/file/1770721895553_左_left.png" class="transfer-back-btn" onclick="closeTransferPage()">
     <div class="transfer-page-top">
         <div class="transfer-title-info">
@@ -5691,7 +5946,8 @@
     let tempAvatarUrl = ""; 
     let currentWalletType = 'recharge'; 
     let currentChatContactId = null; 
-    let tempRoleBgUrl = ""; 
+    let tempRoleBgUrl = "";
+    let currentTransferAmount = 0; // 【新增】这个变量就是我们的“信使”
     let currentWorldBookId = null; 
     let tempSelectedWorldBookIds = []; 
     let tempMomentImages = []; 
@@ -5719,6 +5975,7 @@
     let currentMallCategoryId = null; 
     let tempMallCategoryRoleIds = [];
     let isEditingMallCategory = false;
+    let currentPurchaseInfo = {}; // 新增：这是为程序准备的“购物篮”，用来临时存放商品信息
 
 
     let currentRecollectionContactId = null;
@@ -5800,7 +6057,163 @@
         document.documentElement.style.setProperty('--cat-ear-color', color);
         localStorage.setItem(CAT_EAR_COLOR_KEY, color);
     }
+    // ========================= 已购买商品页面 JS 逻辑 =========================
+const MALL_PURCHASES_KEY = 'mallPurchasesData_v1';
+let isPurchasedManageMode = false;
+let selectedPurchasedIds = new Set();
+
+function getMallPurchases() {
+    try { return JSON.parse(localStorage.getItem(MALL_PURCHASES_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveMallPurchases(data) { localStorage.setItem(MALL_PURCHASES_KEY, JSON.stringify(data)); }
+
+// 这个函数在密码正确后调用，负责扣钱和保存购买记录
+function executeMallPurchase(amount, data) {
+    let walletData = getWalletData();
+    walletData.balance -= amount;
+    walletData.transactions.push({
+        id: Date.now().toString(), type: 'expense', amount: amount, desc: `购买商城商品: ${data.name}`, timestamp: Date.now()
+    });
+    saveWalletData(walletData);
+
+    // 存入已购买库
+    let purchases = getMallPurchases();
+    purchases.unshift({
+        ...data,
+        purchaseId: Date.now().toString(), // 每一笔交易的唯一ID
+        purchaseTime: Date.now(),
+        paidAmount: amount
+    });
+    saveMallPurchases(purchases);
+
+    closeTransferConfirmPopup();
+    closePurchasePanel();
+    showToast("付款成功！");
+}
+
+window.openMallPurchasedPage = () => {
+    isPurchasedManageMode = false;
+    selectedPurchasedIds.clear();
+    document.getElementById('mall-purchased-content').classList.remove('manage-mode');
+    document.getElementById('mall-purchased-footer').classList.remove('active');
+    renderPurchasedProducts();
+    document.getElementById('mall-purchased-page').classList.add('active');
+};
+window.closeMallPurchasedPage = () => { document.getElementById('mall-purchased-page').classList.remove('active'); };
+
+window.togglePurchasedManageMode = () => {
+    const purchases = getMallPurchases();
+    if(purchases.length === 0) { showToast("暂无购买记录可管理"); return; }
+    isPurchasedManageMode = !isPurchasedManageMode;
+    if(isPurchasedManageMode) {
+        document.getElementById('mall-purchased-content').classList.add('manage-mode');
+        document.getElementById('mall-purchased-footer').classList.add('active');
+    } else {
+        document.getElementById('mall-purchased-content').classList.remove('manage-mode');
+        document.getElementById('mall-purchased-footer').classList.remove('active');
+        selectedPurchasedIds.clear();
+    }
+    renderPurchasedProducts();
+};
+
+// 优化勾选逻辑，不再刷新整个列表
+window.togglePurchasedSelection = (pid, checkboxEl) => {
+    pid = String(pid);
+    if(selectedPurchasedIds.has(pid)) {
+        selectedPurchasedIds.delete(pid);
+        if(checkboxEl) checkboxEl.classList.remove('checked');
+    } else {
+        selectedPurchasedIds.add(pid);
+        if(checkboxEl) checkboxEl.classList.add('checked');
+    }
+    updatePurchasedSelectAllCheckbox();
+};
+
+window.toggleSelectAllPurchased = () => {
+    const purchases = getMallPurchases();
+    if(selectedPurchasedIds.size === purchases.length) {
+        selectedPurchasedIds.clear();
+    } else {
+        // 兼容没有 purchaseId 的旧数据
+        purchases.forEach(p => selectedPurchasedIds.add(String(p.purchaseId || p.id)));
+    }
+    updatePurchasedSelectAllCheckbox();
+    renderPurchasedProducts();
+};
+
+function updatePurchasedSelectAllCheckbox() {
+    const purchases = getMallPurchases();
+    const selectAllBox = document.getElementById('purchased-select-all-checkbox');
+    if (purchases.length > 0 && selectedPurchasedIds.size === purchases.length) {
+        selectAllBox.classList.add('checked');
+    } else {
+        selectAllBox.classList.remove('checked');
+    }
+}
+
+window.deleteSelectedPurchased = () => {
+    if(selectedPurchasedIds.size === 0) { showToast("请先选择商品"); return; }
     
+    // [修复] 移除容易被拦截的原生 confirm，实现丝滑直接删除
+    let purchases = getMallPurchases();
+    // 兼容旧数据过滤
+    purchases = purchases.filter(p => !selectedPurchasedIds.has(String(p.purchaseId || p.id)));
+    saveMallPurchases(purchases);
+    selectedPurchasedIds.clear();
+    showToast("删除成功");
+    
+    // 当列表删空时，自动退出管理模式
+    if(purchases.length === 0) {
+        isPurchasedManageMode = false;
+        document.getElementById('mall-purchased-content').classList.remove('manage-mode');
+        document.getElementById('mall-purchased-footer').classList.remove('active');
+    }
+    renderPurchasedProducts();
+};
+
+
+function renderPurchasedProducts() {
+    const container = document.getElementById('mall-purchased-content');
+    const purchases = getMallPurchases();
+    if(purchases.length === 0) {
+        container.innerHTML = `<div class="cart-empty-state"><p>还没有购买过商品哦</p><button onclick="closeMallPurchasedPage();switchMallPage('home');">去逛逛</button></div>`;
+        return;
+    }
+
+    const itemsHtml = purchases.map(item => {
+        const uniqueId = String(item.purchaseId || item.id); // 取出稳定的唯一ID
+        const isChecked = selectedPurchasedIds.has(uniqueId);
+        // 复用购物车的卡片排版
+        return `
+            <div class="cart-item-card" style="margin-bottom:12px;" onclick="if(isPurchasedManageMode){ togglePurchasedSelection('${uniqueId}', this.querySelector('.purchased-item-checkbox')); } else { openMallDetail('${item.productId || item.id}') }">
+
+                <div class="cart-item-select-zone" style="${isPurchasedManageMode ? '' : 'display:none;'}">
+                    <div class="purchased-item-checkbox ${isChecked ? 'checked' : ''}"></div>
+                </div>
+                <div class="cart-item-info-zone">
+                    <div class="cart-product-core">
+                        <div class="cart-product-emoji">${item.emoji || '📦'}</div>
+                        <div class="cart-product-spec-wrapper">
+                            <div style="font-size:14px; font-weight:500; color:#333; margin-bottom:5px; line-height:1.4;">${escapeHtml(item.name)}</div>
+                            <div class="cart-product-spec"><span>款式: ${escapeHtml(item.style)}</span></div>
+                        </div>
+                    </div>
+                    <div class="cart-product-price-bar">
+                        <div><span class="cart-product-price">${parseFloat(item.price).toFixed(2)}</span></div>
+                        <div style="font-size:13px; color:#666; font-weight:bold;">x ${item.quantity}</div>
+                    </div>
+                    <div style="text-align:right; font-size:12px; color:#999; margin-top:5px; border-top:1px dashed #eee; padding-top:8px;">
+                        实付款: <span style="color:#ff5000; font-weight:bold; font-size:14px;">¥${parseFloat(item.paidAmount).toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = itemsHtml;
+    updatePurchasedSelectAllCheckbox();
+}
+
     /* --- 新增的代码 --- */
     function applyIconFontLightMode(enabled) {
       if (enabled) {
@@ -6692,10 +7105,11 @@ function addToCart(productInfo) {
     let cart = getCartData();
     const { productId, selectedStyle, quantity } = productInfo;
 
-    // 检查购物车中是否已有完全相同的商品（ID和款式都相同）
+        // 检查购物车中是否已有完全相同的商品（ID和款式都相同）
     const existingItemIndex = cart.findIndex(item => item.productId === productId && item.style === selectedStyle);
 
     if (existingItemIndex > -1) {
+
         // 如果存在，则只增加数量
         cart[existingItemIndex].quantity += quantity;
     } else {
@@ -6726,15 +7140,20 @@ function addToCart(productInfo) {
 // ========================= 购买弹窗相关JS =========================
 
 window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
-
+    // 【关键修复】从 productId 中解析出真正的 categoryId
+    const categoryId = productId.split('-').slice(1, -2).join('-');
     const cache = getMallProductsCache();
-    const products = cache[currentMallCategoryId];
-    if (!products) return;
+    const products = cache[categoryId]; // 使用解析出来的 categoryId
+    if (!products) {
+        showToast("商品信息已失效，请刷新页面");
+        return;
+    }
     const product = products.find(p => p.id === productId);
     if (!product) {
         showToast("找不到该商品");
         return;
     }
+
 
     // 更新全局购买信息
     currentPurchaseInfo.productId = productId;
@@ -6802,18 +7221,37 @@ window.openPurchasePanel = (productId, mode = 'buy') => { // 增加 mode 参数
             }
             addToCart(currentPurchaseInfo); // 调用新写的加入购物车函数
         };
-    } else { // 默认是 'buy'
+        } else { // 默认是 'buy'
         confirmBtn.textContent = '确定';
         confirmBtn.onclick = () => {
             if (!currentPurchaseInfo.selectedStyle) {
                 showToast('请选择一个款式');
                 return;
             }
-            // 这里的购买逻辑可以后续实现
-            showToast(`功能待开发：购买 ${currentPurchaseInfo.selectedStyle} x ${currentPurchaseInfo.quantity}`);
-            closePurchasePanel();
+            
+            // 找到完整的商品信息以便记录
+            const categoryId = currentPurchaseInfo.productId.split('-').slice(1, -2).join('-');
+            const cache = getMallProductsCache();
+            let product = cache[categoryId]?.find(p => p.id === currentPurchaseInfo.productId);
+            if (!product) product = getMallFavorites().find(p => p.id === currentPurchaseInfo.productId);
+            if (!product) product = getMallPurchases().find(p => p.productId === currentPurchaseInfo.productId);
+            if (!product) product = { id: currentPurchaseInfo.productId, name: "未知商品", emoji: "📦" };
+
+            const totalAmount = currentPurchaseInfo.basePrice * currentPurchaseInfo.quantity;
+            const purchaseData = {
+                productId: product.id,
+                name: product.name,
+                emoji: product.emoji,
+                price: currentPurchaseInfo.basePrice,
+                style: currentPurchaseInfo.selectedStyle,
+                quantity: currentPurchaseInfo.quantity
+            };
+            
+            // 调起定制的商城付款密码弹窗
+            openMallPaymentPopup(totalAmount, purchaseData);
         };
     }
+
 
     // 显示面板
     document.getElementById('mall-purchase-overlay').classList.add('active');
@@ -6920,7 +7358,7 @@ window.switchMallPage = (pageName) => {
     const categoryNav = document.getElementById('mall-category-nav');
     const headerTitle = document.getElementById('mall-header-title');
 
-    if (pageName === 'cart') {
+        if (pageName === 'cart') {
         headerTitle.textContent = '购物车';
         categoryNav.style.display = 'none'; // 购物车页面隐藏分类导航
         document.getElementById('mall-refresh-btn').style.display = 'none';
@@ -6931,7 +7369,9 @@ window.switchMallPage = (pageName) => {
         categoryNav.style.display = 'none';
         document.getElementById('mall-refresh-btn').style.display = 'none';
         document.getElementById('mall-add-category-btn').style.display = 'none';
+        renderMallMePage(); // 【关键】切换到我的页面时，调用随机渲染商品和信息的函数
     } else { // home page
+
         headerTitle.textContent = '商城';
         categoryNav.style.display = 'flex';
         document.getElementById('mall-refresh-btn').style.display = 'block';
@@ -7065,15 +7505,16 @@ function deleteMallCategory() {
 }
 
 async function generateMallProducts() {
-    const contentArea = document.getElementById('mall-content');
-    if (!contentArea) return;
-    const grid = document.createElement('div');
-    grid.className = 'mall-product-grid';
-    grid.id = 'mall-product-grid';
-    contentArea.innerHTML = '';
-    contentArea.appendChild(grid);
-    grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">正在生成商品...</p>';
+    // 【关键修复】将容器指向新的主页 ID
+    const homePage = document.getElementById('mall-home-page');
+    if (!homePage) return;
+    
+    // 重置主页内容并显示加载提示
+    homePage.innerHTML = '<div class="mall-product-grid" id="mall-product-grid"><p style="color:#ccc; text-align:center; grid-column: span 2;">正在生成商品，请稍候...</p></div>';
+    const grid = document.getElementById('mall-product-grid');
+    
     const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+
     if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
         grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2;">请先在设置中配置 API</p>';
         return;
@@ -7192,12 +7633,32 @@ function renderReviewStars(rating) {
 }
 
 window.openMallDetail = (productId) => {
+    const categoryId = productId.split('-').slice(1, -2).join('-');
     const cache = getMallProductsCache();
-    const products = cache[currentMallCategoryId];
-    if (!products) return;
-    const product = products.find(p => p.id === productId);
-    if (!product) { showToast("找不到该商品"); return; }
+    const products = cache[categoryId]; 
+    
+    let product = null;
+    if (products) {
+        product = products.find(p => p.id === String(productId));
+    }
+    // 如果缓存里找不到，去收藏库找
+    if (!product) {
+        const favorites = getMallFavorites();
+        product = favorites.find(p => p.id === String(productId));
+    }
+    // 如果收藏库还找不到，去已购买库找
+    if (!product) {
+        const purchases = getMallPurchases();
+        product = purchases.find(p => p.productId === String(productId) || p.id === String(productId));
+    }
+
+    if (!product) {
+        showToast("商品信息已失效，请刷新页面");
+        return;
+    }
+
     const contentEl = document.getElementById('mall-detail-content');
+
     const reviewsHtml = (product.reviews && product.reviews.length > 0)
         ? product.reviews.map(review => `<div class="review-item"><div class="review-header"><span class="review-nickname">${escapeHtml(review.nickname)}</span><span class="review-stars">${renderReviewStars(review.rating)}</span></div><p class="review-content">${escapeHtml(review.content)}</p></div>`).join('')
         : '<p style="color:#ccc; text-align:center; padding: 20px 0;">暂无评价</p>';
@@ -7213,17 +7674,22 @@ window.openMallDetail = (productId) => {
             ${reviewsHtml}
         </div>
     `;
-    const favBtn = document.getElementById('mall-detail-fav-btn');
+        const favBtn = document.getElementById('mall-detail-fav-btn');
     const favIcon = favBtn.querySelector('img');
-    if (product.isFavorited) {
+    
+    // 【修改】判断爱心状态改为从永久收藏库里读取
+    const favorites = getMallFavorites();
+    const isFav = favorites.some(f => f.id === productId);
+    if (isFav) {
         favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png";
     } else {
         favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png";
     }
-       favBtn.onclick = () => toggleMallProductFavorite(productId);
+    favBtn.onclick = () => toggleMallProductFavorite(productId);
     
     // 【正确绑定的代码】
     const buyBtn = document.getElementById('mall-detail-buy-btn');
+// ... (保留你原来的 buyBtn 和 cartBtn 绑定代码，只要替换上面和下面的即可) ...
     if (buyBtn) {
         buyBtn.onclick = () => openPurchasePanel(productId, 'buy'); // 传入 'buy' 模式
     }
@@ -7235,29 +7701,59 @@ window.openMallDetail = (productId) => {
     document.getElementById('mall-detail-page').classList.add('active');
 };
 
-
 window.closeMallDetail = () => {
     document.getElementById('mall-detail-page').classList.remove('active');
 };
 
-    window.toggleMallProductFavorite = (productId) => {
+// ========================= NEW: 永久商品收藏库机制 =========================
+const MALL_FAVORITES_KEY = 'mallFavoritesData_v1';
+
+function getMallFavorites() {
+    try {
+        const data = localStorage.getItem(MALL_FAVORITES_KEY);
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveMallFavorites(favorites) {
+    localStorage.setItem(MALL_FAVORITES_KEY, JSON.stringify(favorites));
+}
+
+window.toggleMallProductFavorite = (productId) => {
+    let favorites = getMallFavorites();
+    const favIndex = favorites.findIndex(f => f.id === productId);
+    const favBtn = document.getElementById('mall-detail-fav-btn');
+    const favIcon = favBtn.querySelector('img');
+
+    if (favIndex > -1) {
+        // 如果已经在收藏库里，就取消收藏
+        favorites.splice(favIndex, 1);
+        favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png";
+        showToast("已取消收藏");
+    } else {
+        // 从当前缓存中抓取完整商品信息存入收藏库
+        const categoryId = productId.split('-').slice(1, -2).join('-');
         const cache = getMallProductsCache();
-        const products = cache[currentMallCategoryId];
-        if (!products) return;
-        const product = products.find(p => p.id === productId);
-        if (!product) return;
-        product.isFavorited = !product.isFavorited;
-        saveMallProductsCache(cache);
-        const favBtn = document.getElementById('mall-detail-fav-btn');
-        const favIcon = favBtn.querySelector('img');
-        if (product.isFavorited) {
-            favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png"; // 修改了链接
-            showToast("已收藏");
+        const product = cache[categoryId]?.find(p => p.id === productId);
+        
+        if (product) {
+            // 获取分类名称，一并存入，方便收藏页分类显示
+            const categories = getMallCategories();
+            const categoryName = categories.find(c => c.id === categoryId)?.name || '未分类';
+            
+            // 深拷贝并追加分类信息，放入数组开头
+            favorites.unshift({ ...product, categoryId: categoryId, categoryName: categoryName });
+            favIcon.src = "https://img.heliar.top/file/1770356886806_喜欢_like_3.png";
+            showToast("已加入我的收藏");
         } else {
-            favIcon.src = "https://img.heliar.top/file/1772373425318_喜欢_like_5.png"; // 修改了链接
-            showToast("已取消收藏");
+            showToast("商品信息读取失败");
         }
-    };
+    }
+    saveMallFavorites(favorites);
+};
+
 
 
     // --- Forum App Logic ---
@@ -9320,6 +9816,36 @@ Strictly adhere to the JSON format. Example:
         input.value = '';
         renderConversationMessages();
     }
+// ========================= 商城及转账通用支付核心逻辑 =========================
+let currentPaymentContext = null; // 用于区分是转账还是商城购买
+
+// 新增：专门给商城用的付款弹窗
+window.openMallPaymentPopup = (amount, purchaseData) => {
+    currentPaymentContext = { type: 'mall_buy', amount: amount, data: purchaseData };
+    
+    document.getElementById('confirm-transfer-target').style.display = 'none'; // 隐藏“向x转账”
+    document.getElementById('confirm-transfer-amount').textContent = `¥${amount.toFixed(2)}`;
+    document.getElementById('confirm-popup-title').textContent = '商品付款';
+    
+    currentPasswordInput = '';
+    updatePasswordDisplay();
+    
+    document.getElementById('payment-details-section').style.display = 'block';
+    document.getElementById('password-input-section').style.display = 'block';
+    document.getElementById('numeric-keypad').style.display = 'grid';
+    
+    renderNumericKeypad();
+    document.getElementById('transfer-confirm-overlay').classList.add('active');
+};
+
+// 修改原有的转账弹窗，补充 Context
+const originalOpenTransferConfirmPopup = window.openTransferConfirmPopup;
+window.openTransferConfirmPopup = (amount) => {
+    currentPaymentContext = { type: 'transfer', amount: amount };
+    document.getElementById('confirm-transfer-target').style.display = 'block'; // 恢复显示“向x转账”
+    document.getElementById('confirm-popup-title').textContent = '确认付款';
+    if(originalOpenTransferConfirmPopup) originalOpenTransferConfirmPopup(amount);
+};
 
     // --- Transfer Functions ---
         window.openTransferPage = () => {
@@ -9355,23 +9881,21 @@ Strictly adhere to the JSON format. Example:
         }
     };
 
-    window.handleTransferInputKey = (e) => {
+        window.handleTransferInputKey = (e) => {
         if (e.key === 'Enter') {
             const amount = parseFloat(document.getElementById('transfer-amount-input').value);
             if (isNaN(amount) || amount <= 0) {
                 showToast("请输入正确的金额");
                 return;
             }
-            const walletData = getWalletData();
-            if (amount > walletData.balance) {
-                showToast("余额不足");
-                return;
-            }
+            // 【已删除】删除了这里的余额检查逻辑
             openTransferConfirmPopup(amount);
         }
     };
 
-                window.openTransferConfirmPopup = (amount) => {
+
+        window.openTransferConfirmPopup = (amount) => {
+        currentTransferAmount = amount;
         const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         const contact = contacts.find(c => c.id === currentChatContactId);
         
@@ -9455,17 +9979,36 @@ Strictly adhere to the JSON format. Example:
     function verifyTransferPassword() {
         const profile = getUserProfile();
         const correctPw = profile.paymentPassword || '123456';
+
         if (currentPasswordInput === correctPw) {
-            executeTransfer();
+            const amount = currentPaymentContext ? currentPaymentContext.amount : currentTransferAmount;
+            const walletData = getWalletData();
+
+            if (amount > walletData.balance) {
+                document.getElementById('password-error-tip').textContent = '余额不足';
+                setTimeout(() => {
+                    currentPasswordInput = '';
+                    updatePasswordDisplay();
+                }, 1000);
+            } else {
+                // 密码正确且余额充足，根据 Context 决定执行什么操作
+                if (currentPaymentContext && currentPaymentContext.type === 'mall_buy') {
+                    executeMallPurchase(amount, currentPaymentContext.data);
+                } else {
+                    executeTransfer(amount); 
+                }
+            }
         } else {
             document.getElementById('password-error-tip').textContent = '密码错误，请重试';
-            currentPasswordInput = '';
-            updatePasswordDisplay();
+            setTimeout(() => {
+                currentPasswordInput = '';
+                updatePasswordDisplay();
+            }, 1000);
         }
     }
 
-    function executeTransfer() {
-        const amount = parseFloat(document.getElementById('transfer-amount-input').value);
+
+    function executeTransfer(amount) {
         
         let walletData = getWalletData();
         walletData.balance -= amount;
@@ -10723,13 +11266,16 @@ function renderShoppingCartPage() {
         return;
     }
 
+    // ...
     // 动态生成每个商品条目的HTML
     const itemsHtml = cartData.map(item => {
         const originalPrice = (parseFloat(item.price) * 1.2).toFixed(2); // 假设原价是优惠价的1.2倍
         return `
             <div class="cart-item-card" data-product-id="${item.productId}" data-style="${item.style}">
                 <div class="cart-item-select-zone">
-                    <div class="cart-item-checkbox ${item.selected ? 'checked' : ''}" onclick="toggleCartItemSelection('${item.productId}', '${item.style}')"></div>
+                    <div class="cart-item-checkbox ${item.selected ? 'checked' : ''}" onclick="toggleCartItemSelection('${item.productId}', '${item.style}', this)"></div>
+// ...
+
                 </div>
                 <div class="cart-item-info-zone">
                     <div class="cart-info-top-bar">
@@ -10795,15 +11341,31 @@ function renderShoppingCartPage() {
 }
 
 // 切换单个商品选中状态的函数
-window.toggleCartItemSelection = (productId, style) => {
+window.toggleCartItemSelection = (productId, style, element) => {
     let cart = getCartData();
     const itemIndex = cart.findIndex(item => item.productId === productId && item.style === style);
     if (itemIndex > -1) {
-        cart[itemIndex].selected = !cart[itemIndex].selected;
+        const isSelected = !cart[itemIndex].selected;
+        cart[itemIndex].selected = isSelected;
         saveCartData(cart);
-        renderShoppingCartPage(); // 重新渲染页面以更新UI
+        
+        // 直接更新UI，而不是重新渲染整个页面
+        if (element) {
+            element.classList.toggle('checked', isSelected);
+        }
+        
+        // 只更新底部的结算栏，效率更高
+        const selectedItems = cart.filter(item => item.selected);
+        const totalQuantity = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+        const totalPrice = selectedItems.reduce((sum, item) => sum + (item.quantity * parseFloat(item.price)), 0);
+        const allSelected = cart.length > 0 && cart.every(item => item.selected);
+
+        document.querySelector('.cart-total-price-text .price').textContent = `¥${totalPrice.toFixed(2)}`;
+        document.querySelector('.cart-checkout-btn').textContent = `结算(${totalQuantity})`;
+        document.querySelector('.cart-footer-select-all .cart-item-checkbox').classList.toggle('checked', allSelected);
     }
 };
+
 
 // 切换全选状态的函数
 window.toggleSelectAllCartItems = () => {
@@ -10820,19 +11382,394 @@ window.updateCartItemQuantity = (productId, style, change) => {
     let cart = getCartData();
     const itemIndex = cart.findIndex(item => item.productId === productId && item.style === style);
     if (itemIndex > -1) {
-        cart[itemIndex].quantity += change;
-        // 如果数量减到0或以下，提示用户是否删除
-        if (cart[itemIndex].quantity <= 0) {
-            if (confirm("确定要从购物车中删除该商品吗？")) {
-                cart.splice(itemIndex, 1); // 从数组中移除该商品
-            } else {
-                cart[itemIndex].quantity = 1; // 如果用户取消，则恢复数量为1
-            }
+        // 先计算出新的数量
+        const newQuantity = cart[itemIndex].quantity + change;
+
+        if (newQuantity <= 0) {
+            // 如果新数量小于等于0，就直接从购物车数组中删除这一项
+            cart.splice(itemIndex, 1);
+        } else {
+            // 否则，正常更新数量
+            cart[itemIndex].quantity = newQuantity;
         }
-        saveCartData(cart);
-        renderShoppingCartPage();
+
+                saveCartData(cart);
+        renderShoppingCartPage(); // 重新渲染购物车页面
     }
 };
+
+// ========================= NEW: 商城“我的”设置与收藏页逻辑 =========================
+let tempMallAvatarBase64 = '';
+
+// 1. 打开商城设置弹窗
+window.openMallProfileModal = () => {
+    const profile = getUserProfile();
+    document.getElementById('mall-setting-nickname').value = profile.nickname || 'User Name';
+    
+    const preview = document.getElementById('mall-setting-avatar-preview');
+    if (profile.avatar) {
+        preview.src = profile.avatar;
+        preview.style.display = 'block';
+        document.getElementById('mall-avatar-placeholder').style.display = 'none';
+    }
+    tempMallAvatarBase64 = profile.avatar || '';
+    
+    document.getElementById('mall-profile-setting-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('mall-profile-setting-modal').classList.add('active'), 10);
+};
+
+window.closeMallProfileModal = () => {
+    document.getElementById('mall-profile-setting-modal').classList.remove('active');
+    setTimeout(() => document.getElementById('mall-profile-setting-modal').style.display = 'none', 200);
+};
+
+window.saveMallProfileSettings = () => {
+    const profile = getUserProfile();
+    const newName = document.getElementById('mall-setting-nickname').value.trim();
+    if (newName) profile.nickname = newName;
+    if (tempMallAvatarBase64) profile.avatar = tempMallAvatarBase64;
+    
+    saveUserProfile(profile);
+    renderMallMePage(); 
+    closeMallProfileModal();
+    showToast("资料修改成功");
+};
+
+// 全局监听商城头像上传 (需要在DOM加载后执行，也可以写在这里)
+document.addEventListener('DOMContentLoaded', () => {
+    // 补一个隐藏的文件上传 input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'input-mall-avatar';
+    fileInput.className = 'file-input-hidden';
+    fileInput.accept = 'image/*';
+    fileInput.onchange = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        compressImage(file, 300, (base64) => {
+            tempMallAvatarBase64 = base64;
+            const preview = document.getElementById('mall-setting-avatar-preview');
+            preview.src = base64;
+            preview.style.display = 'block';
+            document.getElementById('mall-avatar-placeholder').style.display = 'none';
+        });
+        event.target.value = '';
+    };
+    document.getElementById('app-wrapper').appendChild(fileInput);
+});
+
+
+// 2. 渲染“我的”页面（加载信息并随机挑6个商品）
+window.renderMallMePage = () => {
+    const mePage = document.getElementById('mall-me-page');
+
+    // 生成页面框架的HTML，确保所有容器都存在
+    mePage.innerHTML = `
+        <div style="position: relative;">
+            <div class="mall-me-profile">
+                <img id="mall-me-avatar" src="" alt="avatar">
+                <span id="mall-me-nickname"></span>
+            </div>
+            <img src="https://img.heliar.top/file/1772475392914_设置_setting-two_2.png" style="position: absolute; right: 20px; top: 32px; width: 26px; height: 26px; cursor: pointer;" onclick="openMallProfileModal()">
+        </div>
+        <div class="mall-me-orders">
+            <div class="orders-title">我的订单</div>
+            <div class="orders-icons">
+                <div class="order-icon-item" id="mall-me-fav-btn">
+                    <img src="https://img.heliar.top/file/1772473595310_健康认知_healthy-recognition.png">
+                    <span>商品收藏</span>
+                </div>
+                <div class="order-icon-item" id="mall-me-purchased-btn">
+                    <img src="https://img.heliar.top/file/1772473595482_微信电商_weixin-market.png">
+                    <span>已购买</span>
+                </div>
+                <div class="order-icon-item" onclick="showToast('送出的物品待开发')">
+                    <img src="https://img.heliar.top/file/1772473602219_关注_concern.png">
+                    <span>送出的物品</span>
+                </div>
+                <div class="order-icon-item" onclick="showToast('收到的礼物待开发')">
+                    <img src="https://img.heliar.top/file/1772473598492_礼物_gift.png">
+                    <span>收到的礼物</span>
+                </div>
+            </div>
+        </div>
+        <div class="mall-me-recommend-title">猜你喜欢</div>
+        <div class="mall-product-grid" id="mall-me-recommend-grid"></div>
+    `;
+
+    // 动态绑定事件
+    document.getElementById('mall-me-fav-btn').onclick = openMallFavoritePage;
+    document.getElementById('mall-me-purchased-btn').onclick = openMallPurchasedPage;
+    
+    // 渲染个人信息
+    const profile = getUserProfile();
+    document.getElementById('mall-me-avatar').src = profile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
+    document.getElementById('mall-me-nickname').textContent = profile.nickname || 'User Name';
+
+    // 获取所有的商品缓存
+    const cache = getMallProductsCache();
+    let allProducts = [];
+    for (const categoryId in cache) {
+        if (cache.hasOwnProperty(categoryId) && Array.isArray(cache[categoryId])) {
+            allProducts = allProducts.concat(cache[categoryId]);
+        }
+    }
+
+    const grid = document.getElementById('mall-me-recommend-grid');
+    grid.innerHTML = '';
+    if (allProducts.length === 0) {
+        grid.innerHTML = '<p style="color:#ccc; text-align:center; grid-column: span 2; padding: 30px 0;">暂无商品，请先去首页生成一些商品吧~</p>';
+        return;
+    }
+
+    // 随机洗牌并截取6个
+    for (let i = allProducts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allProducts[i], allProducts[j]] = [allProducts[j], allProducts[i]];
+    }
+    const randomProducts = allProducts.slice(0, 6);
+
+    randomProducts.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'mall-product-item';
+        item.onclick = () => openMallDetail(p.id);
+        const price = parseFloat(p.price) || 0;
+        const sales = parseInt(p.sales) || 0;
+        item.innerHTML = `
+            <div class="product-image">${p.emoji || '📦'}</div>
+            <div class="product-details">
+                <div class="product-name">${escapeHtml(p.name)}</div>
+                <div class="product-price-info">
+                    <span class="product-price">${price.toFixed(2)}</span>
+                    <div class="product-price-extra">
+                        <span class="product-coupon-tag">猜你喜欢</span>
+                        <span class="product-sales">已售 ${formatSales(sales)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        grid.appendChild(item);
+    });
+};
+
+
+
+// 3. 收藏页面及管理逻辑
+let currentFavCategoryId = 'all';
+let isFavoriteManageMode = false;
+let selectedFavoriteIds = new Set();
+
+window.openMallFavoritePage = () => {
+    isFavoriteManageMode = false;
+    selectedFavoriteIds.clear();
+    currentFavCategoryId = 'all';
+    
+    document.getElementById('mall-favorite-content').classList.remove('manage-mode');
+    document.getElementById('mall-favorite-footer').classList.remove('active');
+    document.getElementById('mall-fav-manage-btn').textContent = '管理';
+    
+    renderFavoriteCategories();
+    renderFavoriteProducts();
+    document.getElementById('mall-favorite-page').classList.add('active');
+};
+
+window.closeMallFavoritePage = () => {
+    document.getElementById('mall-favorite-page').classList.remove('active');
+};
+
+// 渲染收藏分类导航
+function renderFavoriteCategories() {
+    const nav = document.getElementById('mall-favorite-category-nav');
+    nav.innerHTML = '';
+    
+    const favorites = getMallFavorites();
+    if (favorites.length === 0) return; // 没收藏就不渲染分类
+
+    // 提取所有有收藏的分类 (去重)
+    const categoryMap = new Map();
+    favorites.forEach(f => {
+        if (!categoryMap.has(f.categoryId)) {
+            categoryMap.set(f.categoryId, f.categoryName || '默认分类');
+        }
+    });
+
+    // 塞入一个“全部”选项
+    const allItem = document.createElement('div');
+    allItem.className = `mall-category-item ${currentFavCategoryId === 'all' ? 'active' : ''}`;
+    allItem.textContent = '全部';
+    allItem.onclick = () => {
+        currentFavCategoryId = 'all';
+        renderFavoriteCategories();
+        renderFavoriteProducts();
+    };
+    nav.appendChild(allItem);
+
+    // 塞入其他有收藏的分类
+    categoryMap.forEach((name, id) => {
+        const item = document.createElement('div');
+        item.className = `mall-category-item ${currentFavCategoryId === id ? 'active' : ''}`;
+        item.textContent = name;
+        item.onclick = () => {
+            currentFavCategoryId = id;
+            renderFavoriteCategories();
+            renderFavoriteProducts();
+        };
+        nav.appendChild(item);
+    });
+}
+
+// 渲染收藏商品列表
+function renderFavoriteProducts() {
+    const grid = document.getElementById('mall-favorite-grid');
+    grid.innerHTML = '';
+    
+    const allFavorites = getMallFavorites();
+    
+    if (allFavorites.length === 0) {
+        grid.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:50px 20px; color:#ccc;">还没有收藏任何商品哦~</div>';
+        return;
+    }
+
+    // 根据当前选中的分类过滤
+    const displayList = currentFavCategoryId === 'all' 
+                        ? allFavorites 
+                        : allFavorites.filter(f => f.categoryId === currentFavCategoryId);
+
+    if (displayList.length === 0) {
+        grid.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:50px 20px; color:#ccc;">该分类下暂无收藏</div>';
+        return;
+    }
+
+    displayList.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'mall-product-item';
+        item.style.position = 'relative'; // 为了复选框定位
+        
+        // 点击逻辑：管理模式下选框，正常模式下进详情页
+        item.onclick = () => {
+            if (isFavoriteManageMode) {
+                toggleFavoriteSelection(p.id, item);
+            } else {
+                openMallDetail(p.id);
+            }
+        };
+
+        const isChecked = selectedFavoriteIds.has(p.id);
+        const price = parseFloat(p.price) || 0;
+        const sales = parseInt(p.sales) || 0;
+
+        item.innerHTML = `
+            <div class="fav-item-checkbox ${isChecked ? 'checked' : ''}"></div>
+            <div class="product-image">${p.emoji || '📦'}</div>
+            <div class="product-details">
+                <div class="product-name">${escapeHtml(p.name)}</div>
+                <div class="product-price-info">
+                    <span class="product-price">${price.toFixed(2)}</span>
+                    <div class="product-price-extra">
+                        <span class="product-sales">已售 ${formatSales(sales)}</span>
+                    </div>
+                </div>
+                        </div>
+        `;
+        grid.appendChild(item);
+    });
+    
+    updateFavoriteSelectAllCheckbox(); // 修改成新名字
+}
+
+// 切换管理模式
+
+window.toggleFavoriteManageMode = () => {
+    const favorites = getMallFavorites();
+    if (favorites.length === 0) {
+        showToast("暂无商品可管理");
+        return;
+    }
+    
+    isFavoriteManageMode = !isFavoriteManageMode;
+    const content = document.getElementById('mall-favorite-content');
+    const footer = document.getElementById('mall-favorite-footer');
+    const manageBtn = document.getElementById('mall-fav-manage-btn');
+
+    if (isFavoriteManageMode) {
+        content.classList.add('manage-mode');
+        footer.classList.add('active');
+        manageBtn.textContent = '完成';
+    } else {
+        content.classList.remove('manage-mode');
+        footer.classList.remove('active');
+        manageBtn.textContent = '管理';
+        selectedFavoriteIds.clear(); // 退出时清空选择
+        renderFavoriteProducts(); // 刷新掉打钩状态
+    }
+};
+
+// 单选商品
+function toggleFavoriteSelection(id, itemElement) {
+    const checkbox = itemElement.querySelector('.fav-item-checkbox');
+    const strId = String(id); // 强制转为字符串防错
+    if (selectedFavoriteIds.has(strId)) {
+        selectedFavoriteIds.delete(strId);
+        checkbox.classList.remove('checked');
+    } else {
+        selectedFavoriteIds.add(strId);
+        checkbox.classList.add('checked');
+    }
+    updateFavoriteSelectAllCheckbox(); // 改名，防止冲突
+}
+
+// 补全缺失的全选框状态更新函数
+function updateFavoriteSelectAllCheckbox() {
+    const favorites = getMallFavorites();
+    const displayList = currentFavCategoryId === 'all' ? favorites : favorites.filter(f => f.categoryId === currentFavCategoryId);
+    const selectAllBox = document.getElementById('fav-select-all-checkbox');
+    
+    if (displayList.length > 0 && selectedFavoriteIds.size === displayList.length) {
+        selectAllBox.classList.add('checked');
+    } else {
+        selectAllBox.classList.remove('checked');
+    }
+}
+
+// 全选操作（一并修复强制字符串）
+window.toggleSelectAllFavorites = () => {
+    const allFavorites = getMallFavorites();
+    const displayList = currentFavCategoryId === 'all' ? allFavorites : allFavorites.filter(f => f.categoryId === currentFavCategoryId);
+    const selectAllBox = document.getElementById('fav-select-all-checkbox');
+    
+    if (selectAllBox.classList.contains('checked')) {
+        selectedFavoriteIds.clear();
+    } else {
+        displayList.forEach(f => selectedFavoriteIds.add(String(f.id)));
+    }
+    renderFavoriteProducts();
+};
+
+// 批量删除收藏
+window.deleteSelectedFavorites = () => {
+    if (selectedFavoriteIds.size === 0) {
+        showToast("请先选择要删除的商品");
+        return;
+    }
+    
+    // [修复] 移除容易被拦截的原生 confirm
+    let favorites = getMallFavorites();
+    // 过滤掉被选中的ID (强制转字符串匹配)
+    favorites = favorites.filter(f => !selectedFavoriteIds.has(String(f.id)));
+    saveMallFavorites(favorites);
+    
+    selectedFavoriteIds.clear();
+    showToast("删除成功");
+    
+    // 重新渲染分类栏（如果某个分类被删空了，分类栏也需要更新）
+    renderFavoriteCategories();
+    renderFavoriteProducts();
+    
+    if (favorites.length === 0) {
+        toggleFavoriteManageMode(); // 如果删空了自动退出管理模式
+    }
+};
+
 
 </script>
 </body>
