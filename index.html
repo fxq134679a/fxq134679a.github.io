@@ -383,6 +383,31 @@
             border-radius: 4px;
             margin: 5px 0;
         }
+        /* 新增：被撤回的原文显示样式 */
+        .msg-recalled-original {
+            font-size: 12px;
+            color: #666;
+            background: #ffffff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            max-width: 180px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 1px solid #eee;
+            position: relative;
+        }
+        /* 原文左边的小三角 */
+        .msg-recalled-original::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 4px 5px 4px 0;
+            border-style: solid;
+            border-color: transparent #ffffff transparent transparent;
+        }
 
         .msg-bubble-avatar {
             width: 38px; height: 38px; border-radius: 8px; object-fit: cover;
@@ -396,13 +421,147 @@
             word-wrap: break-word; word-break: break-all; user-select: text;
             white-space: pre-wrap; text-align: left; display: block;
         }
-        .msg-bubble-row.them .msg-bubble-content {
+                .msg-bubble-row.them .msg-bubble-content {
             background: #FFFFFF; color: #333;
             border-radius: 18px 18px 18px 4px;
         }
         .msg-bubble-row.me .msg-bubble-content {
-            background: var(--theme-pink-text); color: white;
+            background: #fcc0d7; color: white;
             border-radius: 18px 18px 4px 18px;
+        }
+
+        /* --- 新增：聊天界面的礼物卡片样式 --- */
+        .gift-message-card {
+            width: 210px;
+            background-color: #ffe6ee; /* 粉色礼盒背景 */
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 3px 10px rgba(255, 182, 193, 0.3);
+            cursor: default;
+        }
+        .gift-message-title {
+            font-size: 12px;
+            color: #d1567d;
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed #ffb3c6;
+            padding-bottom: 4px;
+        }
+        .gift-message-body {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .gift-message-emoji {
+            width: 45px;
+            height: 45px;
+            background-color: #fff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .gift-message-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .gift-message-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .gift-message-spec {
+            font-size: 11px;
+            color: #666;
+        }
+        /* --- 新增：礼物详情弹窗样式 --- */
+        #gift-detail-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        #gift-detail-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .gift-detail-card {
+            background-color: #fff;
+            width: 80%;
+            max-width: 320px;
+            border-radius: 24px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(255, 182, 193, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        #gift-detail-overlay.active .gift-detail-card {
+            transform: scale(1);
+        }
+        .gift-detail-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .gift-detail-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d1567d;
+            margin-bottom: 25px;
+        }
+        .gift-detail-emoji {
+            width: 100px;
+            height: 100px;
+            background-color: #f7f7f7;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .gift-detail-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .gift-detail-specs {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         /* --- [MODIFIED] Transfer Bubble Style in Chat --- */
@@ -1640,11 +1799,21 @@
             background-size: cover;
             background-position: center;
         }
-        .wb-book-cover::before {
+                .wb-book-cover::before {
             content: ''; position: absolute; left: 4px; top: 0; width: 2px; height: 100%;
             background: rgba(0,0,0,0.05); box-shadow: 2px 0 0 rgba(0,0,0,0.05);
         }
-        .wb-book-name { font-size: 13px; font-weight: 600; color: #555; text-align: center; word-break: break-all; line-height: 1.4; text-shadow: 0 1px 2px rgba(255,255,255,0.8); }
+        .wb-book-name { font-size: 13px; font-weight: 600; color: #555; text-align: center; word-break: break-all; line-height: 1.4; }
+        
+        /* 新增：世界书内容超过6行折叠样式 */
+        .wb-detail-val.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
 
         #worldbook-add-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -3417,6 +3586,7 @@
         body.phone-frame-active #settings-page > .settings-header,
         body.phone-frame-active #me-settings-modal > .me-settings-header-bar,
         body.phone-frame-active #worldbook-detail-modal > .wb-detail-header,
+        body.phone-frame-active #worldbook-entry-fullscreen-page > .wb-detail-header,
         body.phone-frame-active #worldbook-color-page > .wb-color-header,
         body.phone-frame-active #add-moment-modal > .add-moment-header,
         body.phone-frame-active #role-settings-page > .role-setting-close-area,
@@ -4722,7 +4892,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 
     <!-- 角色聊天专属页面 -->
     <div id="chat-conversation-view">
-        <div id="chat-extra-menu">
+                <div id="chat-extra-menu">
+            <!-- 第一行 -->
             <div class="chat-menu-item">
                 <img src="https://img.heliar.top/file/1770713133852_红包_red-envelopes.png" class="chat-menu-icon">
                 <span class="chat-menu-text">红包</span>
@@ -4731,19 +4902,27 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 <img src="https://img.heliar.top/file/1770713126016_支出_expenses-one.png" class="chat-menu-icon">
                 <span class="chat-menu-text">转账</span>
             </div>
-            <div class="chat-menu-item">
+                        <div class="chat-menu-item" onclick="openMallPurchasedPageFromChat()">
                 <img src="https://img.heliar.top/file/1770713131222_淘宝_taobao_2.png" class="chat-menu-icon">
                 <span class="chat-menu-text">淘宝</span>
             </div>
+
             <div class="chat-menu-item" onclick="openWalletApp()">
                 <img src="https://img.heliar.top/file/1770721898565_支付宝_alipay.png" class="chat-menu-icon">
                 <span class="chat-menu-text">钱包</span>
             </div>
-            <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
+            
+            <!-- 第二行 -->
+            <div class="chat-menu-item" onclick="retryLastAiReply()">
+                <img src="https://img.heliar.top/file/1773078710555_重新_redo_5.png" class="chat-menu-icon">
+                <span class="chat-menu-text">重说</span>
+            </div>
             <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
             <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
             <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
         </div>
+    
+   
         <div class="chat-conv-header">
             <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="chat-conv-back-btn" onclick="closeChatConversation()">
             <div class="chat-conv-title-container">
@@ -4829,7 +5008,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
         <textarea id="role-user-persona" class="role-persona-input" placeholder="输入您的人设 (User Persona)..."></textarea>
     </div>
-
     <div class="settings-section-card">
         <div class="settings-card-title">主动发动态</div>
         <div class="settings-row-with-switch" style="width:100%; padding: 10px 5px;">
@@ -4844,10 +5022,43 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <input type="number" id="role-auto-post-interval" placeholder="10" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
         </div>
     </div>
+
+    <!-- === 新增：自动撤回设置卡片 === -->
+    <div class="settings-section-card">
+        <div class="settings-card-title">自动撤回消息设置</div>
+        <div class="settings-row" style="width:100%; padding: 10px 5px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+            <label style="margin-bottom:0;">每次撤回条数</label>
+            <select id="role-recall-amount" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center; background:#fff; outline:none;">
+                <option value="1">1条</option>
+                <option value="2">2条</option>
+                <option value="3">3条</option>
+                <option value="4">4条</option>
+                <option value="5">5条</option>
+                <option value="all">全部</option>
+            </select>
+        </div>
+        <div class="settings-row-with-switch" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 5px;">
+            <label for="role-auto-recall-switch">按聊天轮数频率自动撤回</label>
+            <label class="ios-switch">
+                <input type="checkbox" id="role-auto-recall-switch" onchange="document.getElementById('recall-freq-settings').style.display = this.checked ? 'flex' : 'none'">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div id="recall-freq-settings" class="settings-row" style="width:100%; padding: 10px 5px; display: none; flex-direction: row; align-items: center; justify-content: space-between; border-top: 1px solid #f0f0f0;">
+            <label style="margin-bottom:0;">触发轮数区间 (轮)</label>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <input type="number" id="role-recall-min" placeholder="20" style="width: 55px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+                <span style="color:#888;">-</span>
+                <input type="number" id="role-recall-max" placeholder="50" style="width: 55px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            </div>
+        </div>
+    </div>
+    <!-- === 新增结束 === -->
     
     <div class="settings-section-card">
          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 15px;">
-            <div class="settings-card-title" style="margin-bottom: 0; border-bottom: none;">自定义样式 (CSS)</div>
+
+    <div class="settings-card-title" style="margin-bottom: 0; border-bottom: none;">自定义样式 (CSS)</div>
             <button class="role-bg-btn" onclick="openSaveCssPresetModal()">保存</button>
         </div>
         <textarea id="role-setting-css" class="role-css-input" placeholder="/* 在这里输入CSS代码修改气泡样式 */..."></textarea>
@@ -4979,14 +5190,62 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     </div>
 </div>
 
+<!-- 世界书删除确认弹窗 -->
+<div id="wb-delete-confirm-modal" class="delete-confirm-modal" style="z-index: 900;">
+    <div class="delete-card">
+        <div class="delete-card-title" id="wb-delete-confirm-title">确定要删除吗？</div>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('wb-delete-confirm-modal')">取消</button>
+            <button class="delete-card-btn btn-confirm-delete" onclick="executeWbDelete()">删除</button>
+        </div>
+    </div>
+</div>
+
 <!-- World Book Detail Modal -->
 <div id="worldbook-detail-modal">
     <div class="wb-detail-header">
-        <div class="wb-detail-back" onclick="closeWorldBookDetail()">＜</div>
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="wb-back-btn-img" onclick="closeWorldBookDetail()">
         <div class="wb-detail-title" id="wb-detail-title-text">Title</div>
-        <button class="wb-delete-book-btn" onclick="deleteCurrentWorldBook()">删除</button>
+        
+        <!-- 正常状态下显示的编辑按钮 -->
+        <div id="wb-detail-normal-actions">
+            <button class="wb-delete-book-btn" onclick="toggleWbDetailEdit()">编辑</button>
+        </div>
+        <!-- 编辑状态下显示的 删除、添加、完成 按钮 -->
+        <div id="wb-detail-edit-actions" style="display: none; align-items: center; gap: 15px;">
+            <img src="https://img.heliar.top/file/1770357709135_删除_delete.png" style="width: 22px; height: 22px; cursor: pointer; opacity: 0.8;" onclick="deleteCurrentWorldBook()">
+            <div style="font-size: 28px; font-weight: 300; color: var(--theme-pink-btn); cursor: pointer; line-height: 1; padding-bottom: 2px;" onclick="openAddWbEntryModal()">+</div>
+            <button class="wb-delete-book-btn" style="background: transparent; color: var(--theme-pink-text); border: 1px solid var(--theme-pink-btn);" onclick="toggleWbDetailEdit()">完成</button>
+        </div>
     </div>
     <div class="wb-detail-content" id="wb-detail-content-area"></div>
+</div>
+
+<!-- 新增：为现有世界书添加新条目的弹窗 -->
+<div id="worldbook-add-entry-modal" class="delete-confirm-modal" style="z-index: 900;">
+    <div class="wb-modal-card" onclick="event.stopPropagation()">
+        <div class="wb-modal-header">新增条目</div>
+        <div class="wb-modal-scroll-area">
+            <input type="text" id="wb-single-entry-key" class="wb-entry-input key" placeholder="名称（可选）" style="margin-bottom: 10px; border: 1px solid #FADBE6; background: #fff;">
+            <textarea id="wb-single-entry-val" class="wb-entry-input val" placeholder="世界书内容" style="min-height: 120px; border: 1px solid #FADBE6; background: #fff;"></textarea>
+        </div>
+        <div class="wb-modal-actions" style="margin-top: 15px;">
+            <button class="wb-action-btn wb-btn-cancel" onclick="closeAddWbEntryModal()">取消</button>
+            <button class="wb-action-btn wb-btn-ok" onclick="saveNewWbEntry()">保存</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- 世界书条目全屏阅读页面 -->
+<div id="worldbook-entry-fullscreen-page" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--theme-pink-bg-soft); z-index: 700; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);">
+    <div class="wb-detail-header" id="wb-fullscreen-header">
+        <div class="wb-detail-back" onclick="closeWbEntryFullscreen()">＜</div>
+        <div class="wb-detail-title" id="wb-fullscreen-title" style="flex: 1; text-align: center; margin-right: 24px; font-size: 18px; font-weight: 600; color: var(--theme-pink-text);">详情</div>
+    </div>
+    <div style="flex: 1; padding: 20px; overflow-y: auto;">
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); font-size: 16px; color: #333; line-height: 1.8; white-space: pre-wrap; word-break: break-word;" id="wb-fullscreen-content"></div>
+    </div>
 </div>
 
 <!-- World Book Color Settings Page -->
@@ -5321,6 +5580,19 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 </div>
 
 <div id="toast-notification"></div>
+<!-- 礼物详情弹窗 -->
+<div id="gift-detail-overlay" onclick="closeGiftDetailModal()">
+    <div class="gift-detail-card" onclick="event.stopPropagation()">
+        <img src="https://img.heliar.top/file/1770767041294_关闭_close-one_2.png" class="gift-detail-close" onclick="closeGiftDetailModal()">
+        <div class="gift-detail-title" id="gift-detail-title">送给好友的礼物</div>
+        <div class="gift-detail-emoji" id="gift-detail-emoji">🎁</div>
+        <div class="gift-detail-name" id="gift-detail-name">商品名称</div>
+        <div class="gift-detail-specs">
+            <span id="gift-detail-style">款式：默认</span>
+            <span id="gift-detail-quantity">数量：x1</span>
+        </div>
+    </div>
+</div>
 
 <div id="me-settings-modal">
     <div class="me-settings-header-bar">
@@ -5565,8 +5837,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         <div class="mall-header-actions">
             <img src="https://img.heliar.top/file/1770580892666_刷新_refresh.png" class="refresh-btn" id="mall-refresh-btn">
             <button class="mall-add-btn" id="mall-add-category-btn">+</button>
+            <img src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" id="mall-cart-delete-btn" style="width:24px; height:24px; cursor:pointer; display:none;" onclick="deleteSelectedCartItems()">
         </div>
     </div>
+
     <div class="mall-category-nav" id="mall-category-nav"></div>
 
     <!-- 页面容器 -->
@@ -5761,8 +6035,13 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     <div class="mall-favorite-header">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallPurchasedPage()">
         <div class="mall-favorite-title">购买的商品</div>
-        <img src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" style="width:24px; height:24px; cursor:pointer; position:absolute; right:20px;" onclick="togglePurchasedManageMode()">
+        <div style="position:absolute; right:20px; display:flex; align-items:center; gap:15px;">
+            <img id="mall-purchased-gift-btn" src="https://img.heliar.top/file/1773086327829_礼物_gift_2.png" style="width:24px; height:24px; cursor:pointer; display:none;" onclick="sendSelectedGifts()">
+            <img id="mall-purchased-delete-btn" src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" style="width:24px; height:24px; cursor:pointer;" onclick="togglePurchasedManageMode()">
+        </div>
+
     </div>
+
     <div class="mall-favorite-content" id="mall-purchased-content">
         <!-- 购买列表将渲染在这里 -->
     </div>
@@ -6139,6 +6418,13 @@ function executeMallPurchase(amount, data) {
 }
 
 window.openMallPurchasedPage = () => {
+    document.getElementById('mall-purchased-gift-btn').style.display = 'none'; // 常规进入时隐藏送礼图标
+    document.getElementById('mall-purchased-delete-btn').style.display = 'block'; // 商城里正常显示删除图标
+    
+    // 【修复关键】：确保从商城进入时，底部的删除按钮能够正常显示
+    const deleteBtn = document.querySelector('#mall-purchased-footer .delete-btn');
+    if(deleteBtn) deleteBtn.style.display = 'block';
+    
     isPurchasedManageMode = false;
     selectedPurchasedIds.clear();
     document.getElementById('mall-purchased-content').classList.remove('manage-mode');
@@ -6146,6 +6432,95 @@ window.openMallPurchasedPage = () => {
     renderPurchasedProducts();
     document.getElementById('mall-purchased-page').classList.add('active');
 };
+
+// 从聊天界面打开已购买页面
+window.openMallPurchasedPageFromChat = () => {
+    if (!currentChatContactId) {
+        showToast("请在聊天窗口内使用此功能");
+        return;
+    }
+    document.getElementById('chat-extra-menu').classList.remove('active'); // 关掉底部菜单
+    document.getElementById('mall-purchased-gift-btn').style.display = 'block'; // 显示送礼图标
+    document.getElementById('mall-purchased-delete-btn').style.display = 'none'; // 聊天集里隐藏右上角删除图标
+    
+    // 直接进入管理模式，方便用户直接勾选商品
+    isPurchasedManageMode = true;
+    selectedPurchasedIds.clear();
+    document.getElementById('mall-purchased-content').classList.add('manage-mode');
+    document.getElementById('mall-purchased-footer').classList.add('active');
+    
+    // 【修复关键】：因为是送礼，所以隐藏底部的删除按钮
+    const deleteBtn = document.querySelector('#mall-purchased-footer .delete-btn');
+    if(deleteBtn) deleteBtn.style.display = 'none';
+    
+    renderPurchasedProducts();
+    document.getElementById('mall-purchased-page').classList.add('active');
+};
+
+// 重置页面关闭时的状态（确保再次打开其他地方不冲突）
+window.closeMallPurchasedPage = () => { 
+    document.getElementById('mall-purchased-page').classList.remove('active'); 
+    const deleteBtn = document.querySelector('#mall-purchased-footer .delete-btn');
+    if(deleteBtn) deleteBtn.style.display = 'block'; // 恢复底部删除按钮
+};
+
+
+// 新增：送出礼物逻辑
+window.sendSelectedGifts = () => {
+    if (selectedPurchasedIds.size === 0) {
+        showToast("请先勾选要送出的商品哦");
+        return;
+    }
+    
+    let purchases = getMallPurchases();
+    let giftItems = [];
+    let remainingPurchases = [];
+    
+    purchases.forEach(p => {
+        if (selectedPurchasedIds.has(String(p.purchaseId || p.id))) {
+            giftItems.push(p);
+        } else {
+            remainingPurchases.push(p);
+        }
+    });
+    
+    const key = getMessagesKey(currentChatContactId);
+    let messages = JSON.parse(localStorage.getItem(key) || '[]');
+    
+    // 把送出的每个商品，作为单独的卡片发出
+    giftItems.forEach((item, index) => {
+        messages.push({
+            id: Date.now() + index,
+            type: 'sent',
+            isGift: true, // 核心标记
+            giftData: item,
+            text: `[送出礼物：${item.name}]`, // 这个是给列表页预览用的文本
+            timestamp: Date.now() + index
+        });
+    });
+    localStorage.setItem(key, JSON.stringify(messages));
+    
+    let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+    const idx = contacts.findIndex(c => c.id === currentChatContactId);
+    if (idx > -1) {
+        contacts[idx].lastMsg = `[送出礼物]`;
+        contacts[idx].timestamp = Date.now();
+        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+    }
+    
+    saveMallPurchases(remainingPurchases);
+    
+    window.closeMallPurchasedPage();
+    renderConversationMessages();
+    showToast("礼物已送出！");
+    
+    setTimeout(() => {
+        if (typeof triggerAIAutoReply === 'function') {
+            triggerAIAutoReply();
+        }
+    }, 1500);
+};
+
 window.closeMallPurchasedPage = () => { document.getElementById('mall-purchased-page').classList.remove('active'); };
 
 window.togglePurchasedManageMode = () => {
@@ -7450,29 +7825,49 @@ window.switchMallPage = (pageName) => {
     }
 
     // 根据不同页面更新顶部栏
-    const header = document.getElementById('mall-main-header');
-    const categoryNav = document.getElementById('mall-category-nav');
     const headerTitle = document.getElementById('mall-header-title');
+    const categoryNav = document.getElementById('mall-category-nav');
+    const refreshBtn = document.getElementById('mall-refresh-btn');
+    const addBtn = document.getElementById('mall-add-category-btn');
+    const cartDelBtn = document.getElementById('mall-cart-delete-btn');
 
-        if (pageName === 'cart') {
+    if (pageName === 'cart') {
         headerTitle.textContent = '购物车';
-        categoryNav.style.display = 'none'; // 购物车页面隐藏分类导航
-        document.getElementById('mall-refresh-btn').style.display = 'none';
-        document.getElementById('mall-add-category-btn').style.display = 'none';
-        renderShoppingCartPage(); // 【关键】切换到购物车时，调用渲染函数
+        categoryNav.style.display = 'none'; 
+        if(refreshBtn) refreshBtn.style.display = 'none';
+        if(addBtn) addBtn.style.display = 'none';
+        if(cartDelBtn) cartDelBtn.style.display = 'block'; // 显示购物车删除图标
+        renderShoppingCartPage(); 
     } else if (pageName === 'me') {
         headerTitle.textContent = '我的';
         categoryNav.style.display = 'none';
-        document.getElementById('mall-refresh-btn').style.display = 'none';
-        document.getElementById('mall-add-category-btn').style.display = 'none';
-        renderMallMePage(); // 【关键】切换到我的页面时，调用随机渲染商品和信息的函数
+        if(refreshBtn) refreshBtn.style.display = 'none';
+        if(addBtn) addBtn.style.display = 'none';
+        if(cartDelBtn) cartDelBtn.style.display = 'none'; // 隐藏
+        renderMallMePage(); 
     } else { // home page
-
         headerTitle.textContent = '商城';
         categoryNav.style.display = 'flex';
-        document.getElementById('mall-refresh-btn').style.display = 'block';
-        document.getElementById('mall-add-category-btn').style.display = 'block';
+        if(refreshBtn) refreshBtn.style.display = 'block';
+        if(addBtn) addBtn.style.display = 'block';
+        if(cartDelBtn) cartDelBtn.style.display = 'none'; // 隐藏
     }
+};
+
+// 新增：处理购物车商品删除的函数
+window.deleteSelectedCartItems = () => {
+    let cart = getCartData();
+    const originalLength = cart.length;
+    cart = cart.filter(item => !item.selected); // 过滤掉被选中的商品
+    
+    if (cart.length === originalLength) {
+        showToast("请先在左侧勾选要删除的商品");
+        return;
+    }
+    
+    saveCartData(cart);
+    renderShoppingCartPage();
+    showToast("已删除选中商品");
 };
 
 
@@ -9157,7 +9552,6 @@ Strictly adhere to the JSON format. Example:
     window.closeWorldBookAddModal = () => { document.getElementById('worldbook-add-modal').classList.remove('active'); };
     window.addWorldBookEntryRow = () => { const container = document.getElementById('wb-dynamic-entries'); const row = document.createElement('div'); row.className = 'wb-entry-row wb-dynamic-row'; row.innerHTML = `<input type="text" class="wb-entry-input key" placeholder="名称（可选）"><textarea class="wb-entry-input val" placeholder="世界书内容"></textarea>`; container.appendChild(row); };
     window.saveWorldBook = () => { const title = document.getElementById('wb-title-input').value.trim(); if(!title) { showToast("请输入世界书名"); return; } const rows = document.querySelectorAll('.wb-dynamic-row'); const entries = []; let hasContent = false; rows.forEach(row => { const key = row.querySelector('.key').value.trim(); const val = row.querySelector('.val').value.trim(); if(val) { entries.push({ key: key, content: val }); hasContent = true; } }); if (!hasContent) { showToast("请至少输入一条世界书内容"); return; } const newBook = { id: Date.now(), title: title, entries: entries, coverColor: '#EAEAEA', coverImage: '' }; let books = []; try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {} books.push(newBook); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("世界书已保存"); closeWorldBookAddModal(); renderWorldBooks(); };
-    
     window.renderWorldBooks = () => { 
         const container = document.getElementById('worldbook-list'); 
         container.innerHTML = ''; 
@@ -9169,26 +9563,161 @@ Strictly adhere to the JSON format. Example:
             item.onclick = () => viewWorldBook(book.id); 
             item.innerHTML = `<div class="wb-book-cover"><div class="wb-book-name">${escapeHtml(book.title)}</div></div>`; 
             const coverEl = item.querySelector('.wb-book-cover'); 
+            const nameEl = item.querySelector('.wb-book-name');
             
             if (book.coverImage) {
                 coverEl.style.backgroundImage = `url(${book.coverImage})`;
                 coverEl.style.backgroundColor = 'transparent';
-                item.querySelector('.wb-book-name').style.color = "white";
-                item.querySelector('.wb-book-name').style.textShadow = "0 1px 4px rgba(0,0,0,0.8)";
+                nameEl.style.color = "white";
+                nameEl.style.textShadow = "none";
             } else if (book.coverColor) { 
                 coverEl.style.background = book.coverColor; 
             } 
+            
+            // 新增：如果用户设置了自定义的标题颜色，优先使用该颜色
+            if (book.titleColor) {
+                nameEl.style.color = book.titleColor;
+            }
+            
             container.appendChild(item); 
         }); 
     };
-    window.viewWorldBook = (id) => { currentWorldBookId = id; renderWorldBookDetailView(); document.getElementById('worldbook-detail-modal').classList.add('active'); };
-    function renderWorldBookDetailView() { if (!currentWorldBookId) return; let books = []; try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {} const book = books.find(b => b.id === currentWorldBookId); if(!book) { closeWorldBookDetail(); return; } document.getElementById('wb-detail-title-text').innerText = book.title; const contentArea = document.getElementById('wb-detail-content-area'); contentArea.innerHTML = ''; book.entries.forEach((entry, index) => { const div = document.createElement('div'); div.className = 'wb-detail-item'; div.id = `wb-entry-item-${index}`; div.innerHTML = `<div class="wb-detail-item-content">${entry.key ? `<div class="wb-detail-key">${escapeHtml(entry.key)}</div>` : ''}<div class="wb-detail-val">${escapeHtml(entry.content)}</div></div><div class="wb-detail-item-actions"><button onclick="editWorldBookEntry(${index})">修改</button><button onclick="deleteWorldBookEntry(${index})">删除</button></div>`; contentArea.appendChild(div); }); }
+   
+         // 切换右上角的编辑菜单模式
+    window.toggleWbDetailEdit = () => {
+        const normal = document.getElementById('wb-detail-normal-actions');
+        const edit = document.getElementById('wb-detail-edit-actions');
+        if (normal.style.display !== 'none') {
+            normal.style.display = 'none';
+            edit.style.display = 'flex';
+        } else {
+            normal.style.display = 'block';
+            edit.style.display = 'none';
+        }
+    };
+
+    window.openAddWbEntryModal = () => {
+        document.getElementById('wb-single-entry-key').value = '';
+        document.getElementById('wb-single-entry-val').value = '';
+        document.getElementById('worldbook-add-entry-modal').classList.add('active');
+    };
+
+    window.closeAddWbEntryModal = () => {
+        document.getElementById('worldbook-add-entry-modal').classList.remove('active');
+    };
+
+    window.saveNewWbEntry = () => {
+        const key = document.getElementById('wb-single-entry-key').value.trim();
+        const val = document.getElementById('wb-single-entry-val').value.trim();
+        if (!val) {
+            showToast("内容不能为空");
+            return;
+        }
+        
+        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); 
+        const bookIndex = books.findIndex(b => b.id === currentWorldBookId); 
+        if (bookIndex !== -1) {
+            if (!books[bookIndex].entries) books[bookIndex].entries = [];
+            books[bookIndex].entries.push({ key: key, content: val });
+            localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books));
+            showToast("条目已添加");
+            closeAddWbEntryModal();
+            renderWorldBookDetailView();
+        }
+    };
+
+    // 每次点开世界书时，恢复非编辑的默认状态
+    window.viewWorldBook = (id) => { 
+        currentWorldBookId = id; 
+        document.getElementById('wb-detail-normal-actions').style.display = 'block';
+        document.getElementById('wb-detail-edit-actions').style.display = 'none';
+        renderWorldBookDetailView(); 
+        document.getElementById('worldbook-detail-modal').classList.add('active'); 
+    };
+    
+    function renderWorldBookDetailView() { 
+        if (!currentWorldBookId) return; 
+        let books = []; 
+        try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {} 
+        const book = books.find(b => b.id === currentWorldBookId); 
+        if(!book) { closeWorldBookDetail(); return; } 
+        document.getElementById('wb-detail-title-text').innerText = book.title; 
+        const contentArea = document.getElementById('wb-detail-content-area'); 
+        contentArea.innerHTML = ''; 
+        book.entries.forEach((entry, index) => { 
+            const div = document.createElement('div'); 
+            div.className = 'wb-detail-item'; 
+            div.id = `wb-entry-item-${index}`; 
+            // 在 .wb-detail-val 处加上了 collapsed 类，并添加 onclick 展开详情的事件，下面的操作按钮依然在原布局里不动
+            div.innerHTML = `<div class="wb-detail-item-content">${entry.key ? `<div class="wb-detail-key">${escapeHtml(entry.key)}</div>` : ''}<div class="wb-detail-val collapsed" onclick="openWbEntryFullscreen(${index})">${escapeHtml(entry.content)}</div></div><div class="wb-detail-item-actions"><button onclick="editWorldBookEntry(${index})">修改</button><button onclick="deleteWorldBookEntry(${index})">删除</button></div>`; 
+            contentArea.appendChild(div); 
+        }); 
+    }
+
+    // 新增：打开全屏阅读页面
+    window.openWbEntryFullscreen = (index) => {
+        let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); 
+        const book = books.find(b => b.id === currentWorldBookId); 
+        if (!book || !book.entries[index]) return;
+        const entry = book.entries[index];
+        document.getElementById('wb-fullscreen-title').innerText = entry.key || '详情';
+        document.getElementById('wb-fullscreen-content').innerText = entry.content;
+        
+        const page = document.getElementById('worldbook-entry-fullscreen-page');
+        page.style.display = 'flex';
+        setTimeout(() => page.style.transform = 'translateX(0)', 10);
+    };
+
+    // 新增：关闭全屏阅读页面
+    window.closeWbEntryFullscreen = () => {
+        const page = document.getElementById('worldbook-entry-fullscreen-page');
+        page.style.transform = 'translateX(100%)';
+        setTimeout(() => page.style.display = 'none', 300);
+    };
     window.editWorldBookEntry = (index) => { const itemEl = document.getElementById(`wb-entry-item-${index}`); if (!itemEl) return; const books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const book = books.find(b => b.id === currentWorldBookId); if (!book || !book.entries[index]) return; const entry = book.entries[index]; itemEl.innerHTML = `<div class="edit-form"><input type="text" class="wb-entry-input key" placeholder="名称（可选）" value="${escapeHtml(entry.key)}"><textarea class="wb-entry-input val" placeholder="世界书内容">${escapeHtml(entry.content)}</textarea></div><div class="wb-detail-item-actions"><button class="save" onclick="saveWorldBookEntry(${index})">保存</button><button onclick="renderWorldBookDetailView()">取消</button></div>`; };
     window.saveWorldBookEntry = (index) => { const itemEl = document.getElementById(`wb-entry-item-${index}`); const newKey = itemEl.querySelector('.key').value.trim(); const newVal = itemEl.querySelector('.val').value.trim(); if (!newVal) { showToast("内容不能为空"); return; } let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const bookIndex = books.findIndex(b => b.id === currentWorldBookId); if (bookIndex !== -1 && books[bookIndex].entries[index]) { books[bookIndex].entries[index] = { key: newKey, content: newVal }; localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("已保存"); renderWorldBookDetailView(); } };
-    window.deleteWorldBookEntry = (index) => { if (!confirm("确定要删除这个条目吗？")) return; let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); const bookIndex = books.findIndex(b => b.id === currentWorldBookId); if (bookIndex !== -1 && books[bookIndex].entries[index]) { books[bookIndex].entries.splice(index, 1); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("已删除"); renderWorldBookDetailView(); } };
+        let pendingWbDeleteCallback = null;
+
+    // 新增：执行自定义弹窗确认后的删除动作
+    window.executeWbDelete = () => {
+        if (pendingWbDeleteCallback) pendingWbDeleteCallback();
+        closeDeleteModal('wb-delete-confirm-modal');
+        pendingWbDeleteCallback = null;
+    };
+
+    // 修改：使用自定义弹窗代替会被浏览器拦截的原生 confirm
+    window.deleteWorldBookEntry = (index) => { 
+        document.getElementById('wb-delete-confirm-title').innerText = "确定要删除这个条目吗？";
+        pendingWbDeleteCallback = () => {
+            let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); 
+            const bookIndex = books.findIndex(b => b.id === currentWorldBookId); 
+            if (bookIndex !== -1 && books[bookIndex].entries[index]) { 
+                books[bookIndex].entries.splice(index, 1); 
+                localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); 
+                showToast("已删除"); 
+                renderWorldBookDetailView(); 
+            }
+        };
+        document.getElementById('wb-delete-confirm-modal').classList.add('active');
+    };
+
     window.closeWorldBookDetail = () => { document.getElementById('worldbook-detail-modal').classList.remove('active'); currentWorldBookId = null; };
-    window.deleteCurrentWorldBook = () => { if(!currentWorldBookId) return; if(confirm("确定要删除这本世界书吗？此操作不可撤销。")) { let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); books = books.filter(b => b.id !== currentWorldBookId); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); closeWorldBookDetail(); renderWorldBooks(); showToast("世界书已删除"); } };
     
+    // 修改：使用自定义弹窗代替会被浏览器拦截的原生 confirm
+    window.deleteCurrentWorldBook = () => { 
+        if(!currentWorldBookId) return; 
+        document.getElementById('wb-delete-confirm-title').innerText = "确定删除这本世界书吗？不可撤销。";
+        pendingWbDeleteCallback = () => {
+            let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); 
+            books = books.filter(b => b.id !== currentWorldBookId); 
+            localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); 
+            closeWorldBookDetail(); 
+            renderWorldBooks(); 
+            showToast("世界书已删除"); 
+        };
+        document.getElementById('wb-delete-confirm-modal').classList.add('active');
+    };
+
     window.openWorldBookColorSettings = () => { 
         const page = document.getElementById('worldbook-color-page'); 
         const container = document.getElementById('wb-color-list'); 
@@ -9200,10 +9729,27 @@ Strictly adhere to the JSON format. Example:
             books.forEach(book => { 
                 const item = document.createElement('div'); 
                 item.className = 'wb-color-item'; 
+                // 新增：调整排版并加入文字颜色选择器
+                item.style.flexDirection = 'column';
+                item.style.alignItems = 'flex-start';
+                
+                const defaultTitleColor = book.titleColor || (book.coverImage ? '#FFFFFF' : '#555555');
+                
                 item.innerHTML = `
-                    <span class="wb-color-item-name">${escapeHtml(book.title)}</span>
-                    <button class="wb-cover-upload-btn" onclick="triggerWbCoverUpload(${book.id})">封面图</button>
-                    <input type="color" class="wb-color-input" data-book-id="${book.id}" value="${book.coverColor || '#EAEAEA'}">
+                    <span class="wb-color-item-name" style="margin-bottom: 10px; width: 100%;">${escapeHtml(book.title)}</span>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                         <button class="wb-cover-upload-btn" onclick="triggerWbCoverUpload(${book.id})">封面图</button>
+                         <div style="display: flex; align-items: center; gap: 8px;">
+                             <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
+                                 <span style="font-size: 10px; color: #888;">背景</span>
+                                 <input type="color" class="wb-color-input" data-book-id="${book.id}" value="${book.coverColor || '#EAEAEA'}">
+                             </div>
+                             <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
+                                 <span style="font-size: 10px; color: #888;">文字</span>
+                                 <input type="color" class="wb-title-color-input" data-book-id="${book.id}" value="${defaultTitleColor}">
+                             </div>
+                         </div>
+                    </div>
                 `; 
                 container.appendChild(item); 
             }); 
@@ -9211,8 +9757,11 @@ Strictly adhere to the JSON format. Example:
         page.classList.add('active'); 
     };
     window.closeWorldBookColorSettings = () => { document.getElementById('worldbook-color-page').classList.remove('active'); };
+    
     window.saveWorldBookColors = () => { 
         let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); 
+        
+        // 1. 保存背景颜色
         const colorInputs = document.querySelectorAll('.wb-color-input'); 
         colorInputs.forEach(input => { 
             const bookId = parseInt(input.dataset.bookId); 
@@ -9222,11 +9771,24 @@ Strictly adhere to the JSON format. Example:
                 books[bookIndex].coverColor = newColor; 
             } 
         }); 
+        
+        // 2. 保存文字颜色
+        const titleColorInputs = document.querySelectorAll('.wb-title-color-input');
+        titleColorInputs.forEach(input => {
+            const bookId = parseInt(input.dataset.bookId); 
+            const newColor = input.value; 
+            const bookIndex = books.findIndex(b => b.id === bookId); 
+            if (bookIndex !== -1) { 
+                books[bookIndex].titleColor = newColor; 
+            } 
+        });
+        
         localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); 
         showToast("设置已保存"); 
         closeWorldBookColorSettings(); 
         renderWorldBooks(); 
     };
+
     
     window.triggerWbCoverUpload = (bookId) => {
         currentWbCoverUploadId = bookId;
@@ -9525,13 +10087,44 @@ Strictly adhere to the JSON format. Example:
                 lastMsgTime = msg.timestamp;
             }
 
-            if (msg.type === 'recalled') {
+                        if (msg.type === 'recalled') {
+                // --- 修改：支持点击显示撤回原文 ---
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.alignSelf = 'center';
+                wrapper.style.gap = '8px';
+                wrapper.style.margin = '5px 0';
+                
                 const tipDiv = document.createElement('div');
                 tipDiv.className = 'msg-recalled-tip';
                 tipDiv.innerText = msg.text;
-                fragment.appendChild(tipDiv);
+                tipDiv.style.margin = '0'; // 清除原有margin
+                
+                wrapper.appendChild(tipDiv);
+
+                // 如果有保存的原文本，则添加点击事件
+                if (msg.originalText) {
+                    tipDiv.style.cursor = 'pointer';
+                    tipDiv.title = '点击查看原文';
+                    
+                    const origDiv = document.createElement('div');
+                    origDiv.className = 'msg-recalled-original';
+                    origDiv.innerText = msg.originalText;
+                    origDiv.style.display = 'none'; // 默认隐藏
+                    
+                    tipDiv.onclick = (e) => {
+                        e.stopPropagation();
+                        origDiv.style.display = origDiv.style.display === 'none' ? 'block' : 'none';
+                    };
+                    wrapper.appendChild(origDiv);
+                }
+                
+                fragment.appendChild(wrapper);
                 return;
+                // --- 修改结束 ---
             }
+
 
             const row = document.createElement('div');
             row.className = `msg-bubble-row ${msg.type === 'sent' ? 'me' : 'them'}`;
@@ -9545,9 +10138,12 @@ Strictly adhere to the JSON format. Example:
             avatar.src = msg.type === 'sent' ? meAvatar : themAvatar;
             avatar.className = 'msg-bubble-avatar';
 
-            let contentHtml;
+                        let contentHtml;
             if (msg.isTransfer) {
                 contentHtml = createTransferCard(msg);
+            } else if (msg.isGift) {
+                // 如果是礼物，渲染我们刚加的粉色盒子
+                contentHtml = createGiftCard(msg);
             } else {
                 contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`;
             }
@@ -9555,8 +10151,18 @@ Strictly adhere to the JSON format. Example:
             const contentElement = document.createRange().createContextualFragment(contentHtml).firstElementChild;
             contentElement.ondblclick = (e) => { 
                 e.stopPropagation(); 
-                showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer); 
+                // 添加 isGift 参数，让礼物和转账一样不能被编辑文字
+                showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer || msg.isGift); 
             };
+            // --- 新增：给礼物卡片加单击弹出详情的事件 ---
+            if (msg.isGift) {
+                contentElement.onclick = (e) => {
+                    e.stopPropagation();
+                    openGiftDetailModal(msg);
+                };
+                contentElement.style.cursor = 'pointer';
+            }
+
             
             if (isMultiSelectMode) {
                 row.onclick = (e) => { e.stopPropagation(); toggleMsgSelection(msg.id); };
@@ -9584,6 +10190,45 @@ Strictly adhere to the JSON format. Example:
         }
     };
 
+    function createGiftCard(msg) {
+        const item = msg.giftData;
+        const name = item.name || '神秘礼物';
+        const emoji = item.emoji || '🎁';
+        const style = item.style || '默认';
+        const quantity = item.quantity || 1;
+        
+        let titleText = msg.type === 'sent' ? '送给好友的礼物' : '收到的礼物';
+        
+        return `
+            <div class="gift-message-card">
+                <div class="gift-message-title">${titleText}</div>
+                <div class="gift-message-body">
+                    <div class="gift-message-emoji">${emoji}</div>
+                    <div class="gift-message-info">
+                        <div class="gift-message-name">${escapeHtml(name)}</div>
+                        <div class="gift-message-spec">款式：${escapeHtml(style)}</div>
+                        <div class="gift-message-spec">数量：x${quantity}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    window.openGiftDetailModal = (msg) => {
+        const item = msg.giftData;
+        const titleText = msg.type === 'sent' ? '送给好友的礼物' : '收到的礼物';
+        
+        document.getElementById('gift-detail-title').textContent = titleText;
+        document.getElementById('gift-detail-emoji').textContent = item.emoji || '🎁';
+        document.getElementById('gift-detail-name').textContent = item.name || '神秘礼物';
+        document.getElementById('gift-detail-style').textContent = `款式：${item.style || '默认'}`;
+        document.getElementById('gift-detail-quantity').textContent = `数量：x${item.quantity || 1}`;
+        
+        document.getElementById('gift-detail-overlay').classList.add('active');
+    };
+
+    window.closeGiftDetailModal = () => {
+        document.getElementById('gift-detail-overlay').classList.remove('active');
+    };
 
     function createTransferCard(msg) {
         const { amount, transferStatus, id } = msg.transferData;
@@ -9819,10 +10464,12 @@ Strictly adhere to the JSON format. Example:
         const key = getMessagesKey(currentChatContactId);
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
-        if (msgIndex !== -1 && messages[msgIndex].type === 'sent' && !messages[msgIndex].isTransfer) {
+            if (msgIndex !== -1 && messages[msgIndex].type === 'sent' && !messages[msgIndex].isTransfer) {
             messages[msgIndex].type = 'recalled';
+            messages[msgIndex].originalText = messages[msgIndex].text; // <--- 新增这行，保存原文
             messages[msgIndex].text = "你撤回了一条消息";
             localStorage.setItem(key, JSON.stringify(messages));
+
             renderConversationMessages();
         } else {
             showToast("只能撤回普通发送的消息");
@@ -9889,7 +10536,7 @@ Strictly adhere to the JSON format. Example:
         }
     };
 
-    function sendMsg() {
+        function sendMsg() {
         if (!currentChatContactId) return;
         const input = document.getElementById('chat-conv-input');
         const text = input.value.trim();
@@ -9916,7 +10563,44 @@ Strictly adhere to the JSON format. Example:
         input.value = '';
         renderConversationMessages();
     }
+
+        // 新增：让 AI 重新回复最新的一次对话
+    window.retryLastAiReply = () => {
+        if (!currentChatContactId) return;
+        
+        // 1. 关闭功能菜单
+        document.getElementById('chat-extra-menu').classList.remove('active');
+
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        if (messages.length === 0) {
+            return;
+        }
+
+        // 2. 从下往上找，删除所有 AI 连续发送的消息，直到遇到我发的消息
+        let deleteCount = 0;
+        for (let i = messages.length - 1; i >= 0; i--) {
+            if (messages[i].type === 'received') {
+                deleteCount++;
+            } else {
+                break; // 遇到我的消息（sent 或 recalled 等），停止删除
+            }
+        }
+
+        if(deleteCount > 0) {
+// 删除数组末尾的 AI 回复记录
+messages.splice(messages.length - deleteCount, deleteCount);
+localStorage.setItem(key, JSON.stringify(messages));
+renderConversationMessages();
+}
+    // 3. 重新触发 AI 的自动回复
+    triggerAIAutoReply();
+};
+
+
 // ========================= 商城及转账通用支付核心逻辑 =========================
+
 let currentPaymentContext = null; // 用于区分是转账还是商城购买
 
 // 新增：专门给商城用的付款弹窗
@@ -10090,14 +10774,17 @@ window.openTransferConfirmPopup = (amount) => {
                     currentPasswordInput = '';
                     updatePasswordDisplay();
                 }, 1000);
-            } else {
+                        } else {
                 // 密码正确且余额充足，根据 Context 决定执行什么操作
                 if (currentPaymentContext && currentPaymentContext.type === 'mall_buy') {
                     executeMallPurchase(amount, currentPaymentContext.data);
+                } else if (currentPaymentContext && currentPaymentContext.type === 'mall_cart_buy') {
+                    executeMallCartPurchase(amount, currentPaymentContext.data); // <-- 插入合并购买逻辑
                 } else {
                     executeTransfer(amount); 
                 }
             }
+
         } else {
             document.getElementById('password-error-tip').textContent = '密码错误，请重试';
             setTimeout(() => {
@@ -10157,9 +10844,10 @@ window.openTransferConfirmPopup = (amount) => {
         closeTransferPage();
         renderConversationMessages();
         showToast("转账成功");
-        
-        triggerAIAutoReply(true, amount, transferId);
     }
+
+    // --- Role Settings & Styling ---
+
 
     // --- Role Settings & Styling ---
     window.openRoleSettings = () => {
@@ -10182,7 +10870,16 @@ window.openTransferConfirmPopup = (amount) => {
         document.getElementById('role-auto-post-switch').checked = contact.autoPostEnabled || false;
         document.getElementById('role-auto-post-interval').value = contact.autoPostInterval || 60;
         
+        // --- 新增：读取撤回设置 ---
+        document.getElementById('role-recall-amount').value = contact.recallAmount || '1';
+        document.getElementById('role-auto-recall-switch').checked = contact.autoRecallEnabled || false;
+        document.getElementById('role-recall-min').value = contact.autoRecallMin || 20;
+        document.getElementById('role-recall-max').value = contact.autoRecallMax || 50;
+        document.getElementById('recall-freq-settings').style.display = contact.autoRecallEnabled ? 'flex' : 'none';
+        // --- 新增结束 ---
+
         const globalProfile = getUserProfile();
+
         document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || '';
         document.getElementById('role-user-persona').value = contact.userPersona || '';
@@ -10212,7 +10909,7 @@ window.openTransferConfirmPopup = (amount) => {
 
     window.closeRoleSettings = () => { document.getElementById('role-settings-page').classList.remove('active'); };
 
-    window.saveRoleSettings = () => {
+        window.saveRoleSettings = () => {
         if (!currentChatContactId) return;
         const alias = document.getElementById('role-setting-alias').value.trim();
         const signature = document.getElementById('role-setting-signature').value.trim();
@@ -10228,9 +10925,20 @@ window.openTransferConfirmPopup = (amount) => {
         const autoPostEnabled = document.getElementById('role-auto-post-switch').checked;
         const autoPostInterval = parseInt(document.getElementById('role-auto-post-interval').value) || 60;
 
+        // --- 新增：获取撤回设置参数 ---
+        const recallAmount = document.getElementById('role-recall-amount').value;
+        const autoRecallEnabled = document.getElementById('role-auto-recall-switch').checked;
+        let autoRecallMin = parseInt(document.getElementById('role-recall-min').value);
+        let autoRecallMax = parseInt(document.getElementById('role-recall-max').value);
+        if (isNaN(autoRecallMin)) autoRecallMin = 20;
+        if (isNaN(autoRecallMax)) autoRecallMax = 50;
+        if (autoRecallMin > autoRecallMax) { let temp = autoRecallMin; autoRecallMin = autoRecallMax; autoRecallMax = temp; }
+        // --- 新增结束 ---
+
         let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
         const idx = contacts.findIndex(c => c.id === currentChatContactId);
         if (idx > -1) {
+            // 【修复】把丢失的保存字段全部补回来
             contacts[idx].alias = alias;
             contacts[idx].signature = signature;
             contacts[idx].persona = persona;
@@ -10246,7 +10954,19 @@ window.openTransferConfirmPopup = (amount) => {
             contacts[idx].autoPostEnabled = autoPostEnabled;
             contacts[idx].autoPostInterval = autoPostInterval;
             
+            // --- 新增：保存撤回设置，并初始化随机轮数 ---
+            contacts[idx].recallAmount = recallAmount;
+            contacts[idx].autoRecallEnabled = autoRecallEnabled;
+            contacts[idx].autoRecallMin = autoRecallMin;
+            contacts[idx].autoRecallMax = autoRecallMax;
+            if (autoRecallEnabled && !contacts[idx].targetRecallTurn) {
+                contacts[idx].turnCount = 0;
+                contacts[idx].targetRecallTurn = Math.floor(Math.random() * (autoRecallMax - autoRecallMin + 1)) + autoRecallMin;
+            }
+            // --- 新增结束 ---
+
             localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+
             showToast("角色设置已保存");
             
             if (autoPostEnabled) { scheduleAutoPost(contacts[idx].id, autoPostInterval); } 
@@ -10257,7 +10977,7 @@ window.openTransferConfirmPopup = (amount) => {
             renderContactList(); 
         }
     };
-    
+
     // --- CSS Preset Management ---
     function loadCssPresets() {
         const select = document.getElementById('css-preset-select');
@@ -10947,8 +11667,8 @@ window.openTransferConfirmPopup = (amount) => {
     });
 
     // --- AI Auto Reply Logic ---
-        // 【修改后】的 triggerAIAutoReply 函数
-    window.triggerAIAutoReply = async (isTransferEvent = false, transferAmount = 0, transferId = null) => {
+                // 【修改后】的 triggerAIAutoReply 函数
+    window.triggerAIAutoReply = async () => {
         if (!currentChatContactId) return;
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
         if (!settings?.api?.url || !settings?.api?.key) { showToast("请先配置API"); return; }
@@ -10968,7 +11688,23 @@ window.openTransferConfirmPopup = (amount) => {
         const key = getMessagesKey(currentChatContactId);
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         
+        // 新增：每次手动点击时，自动检测近期是否有待处理的转账记录
+        let isTransferEvent = false;
+        let transferAmount = 0;
+        let transferId = null;
+        for (let i = messages.length - 1; i >= 0; i--) {
+            const m = messages[i];
+            // 找到最近一笔状态为 pending（待收款）的发出转账
+            if (m.isTransfer && m.type === 'sent' && m.transferData && m.transferData.transferStatus === 'pending') {
+                isTransferEvent = true;
+                transferAmount = m.transferData.amount;
+                transferId = m.transferData.id;
+                break;
+            }
+        }
+
         const depth = contact.memoryDepth || 15;
+
         let recentMsgs = messages.slice(-depth);
 
         const recollectionData = getRecollections(currentChatContactId);
@@ -10990,18 +11726,44 @@ window.openTransferConfirmPopup = (amount) => {
             timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
         }
 
-        let historyStr = recentMsgs.map(m => {
+                let historyStr = recentMsgs.map(m => {
             let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
             if (m.isTransfer) {
                 if (m.type === 'sent') return `[${sender}向${contact.alias || contact.name}转账了 ¥${m.transferData.amount}]`;
-                else return `[${sender}向${uName}转账了 ¥${m.transferData.amount}]`;
+                else return `[${contact.alias || contact.name}向${uName}转账了 ¥${m.transferData.amount}]`;
             }
-            if (m.type === 'recalled') return `[系统消息：撤回了一条消息]`;
+            // --- 新增：让 AI 也能清楚看到你送的礼物具体是什么 ---
+            if (m.isGift) {
+                if (m.type === 'sent') {
+                    return `[系统提示：${sender} 送给 ${contact.alias || contact.name} 一件礼物（名称：${m.giftData.name}，款式：${m.giftData.style}，数量：${m.giftData.quantity}）]`;
+                } else {
+                    return `[系统提示：${contact.alias || contact.name} 送给 ${uName} 一件礼物（${m.giftData.name}）]`;
+                }
+            }
+            
+            if (m.type === 'recalled') {
+                if (m.text === '你撤回了一条消息') {
+                    return `[系统提示：${uName} 刚刚撤回了一条消息。被撤回的真实内容是：“${m.originalText || ''}”]`;
+                } else {
+                    return `[系统提示：你(${contact.alias || contact.name}) 刚刚撤回了一条消息。被撤回的真实内容是：“${m.originalText || ''}”]`;
+                }
+            }
             return `${sender}: ${m.text}`;
         }).join('\n');
 
+
+
+
+        // --- 新增：检测当前对话轮数是否达标 ---
+        let isForceRecallTurn = false;
+        if (contact.autoRecallEnabled && contact.targetRecallTurn && (contact.turnCount || 0) >= contact.targetRecallTurn) {
+            isForceRecallTurn = true;
+        }
+        // --- 新增结束 ---
+
         // ▼▼▼▼▼【 修改核心：更新给AI的指令 (Prompt) 】▼▼▼▼▼
-        let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
+
+                        let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
 ${worldbookContext ? `\n背景设定(世界书)：\n${worldbookContext}\n` : ''}
 ${recollectionContext ? `\n回忆总结(曾发生过的事)：\n${recollectionContext}\n` : ''}
@@ -11013,24 +11775,53 @@ ${timeContext}
 **重要规则**:
 1.  你必须以符合角色设定的口吻和性格进行回复。
 2.  **你的回复必须被分割成多个小的、自然的对话气泡。**
-3.  **最终输出格式必须是一个JSON对象**，其中包含一个名为 "reply" 的键，其值是一个字符串数组。数组中的每个字符串都将成为一个独立的聊天气泡。
-4.  根据对话的自然节奏，将你的完整回复拆分成2到8个句子或短语，放入数组中。
+3.  **如果符合剧情和你的角色性格，你想要主动给用户转账（例如给零花钱、买礼物、赔偿等），请在某个气泡中加入特殊标记 <SEND_TRANSFER:金额>，金额为纯数字。**
+4.  **如果你觉得刚才说错了话，或者想要撤回自己发出的上一条消息，请发一个内容仅为 <RECALL> 的独立气泡，系统会自动将你的上一条消息变成撤回状态。注意：撤回后，你**必须**在下一个气泡中重新发送你要说的正确内容！绝对不能只撤回不补发。**
+5.  **最终输出格式必须是一个JSON对象**，其中包含一个名为 "reply" 的键，其值是一个字符串数组。数组中的每个字符串都将成为一个独立的聊天气泡。
+6.  根据对话的自然节奏，将你的完整回复拆分成2到8个句子或短语，放入数组中。
+7.  **如果聊天记录中有[系统提示：${uName} 刚刚撤回了一条消息]，代表对方撤回了话。你可以利用提示中“被撤回的真实内容”，结合你的人设和回忆，选择假装没看见、好奇追问、或者故意点破嘲笑等真实的反应。**
 
 **输出格式示例**:
 {
   "reply": [
-    "你好啊！",
-    "今天天气真不错。",
-    "让我想起我们去年在湖边散步的日子。",
-    "对了，你带那把旧伞了吗？"
+    "今天好烦啊！",
+    "<RECALL>",
+    "对不起，我刚才情绪不好撤回了。",
+    "<SEND_TRANSFER:520>",
+        "这是补偿你的，拿去买点好吃的好好犒劳一下自己吧！"
   ]
 }`;
+
+
         // ▲▲▲▲▲【 指令更新结束 】▲▲▲▲▲
+
+                // --- 新增：如果轮数达到，强制 AI 撤回并执行拟人化反悔 ---
+        if (isForceRecallTurn) {
+            let amountToRecall = contact.recallAmount || '1';
+            let fakeMsgInstruction = (amountToRecall === 'all') 
+                ? `发出 1 到 2 句“错话”` 
+                : `连续发出 ${amountToRecall} 句“错话”`;
+
+            sysPrompt += `\n\n【特殊系统指令：触发真实的撤回行为】
+本次回复你必须模拟人类真实的“手滑打错字 -> 迅速撤回 -> 重新发”的过程！
+请严格按以下 3 个步骤构造你的 "reply" JSON数组：
+第 1 步：先${fakeMsgInstruction}。必须包含明显的**错别字**或拼音手误，让人一看就知道是打错了。
+第 2 步：放入一个单独的特殊气泡 "<RECALL>"。
+第 3 步：**必须**在 "<RECALL>" 之后补发正确内容。**请随机选择以下两种方式之一进行补发：**
+  - 【方式一（直接更正）】：没有任何多余的解释说明，直接发送修改错字后的完整正确句子，并紧跟后续想说的话。
+    （示例：{"reply": ["今天天气真不粗", "<RECALL>", "今天天气真不错", "我们出去玩吧"]}）
+  - 【方式二（解释后更正）】：先发一个很短的气泡只指出刚才打错了什么字（例如：“打错了，是xxx”或“xxx才对”），然后再发送修改错字后的完整正确句子，最后紧跟后续想说的话。
+    （示例：{"reply": ["去超市买了很逗东西", "<RECALL>", "打错了，是很多", "去超市买了很多东西", "重死了"]}）
+绝对不能只撤回不补发！`;
+        }
+        // --- 新增结束 ---
+
 
 
         if (isTransferEvent) {
              sysPrompt += `\n\n【特殊事件】刚才 ${uName} 向你转账了 ¥${transferAmount}。根据你的性格，决定是否要收下这笔钱。如果接受转账，请在JSON的 "reply" 数组的第一个元素前加上特殊标记 <ACCEPT_TRANSFER>；如果拒绝退回，则加上 <REJECT_TRANSFER>。例如: { "reply": ["<ACCEPT_TRANSFER>谢谢你的钱！", "我正好需要呢。"] }`;
         }
+
 
         const payload = {
             model: settings.api.model || 'gpt-3.5-turbo',
@@ -11073,7 +11864,7 @@ ${timeContext}
                 replyContent = data.choices[0].message.content;
             }
 
-            // ▼▼▼▼▼【 修改核心：解析AI返回的JSON并分句发送 】▼▼▼▼▼
+                        // ▼▼▼▼▼【 修改核心：解析AI返回的JSON并分句发送 】▼▼▼▼▼
             let sentences = [];
             try {
                 const parsedReply = JSON.parse(replyContent);
@@ -11083,12 +11874,34 @@ ${timeContext}
                     throw new Error("AI返回的JSON中没有找到reply数组。");
                 }
             } catch (jsonError) {
-                // 如果AI没有按要求返回JSON，就退回到原来的分割方式
                 console.error("AI未返回标准JSON，回退至手动分割:", jsonError);
                 sentences = replyContent.match(/[^，。,.?!]+[，。,.?!]?/g) || [replyContent];
             }
             
-            if (sentences.length > 0) {
+            // --- 新增：预处理数组，防止 AI 将错话、撤回指令、修正话合并在一个字符串里 ---
+            let processedSentences = [];
+            for (let s of sentences) {
+                if (typeof s === 'string' && s.includes("<RECALL>")) {
+                    // 如果AI把撤回标记写在了一句话的中间，强制把它切开成多个气泡
+                    let parts = s.split("<RECALL>");
+                    for (let i = 0; i < parts.length; i++) {
+                        if (parts[i].trim()) processedSentences.push(parts[i].trim());
+                        if (i < parts.length - 1) processedSentences.push("<RECALL>");
+                    }
+                } else {
+                    processedSentences.push(s);
+                }
+            }
+            
+            // 兜底安全机制：如果数组的最后一个气泡是撤回指令，说明AI忘了发后续的话
+            if (processedSentences.length > 0 && processedSentences[processedSentences.length - 1] === "<RECALL>") {
+                processedSentences.push("咳咳...刚才手滑打错字了，重新组织一下语言哈😅");
+            }
+            sentences = processedSentences;
+            // --- 预处理结束 ---
+            
+                       if (sentences.length > 0) {
+
                  // 检查第一句是否包含转账指令
                 if (isTransferEvent) {
                     let firstSentence = sentences[0];
@@ -11105,32 +11918,139 @@ ${timeContext}
                     handleTransferResponse(transferId, action === 'accept');
                 }
 
+                // 标记本次循环是否有撤回发生
+                let hasRecallHappened = false;
+
                 // 循环发送每一句话
-                for (const sentence of sentences) {
-                    const trimmedSentence = sentence.trim();
+                for (let sentence of sentences) {
+                    let trimmedSentence = sentence.trim();
                     if (!trimmedSentence) continue;
 
                     messages = JSON.parse(localStorage.getItem(key) || '[]');
-                    messages.push({
-                        id: Date.now() + Math.random(),
-                        type: 'received',
-                        text: trimmedSentence,
-                        timestamp: Date.now()
-                    });
-                    localStorage.setItem(key, JSON.stringify(messages));
                     
-                    contacts[contactIndex].lastMsg = trimmedSentence;
-                    contacts[contactIndex].timestamp = Date.now();
-                    localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+                    let isAiTransfer = false;
+                    let aiTransferAmount = 0;
+                    
+                    // 检测是否包含主动转账标记 <SEND_TRANSFER:数字>
+                    const transferMatch = trimmedSentence.match(/<SEND_TRANSFER:\s*(\d+(\.\d+)?)\s*>/);
+                    if (transferMatch) {
+                        isAiTransfer = true;
+                        aiTransferAmount = parseFloat(transferMatch[1]);
+                        // 从句子中移除这个标记
+                        trimmedSentence = trimmedSentence.replace(transferMatch[0], '').trim();
+                    }
 
-                    renderConversationMessages();
+                    // --- 修改：检测是否包含撤回标记，并打上标识 ---
+                    let isAiRecall = false;
+                    if (trimmedSentence.includes("<RECALL>")) {
+                        isAiRecall = true;
+                        hasRecallHappened = true; // 告诉后面的代码，撤回发生过了
+                        trimmedSentence = trimmedSentence.replace(/<RECALL>/g, '').trim();
+                    }
+                    // --------------------------------
 
-                    await sleep(Math.random() * 600 + 800); // 随机延迟0.8到1.4秒
+                    let hasUpdate = false;
+
+
+                    // --- 修改：处理撤回动作 (引入撤回数量，并修复撤回全部时的误伤Bug) ---
+                    if (isAiRecall) {
+                        let amountToRecall = contact.recallAmount || '1';
+                        let targetCount = (amountToRecall === 'all') ? Infinity : parseInt(amountToRecall);
+                        let recalledCount = 0;
+
+                                                // 倒序查找并撤回最近的N条消息
+                        for (let i = messages.length - 1; i >= 0; i--) {
+                            // 【关键修复】遇到用户发送的消息(sent)或已撤回的消息(recalled)，立即中断！
+                            // 这样确保撤回永远不会越界到上一轮的对话中去。
+                            if (messages[i].type !== 'received') {
+                                break;
+                            }
+
+                            messages[i].type = 'recalled';
+                            messages[i].originalText = messages[i].text; // <--- 新增这行，保存原文
+                            messages[i].text = `"${contact.alias || contact.name}" 撤回了一条消息`;
+                            // 清除可能存在的转账标记，防止渲染冲突
+
+                            if (messages[i].isTransfer) {
+                                delete messages[i].isTransfer;
+                                delete messages[i].transferData;
+                            }
+                            hasUpdate = true;
+                            recalledCount++;
+                            
+                            if (recalledCount >= targetCount) break; // 数量达到则停止
+                        }
+                    }
+                    // --------------------------------
+
+                    // 如果去掉标记后还有文本，先发送文本气泡
+                    if (trimmedSentence) {
+                        messages.push({
+                            id: Date.now() + Math.random(),
+                            type: 'received',
+                            text: trimmedSentence,
+                            timestamp: Date.now()
+                        });
+                        hasUpdate = true;
+                    }
+
+                    // 接着发送转账气泡（如果有）
+                    if (isAiTransfer && aiTransferAmount > 0) {
+                        const newTransferId = Date.now().toString() + Math.floor(Math.random() * 1000);
+                        messages.push({
+                            id: Date.now() + Math.random(),
+                            type: 'received',
+                            isTransfer: true,
+                            transferData: {
+                                id: newTransferId,
+                                amount: aiTransferAmount,
+                                transferStatus: 'pending',
+                                senderName: contact.alias || contact.name,
+                                receiverName: uName
+                            },
+                            timestamp: Date.now()
+                        });
+                        hasUpdate = true;
+                    }
+
+                    if (hasUpdate) {
+                        localStorage.setItem(key, JSON.stringify(messages));
+                        
+                        let displayMsg = trimmedSentence;
+                        if (!trimmedSentence && isAiTransfer) {
+                            displayMsg = `[转账] ¥${aiTransferAmount.toFixed(2)}`;
+                        } else if (!trimmedSentence && isAiRecall) {
+                            displayMsg = `[撤回了一条消息]`;
+                        }
+                        
+                        contacts[contactIndex].lastMsg = displayMsg;
+                        contacts[contactIndex].timestamp = Date.now();
+                        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+
+                        renderConversationMessages();
+                        await sleep(Math.random() * 600 + 800); // 随机延迟
+                    }
                 }
+                
+                // --- 新增：在对话发送完后，处理轮数记录 ---
+                contacts[contactIndex].turnCount = (contacts[contactIndex].turnCount || 0) + 1;
+                // 如果本轮触发了撤回，重置计数器，并生成下次的目标轮数
+                if (hasRecallHappened) {
+                    contacts[contactIndex].turnCount = 0;
+                    if (contacts[contactIndex].autoRecallEnabled) {
+                        const min = contacts[contactIndex].autoRecallMin || 20;
+                        const max = contacts[contactIndex].autoRecallMax || 50;
+                        contacts[contactIndex].targetRecallTurn = Math.floor(Math.random() * (max - min + 1)) + min;
+                    }
+                }
+                localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+                // --- 新增结束 ---
+
             }
             // ▲▲▲▲▲【 新逻辑结束 】▲▲▲▲▲
 
         } catch (e) {
+
             showToast("AI 回复失败: " + e.message, 4000);
             console.error("AI Reply Error:", e);
         } finally {
@@ -11425,7 +12345,7 @@ function renderShoppingCartPage() {
                 <div class="cart-total-price-text">
                     合计: <span class="price">¥${totalPrice.toFixed(2)}</span>
                 </div>
-                <button class="cart-checkout-btn">结算(${totalQuantity})</button>
+                                <button class="cart-checkout-btn" onclick="checkoutCart()">结算(${totalQuantity})</button>
             </div>
         </div>
     `;
@@ -11437,6 +12357,62 @@ function renderShoppingCartPage() {
         </div>
         ${footerHtml}
     `;
+}
+window.checkoutCart = () => {
+    let cart = getCartData();
+    const selectedItems = cart.filter(item => item.selected);
+    if (selectedItems.length === 0) {
+        showToast("请先选择商品");
+        return;
+    }
+    const totalPrice = selectedItems.reduce((sum, item) => sum + (item.quantity * parseFloat(item.price)), 0);
+    
+    // 打开支付弹窗并传递特殊上下文
+    currentPaymentContext = { type: 'mall_cart_buy', amount: totalPrice, data: selectedItems };
+    
+    document.getElementById('confirm-transfer-target').style.display = 'none';
+    document.getElementById('confirm-transfer-amount').textContent = `¥${totalPrice.toFixed(2)}`;
+    document.getElementById('confirm-popup-title').textContent = '合并付款';
+    
+    currentPasswordInput = '';
+    updatePasswordDisplay();
+    
+    document.getElementById('payment-details-section').style.display = 'block';
+    document.getElementById('password-input-section').style.display = 'block';
+    document.getElementById('numeric-keypad').style.display = 'grid';
+    
+    renderNumericKeypad();
+    document.getElementById('transfer-confirm-overlay').classList.add('active');
+};
+
+function executeMallCartPurchase(amount, items) {
+    let walletData = getWalletData();
+    walletData.balance -= amount;
+    walletData.transactions.push({
+        id: Date.now().toString(), type: 'expense', amount: amount, desc: `购买商城商品(合并付款)`, timestamp: Date.now()
+    });
+    saveWalletData(walletData);
+
+    // 把购物车里的每个东西分别存入已购买库
+    let purchases = getMallPurchases();
+    items.forEach((item, index) => {
+        purchases.unshift({
+            ...item,
+            purchaseId: Date.now().toString() + index, // 保证每一笔唯一
+            purchaseTime: Date.now(),
+            paidAmount: item.quantity * parseFloat(item.price)
+        });
+    });
+    saveMallPurchases(purchases);
+
+    // 剔除购物车中已经买掉的东西
+    let cart = getCartData();
+    cart = cart.filter(item => !item.selected);
+    saveCartData(cart);
+
+    closeTransferConfirmPopup();
+    renderShoppingCartPage();
+    showToast("付款成功！");
 }
 
 // 切换单个商品选中状态的函数
