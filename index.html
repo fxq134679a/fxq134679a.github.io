@@ -669,16 +669,35 @@
         .chat-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
         .chat-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
         
+                /* Multi-select Mode Styles */
+        .chat-conv-messages.multi-select-active .msg-bubble-row {
+            padding-left: 30px; /* Space for checkbox */
+        }
+        .chat-checkbox {
+            position: absolute; left: -30px; top: 50%; transform: translateY(-50%);
+            width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd;
+            display: none; justify-content: center; align-items: center;
+            background: white; transition: all 0.2s;
+        }
+        .chat-conv-messages.multi-select-active .chat-checkbox { display: flex; left: 0; }
+        .chat-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
+        .chat-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+        
         .chat-multiselect-footer {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
             background: white; border-top: 1px solid #eee; z-index: 25;
-            display: none; justify-content: center; align-items: center;
+            display: none; justify-content: center; align-items: center; gap: 15px; /* 添加按钮间距 */
             padding-bottom: env(safe-area-inset-bottom, 0);
         }
         .chat-multiselect-footer.active { display: flex; }
         .chat-multiselect-delete-btn {
             background: #ffebee; color: #F44336; padding: 10px 30px; border-radius: 20px;
-            border: none; font-weight: 600; font-size: 14px; cursor: pointer;
+            border: none; font-weight: 600; font-size: 14px; cursor: pointer; flex: 1; max-width: 150px;
+        }
+        /* 新增取消按钮样式 */
+        .chat-multiselect-cancel-btn {
+            background: #f0f0f0; color: #666; padding: 10px 30px; border-radius: 20px;
+            border: none; font-weight: 600; font-size: 14px; cursor: pointer; flex: 1; max-width: 150px;
         }
 
 
@@ -4940,8 +4959,9 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <button class="chat-conv-btn" style="margin-right: 0;"><img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
             <button class="chat-conv-btn send ai-trigger" onclick="triggerAIAutoReply()"><img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;"></button>
         </div>
-        <!-- Multiselect Footer -->
+                <!-- Multiselect Footer -->
         <div class="chat-multiselect-footer" id="chat-multiselect-footer">
+             <button class="chat-multiselect-cancel-btn" onclick="cancelMultiSelectMode()">取消</button>
              <button class="chat-multiselect-delete-btn" onclick="executeBatchDelete()">删除</button>
         </div>
     </div>
@@ -5359,6 +5379,39 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 </div>
 
 <!-- 删除朋友圈确认弹窗 -->
+<!-- 编辑消息自定义美化弹窗 -->
+<div id="edit-msg-modal" class="delete-confirm-modal" style="z-index: 10050;">
+    <div class="delete-card" onclick="event.stopPropagation()" style="width: 85%; max-width: 340px; padding: 25px;">
+        <div class="delete-card-title" style="margin-bottom: 15px; color: var(--theme-pink-text); font-weight: 600;">编辑消息</div>
+        <textarea id="edit-msg-textarea" class="wb-entry-input val" style="width: 100%; min-height: 100px; margin-bottom: 20px; border: 1px solid #FADBE6; background: #fff; padding: 12px; font-size: 15px;"></textarea>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('edit-msg-modal')">取消</button>
+            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="executeEditMsg()">保存修改</button>
+        </div>
+    </div>
+</div>
+
+<!-- 单条消息删除确认弹窗 -->
+<div id="delete-msg-confirm-modal" class="delete-confirm-modal" style="z-index: 10050;">
+    <div class="delete-card" onclick="event.stopPropagation()">
+        <div class="delete-card-title">确定要永久删除这条消息吗？</div>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('delete-msg-confirm-modal')">取消</button>
+            <button class="delete-card-btn btn-confirm-delete" onclick="executeDeleteMsg()">删除</button>
+        </div>
+    </div>
+</div>
+
+<!-- 批量删除消息确认弹窗 -->
+<div id="batch-delete-confirm-modal" class="delete-confirm-modal" style="z-index: 10050;">
+    <div class="delete-card" onclick="event.stopPropagation()">
+        <div class="delete-card-title" id="batch-delete-title">确定要删除选中的消息吗？</div>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('batch-delete-confirm-modal')">取消</button>
+            <button class="delete-card-btn btn-confirm-delete" onclick="confirmBatchDelete()">删除</button>
+        </div>
+    </div>
+</div>
 <div id="delete-moment-confirm-modal" class="delete-confirm-modal">
     <div class="delete-card">
         <div class="delete-card-title">删除该朋友圈？</div>
@@ -10405,7 +10458,7 @@ Strictly adhere to the JSON format. Example:
         renderConversationMessages();
     }
     
-    window.showBubbleMenu = (event, msgId, text, type, isTransfer) => {
+        window.showBubbleMenu = (event, msgId, text, type, isTransfer) => {
         event.preventDefault();
         event.stopPropagation();
         closeBubbleMenu(); 
@@ -10416,9 +10469,11 @@ Strictly adhere to the JSON format. Example:
         menu.className = 'bubble-context-menu';
         
         const recallOption = (type === 'sent') ? `<div class="bubble-menu-item" onclick="event.stopPropagation(); handleRecallMsg('${msgId}')">撤回</div>` : '';
+        
+        // 【修改】只传 msgId，避免特殊字符和引号导致报错
         const editOption = isTransfer 
-                        ? `<div class="bubble-menu-item" style="color:#ccc; cursor:not-allowed;">编辑</div>`
-            : `<div class="bubble-menu-item" onclick="event.stopPropagation(); handleEditMsg('${msgId}', '${escapeHtml(text).replace(/'/g, "\\'")}')">编辑</div>`;
+            ? `<div class="bubble-menu-item" style="color:#ccc; cursor:not-allowed;">编辑</div>`
+            : `<div class="bubble-menu-item" onclick="event.stopPropagation(); handleEditMsg('${msgId}')">编辑</div>`;
             
         const multiSelectOption = `<div class="bubble-menu-item" onclick="event.stopPropagation(); toggleMultiSelectMode()">多选</div>`;
         const deleteOption = `<div class="bubble-menu-item" style="color:#F44336;" onclick="event.stopPropagation(); deleteMsg('${msgId}')">删除</div>`;
@@ -10444,55 +10499,105 @@ Strictly adhere to the JSON format. Example:
         activeMsgIdForMenu = null;
     };
 
-    window.handleEditMsg = (msgId, oldText) => {
+    // ================== 新增的美化版编辑逻辑 ==================
+    let pendingEditMsgId = null;
+    window.handleEditMsg = (msgId) => {
         closeBubbleMenu();
-        const newText = prompt("编辑消息:", oldText);
-        if (newText !== null && newText.trim() !== "") {
-            const key = getMessagesKey(currentChatContactId);
-            let messages = JSON.parse(localStorage.getItem(key) || '[]');
-            const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
-            if (msgIndex !== -1) {
-                messages[msgIndex].text = newText.trim();
-                localStorage.setItem(key, JSON.stringify(messages));
-                renderConversationMessages();
-            }
-        }
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        const msg = messages.find(m => String(m.id) === String(msgId));
+        if (!msg) return;
+
+        pendingEditMsgId = msgId;
+        const textarea = document.getElementById('edit-msg-textarea');
+        textarea.value = msg.text; // 直接从库中拿纯净数据，防乱码防报错
+        
+        document.getElementById('edit-msg-modal').classList.add('active');
+        setTimeout(() => textarea.focus(), 100);
     };
 
+    window.executeEditMsg = () => {
+        if (!pendingEditMsgId || !currentChatContactId) return;
+        const newText = document.getElementById('edit-msg-textarea').value.trim();
+        
+        if (newText !== "") {
+            const key = getMessagesKey(currentChatContactId);
+            let messages = JSON.parse(localStorage.getItem(key) || '[]');
+            const msgIndex = messages.findIndex(m => String(m.id) === String(pendingEditMsgId));
+            if (msgIndex !== -1) {
+                messages[msgIndex].text = newText;
+                localStorage.setItem(key, JSON.stringify(messages));
+                
+                // 如果修改的是最后一条消息，同步更新外层列表的概览
+                if (msgIndex === messages.length - 1) {
+                    let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+                    const contactIdx = contacts.findIndex(c => c.id === currentChatContactId);
+                    if (contactIdx > -1) {
+                        contacts[contactIdx].lastMsg = newText;
+                        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+                    }
+                }
+                
+                renderConversationMessages();
+                showToast("修改成功");
+            }
+        }
+        closeDeleteModal('edit-msg-modal');
+        pendingEditMsgId = null;
+    };
+
+    // ================== 原有撤回逻辑保持不变 ==================
     window.handleRecallMsg = (msgId) => {
         closeBubbleMenu();
         const key = getMessagesKey(currentChatContactId);
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
-            if (msgIndex !== -1 && messages[msgIndex].type === 'sent' && !messages[msgIndex].isTransfer) {
+        if (msgIndex !== -1 && messages[msgIndex].type === 'sent' && !messages[msgIndex].isTransfer) {
             messages[msgIndex].type = 'recalled';
-            messages[msgIndex].originalText = messages[msgIndex].text; // <--- 新增这行，保存原文
+            messages[msgIndex].originalText = messages[msgIndex].text; 
             messages[msgIndex].text = "你撤回了一条消息";
             localStorage.setItem(key, JSON.stringify(messages));
-
             renderConversationMessages();
         } else {
             showToast("只能撤回普通发送的消息");
         }
     };
 
+    // ================== 新增的美化版删除单条消息逻辑 ==================
+    let pendingDeleteMsgId = null;
     window.deleteMsg = (msgId) => {
         closeBubbleMenu();
-        if (confirm("确定要删除这条消息吗？")) {
-            const key = getMessagesKey(currentChatContactId);
-            let messages = JSON.parse(localStorage.getItem(key) || '[]');
-            messages = messages.filter(m => String(m.id) !== String(msgId));
-            localStorage.setItem(key, JSON.stringify(messages));
-            renderConversationMessages();
-        }
+        pendingDeleteMsgId = msgId;
+        document.getElementById('delete-msg-confirm-modal').classList.add('active');
     };
 
+    window.executeDeleteMsg = () => {
+        if (!pendingDeleteMsgId || !currentChatContactId) return;
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        messages = messages.filter(m => String(m.id) !== String(pendingDeleteMsgId));
+        localStorage.setItem(key, JSON.stringify(messages));
+        
+        closeDeleteModal('delete-msg-confirm-modal');
+        renderConversationMessages();
+        showToast("消息已永久删除");
+        pendingDeleteMsgId = null;
+    };
+
+    // ================== 多选与取消逻辑 ==================
     window.toggleMultiSelectMode = () => {
         closeBubbleMenu();
         isMultiSelectMode = true;
         selectedMsgIds.clear();
         if(activeMsgIdForMenu) selectedMsgIds.add(activeMsgIdForMenu);
         document.getElementById('chat-multiselect-footer').classList.add('active');
+        renderConversationMessages();
+    };
+
+    window.cancelMultiSelectMode = () => {
+        isMultiSelectMode = false;
+        selectedMsgIds.clear();
+        document.getElementById('chat-multiselect-footer').classList.remove('active');
         renderConversationMessages();
     };
 
@@ -10506,23 +10611,28 @@ Strictly adhere to the JSON format. Example:
         renderConversationMessages();
     };
 
+    // ================== 新增的美化版批量删除逻辑 ==================
     window.executeBatchDelete = () => {
         if (selectedMsgIds.size === 0) {
-            showToast("请先选择消息");
+            showToast("请先在左侧勾选要删除的消息");
             return;
         }
-        if (confirm(`确定要删除选中的 ${selectedMsgIds.size} 条消息吗？`)) {
-            const key = getMessagesKey(currentChatContactId);
-            let messages = JSON.parse(localStorage.getItem(key) || '[]');
-            messages = messages.filter(m => !selectedMsgIds.has(m.id));
-            localStorage.setItem(key, JSON.stringify(messages));
-            
-            isMultiSelectMode = false;
-            selectedMsgIds.clear();
-            document.getElementById('chat-multiselect-footer').classList.remove('active');
-            renderConversationMessages();
-            showToast("批量删除成功");
-        }
+        document.getElementById('batch-delete-title').innerText = `确定要永久删除选中的 ${selectedMsgIds.size} 条消息吗？`;
+        document.getElementById('batch-delete-confirm-modal').classList.add('active');
+    };
+
+    window.confirmBatchDelete = () => {
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        messages = messages.filter(m => !selectedMsgIds.has(m.id));
+        localStorage.setItem(key, JSON.stringify(messages));
+        
+        isMultiSelectMode = false;
+        selectedMsgIds.clear();
+        document.getElementById('chat-multiselect-footer').classList.remove('active');
+        closeDeleteModal('batch-delete-confirm-modal');
+        renderConversationMessages();
+        showToast("批量删除成功");
     };
 
     window.toggleChatExtraMenu = () => {
@@ -11798,24 +11908,41 @@ ${timeContext}
                 // --- 新增：如果轮数达到，强制 AI 撤回并执行拟人化反悔 ---
         if (isForceRecallTurn) {
             let amountToRecall = contact.recallAmount || '1';
+            let isSingleRecall = (amountToRecall === '1');
+            
             let fakeMsgInstruction = (amountToRecall === 'all') 
-                ? `发出 1 到 2 句“错话”` 
+                ? `连续发出 2 到 4 句“错话”` 
                 : `连续发出 ${amountToRecall} 句“错话”`;
 
-            sysPrompt += `\n\n【特殊系统指令：触发真实的撤回行为】
-本次回复你必须模拟人类真实的“手滑打错字 -> 迅速撤回 -> 重新发”的过程！
+            if (isSingleRecall) {
+                sysPrompt += `\n\n【特殊系统指令：触发真实的单条撤回行为】
+本次回复你必须模拟人类真实的“反悔 -> 迅速撤回 -> 重新发”的过程！
 请严格按以下 3 个步骤构造你的 "reply" JSON数组：
-第 1 步：先${fakeMsgInstruction}。必须包含明显的**错别字**或拼音手误，让人一看就知道是打错了。
+第 1 步：先发出 1 句“错话”。请在以下三种情境中**随机选择一种**来生成这句错话：
+  - 情境 A (打错字)：包含明显的错别字或拼音手误。
+  - 情境 B (冲动的话)：语气比较重、带情绪、伤人或过于急躁的话。
+  - 情境 C (口是心非/害羞)：不小心吐露了真实的喜欢、关心或心里话，觉得不好意思。
 第 2 步：放入一个单独的特殊气泡 "<RECALL>"。
-第 3 步：**必须**在 "<RECALL>" 之后补发正确内容。**请随机选择以下两种方式之一进行补发：**
-  - 【方式一（直接更正）】：没有任何多余的解释说明，直接发送修改错字后的完整正确句子，并紧跟后续想说的话。
-    （示例：{"reply": ["今天天气真不粗", "<RECALL>", "今天天气真不错", "我们出去玩吧"]}）
-  - 【方式二（解释后更正）】：先发一个很短的气泡只指出刚才打错了什么字（例如：“打错了，是xxx”或“xxx才对”），然后再发送修改错字后的完整正确句子，最后紧跟后续想说的话。
-    （示例：{"reply": ["去超市买了很逗东西", "<RECALL>", "打错了，是很多", "去超市买了很多东西", "重死了"]}）
+第 3 步：**必须**在 "<RECALL>" 之后补发。根据你选的情境：
+  - 如果是情境 A (打错字)：直接发正确的句子，或者说明一下“打错了”再发正确句子。
+  - 如果是情境 B (冲动的话)：发一句缓和语气的话、道歉或者傲娇地找补。
+  - 如果是情境 C (害羞)：发一句嘴硬的话、岔开话题或者掩饰尴尬的话。
 绝对不能只撤回不补发！`;
+            } else {
+                sysPrompt += `\n\n【特殊系统指令：触发真实的多条撤回行为】
+本次回复你必须模拟人类真实的“情绪失控连发 -> 突然清醒/害羞全部撤回 -> 找补”的过程！
+请严格按以下 3 个步骤构造你的 "reply" JSON数组：
+第 1 步：先${fakeMsgInstruction}。请在以下两种情境中**随机选择一种**来生成这些错话：
+  - 情境 A (情绪失控)：连发多句抱怨、生气、吃醋或冲动的话。
+  - 情境 B (吐露心声/碎碎念)：连发多句非常私密、害羞的心里话，或者一连串不知所云的碎碎念。
+第 2 步：放入一个单独的特殊气泡 "<RECALL>" (系统会自动根据你设置的条数撤回前面的多条消息)。
+第 3 步：**必须**在 "<RECALL>" 之后补发找补的内容。根据你选的情境：
+  - 如果是情境 A：发一句道歉、“刚才有点冲动”、“算了没事”等缓和情绪的话。
+  - 如果是情境 B：发一句“发错群了”、“啊啊啊没看清”、“刚才猫踩键盘了”等极力掩饰尴尬的话，或者强行岔开话题。
+绝对不能只撤回不补发！`;
+            }
         }
         // --- 新增结束 ---
-
 
 
         if (isTransferEvent) {
