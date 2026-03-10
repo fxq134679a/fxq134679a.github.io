@@ -3680,17 +3680,17 @@
             display: flex;
         }
         body.tablet-mode-active .phone {
-            width: 768px; 
-            height: 900px; 
+            width: 640px;  /* 宽度缩短 1/6 */
+            height: 675px; /* 高度缩短 1/4 */
             border-radius: 32px; 
             border: 14px solid var(--phone-case-color); 
-            /* 【关键修改】：把 95vw/95vh 改成 80vw/80vh，让它在屏幕上最多只占 80% 的空间，从而实现整体缩小 */
-            transform: scale(min(calc(80vw / 768), calc(80vh / 900)));
+            /* 限制最大占屏幕的 75%，确保四周留有足够缝隙，绝对碰不到边缘 */
+            transform: scale(min(calc(75vw / 640), calc(75vh / 675)));
             transform-origin: center center;
         }
-        /* 平板屏幕变宽了，让主页图标间距也更宽松一点 */
-        body.tablet-mode-active #grid-area { max-width: 650px; }
-        body.tablet-mode-active .dock-container { max-width: 450px; }
+        /* 平板尺寸调整后，内部主页图标间距适配 */
+        body.tablet-mode-active #grid-area { max-width: 550px; }
+        body.tablet-mode-active .dock-container { max-width: 400px; }
         /* 平板不适合猫耳朵，强制隐藏 */
         body.tablet-mode-active .cute-cat-ear { display: none !important; }
         /* ========================================================================= */
@@ -4842,7 +4842,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                             <div class="avatar-img-circle" id="chat-avatar-1" style="background-image: url('https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');"></div>
                         </div>
                     </div>
-                    <input type="text" class="chat-bubble-input left-bubble" value="Say Hi~" oninput="adjustInputWidth(this)">
+                    <input type="text" id="home-chat-bubble-1" class="chat-bubble-input left-bubble" value="Say Hi~" oninput="adjustInputWidth(this); saveHomeBubble(1, this.value)">
                 </div>
                 <div class="chat-row right">
                     <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-2')">
@@ -4850,7 +4850,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                             <div class="avatar-img-circle" id="chat-avatar-2" style="background-image: url('https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png');"></div>
                         </div>
                     </div>
-                    <input type="text" class="chat-bubble-input right-bubble" value="Hello!" oninput="adjustInputWidth(this)">
+                    <input type="text" id="home-chat-bubble-2" class="chat-bubble-input right-bubble" value="Hello!" oninput="adjustInputWidth(this); saveHomeBubble(2, this.value)">
                 </div>
             </div>
         </div>
@@ -5850,13 +5850,22 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 <!-- Forum App 页面 -->
 <div id="forum-app-page">
     <div id="forum-content-wrapper">
-        <div id="forum-page-home" class="forum-page active">
+            <div id="forum-page-home" class="forum-page active">
             <div class="forum-header-home">
                  <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumApp()">
                 <h1 class="forum-header-title">论坛</h1>
+                <div style="width: 30px;"></div> <!-- 占位平衡 -->
+            </div>
+            <!-- 首页内容已被移动到星球页 -->
+        </div>
+
+        <!-- 新增：星球页 -->
+        <div id="forum-page-planet" class="forum-page">
+            <div class="forum-header-home">
+                 <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumApp()">
+                <h1 class="forum-header-title">星球</h1>
                 <img src="https://img.heliar.top/file/1770413434847_添加_add-one.png" class="forum-header-create-btn" onclick="openCreateForumModal()">
             </div>
-            
             <div id="forum-list-container"></div>
             <div id="forum-posts-area"></div>
         </div>
@@ -5951,9 +5960,12 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <img src="https://img.heliar.top/file/1770411000514_首页_home.png" class="forum-nav-icon">
         </div>
         <div class="forum-nav-item" onclick="switchForumTab(1)">
-            <img src="https://img.heliar.top/file/1770411008165_添加_add.png" class="forum-nav-icon">
+            <img src="https://img.heliar.top/file/1773176411691_星球_planet.png" class="forum-nav-icon">
         </div>
         <div class="forum-nav-item" onclick="switchForumTab(2)">
+            <img src="https://img.heliar.top/file/1770411008165_添加_add.png" class="forum-nav-icon">
+        </div>
+        <div class="forum-nav-item" onclick="switchForumTab(3)">
             <img src="https://img.heliar.top/file/1770411008745_用户_user.png" class="forum-nav-icon">
         </div>
     </div>
@@ -6508,6 +6520,43 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
     function escapeHtml(text) { if(typeof text !== 'string') return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
     
+    // --- 新增：更新角色最后一条消息预览 ---
+    function updateContactLastMsg(contactId) {
+        const key = `chat_msgs_${contactId}`;
+        let messages = []; 
+        try { messages = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
+        
+        let lastMsgText = "点击开始聊天";
+        let lastTimestamp = Date.now();
+
+        // 找到最后一条未被删除的消息
+        if (messages.length > 0) {
+            const lastMsg = messages[messages.length - 1];
+            lastTimestamp = lastMsg.timestamp;
+            
+            if (lastMsg.isTransfer) {
+                lastMsgText = `[转账] ¥${parseFloat(lastMsg.transferData.amount).toFixed(2)}`;
+            } else if (lastMsg.isGift) {
+                lastMsgText = `[礼物] ${lastMsg.giftData.name}`;
+            } else if (lastMsg.type === 'recalled') {
+                lastMsgText = lastMsg.text; 
+            } else {
+                lastMsgText = lastMsg.text;
+            }
+        }
+        
+        // 更新并保存到通讯录列表数据中
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const idx = contacts.findIndex(c => c.id === contactId);
+        if (idx > -1) {
+            contacts[idx].lastMsg = lastMsgText;
+            if (messages.length > 0) {
+                contacts[idx].timestamp = lastTimestamp;
+            }
+            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+        }
+    }
+
     // --- 新增：小红点管理函数 ---
     function getMomentsUnreadCount() { return parseInt(localStorage.getItem(MOMENTS_UNREAD_COUNT_KEY) || '0'); }
     function setMomentsUnreadCount(count) { localStorage.setItem(MOMENTS_UNREAD_COUNT_KEY, count); updateMomentsBadgeUI(); }
@@ -8514,20 +8563,63 @@ window.toggleMallProductFavorite = (productId) => {
             pageToShow.classList.add('active');
         }
     }
-    
+    // --- 新增：主屏幕聊天气泡保存与读取 ---
+    window.adjustInputWidth = (el) => {
+        const minWidth = 60;
+        const maxWidth = 150;
+        let tempSpan = document.createElement('span');
+        tempSpan.style.visibility = 'hidden';
+        tempSpan.style.position = 'absolute';
+        tempSpan.style.fontSize = '13px';
+        tempSpan.style.whiteSpace = 'pre';
+        tempSpan.innerText = el.value || el.placeholder || 'Say Hi~';
+        document.body.appendChild(tempSpan);
+        let textWidth = tempSpan.getBoundingClientRect().width + 30; 
+        document.body.removeChild(tempSpan);
+        
+        if (textWidth < minWidth) textWidth = minWidth;
+        if (textWidth > maxWidth) textWidth = maxWidth;
+        el.style.width = textWidth + 'px';
+    };
+
+    window.saveHomeBubble = (index, value) => {
+        let data = JSON.parse(localStorage.getItem('homeBubblesData_v1') || '{}');
+        data['bubble' + index] = value;
+        localStorage.setItem('homeBubblesData_v1', JSON.stringify(data));
+    };
+
+    function loadHomeBubbles() {
+        let data = JSON.parse(localStorage.getItem('homeBubblesData_v1') || '{}');
+        const b1 = document.getElementById('home-chat-bubble-1');
+        const b2 = document.getElementById('home-chat-bubble-2');
+        if (b1) {
+            if (data.bubble1 !== undefined) b1.value = data.bubble1;
+            window.adjustInputWidth(b1);
+        }
+        if (b2) {
+            if (data.bubble2 !== undefined) b2.value = data.bubble2;
+            window.adjustInputWidth(b2);
+        }
+    }
+    // --- 新增结束 ---
+
     window.switchForumTab = (index) => {
-        const pageNames = ['home', 'post', 'me'];
+        const pageNames = ['home', 'planet', 'post', 'me'];
         switchForumPage(pageNames[index]);
         
-        document.querySelectorAll('.forum-nav-item').forEach((el, i) => {
+        // 修复：只针对论坛底栏的图标做高亮切换，防止影响到其他App
+        document.querySelectorAll('#forum-bottom-nav .forum-nav-item').forEach((el, i) => {
             el.classList.toggle('active', i === index);
         });
         
         if (index === 0) { 
-            renderAllForumPosts();
+            // 首页留空
         } else if (index === 1) { 
-            prepareForumPostPage();
+            renderForumList();
+            renderAllForumPosts();
         } else if (index === 2) { 
+            prepareForumPostPage();
+        } else if (index === 3) { 
             renderForumMePage();
         }
     };
@@ -11123,15 +11215,7 @@ ${actionInstruction}
                 messages[msgIndex].text = newText;
                 localStorage.setItem(key, JSON.stringify(messages));
                 
-                // 如果修改的是最后一条消息，同步更新外层列表的概览
-                if (msgIndex === messages.length - 1) {
-                    let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-                    const contactIdx = contacts.findIndex(c => c.id === currentChatContactId);
-                    if (contactIdx > -1) {
-                        contacts[contactIdx].lastMsg = newText;
-                        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-                    }
-                }
+                updateContactLastMsg(currentChatContactId); // 新增：更新最新消息
                 
                 renderConversationMessages();
                 showToast("修改成功");
@@ -11148,10 +11232,13 @@ ${actionInstruction}
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
         if (msgIndex !== -1 && messages[msgIndex].type === 'sent' && !messages[msgIndex].isTransfer) {
-            messages[msgIndex].type = 'recalled';
+                messages[msgIndex].type = 'recalled';
             messages[msgIndex].originalText = messages[msgIndex].text; 
             messages[msgIndex].text = "你撤回了一条消息";
             localStorage.setItem(key, JSON.stringify(messages));
+            
+            updateContactLastMsg(currentChatContactId); // 新增：更新最新消息
+            
             renderConversationMessages();
         } else {
             showToast("只能撤回普通发送的消息");
@@ -11173,11 +11260,14 @@ ${actionInstruction}
         messages = messages.filter(m => String(m.id) !== String(pendingDeleteMsgId));
         localStorage.setItem(key, JSON.stringify(messages));
         
+        updateContactLastMsg(currentChatContactId); // 重新计算最新消息
+        
         closeDeleteModal('delete-msg-confirm-modal');
         renderConversationMessages();
         showToast("消息已永久删除");
         pendingDeleteMsgId = null;
     };
+
 
     // ================== 多选与取消逻辑 ==================
     window.toggleMultiSelectMode = () => {
@@ -11222,6 +11312,8 @@ ${actionInstruction}
         messages = messages.filter(m => !selectedMsgIds.has(m.id));
         localStorage.setItem(key, JSON.stringify(messages));
         
+        updateContactLastMsg(currentChatContactId); // 重新计算最新消息
+        
         isMultiSelectMode = false;
         selectedMsgIds.clear();
         document.getElementById('chat-multiselect-footer').classList.remove('active');
@@ -11229,6 +11321,7 @@ ${actionInstruction}
         renderConversationMessages();
         showToast("批量删除成功");
     };
+
 
     window.toggleChatExtraMenu = () => {
         const menu = document.getElementById('chat-extra-menu');
@@ -11294,11 +11387,14 @@ ${actionInstruction}
         }
 
         if(deleteCount > 0) {
-// 删除数组末尾的 AI 回复记录
-messages.splice(messages.length - deleteCount, deleteCount);
-localStorage.setItem(key, JSON.stringify(messages));
-renderConversationMessages();
-}
+            // 删除数组末尾的 AI 回复记录
+            messages.splice(messages.length - deleteCount, deleteCount);
+            localStorage.setItem(key, JSON.stringify(messages));
+            
+            updateContactLastMsg(currentChatContactId); // 新增：更新最新消息
+            
+            renderConversationMessages();
+        }
     // 3. 重新触发 AI 的自动回复
     triggerAIAutoReply();
 };
@@ -13055,6 +13151,8 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
         
         setInterval(updatePhoneTime, 1000);
         updatePhoneTime();
+
+        loadHomeBubbles(); // 新增：加载主页气泡的文字
 
                 setTimeout(() => {
              initializeAllAutoPosts();
