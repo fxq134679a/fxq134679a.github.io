@@ -11019,7 +11019,7 @@ window.openTransferConfirmPopup = (amount) => {
 
     window.closeRoleSettings = () => { document.getElementById('role-settings-page').classList.remove('active'); };
 
-        window.saveRoleSettings = () => {
+            window.saveRoleSettings = () => {
         if (!currentChatContactId) return;
         const alias = document.getElementById('role-setting-alias').value.trim();
         const signature = document.getElementById('role-setting-signature').value.trim();
@@ -11069,9 +11069,15 @@ window.openTransferConfirmPopup = (amount) => {
             contacts[idx].autoRecallEnabled = autoRecallEnabled;
             contacts[idx].autoRecallMin = autoRecallMin;
             contacts[idx].autoRecallMax = autoRecallMax;
-            if (autoRecallEnabled && !contacts[idx].targetRecallTurn) {
-                contacts[idx].turnCount = 0;
-                contacts[idx].targetRecallTurn = Math.floor(Math.random() * (autoRecallMax - autoRecallMin + 1)) + autoRecallMin;
+            if (autoRecallEnabled) {
+                // 如果当前没有目标轮数，或者目标轮数不在新的范围内，就重置它，解决修改区间后不生效的问题
+                if (!contacts[idx].targetRecallTurn || 
+                    contacts[idx].targetRecallTurn < autoRecallMin || 
+                    contacts[idx].targetRecallTurn > autoRecallMax) {
+                    
+                    contacts[idx].turnCount = 0;
+                    contacts[idx].targetRecallTurn = Math.floor(Math.random() * (autoRecallMax - autoRecallMin + 1)) + autoRecallMin;
+                }
             }
             // --- 新增结束 ---
 
@@ -11778,7 +11784,7 @@ window.openTransferConfirmPopup = (amount) => {
 
     // --- AI Auto Reply Logic ---
                 // 【修改后】的 triggerAIAutoReply 函数
-    window.triggerAIAutoReply = async () => {
+        window.triggerAIAutoReply = async () => {
         if (!currentChatContactId) return;
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
         if (!settings?.api?.url || !settings?.api?.key) { showToast("请先配置API"); return; }
@@ -11836,7 +11842,7 @@ window.openTransferConfirmPopup = (amount) => {
             timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
         }
 
-                let historyStr = recentMsgs.map(m => {
+        let historyStr = recentMsgs.map(m => {
             let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
             if (m.isTransfer) {
                 if (m.type === 'sent') return `[${sender}向${contact.alias || contact.name}转账了 ¥${m.transferData.amount}]`;
@@ -11862,8 +11868,6 @@ window.openTransferConfirmPopup = (amount) => {
         }).join('\n');
 
 
-
-
         // --- 新增：检测当前对话轮数是否达标 ---
         let isForceRecallTurn = false;
         if (contact.autoRecallEnabled && contact.targetRecallTurn && (contact.turnCount || 0) >= contact.targetRecallTurn) {
@@ -11871,9 +11875,8 @@ window.openTransferConfirmPopup = (amount) => {
         }
         // --- 新增结束 ---
 
-        // ▼▼▼▼▼【 修改核心：更新给AI的指令 (Prompt) 】▼▼▼▼▼
 
-                        let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
+        let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
 ${worldbookContext ? `\n背景设定(世界书)：\n${worldbookContext}\n` : ''}
 ${recollectionContext ? `\n回忆总结(曾发生过的事)：\n${recollectionContext}\n` : ''}
@@ -11898,14 +11901,11 @@ ${timeContext}
     "<RECALL>",
     "对不起，我刚才情绪不好撤回了。",
     "<SEND_TRANSFER:520>",
-        "这是补偿你的，拿去买点好吃的好好犒劳一下自己吧！"
+    "这是补偿你的，拿去买点好吃的好好犒劳一下自己吧！"
   ]
 }`;
 
-
-        // ▲▲▲▲▲【 指令更新结束 】▲▲▲▲▲
-
-                // --- 新增：如果轮数达到，强制 AI 撤回并执行拟人化反悔 ---
+        // --- 新增：如果轮数达到，强制 AI 撤回并执行拟人化反悔 ---
         if (isForceRecallTurn) {
             let amountToRecall = contact.recallAmount || '1';
             let isSingleRecall = (amountToRecall === '1');
@@ -11944,11 +11944,9 @@ ${timeContext}
         }
         // --- 新增结束 ---
 
-
         if (isTransferEvent) {
              sysPrompt += `\n\n【特殊事件】刚才 ${uName} 向你转账了 ¥${transferAmount}。根据你的性格，决定是否要收下这笔钱。如果接受转账，请在JSON的 "reply" 数组的第一个元素前加上特殊标记 <ACCEPT_TRANSFER>；如果拒绝退回，则加上 <REJECT_TRANSFER>。例如: { "reply": ["<ACCEPT_TRANSFER>谢谢你的钱！", "我正好需要呢。"] }`;
         }
-
 
         const payload = {
             model: settings.api.model || 'gpt-3.5-turbo',
@@ -11969,7 +11967,6 @@ ${timeContext}
             let bodyData, headers = { 'Content-Type': 'application/json' };
             
             if (isGemini) {
-                // Gemini 需要不同的 payload 格式
                 fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
                 bodyData = JSON.stringify({ contents: [{ parts: [{ text: sysPrompt + "\n\n历史聊天记录:\n" + historyStr + "\n\n请严格按照JSON格式要求给出你的回复:" }] }], generationConfig: { temperature: payload.temperature, response_mime_type: "application/json" } });
             } else {
@@ -11991,7 +11988,6 @@ ${timeContext}
                 replyContent = data.choices[0].message.content;
             }
 
-                        // ▼▼▼▼▼【 修改核心：解析AI返回的JSON并分句发送 】▼▼▼▼▼
             let sentences = [];
             try {
                 const parsedReply = JSON.parse(replyContent);
@@ -12009,7 +12005,6 @@ ${timeContext}
             let processedSentences = [];
             for (let s of sentences) {
                 if (typeof s === 'string' && s.includes("<RECALL>")) {
-                    // 如果AI把撤回标记写在了一句话的中间，强制把它切开成多个气泡
                     let parts = s.split("<RECALL>");
                     for (let i = 0; i < parts.length; i++) {
                         if (parts[i].trim()) processedSentences.push(parts[i].trim());
@@ -12020,16 +12015,12 @@ ${timeContext}
                 }
             }
             
-            // 兜底安全机制：如果数组的最后一个气泡是撤回指令，说明AI忘了发后续的话
             if (processedSentences.length > 0 && processedSentences[processedSentences.length - 1] === "<RECALL>") {
                 processedSentences.push("咳咳...刚才手滑打错字了，重新组织一下语言哈😅");
             }
             sentences = processedSentences;
-            // --- 预处理结束 ---
             
-                       if (sentences.length > 0) {
-
-                 // 检查第一句是否包含转账指令
+            if (sentences.length > 0) {
                 if (isTransferEvent) {
                     let firstSentence = sentences[0];
                     let action = null;
@@ -12058,45 +12049,34 @@ ${timeContext}
                     let isAiTransfer = false;
                     let aiTransferAmount = 0;
                     
-                    // 检测是否包含主动转账标记 <SEND_TRANSFER:数字>
                     const transferMatch = trimmedSentence.match(/<SEND_TRANSFER:\s*(\d+(\.\d+)?)\s*>/);
                     if (transferMatch) {
                         isAiTransfer = true;
                         aiTransferAmount = parseFloat(transferMatch[1]);
-                        // 从句子中移除这个标记
                         trimmedSentence = trimmedSentence.replace(transferMatch[0], '').trim();
                     }
 
-                    // --- 修改：检测是否包含撤回标记，并打上标识 ---
                     let isAiRecall = false;
                     if (trimmedSentence.includes("<RECALL>")) {
                         isAiRecall = true;
-                        hasRecallHappened = true; // 告诉后面的代码，撤回发生过了
+                        hasRecallHappened = true; 
                         trimmedSentence = trimmedSentence.replace(/<RECALL>/g, '').trim();
                     }
-                    // --------------------------------
 
                     let hasUpdate = false;
 
-
-                    // --- 修改：处理撤回动作 (引入撤回数量，并修复撤回全部时的误伤Bug) ---
                     if (isAiRecall) {
                         let amountToRecall = contact.recallAmount || '1';
                         let targetCount = (amountToRecall === 'all') ? Infinity : parseInt(amountToRecall);
                         let recalledCount = 0;
 
-                                                // 倒序查找并撤回最近的N条消息
                         for (let i = messages.length - 1; i >= 0; i--) {
-                            // 【关键修复】遇到用户发送的消息(sent)或已撤回的消息(recalled)，立即中断！
-                            // 这样确保撤回永远不会越界到上一轮的对话中去。
                             if (messages[i].type !== 'received') {
                                 break;
                             }
-
                             messages[i].type = 'recalled';
-                            messages[i].originalText = messages[i].text; // <--- 新增这行，保存原文
+                            messages[i].originalText = messages[i].text;
                             messages[i].text = `"${contact.alias || contact.name}" 撤回了一条消息`;
-                            // 清除可能存在的转账标记，防止渲染冲突
 
                             if (messages[i].isTransfer) {
                                 delete messages[i].isTransfer;
@@ -12105,12 +12085,10 @@ ${timeContext}
                             hasUpdate = true;
                             recalledCount++;
                             
-                            if (recalledCount >= targetCount) break; // 数量达到则停止
+                            if (recalledCount >= targetCount) break; 
                         }
                     }
-                    // --------------------------------
 
-                    // 如果去掉标记后还有文本，先发送文本气泡
                     if (trimmedSentence) {
                         messages.push({
                             id: Date.now() + Math.random(),
@@ -12121,7 +12099,6 @@ ${timeContext}
                         hasUpdate = true;
                     }
 
-                    // 接着发送转账气泡（如果有）
                     if (isAiTransfer && aiTransferAmount > 0) {
                         const newTransferId = Date.now().toString() + Math.floor(Math.random() * 1000);
                         messages.push({
@@ -12150,34 +12127,41 @@ ${timeContext}
                             displayMsg = `[撤回了一条消息]`;
                         }
                         
-                        contacts[contactIndex].lastMsg = displayMsg;
-                        contacts[contactIndex].timestamp = Date.now();
-                        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+                        // [修改]：即时拉取最新 contacts，防止并发覆盖其他角色的设置
+                        let liveContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+                        let liveIdx = liveContacts.findIndex(c => c.id === currentChatContactId);
+                        if (liveIdx > -1) {
+                            liveContacts[liveIdx].lastMsg = displayMsg;
+                            liveContacts[liveIdx].timestamp = Date.now();
+                            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(liveContacts));
+                        }
 
                         renderConversationMessages();
                         await sleep(Math.random() * 600 + 800); // 随机延迟
                     }
                 }
                 
-                // --- 新增：在对话发送完后，处理轮数记录 ---
-                contacts[contactIndex].turnCount = (contacts[contactIndex].turnCount || 0) + 1;
-                // 如果本轮触发了撤回，重置计数器，并生成下次的目标轮数
-                if (hasRecallHappened) {
-                    contacts[contactIndex].turnCount = 0;
-                    if (contacts[contactIndex].autoRecallEnabled) {
-                        const min = contacts[contactIndex].autoRecallMin || 20;
-                        const max = contacts[contactIndex].autoRecallMax || 50;
-                        contacts[contactIndex].targetRecallTurn = Math.floor(Math.random() * (max - min + 1)) + min;
+                // --- 新增：在对话发送完后，处理轮数记录 (同时防异步覆盖) ---
+                let endContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+                let endIdx = endContacts.findIndex(c => c.id === currentChatContactId);
+                if (endIdx > -1) {
+                    endContacts[endIdx].turnCount = (endContacts[endIdx].turnCount || 0) + 1;
+                    // 如果本轮触发了撤回，重置计数器，并生成下次的目标轮数
+                    if (hasRecallHappened) {
+                        endContacts[endIdx].turnCount = 0;
+                        if (endContacts[endIdx].autoRecallEnabled) {
+                            const min = endContacts[endIdx].autoRecallMin || 20;
+                            const max = endContacts[endIdx].autoRecallMax || 50;
+                            endContacts[endIdx].targetRecallTurn = Math.floor(Math.random() * (max - min + 1)) + min;
+                        }
                     }
+                    localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(endContacts));
                 }
-                localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
                 // --- 新增结束 ---
 
             }
-            // ▲▲▲▲▲【 新逻辑结束 】▲▲▲▲▲
 
         } catch (e) {
-
             showToast("AI 回复失败: " + e.message, 4000);
             console.error("AI Reply Error:", e);
         } finally {
