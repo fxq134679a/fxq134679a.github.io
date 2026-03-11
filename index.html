@@ -7,6 +7,93 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>iOS Home Screen</title>
     <style>
+        /* ========================= 外卖详情页：Tabs & 双栏菜单 ========================= */
+        .takeout-shop-tabs {
+            display: flex; background: #fff; border-bottom: 1px solid #f0f0f0;
+            padding: 0 20px; flex-shrink: 0;
+        }
+        .takeout-shop-tab {
+            padding: 15px 20px; font-size: 15px; color: #666; cursor: pointer;
+            position: relative; transition: color 0.2s; font-weight: 500;
+        }
+        .takeout-shop-tab.active {
+            color: var(--takeout-primary-color); font-weight: bold;
+        }
+        .takeout-shop-tab.active::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 3px; background: var(--takeout-primary-color); border-radius: 2px;
+        }
+
+        .takeout-shop-content-area {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff;
+        }
+        
+        .takeout-shop-view {
+            display: none; height: 100%; width: 100%;
+        }
+        .takeout-shop-view.active {
+            display: flex;
+        }
+
+        /* 点菜双栏布局 */
+        .takeout-shop-sidebar {
+            width: 85px; background: #f7f8fa; overflow-y: auto; flex-shrink: 0;
+        }
+        .takeout-shop-sidebar::-webkit-scrollbar { display: none; }
+        
+        .takeout-shop-category {
+            padding: 18px 10px; text-align: center; font-size: 13px; color: #555;
+            cursor: pointer; transition: all 0.2s; line-height: 1.3;
+        }
+        .takeout-shop-category.active {
+            background: #fff; color: #333; font-weight: bold;
+        }
+
+        .takeout-shop-menu-main {
+            flex: 1; overflow-y: auto; padding: 0 15px 80px 15px; background: #fff; scroll-behavior: smooth;
+        }
+        .takeout-shop-menu-main::-webkit-scrollbar { display: none; }
+
+        .takeout-category-section {
+            padding-top: 15px;
+        }
+        .takeout-category-title {
+            font-size: 14px; font-weight: bold; color: #333; margin-bottom: 15px;
+        }
+
+        .takeout-shop-dish-card {
+            display: flex; margin-bottom: 20px; gap: 12px;
+        }
+        .takeout-dish-emoji {
+            width: 85px; height: 85px; border-radius: 12px; background: #f9f9f9;
+            display: flex; justify-content: center; align-items: center; font-size: 45px;
+            flex-shrink: 0; border: 1px solid #eee;
+        }
+        .takeout-dish-info {
+            flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-width: 0;
+        }
+        .takeout-dish-name {
+            font-size: 15px; font-weight: bold; color: #333;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .takeout-dish-sales {
+            font-size: 11px; color: #999; margin-top: 4px;
+        }
+        .takeout-dish-price-bar {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 5px;
+        }
+        .takeout-dish-price {
+            font-size: 18px; font-weight: bold; color: #ff5000;
+        }
+        .takeout-dish-price::before {
+            content: '¥'; font-size: 12px; margin-right: 2px;
+        }
+        .takeout-dish-add-btn {
+            width: 24px; height: 24px; background: var(--takeout-primary-color);
+            color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 18px; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .takeout-dish-add-btn:active { transform: scale(0.9); }
         /* --- 全局重置与基础样式 --- */
                 :root {
              --clock-text-color: #FFFFFF; /* 新增：时间字体颜色变量 */
@@ -2029,10 +2116,11 @@
 
         #worldbook-bind-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); z-index: 900; /* MODIFIED: Increased z-index */ backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.4); z-index: 3000; /* 解决被其他高层级弹窗挡住的问题 */ backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
+
         #worldbook-bind-modal.active { opacity: 1; pointer-events: auto; }
         .wb-bind-modal-card {
             background: white;
@@ -4460,6 +4548,218 @@
         #takeout-app-page .image-upload-container { display: flex; justify-content: center; margin-bottom: 20px;}
         #takeout-app-page .image-preview { width: 120px; height: 120px; object-fit: cover; border-radius: var(--takeout-border-radius-l); cursor: pointer; border: 2px dashed var(--takeout-primary-color); }
         #takeout-app-page .image-preview.round { border-radius: 50%; }
+        /* --- 新增：外卖商家列表样式 --- */
+        .takeout-shop-item {
+            display: flex;
+            background-color: var(--takeout-white-color);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .takeout-shop-item:active {
+            transform: scale(0.98);
+        }
+        .shop-emoji-box {
+            width: 75px;
+            height: 75px;
+            background-color: #f7f7f7;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            flex-shrink: 0;
+            border: 1px solid #eee;
+        }
+        .shop-info {
+            margin-left: 12px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
+        }
+        .shop-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 60px; /* 给右边的距离留出空间 */
+        }
+        .shop-meta {
+            display: flex;
+            align-items: center;
+            margin-top: 6px;
+            font-size: 12px;
+        }
+        .shop-rating {
+            color: #ff6b00; /* 橘色评分 */
+            font-weight: bold;
+            font-size: 13px;
+            margin-right: 10px;
+        }
+        .shop-sales {
+            color: #888;
+        }
+        .shop-delivery {
+            font-size: 11px;
+            color: #666;
+            margin-top: 6px;
+        }
+        .shop-tags {
+            margin-top: 8px;
+        }
+        .shop-coupon {
+            display: inline-block;
+            color: #ff4a4a; /* 红色神券 */
+            border: 1px solid #ff4a4a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            background-color: #fff0f0;
+        }
+        .shop-distance {
+            position: absolute;
+            right: 15px;
+            top: 18px;
+            font-size: 11px;
+            color: #999;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        /* --- 新增：外卖评价页面专属样式 --- */
+        .takeout-review-container {
+            display: flex; flex-direction: column; height: 100%; width: 100%; background: #f7f8fa;
+        }
+        .takeout-review-filters {
+            display: flex; gap: 10px; padding: 15px; background: #fff; border-bottom: 1px solid #eee; flex-shrink: 0;
+        }
+        .takeout-filter-btn {
+            padding: 6px 12px; background: #fff0f0; color: #666; border-radius: 16px; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+        }
+        .takeout-filter-btn.active {
+            background: #ffe6eb; color: var(--takeout-primary-color); border-color: var(--takeout-primary-color); font-weight: bold;
+        }
+        .takeout-review-list {
+            flex: 1; overflow-y: auto; padding: 15px 15px 80px 15px; background: #fff; scroll-behavior: smooth;
+        }
+        .takeout-review-list::-webkit-scrollbar { display: none; }
+        .takeout-review-item {
+            display: flex; margin-bottom: 20px; border-bottom: 1px solid #f9f9f9; padding-bottom: 15px;
+        }
+        .takeout-review-avatar {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; flex-shrink: 0; background: #eee;
+        }
+        .takeout-review-content-area {
+            flex: 1; min-width: 0;
+        }
+        .takeout-review-name {
+            font-size: 14px; color: #333; margin-bottom: 4px; font-weight: 500;
+        }
+        .takeout-review-stars {
+            display: flex; align-items: center; margin-bottom: 8px; height: 14px;
+        }
+        .takeout-review-star-img {
+            width: 12px; height: 12px; object-fit: contain; margin-right: 2px;
+        }
+        .takeout-review-bad-text {
+            font-size: 12px; color: #999; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; line-height: 1;
+        }
+        .takeout-review-text {
+            font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 10px; word-break: break-all;
+        }
+        .takeout-review-dish {
+            display: inline-flex; align-items: center; font-size: 11px; color: #666; background: #f5f5f5; padding: 4px 10px; border-radius: 6px;
+        }
+        .takeout-review-dish span { color: #ff5000; margin-left: 4px; }
+
+        /* 外卖“我的”页面及收藏样式 */
+        .takeout-me-profile {
+            display: flex; align-items: center; background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative;
+        }
+        /* 将原来的 .takeout-me-profile img 改为精准定位头像，防止误伤设置图标 */
+        #takeout-my-avatar {
+            width: 65px; height: 65px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #f0f0f0;
+        }
+        .takeout-me-profile span {
+            font-size: 18px; font-weight: 600; color: #333; flex: 1;
+        }
+        .takeout-me-setting-icon {
+            width: 24px !important; height: 24px !important; border: none !important; border-radius: 0 !important; object-fit: contain; cursor: pointer;
+        }
+
+        .takeout-me-fav-section {
+            background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .takeout-me-fav-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        }
+        .takeout-me-fav-title {
+            font-size: 16px; font-weight: bold; color: #333;
+        }
+        .takeout-me-fav-more {
+            font-size: 13px; color: #999; cursor: pointer;
+        }
+        .takeout-me-fav-grid {
+            display: flex; gap: 12px;
+        }
+        .takeout-me-fav-item {
+            width: calc((100% - 24px) / 3); aspect-ratio: 1/1; background: #f9f9f9; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 36px; cursor: pointer; border: 1px solid #eee; transition: transform 0.2s; overflow: hidden;
+        }
+        .takeout-me-fav-item:active { transform: scale(0.95); }
+        .takeout-me-fav-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 外卖收藏列表页 */
+        #takeout-favorite-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #f7f8fa; z-index: 556; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+        }
+        #takeout-favorite-page.active { transform: translateX(0); }
+        body.ios-mode-active #takeout-favorite-page .takeout-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.phone-frame-active #takeout-favorite-page .takeout-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
+
+        /* 外卖底部购物车结算栏 */
+        .takeout-cart-footer {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 65px;
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+            border-top: 1px solid #f0f0f0; display: flex; align-items: center; padding: 0 15px 0 90px;
+            z-index: 1000; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .takeout-cart-footer.active { transform: translateY(0); }
+        .takeout-cart-icon {
+            position: absolute; left: 15px; bottom: 8px; width: 60px; height: 60px; object-fit: contain; z-index: 1001;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+        }
+        .takeout-cart-info { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+        .takeout-cart-price-row { display: flex; align-items: baseline; gap: 4px; }
+        .takeout-cart-total { font-size: 26px; font-weight: bold; color: #ff4a4a; line-height: 1; }
+        .takeout-cart-total::before { content: '¥ '; font-size: 14px; margin-right: 2px; font-weight: 500; }
+        .takeout-cart-discount { font-size: 12px; color: #ff4a4a; white-space: nowrap; margin-left: 4px; }
+        .takeout-cart-delivery { font-size: 11px; color: #888; margin-top: 4px; }
+        .takeout-cart-btn {
+            background-color: #fdf0ba; /* 淡黄色 */ color: #333; border: none; padding: 12px 18px; border-radius: 25px;
+            font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; white-space: nowrap; margin-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .takeout-cart-btn.ready { background-color: #ffd100; /* 凑满后的明黄色 */ color: #333; }
+        
+        /* 数量加减控制器 */
+        .takeout-dish-qty-ctrl { display: flex; align-items: center; gap: 8px; }
+        .takeout-dish-qty-btn {
+            width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; user-select: none;
+        }
+        .takeout-dish-qty-minus { border: 1px solid #ddd; color: #666; background: #fff; }
+        .takeout-dish-qty-plus { background: var(--takeout-primary-color); color: #fff; border: none; }
+        .takeout-dish-qty-num { font-size: 14px; font-weight: 500; color: #333; min-width: 16px; text-align: center; }
+
         /* --- END: 外卖 App Styles --- */
 /* --- NEW: Mall Page switching & Cart Page Styles --- */
 .mall-page {
@@ -4855,6 +5155,7 @@ body.phone-frame-active #mall-favorite-page .mall-favorite-header {
 .mall-favorite-footer .delete-btn { background: #ffebee; color: #F44336; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 600; cursor: pointer; }
 
 /* ========================= 新增：已购买页面样式 ========================= */
+/* ========================= 新增：已购买页面样式 ========================= */
 #mall-purchased-page {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background-color: #f7f7f7; z-index: 556;
@@ -4872,6 +5173,96 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 .manage-mode .purchased-item-checkbox { display: flex; }
 .purchased-item-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
 .purchased-item-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+
+/* ========================= 新增：送出的物品页面样式 ========================= */
+#mall-sent-gifts-page {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #f7f7f7; z-index: 556;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+#mall-sent-gifts-page.active { transform: translateX(0); }
+body.ios-mode-active #mall-sent-gifts-page .mall-favorite-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+body.phone-frame-active #mall-sent-gifts-page .mall-favorite-header { padding-top: calc(15px + var(--status-bar-height)); }
+#mall-purchased-page {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #f7f7f7; z-index: 556;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+#mall-purchased-page.active { transform: translateX(0); }
+body.ios-mode-active #mall-purchased-page .mall-favorite-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top: calc(15px + var(--status-bar-height)); }
+
+.purchased-item-checkbox {
+    display: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd;
+    justify-content: center; align-items: center; transition: all 0.2s; cursor: pointer; background: white;
+}
+.manage-mode .purchased-item-checkbox { display: flex; }
+.purchased-item-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
+.purchased-item-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+        /* ========================= 新增：外卖商家详情页 ========================= */
+        #takeout-shop-detail-page {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #f7f7f7;
+            z-index: 555; /* 确保盖在外卖列表页上方 */
+            display: flex; flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+        }
+        #takeout-shop-detail-page.active {
+            transform: translateX(0);
+        }
+        .takeout-detail-header {
+            padding: 35px 20px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            background-color: #fff; flex-shrink: 0;
+            border-bottom: 1px solid #eee;
+        }
+        body.ios-mode-active #takeout-shop-detail-page .takeout-detail-header {
+            padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
+        }
+        body.phone-frame-active #takeout-shop-detail-page .takeout-detail-header,
+        body.tablet-mode-active #takeout-shop-detail-page .takeout-detail-header {
+            padding-top: calc(15px + var(--status-bar-height));
+        }
+        .takeout-detail-header .back-btn {
+            width: 30px; height: 30px; object-fit: contain; cursor: pointer;
+        }
+        .takeout-detail-header .fav-btn {
+            width: 28px; height: 28px; object-fit: contain; cursor: pointer; transition: transform 0.2s;
+        }
+        .takeout-detail-header .fav-btn:active { transform: scale(0.8); }
+
+        .takeout-shop-top-info {
+            display: flex; padding: 25px 20px; background: #fff; gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .takeout-shop-top-img {
+            width: 85px; height: 85px; border-radius: 12px; background: #f9f9f9;
+            display: flex; justify-content: center; align-items: center; font-size: 45px;
+            flex-shrink: 0; border: 1px solid #eee;
+        }
+        .takeout-shop-top-right {
+            flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0;
+        }
+        .takeout-shop-top-name {
+            font-size: 19px; font-weight: bold; color: #333; margin-bottom: 18px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .takeout-shop-data-modules {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .takeout-shop-data-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        .takeout-shop-data-label {
+            font-size: 11px; color: #888;
+        }
+        .takeout-shop-data-value {
+            font-size: 16px; font-weight: bold; color: #333;
+        }
 
     </style>
 </head>
@@ -5458,33 +5849,42 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     <div class="takeout-header">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="takeout-back-btn" onclick="closeTakeoutApp()">
         <div class="takeout-title" id="takeout-top-bar-title">商家</div>
-        <img id="takeout-search-btn" src="https://img.heliar.top/file/1773227369973_搜索_search.png" style="width: 24px; height: 24px; object-fit: contain; cursor: pointer;" onclick="showToast('搜索功能待开发')">
+        <div style="display:flex; align-items:center; gap:15px; z-index:2;">
+            <img id="takeout-create-shop-btn" src="https://img.heliar.top/file/1773240700290_汉堡_hamburger-one.png" style="width: 26px; height: 26px; object-fit: contain; cursor: pointer;" onclick="openCreateTakeoutShopModal()">
+            <img id="takeout-search-btn" src="https://img.heliar.top/file/1773227369973_搜索_search.png" style="width: 24px; height: 24px; object-fit: contain; cursor: pointer;" onclick="refreshTakeoutShops()">
+        </div>
     </div>
 
     <div class="takeout-content-wrapper">
-        <div id="takeout-page-order" class="page active">
-            <!-- 内容已清空 -->
-            <div style="text-align: center; color: #999; padding-top: 100px; font-size: 14px;">附近暂无商家~</div>
+        <div id="takeout-page-order" class="page active" style="padding: 10px;">
+            <div id="takeout-shop-list-container">
+                <div style="text-align: center; color: #999; padding-top: 100px; font-size: 14px;">附近暂无商家，点击右上角搜索按钮刷新~</div>
+            </div>
         </div>
         <div id="takeout-page-menu" class="page"><div id="takeout-menu-list"></div></div>
         <div id="takeout-page-my" class="page">
-            <div class="my-profile">
-                <div class="my-avatar-wrapper" onclick="document.getElementById('takeout-avatar-upload-input').click()">
-                    <img id="takeout-my-avatar-img" src="https://img.zcool.cn/community/01f0835ab4170ea8012062e3c351cf.png@260w_195h_1c_1e_1o_100sh.png" alt="avatar" class="my-avatar">
-                </div>
-                <input type="file" id="takeout-avatar-upload-input" accept="image/*" style="display: none;">
-                <div id="takeout-my-id-display">尚未生成ID</div>
-                <button id="takeout-get-my-id-btn" class="button">获取我的ID</button>
+            <div class="takeout-me-profile">
+                <img id="takeout-my-avatar" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png">
+                <span id="takeout-my-nickname">外卖吃货</span>
+                <img src="https://img.heliar.top/file/1772475392914_设置_setting-two_2.png" class="takeout-me-setting-icon" onclick="openTakeoutProfileModal()">
             </div>
-            <div class="card"><h2>绑定好友</h2><div id="takeout-bind-status" class="status-text" style="margin-top:0; margin-bottom:15px;">当前未绑定好友</div><div class="input-group"><input type="number" id="takeout-friend-id-input" placeholder="输入好友ID"><button id="takeout-bind-friend-btn" class="button">绑定</button></div></div>
-            <div class="card"><h2>数据管理</h2><div class="modal-actions"><button id="takeout-import-data-btn" class="button secondary" onclick="document.getElementById('takeout-import-file-input').click()">导入数据</button><button id="takeout-export-data-btn" class="button secondary">导出数据</button></div><input type="file" id="takeout-import-file-input" accept=".json" style="display:none;"></div>
+            
+            <div class="takeout-me-fav-section">
+                <div class="takeout-me-fav-header">
+                    <div class="takeout-me-fav-title">我的收藏</div>
+                    <div class="takeout-me-fav-more" onclick="openTakeoutFavPage()">查看更多 ></div>
+                </div>
+                <div class="takeout-me-fav-grid" id="takeout-me-fav-grid">
+                    <!-- JS动态生成三个Emoji方块 -->
+                </div>
+            </div>
         </div>
     </div>
     
-        <nav class="bottom-nav">
+    <nav class="bottom-nav">
         <button class="nav-item active" data-page="takeout-page-order"><svg viewBox="0 0 24 24"><path d="M16 6V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H2v13c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6h-6zm-6-2h4v2h-4V4zM4 8h16v11H4V8zm2 1v3h3V9H6zm5 0v3h3V9h-3zm5 0v3h3V9h-3z"></path></svg><span>商家</span></button>
-        <button class="nav-item" data-page="takeout-page-menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg><span>菜单</span></button>
-    <button class="nav-item" data-page="takeout-page-my"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg><span>我的</span></button>
+        <button class="nav-item" data-page="takeout-page-menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg><span>订单</span></button>
+        <button class="nav-item" data-page="takeout-page-my"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg><span>我的</span></button>
     </nav>
     
     <div id="takeout-dish-detail-modal" class="modal"><div class="modal-content"><button class="close-modal-btn">&times;</button><img id="takeout-dish-detail-image" src=""><h3 id="takeout-dish-detail-name"></h3><h4>制作步骤</h4><div id="takeout-dish-detail-steps" class="steps-content"></div></div></div>
@@ -5505,8 +5905,133 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
+    <!-- 创建外卖店铺弹窗 -->
+    <div id="create-takeout-shop-modal" class="delete-confirm-modal" style="z-index: 1000;">
+        <div class="wb-modal-card" onclick="event.stopPropagation()">
+          <div class="wb-modal-header" style="color: var(--takeout-primary-color);">创建外卖店铺</div>
+            <div class="wb-modal-scroll-area" style="padding-top: 5px;">
+                <div class="create-forum-avatar-upload" style="margin: 0 auto 15px; width: 85px; height: 85px; border-radius: 12px; background: #f9f9f9; border: 1px dashed var(--takeout-primary-color);" onclick="document.getElementById('input-takeout-shop-avatar').click()">
+                    <span id="takeout-shop-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:30px;">+</span>
+                    <img id="takeout-shop-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; border-radius:12px;">
+                </div>
+                <input type="text" id="takeout-create-name" class="wb-main-input" placeholder="店铺名称" style="border-color: #eee;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="number" id="takeout-create-rating" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="评分 (如: 4.8)" step="0.1" max="5">
+                    <input type="number" id="takeout-create-sales" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="月售量 (如: 2000)">
+                    <input type="number" id="takeout-create-time" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="配送时间(分钟)">
+                    <input type="number" id="takeout-create-distance" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="距离(km)" step="0.1">
+                </div>
+                <!-- 新增：店铺内容输入框和绑定角色区 -->
+                <textarea id="takeout-create-desc" class="wb-entry-input val" style="min-height: 80px; width: 100%; border: 1px solid #eee; background: #f9f9f9; margin-bottom: 10px; padding: 10px; font-size: 14px;" placeholder="填写店铺内容"></textarea>
+                <div id="takeout-create-role-selection-display" style="width: 100%; padding: 10px; font-size: 13px; color: #999; background-color: #f9f9f9; border-radius: 8px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 10px; border: 1px solid #eee;">未绑定角色</div>
+                <button class="create-forum-wb-btn" style="background: var(--takeout-primary-color); color: white; opacity: 0.8; margin-bottom: 5px;" onclick="openTakeoutShopRoleBindModal()">绑定角色 (可选)</button>
+            </div>
+            <div class="wb-modal-actions" style="margin-top: 5px;">
+                <button class="wb-action-btn wb-btn-cancel" onclick="closeCreateTakeoutShopModal()">取消</button>
+                <button class="wb-action-btn wb-btn-ok" style="background:var(--takeout-primary-color); color:white;" onclick="saveNewTakeoutShop()">创建</button>
+            </div>
+        </div>
+    </div>
+    <!-- 新增：修改外卖个人资料弹窗 -->
+    <div id="takeout-profile-modal" class="delete-confirm-modal" style="z-index: 1000;">
+        <div class="delete-card" onclick="event.stopPropagation()">
+            <div class="delete-card-title">修改外卖资料</div>
+            <div class="create-forum-avatar-upload" style="margin: 0 auto 15px; width: 80px; height: 80px; border-radius: 50%;" onclick="document.getElementById('input-takeout-my-avatar').click()">
+                <span id="takeout-my-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:30px;">+</span>
+                <img id="takeout-my-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; border-radius:50%;">
+            </div>
+            <input type="text" id="takeout-my-nickname-input" class="add-friend-input" placeholder="外卖昵称">
+            <div class="delete-card-actions" style="margin-top: 20px;">
+                <button class="delete-card-btn btn-cancel" onclick="closeTakeoutProfileModal()">取消</button>
+                <button class="delete-card-btn wb-btn-ok" style="background:var(--takeout-primary-color); color:white;" onclick="saveTakeoutProfile()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增：全部收藏列表页 -->
+    <div id="takeout-favorite-page">
+        <div class="takeout-detail-header">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeTakeoutFavPage()">
+            <div class="takeout-title" style="font-size: 18px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%);">全部收藏</div>
+            <div style="width: 30px;"></div>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 15px;" id="takeout-favorite-list-container">
+            <!-- 渲染收藏的店铺列表 -->
+        </div>
+    </div>
 <!-- *** END: Takeout App *** -->
 
+<!-- ========================= 新增：外卖商家详情页 ========================= -->
+<div id="takeout-shop-detail-page">
+    <div class="takeout-detail-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeTakeoutShopDetail()">
+        <img src="https://img.heliar.top/file/1773236036735_星星_star.png" class="fav-btn" id="takeout-shop-fav-btn" onclick="toggleTakeoutShopFav()">
+    </div>
+    <div class="takeout-detail-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+        <!-- 头部数据区 -->
+        <div class="takeout-shop-top-info">
+            <div class="takeout-shop-top-img" id="takeout-shop-detail-emoji">🍔</div>
+            <div class="takeout-shop-top-right">
+                <div class="takeout-shop-top-name" id="takeout-shop-detail-name">加载中...</div>
+                <div class="takeout-shop-data-modules">
+                    <div class="takeout-shop-data-item">
+                        <span class="takeout-shop-data-label">评分</span>
+                        <span class="takeout-shop-data-value" id="takeout-shop-detail-rating">-</span>
+                    </div>
+                    <div class="takeout-shop-data-item">
+                        <span class="takeout-shop-data-label">月售</span>
+                        <span class="takeout-shop-data-value" id="takeout-shop-detail-sales">-</span>
+                    </div>
+                    <div class="takeout-shop-data-item">
+                        <span class="takeout-shop-data-label">配送时效</span>
+                        <span class="takeout-shop-data-value" id="takeout-shop-detail-time">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs区 -->
+        <div class="takeout-shop-tabs">
+            <div class="takeout-shop-tab active" onclick="switchTakeoutShopTab('order')">点菜</div>
+            <div class="takeout-shop-tab" onclick="switchTakeoutShopTab('review')">评价</div>
+        </div>
+
+        <!-- 内容区（包含点菜双栏） -->
+        <div class="takeout-shop-content-area">
+            <!-- 点菜视图 -->
+            <div id="takeout-view-order" class="takeout-shop-view active">
+                <div class="takeout-shop-sidebar" id="takeout-shop-sidebar">
+                    <!-- 左侧分类列表将在这里生成 -->
+                </div>
+                <div class="takeout-shop-menu-main" id="takeout-shop-menu-main">
+                    <!-- 右侧菜品列表将在这里生成 -->
+                    <div style="text-align:center; padding-top:50px; color:#999; font-size:13px;" id="takeout-menu-loading">
+                        老板正在为您手写菜单，请稍候...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 评价视图 (暂留空占位) -->
+            <div id="takeout-view-review" class="takeout-shop-view" style="flex-direction: column; justify-content: center; align-items: center; color: #ccc;">
+                <div style="font-size: 40px; margin-bottom: 10px;">💬</div>
+                <div>还没有人写评价哦~</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 动态结算底栏 -->
+    <div class="takeout-cart-footer" id="takeout-cart-footer">
+        <img src="https://img.heliar.top/file/1773259861321_IMG_5037.png" class="takeout-cart-icon">
+        <div class="takeout-cart-info">
+            <div class="takeout-cart-price-row">
+                <span class="takeout-cart-total" id="takeout-cart-total-price">0.00</span>
+                <span class="takeout-cart-discount" id="takeout-cart-discount-text">共减¥ 0</span>
+            </div>
+            <div class="takeout-cart-delivery" id="takeout-cart-delivery-text">配送费¥ 0</div>
+        </div>
+        <button class="takeout-cart-btn" id="takeout-cart-submit-btn">差¥0起送</button>
+    </div>
+</div>
 
 <!-- Wallet Recharge Modal -->
 <div id="wallet-add-modal">
@@ -6123,7 +6648,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                         <span>已购买</span>
                     </div>
 
-                    <div class="order-icon-item" onclick="showToast('送出的物品待开发')">
+                    <div class="order-icon-item" onclick="openMallSentGiftsPage()">
                         <img src="https://img.heliar.top/file/1772473602219_关注_concern.png">
                         <span>送出的物品</span>
                     </div>
@@ -6399,6 +6924,50 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
+<!-- ========================= 新增：已购买商品页面 ========================= -->
+<div id="mall-purchased-page">
+    <div class="mall-favorite-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallPurchasedPage()">
+        <div class="mall-favorite-title">购买的商品</div>
+        <div style="position:absolute; right:20px; display:flex; align-items:center; gap:15px;">
+            <img id="mall-purchased-gift-btn" src="https://img.heliar.top/file/1773086327829_礼物_gift_2.png" style="width:24px; height:24px; cursor:pointer; display:none;" onclick="sendSelectedGifts()">
+            <img id="mall-purchased-delete-btn" src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" style="width:24px; height:24px; cursor:pointer;" onclick="togglePurchasedManageMode()">
+        </div>
+
+    </div>
+
+    <div class="mall-favorite-content" id="mall-purchased-content">
+        <!-- 购买列表将渲染在这里 -->
+    </div>
+    <div class="mall-favorite-footer" id="mall-purchased-footer">
+        <div class="select-all-btn" onclick="toggleSelectAllPurchased()">
+            <div class="purchased-item-checkbox" id="purchased-select-all-checkbox" style="position:static; display:flex;"></div>
+            <span>全选</span>
+        </div>
+        <button class="delete-btn" onclick="deleteSelectedPurchased()">删除</button>
+    </div>
+</div>
+
+<!-- ========================= 新增：送出的物品页面 ========================= -->
+<div id="mall-sent-gifts-page">
+    <div class="mall-favorite-header">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeMallSentGiftsPage()">
+        <div class="mall-favorite-title">送出的物品</div>
+        <div style="position:absolute; right:20px; display:flex; align-items:center; gap:15px;">
+            <img id="mall-sent-gifts-delete-btn" src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" style="width:24px; height:24px; cursor:pointer;" onclick="toggleSentGiftsManageMode()">
+        </div>
+    </div>
+    <div class="mall-favorite-content" id="mall-sent-gifts-content">
+        <!-- 送出物品列表将渲染在这里 -->
+    </div>
+    <div class="mall-favorite-footer" id="mall-sent-gifts-footer">
+        <div class="select-all-btn" onclick="toggleSelectAllSentGifts()">
+            <div class="purchased-item-checkbox" id="sent-gifts-select-all-checkbox" style="position:static; display:flex;"></div>
+            <span>全选</span>
+        </div>
+        <button class="delete-btn" onclick="deleteSelectedSentGifts()">删除记录</button>
+    </div>
+</div>
 <!-- ================= 补回：回忆详情页 ================= -->
 <div id="recollection-detail-page">
     <div class="recollection-detail-header">
@@ -6454,7 +7023,12 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 <input type="file" id="input-forum-me-bg" class="file-input-hidden" accept="image/*" onchange="handleForumMeBgUpload(event)">
 <input type="file" id="input-moments-avatar" class="file-input-hidden" accept="image/*" onchange="handleMomentsAvatarUpload(event)">
 <input type="file" id="input-moments-cover" class="file-input-hidden" accept="image/*" onchange="handleMomentsCoverUpload(event)">
+<input type="file" id="input-takeout-shop-avatar" class="file-input-hidden" accept="image/*" onchange="handleTakeoutShopAvatarUpload(event)">
+<!-- 新增这一行： -->
+<input type="file" id="input-takeout-my-avatar" class="file-input-hidden" accept="image/*" onchange="handleTakeoutMyAvatarUpload(event)">
+
 </div> 
+
 <input type="file" id="import-backup-input" class="file-input-hidden" accept=".json" onchange="importBackup(event)">
 
 <!-- 手机外框结构 -->
@@ -6832,7 +7406,10 @@ window.sendSelectedGifts = () => {
     const key = getMessagesKey(currentChatContactId);
     let messages = JSON.parse(localStorage.getItem(key) || '[]');
     
-    // 把送出的每个商品，作为单独的卡片发出
+    // 新增：提取“送出的物品”库
+    let sentGifts = getMallSentGifts();
+    
+    // 把送出的每个商品，作为单独的卡片发出，并同时写入送出记录
     giftItems.forEach((item, index) => {
         messages.push({
             id: Date.now() + index,
@@ -6842,8 +7419,19 @@ window.sendSelectedGifts = () => {
             text: `[送出礼物：${item.name}]`, // 这个是给列表页预览用的文本
             timestamp: Date.now() + index
         });
+        
+        // 追加到“送出的物品”中
+        sentGifts.unshift({
+            ...item,
+            sentGiftId: Date.now().toString() + index, // 给出一个独立的送礼ID
+            sentToId: currentChatContactId, // 记录送给了哪个角色
+            sentTime: Date.now()
+        });
     });
     localStorage.setItem(key, JSON.stringify(messages));
+    
+    // 新增：保存送出物品的记录
+    saveMallSentGifts(sentGifts);
     
     let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
     const idx = contacts.findIndex(c => c.id === currentChatContactId);
@@ -6859,13 +7447,146 @@ window.sendSelectedGifts = () => {
     renderConversationMessages();
     showToast("礼物已送出！");
     
-    setTimeout(() => {
-        if (typeof triggerAIAutoReply === 'function') {
-            triggerAIAutoReply();
-        }
-    }, 1500);
+    // 已删除这里的自动触发AI回复代码，现在需要手动点击发送按钮才会回复
+};
+// ========================= 新增：送出的物品逻辑 =========================
+const MALL_SENT_GIFTS_KEY = 'mallSentGiftsData_v1';
+let isSentGiftsManageMode = false;
+let selectedSentGiftsIds = new Set();
+
+function getMallSentGifts() {
+    try { return JSON.parse(localStorage.getItem(MALL_SENT_GIFTS_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveMallSentGifts(data) { localStorage.setItem(MALL_SENT_GIFTS_KEY, JSON.stringify(data)); }
+
+window.openMallSentGiftsPage = () => {
+    isSentGiftsManageMode = false;
+    selectedSentGiftsIds.clear();
+    document.getElementById('mall-sent-gifts-content').classList.remove('manage-mode');
+    document.getElementById('mall-sent-gifts-footer').classList.remove('active');
+    
+    renderSentGifts();
+    document.getElementById('mall-sent-gifts-page').classList.add('active');
 };
 
+window.closeMallSentGiftsPage = () => {
+    document.getElementById('mall-sent-gifts-page').classList.remove('active');
+};
+
+window.toggleSentGiftsManageMode = () => {
+    const gifts = getMallSentGifts();
+    if(gifts.length === 0) { showToast("暂无记录可管理"); return; }
+    isSentGiftsManageMode = !isSentGiftsManageMode;
+    if(isSentGiftsManageMode) {
+        document.getElementById('mall-sent-gifts-content').classList.add('manage-mode');
+        document.getElementById('mall-sent-gifts-footer').classList.add('active');
+    } else {
+        document.getElementById('mall-sent-gifts-content').classList.remove('manage-mode');
+        document.getElementById('mall-sent-gifts-footer').classList.remove('active');
+        selectedSentGiftsIds.clear();
+    }
+    renderSentGifts();
+};
+
+window.toggleSentGiftsSelection = (id, checkboxEl) => {
+    id = String(id);
+    if(selectedSentGiftsIds.has(id)) {
+        selectedSentGiftsIds.delete(id);
+        if(checkboxEl) checkboxEl.classList.remove('checked');
+    } else {
+        selectedSentGiftsIds.add(id);
+        if(checkboxEl) checkboxEl.classList.add('checked');
+    }
+    updateSentGiftsSelectAllCheckbox();
+};
+
+window.toggleSelectAllSentGifts = () => {
+    const gifts = getMallSentGifts();
+    if(selectedSentGiftsIds.size === gifts.length) {
+        selectedSentGiftsIds.clear();
+    } else {
+        gifts.forEach(g => selectedSentGiftsIds.add(String(g.sentGiftId || g.id)));
+    }
+    updateSentGiftsSelectAllCheckbox();
+    renderSentGifts();
+};
+
+function updateSentGiftsSelectAllCheckbox() {
+    const gifts = getMallSentGifts();
+    const selectAllBox = document.getElementById('sent-gifts-select-all-checkbox');
+    if (gifts.length > 0 && selectedSentGiftsIds.size === gifts.length) {
+        selectAllBox.classList.add('checked');
+    } else {
+        selectAllBox.classList.remove('checked');
+    }
+}
+
+window.deleteSelectedSentGifts = () => {
+    if(selectedSentGiftsIds.size === 0) { showToast("请先选择记录"); return; }
+    
+    let gifts = getMallSentGifts();
+    gifts = gifts.filter(g => !selectedSentGiftsIds.has(String(g.sentGiftId || g.id)));
+    saveMallSentGifts(gifts);
+    selectedSentGiftsIds.clear();
+    showToast("删除成功");
+    
+    if(gifts.length === 0) {
+        isSentGiftsManageMode = false;
+        document.getElementById('mall-sent-gifts-content').classList.remove('manage-mode');
+        document.getElementById('mall-sent-gifts-footer').classList.remove('active');
+    }
+    renderSentGifts();
+};
+
+function renderSentGifts() {
+    const container = document.getElementById('mall-sent-gifts-content');
+    const gifts = getMallSentGifts();
+    if(gifts.length === 0) {
+        container.innerHTML = `<div class="cart-empty-state"><p>还没有送出过物品哦</p></div>`;
+        return;
+    }
+
+    // 获取角色列表用于展示收礼人名字
+    const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+
+    const itemsHtml = gifts.map(item => {
+        const uniqueId = String(item.sentGiftId || item.id);
+        const isChecked = selectedSentGiftsIds.has(uniqueId);
+        
+        const contact = contacts.find(c => c.id === item.sentToId);
+        const receiverName = contact ? (contact.alias || contact.name) : '未知角色';
+        
+        const sendDate = new Date(item.sentTime || Date.now());
+        const dateStr = `${sendDate.getFullYear()}-${String(sendDate.getMonth()+1).padStart(2,'0')}-${String(sendDate.getDate()).padStart(2,'0')} ${String(sendDate.getHours()).padStart(2,'0')}:${String(sendDate.getMinutes()).padStart(2,'0')}`;
+
+        return `
+            <div class="cart-item-card" style="margin-bottom:12px;" onclick="if(isSentGiftsManageMode){ toggleSentGiftsSelection('${uniqueId}', this.querySelector('.purchased-item-checkbox')); }">
+                <div class="cart-item-select-zone" style="${isSentGiftsManageMode ? '' : 'display:none;'}">
+                    <div class="purchased-item-checkbox ${isChecked ? 'checked' : ''}"></div>
+                </div>
+                <div class="cart-item-info-zone">
+                    <div class="cart-product-core">
+                        <div class="cart-product-emoji">${item.emoji || '📦'}</div>
+                        <div class="cart-product-spec-wrapper">
+                            <div style="font-size:14px; font-weight:500; color:#333; margin-bottom:5px; line-height:1.4;">${escapeHtml(item.name)}</div>
+                            <div class="cart-product-spec"><span>款式: ${escapeHtml(item.style)}</span></div>
+                        </div>
+                    </div>
+                    <div class="cart-product-price-bar">
+                        <div style="font-size:12px; color:#999;">送给: <span style="color:#E58AAB; font-weight:bold;">${escapeHtml(receiverName)}</span></div>
+                        <div style="font-size:13px; color:#666; font-weight:bold;">x ${item.quantity}</div>
+                    </div>
+                    <div style="text-align:right; font-size:11px; color:#aaa; margin-top:5px; border-top:1px dashed #eee; padding-top:8px;">
+                        送出时间: ${dateStr}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = itemsHtml;
+    updateSentGiftsSelectAllCheckbox();
+}
 window.closeMallPurchasedPage = () => { document.getElementById('mall-purchased-page').classList.remove('active'); };
 
 window.togglePurchasedManageMode = () => {
@@ -7012,6 +7733,127 @@ function renderPurchasedProducts() {
     }
 
     // --- *** START: Takeout App Logic *** ---
+    // --- 新增：调用API生成外卖商家列表逻辑 ---
+    window.refreshTakeoutShops = async () => {
+        const container = document.getElementById('takeout-shop-list-container');
+        if (!container) return;
+
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        // 如果没有配置API，或者没填模型，直接退出并提示
+        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
+            showToast('请先在主页左下角设置中配置 API');
+            return;
+        }
+
+        // 添加旋转动画并显示加载提示
+        const searchBtn = document.getElementById('takeout-search-btn');
+        if (searchBtn) searchBtn.style.animation = 'spin 1s linear infinite';
+        container.innerHTML = '<div style="text-align: center; color: #999; padding-top: 100px; font-size: 14px;">正在搜寻附近好店，请稍候...</div>';
+
+        // 提供的连锁品牌
+        const chains = "曹氏鸭脖、肯德基、麦当劳、蜜雪冰城、喜茶、茶百道、古茗、霸王茶姬、沪上阿姨、CoCo都可、益禾堂、美宜佳、赵一鸣零食、永辉超市";
+        
+        const prompt = `你是一个外卖平台数据生成器。请模拟美团或饿了么，生成10个外卖店铺信息，并严格以JSON格式返回，封装在 "shops" 数组中。
+
+        要求：
+        1. 每次生成的10个店铺中，【必须】从以下连锁品牌中随机挑选 1 到 3 个加入：[${chains}]。
+        2. 【强制要求】：无论是连锁店还是你编造的店，【绝对不要】在店名后面添加任何"(XX店)"、"大学城店"或类似的地名后缀！直接输出纯净的店名即可。
+        3. 剩下的店铺由你自由发挥种类（如：湘菜、烧烤、麻辣烫、炸鸡、汉堡、轻食、奶茶等）。
+        4. 数据字段要求：
+           - name: 店铺名称（切记无括号无后缀！）
+           - emoji: 一个最能代表该店铺类型的美食Emoji表情（如🍔、🍢）
+           - rating: 评分，3.5到5.0之间的一位小数格式字符串（如 "4.8"）
+           - sales: 月售数量，整数，范围在0到8000之间
+           - minOrder: 起送价，整数
+           - deliveryFee: 配送费，整数
+           - condition: 神券满减门槛，整数
+           - discount: 神券减免金额，整数
+           - distance: 距离，一位小数的字符串（必须在 0.1 到 5.0 之间）
+           - time: 配送时长，整数（如 30, 45）
+           
+        输出格式示例：
+        {
+          "shops": [
+            {"name": "曹氏鸭脖", "emoji": "🦆", "rating": "4.7", "sales": 2300, "minOrder": 20, "deliveryFee": 2, "condition": 40, "discount": 10, "distance": "2.1", "time": 35}
+          ]
+        }
+        请直接输出JSON，不要包含任何Markdown标记。`;
+
+        try {
+            let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
+            const isGemini = settings.api.url.includes('generativelanguage');
+            let bodyData, headers = { 'Content-Type': 'application/json' };
+            
+            if (isGemini) {
+                fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
+                bodyData = JSON.stringify({ 
+                    contents: [{ parts: [{ text: prompt }] }], 
+                    generationConfig: { temperature: 0.8, response_mime_type: "application/json" } 
+                });
+            } else {
+                headers['Authorization'] = `Bearer ${settings.api.key}`;
+                bodyData = JSON.stringify({
+                    model: settings.api.model,
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.8,
+                    response_format: { "type": "json_object" }
+                });
+            }
+
+            const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
+            if (!res.ok) throw new Error(`API 请求失败: ${res.status}`);
+            
+            const data = await res.json();
+            
+            let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+            reply = reply.trim();
+            
+            // 兼容清除可能存在的 Markdown 标记
+            const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
+            if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
+
+            const jsonReply = JSON.parse(reply);
+            const generatedShops = jsonReply.shops || [];
+            
+            if (generatedShops.length === 0) throw new Error("解析到的店铺为空");
+
+            // --- 【修改：刷新时仅保留用户自定义店铺和最新生成的店铺，去除旧的AI店铺】 ---
+            let existingShops = [];
+            try { existingShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]'); } catch(e) { existingShops = []; }
+            
+            let customShops = existingShops.filter(s => s.isCustom === true); // 提取自定义的店铺，永久保留
+            
+            // 只取本次新生成的店铺，丢弃旧的AI店铺，防止列表越来越长
+            let mergedAiShops = [...generatedShops];
+            
+            // 最终顺序：自定义始终置顶 -> 本次最新生成的店铺
+            let finalShops = [...customShops, ...mergedAiShops]; 
+
+            try {
+                localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(finalShops));
+            } catch (err) {
+                // 如果触发了浏览器的极限容量拦截，启动紧急瘦身
+                console.warn("存储空间超限，自动清理过旧数据...");
+                mergedAiShops = generatedShops.slice(0, 5); // 极端缩减
+                finalShops = [...customShops, ...mergedAiShops];
+                localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(finalShops));
+            }
+            
+            renderTakeoutShopList(finalShops);
+            // ----------------------------------------------------
+
+
+            showToast('已为您推荐附近好店！');
+
+        } catch (e) {
+            console.error("生成店铺失败:", e);  
+            container.innerHTML = '<div style="text-align: center; color: #ff4a4a; padding-top: 100px; font-size: 14px;">网络或模型开小差了，请重试~</div>';
+            showToast("生成失败: " + e.message, 3000);
+        } finally {
+            if (searchBtn) searchBtn.style.animation = ''; // 停止旋转
+        }
+    };
+    // --- 新增结束 ---
     function initializeTakeoutApp() {
         const takeoutAppContainer = document.getElementById('takeout-app-page');
         if (takeoutAppContainer.dataset.initialized) return;
@@ -7118,38 +7960,64 @@ function renderCategories() {
             $('#takeout-order-footer').classList.toggle('hidden', totalQuantity === 0 || appState.isEditMode);
         }
         
+        // 挂载到全局方便外部下单后强行触发刷新
+        window.forceRenderTakeoutMenus = renderMenuList;
+
         function renderMenuList() {
+            // 每次渲染前从本地重新读取最新状态，防丢失
+            const freshData = JSON.parse(localStorage.getItem(TAKEOUT_APP_DATA_KEY) || '{"menus":[]}');
+            appState.menus = freshData.menus || [];
+            
             const menuListEl = $('#takeout-menu-list');
             if (appState.menus.length === 0) { menuListEl.innerHTML = '<p class="status-text">还没有下过单哦，快去点菜吧！</p>'; return; }
             menuListEl.innerHTML = '';
+            
             [...appState.menus].reverse().forEach(menu => {
                 const totalDishes = menu.dishes.reduce((sum, dish) => sum + dish.quantity, 0);
                 const card = document.createElement('div');
                 card.className = 'menu-item-card';
                 card.dataset.menuId = menu.id;
-                card.innerHTML = `
-                    <div class="menu-header">
-                        <img src="${menu.avatar}" class="menu-avatar">
-                        <div class="menu-title-wrapper">
-                            <h4 class="menu-title">${menu.name}</h4>
-                            <p class="menu-summary">${new Date(menu.timestamp).toLocaleString()} · 共 ${totalDishes} 件菜品</p>
-                        </div>
-                        <div class="menu-expand-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--takeout-light-text-color)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg></div>
+                
+                // 兼容旧版的情侣头像和新版的店铺Emoji
+                const avatarHtml = menu.shopEmoji 
+                    ? `<div class="menu-avatar" style="display:flex; justify-content:center; align-items:center; font-size: 30px; border:1px solid #eee; background:#f9f9f9;">${menu.shopEmoji}</div>`
+                    : `<img src="${menu.avatar}" class="menu-avatar">`;
+                    
+                const displayName = escapeHtml(menu.shopName || menu.name);
+                
+                // 格式化时间
+                const dateObj = new Date(menu.timestamp);
+                const timeStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+                
+                // 菜品列表
+                const dishesHtml = menu.dishes.map(d => `
+                    <div class="menu-dish-item" style="padding: 10px 0; display:flex; justify-content:space-between; align-items:center;">
+                        <span class="name" style="flex:1; font-size:14px; color:#333;">${escapeHtml(d.name)}</span>
+                        <span class="quantity" style="width:40px; text-align:right; font-size:13px; color:#888;">x ${d.quantity}</span>
+                        ${d.price !== undefined ? `<span style="width:60px; text-align:right; font-size:14px; font-weight:bold; color:#333;">¥${(d.price * d.quantity).toFixed(2)}</span>` : ''}
                     </div>
-                    <div class="menu-dishes-list">${menu.dishes.map(d => `<div class="menu-dish-item" data-name="${d.name}" data-image="${d.image}" data-steps="${d.steps || ''}"><img src="${d.image || 'https://via.placeholder.com/80x80.png?text=无图'}"><span class="name">${d.name}</span><span class="quantity">x ${d.quantity}</span></div>`).join('')}</div>`;
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="menu-header" style="align-items: flex-start;">
+                        ${avatarHtml}
+                        <div class="menu-title-wrapper">
+                            <h4 class="menu-title" style="margin-bottom:4px;">${displayName} ></h4>
+                            <p class="menu-summary">${timeStr}</p>
+                            ${menu.totalPrice ? `<p style="font-size:13px; color:#333; margin-top:6px; font-weight:bold;">总价: ¥${parseFloat(menu.totalPrice).toFixed(2)}</p>` : ''}
+                        </div>
+                        <div class="menu-expand-icon" style="margin-top:2px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--takeout-light-text-color)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg></div>
+                    </div>
+                    <div class="menu-dishes-list">${dishesHtml}</div>`;
                 
                 card.querySelector('.menu-header').addEventListener('click', (e) => {
-                    if(e.target.classList.contains('menu-avatar')) { showEditMenuModal(menu.id); } 
-                    else { e.currentTarget.nextElementSibling.classList.toggle('expanded'); e.currentTarget.querySelector('.menu-expand-icon').classList.toggle('expanded'); }
+                    e.currentTarget.nextElementSibling.classList.toggle('expanded'); 
+                    e.currentTarget.querySelector('.menu-expand-icon').classList.toggle('expanded');
                 });
 
-                card.querySelectorAll('.menu-dish-item').forEach(item => item.addEventListener('click', (e) => {
-                    const { name, image, steps } = e.currentTarget.dataset;
-                    showDishDetailModal(null, { name, image, steps });
-                }));
-
+                // 双击删除订单
                 card.addEventListener('dblclick', () => {
-                    if (confirm('确定要删除这个订单记录吗？')) {
+                    if (confirm('确定要删除这条外卖订单记录吗？')) {
                         const menuId = parseInt(card.dataset.menuId);
                         appState.menus = appState.menus.filter(m => m.id !== menuId);
                         saveState(); renderMenuList();
@@ -7158,6 +8026,7 @@ function renderCategories() {
                 menuListEl.appendChild(card);
             });
         }
+
 
         function renderMyPage() {
             $('#takeout-my-avatar-img').src = appState.myAvatar;
@@ -7169,11 +8038,11 @@ function renderCategories() {
             if (!appState.partnerId) $('#takeout-friend-id-input').value = '';
         }
 
-function switchPage(pageId) {
+        function switchPage(pageId) {
             $$('.page').forEach(p => p.classList.remove('active'));
             $('#' + pageId).classList.add('active');
             $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.page === pageId));
-            $('#takeout-top-bar-title').textContent = { 'takeout-page-order': '商家', 'takeout-page-menu': '菜单', 'takeout-page-my': '我' }[pageId];
+            $('#takeout-top-bar-title').textContent = { 'takeout-page-order': '商家', 'takeout-page-menu': '订单', 'takeout-page-my': '我' }[pageId];
             
             const searchBtn = $('#takeout-search-btn');
             if (searchBtn) searchBtn.style.display = pageId === 'takeout-page-order' ? 'block' : 'none';
@@ -7334,15 +8203,844 @@ function switchPage(pageId) {
         takeoutAppContainer.dataset.initialized = 'true';
     }
 
+    // --- 新增：独立封装的外卖列表渲染函数 ---
+    window.renderTakeoutShopList = (shops) => {
+        const container = document.getElementById('takeout-shop-list-container');
+        if (!container) return;
+        if (!shops || shops.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #999; padding-top: 100px; font-size: 14px;">附近暂无商家，点击右上角搜索按钮刷新~</div>';
+            return;
+        }
+        window.currentTakeoutShops = shops;
+        let html = '';
+        shops.forEach((shop, index) => {
+            html += `
+            <div class="takeout-shop-item" onclick="openTakeoutShopDetail(${index})">
+                <div class="shop-emoji-box">${shop.emoji || '🍽️'}</div>
+                <div class="shop-info">
+                    <div class="shop-name">${escapeHtml(shop.name)}</div>
+                    <div class="shop-meta">
+                        <span class="shop-rating">${shop.rating || '4.5'}分</span>
+                        <span class="shop-sales">月售${shop.sales || 0}+</span>
+                    </div>
+                    <div class="shop-delivery">起送 ￥${shop.minOrder || 15} | 配送费 ￥${shop.deliveryFee || 0}</div>
+                    <div class="shop-tags"><span class="shop-coupon">神劵满${shop.condition || 30}减${shop.discount || 5}</span></div>
+                </div>
+                <div class="shop-distance">
+                    <span>${shop.distance || '2.0'}km</span>
+                    <span>${shop.time || 30}分钟</span>
+                </div>
+            </div>
+            `;
+        });
+        container.innerHTML = html;
+    };
+
     window.openTakeoutApp = () => {
         body.classList.add('takeout-active');
         initializeTakeoutApp();
-    };
+        
+        // 【关键防御】：强制模拟点击底部“商家”Tab，确保每次点开App，界面都百分百归位到商家列表，防止停留在空白页
+        const takeoutAppContainer = document.getElementById('takeout-app-page');
+        if (takeoutAppContainer) {
+            const orderTabBtn = takeoutAppContainer.querySelector('.nav-item[data-page="takeout-page-order"]');
+            if (orderTabBtn) orderTabBtn.click();
+        }
 
+        // 强力从缓存中读取并渲染店铺列表
+        try {
+            let cachedShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
+            if (!Array.isArray(cachedShops)) {
+                cachedShops = [];
+            }
+            renderTakeoutShopList(cachedShops);
+        } catch(e) {
+            console.error("加载缓存外卖店铺失败", e);
+            renderTakeoutShopList([]); 
+        }
+    };
     window.closeTakeoutApp = () => {
         body.classList.remove('takeout-active');
     };
     // --- *** END: Takeout App Logic *** ---
+    // --- 新增：店铺详情 Tabs 切换 ---
+    window.switchTakeoutShopTab = (tabName) => {
+        document.querySelectorAll('.takeout-shop-tab').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.takeout-shop-view').forEach(el => el.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById(`takeout-view-${tabName}`).classList.add('active');
+    };
+
+    // --- 点菜页面联动全局变量 ---
+    let isClickScrollingMenu = false;
+    let menuScrollTimeout = null;
+    
+    // --- 外卖我的页面、持久化收藏逻辑 ---
+    let currentTakeoutShopData = null; // 用于记录当前打开的店铺数据
+    window.currentTakeoutShops = [];
+
+    function getTakeoutFavorites() {
+        try { return JSON.parse(localStorage.getItem('takeoutFavoritesData_v1') || '[]'); } catch(e) { return []; }
+    }
+    function saveTakeoutFavorites(favs) {
+        localStorage.setItem('takeoutFavoritesData_v1', JSON.stringify(favs));
+    }
+
+    // 渲染我的页面
+    window.renderTakeoutMePage = () => {
+        const profile = JSON.parse(localStorage.getItem('takeoutProfile_v1') || '{"nickname":"外卖吃货", "avatar":"https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"}');
+        document.getElementById('takeout-my-avatar').src = profile.avatar;
+        document.getElementById('takeout-my-nickname').textContent = profile.nickname;
+
+        const favs = getTakeoutFavorites();
+        const grid = document.getElementById('takeout-me-fav-grid');
+        grid.innerHTML = '';
+        if (favs.length === 0) {
+            grid.innerHTML = '<div style="font-size:13px; color:#999;">暂无收藏</div>';
+        } else {
+            // 只显示前3个
+            const displayFavs = favs.slice(0, 3);
+            displayFavs.forEach(shop => {
+                const item = document.createElement('div');
+                item.className = 'takeout-me-fav-item';
+                item.innerHTML = shop.emoji || '🍽️';
+                item.onclick = () => window.openTakeoutShopFromFav(shop);
+                grid.appendChild(item);
+            });
+        }
+    };
+
+    // 从收藏列表里点进去
+    window.openTakeoutShopFromFav = (shop) => {
+        let idx = window.currentTakeoutShops.findIndex(s => s.name === shop.name);
+        if (idx === -1) {
+            window.currentTakeoutShops.unshift(shop); // 插在列表最前面
+            idx = 0;
+        } else {
+            window.currentTakeoutShops[idx] = shop; // 用收藏的数据覆盖更新
+        }
+        openTakeoutShopDetail(idx);
+    };
+
+    // 全部收藏页面
+    window.openTakeoutFavPage = () => {
+        const container = document.getElementById('takeout-favorite-list-container');
+        const favs = getTakeoutFavorites();
+        if (favs.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #999; padding-top: 100px; font-size: 14px;">暂无收藏店铺~</div>';
+        } else {
+            let html = '';
+            favs.forEach((shop, index) => {
+                // 用一个安全的 JSON 传递给点击事件，或者直接查下全局的 favs
+                html += `
+                <div class="takeout-shop-item" onclick="openTakeoutShopFromFav(getTakeoutFavorites()[${index}])">
+                    <div class="shop-emoji-box">${shop.emoji || '🍽️'}</div>
+                    <div class="shop-info">
+                        <div class="shop-name">${escapeHtml(shop.name)}</div>
+                        <div class="shop-meta">
+                            <span class="shop-rating">${shop.rating || '4.5'}分</span>
+                            <span class="shop-sales">月售${shop.sales || 0}+</span>
+                        </div>
+                        <div class="shop-delivery">起送 ￥${shop.minOrder || 15} | 配送费 ￥${shop.deliveryFee || 0}</div>
+                        <div class="shop-tags"><span class="shop-coupon">神劵满${shop.condition || 30}减${shop.discount || 5}</span></div>
+                    </div>
+                    <div class="shop-distance">
+                        <span>${shop.distance || '2.0'}km</span>
+                        <span>${shop.time || 30}分钟</span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+        document.getElementById('takeout-favorite-page').classList.add('active');
+    };
+
+    window.closeTakeoutFavPage = () => {
+        document.getElementById('takeout-favorite-page').classList.remove('active');
+    };
+
+    // 设置资料
+    let tempTakeoutMyAvatar = '';
+    window.openTakeoutProfileModal = () => {
+        const profile = JSON.parse(localStorage.getItem('takeoutProfile_v1') || '{"nickname":"外卖吃货", "avatar":"https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"}');
+        document.getElementById('takeout-my-nickname-input').value = profile.nickname;
+        document.getElementById('takeout-my-avatar-preview').src = profile.avatar;
+        document.getElementById('takeout-my-avatar-preview').style.display = 'block';
+        document.getElementById('takeout-my-avatar-placeholder').style.display = 'none';
+        tempTakeoutMyAvatar = profile.avatar;
+        document.getElementById('takeout-profile-modal').classList.add('active');
+    };
+    window.closeTakeoutProfileModal = () => {
+        document.getElementById('takeout-profile-modal').classList.remove('active');
+    };
+    window.handleTakeoutMyAvatarUpload = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        compressImage(file, 200, (base64) => {
+            tempTakeoutMyAvatar = base64;
+            document.getElementById('takeout-my-avatar-preview').src = base64;
+        });
+    };
+    window.saveTakeoutProfile = () => {
+        const nickname = document.getElementById('takeout-my-nickname-input').value.trim() || '外卖吃货';
+        localStorage.setItem('takeoutProfile_v1', JSON.stringify({ nickname, avatar: tempTakeoutMyAvatar }));
+        closeTakeoutProfileModal();
+        renderTakeoutMePage();
+        showToast('资料已保存');
+    };
+    
+    // --- 拦截 switchPage，渲染“我的”页面 ---
+    // 为了不破坏原有的绑定，这里直接覆盖原来的函数
+    const originalTakeoutSwitchPage = window.switchPage; // 但之前他是局部函数，我们用简单判断
+    window.takeoutTabObserver = new MutationObserver(() => {
+        if (document.getElementById('takeout-page-my').classList.contains('active')) {
+            renderTakeoutMePage();
+        }
+    });
+    // 等页面加载完毕后绑定监听，确保能捕捉到 class 变化
+    document.addEventListener('DOMContentLoaded', () => {
+        const targetNode = document.getElementById('takeout-page-my');
+        if (targetNode) {
+            window.takeoutTabObserver.observe(targetNode, { attributes: true, attributeFilter: ['class'] });
+        }
+    });
+
+    // 全局外卖购物车状态
+    window.currentShopCart = {};
+
+    window.openTakeoutShopDetail = async (index) => {
+        const shop = window.currentTakeoutShops[index];
+        if (!shop) return;
+        
+        currentTakeoutShopData = shop; // 记录当前店铺
+        
+        // 每次进入新店铺，清空购物车并隐藏结算栏
+        window.currentShopCart = {};
+        const cartFooter = document.getElementById('takeout-cart-footer');
+        if (cartFooter) cartFooter.classList.remove('active');
+
+        // 1. 初始化预展示界面
+        document.getElementById('takeout-shop-detail-emoji').innerHTML = shop.emoji || '🍽️';
+        document.getElementById('takeout-shop-detail-name').innerText = shop.name;
+        
+        // 滑出页面并默认切回“点菜”Tab
+        document.getElementById('takeout-shop-detail-page').classList.add('active');
+        document.querySelectorAll('.takeout-shop-tab')[0].click();
+
+        const sidebar = document.getElementById('takeout-shop-sidebar');
+        const mainArea = document.getElementById('takeout-shop-menu-main');
+
+        // --- 【关键修改：如果该商家已经生成过菜单和评价，直接读缓存秒开，不再调API】 ---
+        // 动态判断收藏状态
+        const favs = getTakeoutFavorites();
+        const isFav = favs.some(f => f.name === shop.name);
+        const starIconUrl = isFav ? 'https://img.heliar.top/file/1773236031457_星星_star_2.png' : 'https://img.heliar.top/file/1773236036735_星星_star.png';
+
+        if (shop.menu && Array.isArray(shop.menu) && shop.menu.length > 0) {
+            document.getElementById('takeout-shop-detail-rating').innerText = shop.rating || '4.5';
+            document.getElementById('takeout-shop-detail-sales').innerText = (shop.sales || 0) + '+';
+            let tStr = shop.time || 30;
+            document.getElementById('takeout-shop-detail-time').innerText = tStr.toString().includes('分钟') ? tStr : (tStr + '分钟');
+            document.getElementById('takeout-shop-fav-btn').src = starIconUrl;
+            
+            renderShopMenu(shop.menu);
+            if (window.renderShopReviews) window.renderShopReviews(shop.reviews || []); // 恢复并渲染缓存里的评价
+            return; // 已经有缓存，直接展示并跳过下面的API调用
+        }
+        // -----------------------------------------------------------------------
+
+        document.getElementById('takeout-shop-detail-rating').innerText = '-';
+        document.getElementById('takeout-shop-detail-sales').innerText = '-';
+        document.getElementById('takeout-shop-detail-time').innerText = '-';
+        document.getElementById('takeout-shop-fav-btn').src = starIconUrl;
+        // 重置菜单与评价区域
+        sidebar.innerHTML = '';
+        mainArea.innerHTML = '<div style="text-align:center; padding-top:80px; color:#999; font-size:14px;" id="takeout-menu-loading">老板正在为您疯狂手写菜单，请稍候...</div>';
+        document.getElementById('takeout-view-review').innerHTML = '<div style="text-align:center; padding-top:80px; color:#999; font-size:14px;">正在读取食客们的评价，请稍候...</div>';
+
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
+            document.getElementById('takeout-shop-detail-rating').innerText = shop.rating || '4.5';
+            document.getElementById('takeout-shop-detail-sales').innerText = (shop.sales || 0) + '+';
+            document.getElementById('takeout-shop-detail-time').innerText = (shop.time || 30) + '分钟';
+            mainArea.innerHTML = '<div style="text-align:center; padding-top:80px; color:#ccc;">API未配置，无法为您生成专属菜单</div>';
+            showToast('API未配置，当前为基础数据展示');
+            return;
+        }
+
+        // 2. 调用API生成专属数据、菜单数组和评价数组
+        let roleContext = "";
+        if (shop.boundRoleIds && shop.boundRoleIds.length > 0) {
+            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+            const allWorldBooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+            
+            const roleDetails = shop.boundRoleIds.map(roleId => {
+                const contact = allContacts.find(c => c.id === roleId);
+                if (!contact) return '';
+                
+                let wbText = "";
+                if (contact.worldbookIds && contact.worldbookIds.length > 0) {
+                    const activeWbs = allWorldBooks.filter(b => contact.worldbookIds.includes(b.id));
+                    activeWbs.forEach(wb => {
+                        wbText += `[世界书:${wb.title}] `;
+                        wb.entries.forEach(e => { wbText += `${e.key ? e.key+':' : ''}${e.content} `; });
+                    });
+                }
+                return `【特定评价者】昵称: ${contact.alias || contact.name}\n- 人设: ${contact.persona || '无'}\n- 世界书设定: ${wbText || '无'}`;
+            }).filter(Boolean).join('\n\n');
+            
+            if (roleDetails) {
+                roleContext = `\n\n【特别指令】：以下角色是本店的特殊食客，请你务必在生成的评价列表(reviews)中，为他们每人单独生成一条评价（昵称必须完全一致）。评价内容必须极度符合他们各自的人设、说话口吻以及世界书设定：\n${roleDetails}\n`;
+            }
+        }
+
+        let descContext = "";
+        if (shop.description) {
+            descContext = `\n\n【店铺内容简介】：\n${shop.description}\n**极度重要：请结合这段店铺简介生成特色菜品和相关评价！**`;
+        }
+
+        const prompt = `用户进店了。当前店铺名称是"${shop.name}"，主要视觉元素是：${shop.emoji}。${descContext}${roleContext}
+        
+请为该店铺生成头部核心数据、点菜菜单，以及食客的评价。
+严格以 JSON 格式输出，不要带Markdown标记，结构必须如下：
+{
+  "rating": "${shop.rating || '4.8'}",
+  "sales": "${shop.sales || '2000'}",
+  "time": "${shop.time || '35'}",
+  "menu": [
+     {
+       "category": "热销套餐",
+       "items": [{"name": "招牌单人餐", "emoji": "🍱", "sales": 400, "price": 25.5}]
+     }
+  ],
+  "reviews": [
+     {
+       "nickname": "Abc2099",
+       "rating": 5,
+       "content": "非常好吃！",
+       "relatedDish": "招牌单人餐"
+     }
+  ]
+}
+
+【强制要求】：
+1. "menu" 数组中【必须】生成 7 到 10 个分类，包含"优惠套餐"和最后的"口味选择"。每个分类下 3 到 6 个菜品。
+2. "reviews" 数组中【必须】生成 10 到 20 条评价。
+3. 【关键】：除了你生成的普通路人评价外，如果有【特定评价者】，必须包含他们的专属评价（昵称严格跟上面给出的一致，内容贴合其人设与世界书）。
+4. 普通路人评价的昵称：少部分叫“匿名用户”，大部分为“字母+数字”的组合。
+5. 评价星级(rating)：必须是 0 到 5 的整数。可以大部分好评，少部分差评。
+6. 评价内容(content)：生动、口语化，并结合该店铺内容来写！
+7. 关联商品(relatedDish)：填一个该评价提到的菜品名称（必须从你刚生成的 menu 菜品里挑选）。
+8. 必须是纯正的JSON格式！`;
+
+        try {
+            let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
+
+    const isGemini = settings.api.url.includes('generativelanguage');
+            let bodyData, headers = { 'Content-Type': 'application/json' };
+
+            if (isGemini) {
+                fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
+                bodyData = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.8, response_mime_type: "application/json" } });
+            } else {
+                headers['Authorization'] = `Bearer ${settings.api.key}`;
+                bodyData = JSON.stringify({ model: settings.api.model, messages: [{ role: "user", content: prompt }], temperature: 0.8, response_format: { "type": "json_object" } });
+            }
+
+            const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
+            if (!res.ok) throw new Error('API 请求失败');
+
+            const data = await res.json();
+            let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+            reply = reply.trim();
+            
+            const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
+            if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
+            const apiData = JSON.parse(reply);
+
+            // 3. 填入头部数据 (销量后面强制加 +)
+            let finalRating = apiData.rating || shop.rating || '4.5';
+            let finalSales = apiData.sales || shop.sales || 0;
+            let finalTime = apiData.time || shop.time || 30;
+
+                       document.getElementById('takeout-shop-detail-rating').innerText = finalRating;
+            document.getElementById('takeout-shop-detail-sales').innerText = finalSales + '+';
+            let timeStr = finalTime;
+            document.getElementById('takeout-shop-detail-time').innerText = timeStr.toString().includes('分钟') ? timeStr : (timeStr + '分钟');
+            
+            // 4. 渲染菜单和评价，并保存到缓存
+            if (apiData.menu && Array.isArray(apiData.menu)) {
+                renderShopMenu(apiData.menu);
+                let finalReviews = apiData.reviews || [];
+                if (window.renderShopReviews) window.renderShopReviews(finalReviews);
+
+                // --- 【关键修改：持久化保存菜单和评价，保证下次进来秒开】 ---
+                let cachedShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
+                if (cachedShops[index]) {
+                    cachedShops[index].menu = apiData.menu;
+                    cachedShops[index].reviews = finalReviews; // 保存评价
+                    cachedShops[index].rating = finalRating;
+                    cachedShops[index].sales = finalSales;
+                    cachedShops[index].time = finalTime;
+                    localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(cachedShops));
+                    
+                    window.currentTakeoutShops[index] = cachedShops[index]; // 同步运行内存
+                }
+                // ------------------------------------------------------------------
+
+            } else {
+                mainArea.innerHTML = '<div style="text-align:center; padding-top:80px; color:#ccc;">抱歉，未能正确解析菜单数据</div>';
+            }
+
+        } catch (e) {
+            console.error("加载店铺详情失败:", e);
+            document.getElementById('takeout-shop-detail-rating').innerText = shop.rating || '4.5';
+            document.getElementById('takeout-shop-detail-sales').innerText = (shop.sales || 0) + '+';
+            document.getElementById('takeout-shop-detail-time').innerText = (shop.time || 30) + '分钟';
+            mainArea.innerHTML = '<div style="text-align:center; padding-top:80px; color:#ff4a4a;">网络开小差了，请重进店铺试试~</div>';
+        }
+    };
+
+    // --- 新增：渲染并筛选评价的逻辑 ---
+    window.currentShopReviews = [];
+    window.renderShopReviews = (reviews) => {
+        window.currentShopReviews = reviews;
+        // 默认显示全部评价
+        window.filterShopReviews('all');
+    };
+
+    window.filterShopReviews = (type) => {
+        const container = document.getElementById('takeout-view-review');
+        const reviews = window.currentShopReviews || [];
+        
+        // 评判标准：>=4好评，<=3差评
+        let goodReviews = reviews.filter(r => r.rating >= 4);
+        let badReviews = reviews.filter(r => r.rating <= 3);
+
+        let displayReviews = reviews;
+        if (type === 'good') displayReviews = goodReviews;
+        if (type === 'bad') displayReviews = badReviews;
+
+        let html = `
+        <div class="takeout-review-container">
+            <div class="takeout-review-filters">
+                <div class="takeout-filter-btn ${type === 'all' ? 'active' : ''}" onclick="filterShopReviews('all')">全部 ${reviews.length}</div>
+                <div class="takeout-filter-btn ${type === 'good' ? 'active' : ''}" onclick="filterShopReviews('good')">好评 ${goodReviews.length}</div>
+                <div class="takeout-filter-btn ${type === 'bad' ? 'active' : ''}" onclick="filterShopReviews('bad')">差评 ${badReviews.length}</div>
+            </div>
+            <div class="takeout-review-list">
+        `;
+
+        if (displayReviews.length === 0) {
+            html += '<div style="text-align:center; padding-top:40px; color:#ccc;">暂无此类评价</div>';
+        } else {
+            // 用户指定的随机路人头像
+            const avatars = [
+                "https://img.heliar.top/file/1773259046416_IMG_5032.jpeg",
+                "https://img.heliar.top/file/1773259051603_IMG_5031.jpeg",
+                "https://img.heliar.top/file/1773259053273_IMG_5030.jpeg"
+            ];
+            
+            // 获取所有角色数据，用于匹配专属评价者的头像
+            const allContacts = JSON.parse(localStorage.getItem('chatData_v5_final') || '[]');
+            displayReviews.forEach(r => {
+                let randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+                
+                // --- 新增：如果评价昵称和某个角色匹配，直接使用该角色的真实头像 ---
+                let matchedContact = allContacts.find(c => (c.alias || c.name) === r.nickname);
+                if (matchedContact && matchedContact.avatar) {
+                    randomAvatar = matchedContact.avatar;
+                }
+                // ------------------------------------------------------------------
+
+                let starHtml = '';
+                let rNum = parseInt(r.rating) || 0;
+
+                
+                // 处理星星逻辑
+                if (rNum === 0) {
+                    starHtml = '<span class="takeout-review-bad-text">差评</span>';
+                } else {
+                    for(let i=0; i<rNum; i++) {
+                        starHtml += '<img src="https://img.heliar.top/file/1773236031457_星星_star_2.png" class="takeout-review-star-img">';
+                    }
+                }
+
+                html += `
+                    <div class="takeout-review-item">
+                        <img src="${randomAvatar}" class="takeout-review-avatar">
+                        <div class="takeout-review-content-area">
+                            <div class="takeout-review-name">${escapeHtml(r.nickname || '匿名用户')}</div>
+                            <div class="takeout-review-stars">${starHtml}</div>
+                            <div class="takeout-review-text">${escapeHtml(r.content || '这家店非常棒！')}</div>
+                            ${r.relatedDish ? `<div class="takeout-review-dish">点赞商品 <span>${escapeHtml(r.relatedDish)}</span></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        html += `</div></div>`;
+        container.innerHTML = html;
+    };
+
+    // --- 渲染菜单并挂载联动事件 ---
+    function renderShopMenu(menuData) {
+        const sidebar = document.getElementById('takeout-shop-sidebar');
+        const mainArea = document.getElementById('takeout-shop-menu-main');
+        
+        let sidebarHtml = '';
+        let mainHtml = '';
+
+        menuData.forEach((category, index) => {
+            // 生成左边分类
+            sidebarHtml += `<div class="takeout-shop-category ${index === 0 ? 'active' : ''}" data-index="${index}" onclick="scrollToMenuCategory(${index})">${escapeHtml(category.category)}</div>`;
+            
+            // 生成右边菜品区块
+            mainHtml += `<div class="takeout-category-section" id="menu-cat-sec-${index}">
+                            <div class="takeout-category-title">${escapeHtml(category.category)}</div>`;
+            
+            if (category.items && Array.isArray(category.items)) {
+                category.items.forEach((item, itemIdx) => {
+                    const price = parseFloat(item.price) || 0;
+                    const itemName = item.name || '';
+                    const qty = window.currentShopCart[itemName]?.quantity || 0;
+                    
+                    // 动态判断应该显示 + 号还是加减器
+                    let actionHtml = '';
+                    if (qty > 0) {
+                        actionHtml = `
+                            <div class="takeout-dish-qty-ctrl">
+                                <div class="takeout-dish-qty-btn takeout-dish-qty-minus" onclick="updateTakeoutCart(${index}, ${itemIdx}, -1, event)">-</div>
+                                <div class="takeout-dish-qty-num">${qty}</div>
+                                <div class="takeout-dish-qty-btn takeout-dish-qty-plus" onclick="updateTakeoutCart(${index}, ${itemIdx}, 1, event)">+</div>
+                            </div>`;
+                    } else {
+                        actionHtml = `<div class="takeout-dish-add-btn" onclick="updateTakeoutCart(${index}, ${itemIdx}, 1, event)">+</div>`;
+                    }
+
+                    mainHtml += `
+                        <div class="takeout-shop-dish-card">
+                            <div class="takeout-dish-emoji">${item.emoji || '🍽️'}</div>
+                            <div class="takeout-dish-info">
+                                <div>
+                                    <div class="takeout-dish-name">${escapeHtml(item.name)}</div>
+                                    <div class="takeout-dish-sales">月售 ${item.sales || 0}+</div>
+                                </div>
+                                <div class="takeout-dish-price-bar">
+                                    <span class="takeout-dish-price">${price.toFixed(2)}</span>
+                                    <div id="dish-action-${index}-${itemIdx}">
+                                        ${actionHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+            }
+            mainHtml += `</div>`;
+        });
+
+        sidebar.innerHTML = sidebarHtml;
+        mainArea.innerHTML = mainHtml;
+
+        // 绑定滚动监听
+        mainArea.onscroll = handleMenuMainScroll;
+    }
+
+    // --- 新增：处理加减菜的局部刷新和底层结算 ---
+    window.updateTakeoutCart = (catIdx, itemIdx, change, event) => {
+        if (event) event.stopPropagation(); // 阻止冒泡
+        
+        if (!currentTakeoutShopData || !currentTakeoutShopData.menu) return;
+        const item = currentTakeoutShopData.menu[catIdx].items[itemIdx];
+        if (!item) return;
+
+        const itemName = item.name;
+        const price = parseFloat(item.price) || 0;
+
+        if (!window.currentShopCart[itemName]) {
+            window.currentShopCart[itemName] = { price: price, quantity: 0 };
+        }
+        
+        window.currentShopCart[itemName].quantity += change;
+        if (window.currentShopCart[itemName].quantity <= 0) {
+            delete window.currentShopCart[itemName];
+        }
+
+        const qty = window.currentShopCart[itemName]?.quantity || 0;
+        const actionContainer = document.getElementById(`dish-action-${catIdx}-${itemIdx}`);
+        
+        // 局部刷新按钮，防止整体刷新导致滚动跳动
+        if (actionContainer) {
+            if (qty > 0) {
+                actionContainer.innerHTML = `
+                    <div class="takeout-dish-qty-ctrl">
+                        <div class="takeout-dish-qty-btn takeout-dish-qty-minus" onclick="updateTakeoutCart(${catIdx}, ${itemIdx}, -1, event)">-</div>
+                        <div class="takeout-dish-qty-num">${qty}</div>
+                        <div class="takeout-dish-qty-btn takeout-dish-qty-plus" onclick="updateTakeoutCart(${catIdx}, ${itemIdx}, 1, event)">+</div>
+                    </div>`;
+            } else {
+                actionContainer.innerHTML = `<div class="takeout-dish-add-btn" onclick="updateTakeoutCart(${catIdx}, ${itemIdx}, 1, event)">+</div>`;
+            }
+        }
+        
+        // 计算并更新底部分阶段状态
+        updateTakeoutCartFooter();
+    };
+
+    function updateTakeoutCartFooter() {
+        let totalAmount = 0;
+        let totalItems = 0;
+        Object.values(window.currentShopCart).forEach(item => {
+            totalAmount += item.price * item.quantity;
+            totalItems += item.quantity;
+        });
+
+        const footer = document.getElementById('takeout-cart-footer');
+        if (totalItems === 0) {
+            footer.classList.remove('active');
+            return;
+        } else {
+            footer.classList.add('active');
+        }
+
+        const minOrder = parseFloat(currentTakeoutShopData.minOrder) || 15;
+        const deliveryFee = parseFloat(currentTakeoutShopData.deliveryFee) || 0;
+        const condition = parseFloat(currentTakeoutShopData.condition) || 30;
+        const discount = parseFloat(currentTakeoutShopData.discount) || 5;
+
+        // 如果符合满减，计算优惠
+        let appliedDiscount = 0;
+        if (totalAmount >= condition) {
+            appliedDiscount = discount;
+        }
+
+        // 最终结算价（一般不展示负数）
+        const displayPrice = Math.max(0, totalAmount - appliedDiscount);
+
+        document.getElementById('takeout-cart-total-price').innerText = displayPrice.toFixed(2);
+        document.getElementById('takeout-cart-discount-text').innerText = appliedDiscount > 0 ? `共减¥ ${appliedDiscount}` : '';
+        document.getElementById('takeout-cart-delivery-text').innerText = `配送费¥ ${deliveryFee}`;
+
+        const btn = document.getElementById('takeout-cart-submit-btn');
+        // 使用满减后的 displayPrice 来计算是否达到起送价更贴合实际外卖App逻辑
+        if (displayPrice < minOrder) {
+            const diff = (minOrder - displayPrice).toFixed(2);
+            btn.innerText = `去凑单 差¥${diff}起送`;
+            btn.className = 'takeout-cart-btn';
+            btn.onclick = null;
+        } else {
+            btn.innerText = '去结算';
+            btn.className = 'takeout-cart-btn ready';
+            btn.onclick = () => {
+                // 将当前外卖订单信息传入全局支付环境
+                currentPaymentContext = { type: 'takeout_buy', amount: displayPrice };
+                
+                document.getElementById('confirm-transfer-target').style.display = 'none';
+                document.getElementById('confirm-transfer-amount').textContent = `¥${displayPrice.toFixed(2)}`;
+                document.getElementById('confirm-popup-title').textContent = '外卖订单付款';
+                
+                currentPasswordInput = '';
+                updatePasswordDisplay();
+                
+                document.getElementById('payment-details-section').style.display = 'block';
+                document.getElementById('password-input-section').style.display = 'block';
+                document.getElementById('numeric-keypad').style.display = 'grid';
+                
+                renderNumericKeypad();
+                document.getElementById('transfer-confirm-overlay').classList.add('active');
+            };
+        }
+    }
+
+
+    // --- 左侧点击滚动右侧 ---
+    window.scrollToMenuCategory = (index) => {
+        isClickScrollingMenu = true;
+        // 样式切换
+        document.querySelectorAll('.takeout-shop-category').forEach((el, i) => {
+            el.classList.toggle('active', i === index);
+        });
+        
+        const targetSec = document.getElementById(`menu-cat-sec-${index}`);
+        const mainArea = document.getElementById('takeout-shop-menu-main');
+        
+        if (targetSec && mainArea) {
+            // 精确计算滚动位置 (减去一点点顶部留白显得自然)
+            mainArea.scrollTo({
+                top: targetSec.offsetTop - mainArea.offsetTop,
+                behavior: 'smooth'
+            });
+        }
+        
+        // 滚动结束后恢复监听
+        if (menuScrollTimeout) clearTimeout(menuScrollTimeout);
+        menuScrollTimeout = setTimeout(() => {
+            isClickScrollingMenu = false;
+        }, 800); // 平滑滚动一般需要一点时间
+    };
+
+    // --- 右侧滚动联动左侧 ---
+    function handleMenuMainScroll() {
+        if (isClickScrollingMenu) return; // 如果是点击触发的滚动，不执行监听
+        
+        const mainArea = document.getElementById('takeout-shop-menu-main');
+        const sections = document.querySelectorAll('.takeout-category-section');
+        let currentIndex = 0;
+
+        sections.forEach((sec, index) => {
+            const rect = sec.getBoundingClientRect();
+            const parentRect = mainArea.getBoundingClientRect();
+            // 当该区域顶部距离容器顶部接近时（阈值50px），判定为当前活跃分类
+            if (rect.top - parentRect.top <= 50) {
+                currentIndex = index;
+            }
+        });
+
+        const categories = document.querySelectorAll('.takeout-shop-category');
+        categories.forEach((el, i) => {
+            if (i === currentIndex) {
+                if (!el.classList.contains('active')) {
+                    el.classList.add('active');
+                    // 让左边列表也跟着滚动，保证高亮项在可视区内
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            } else {
+                el.classList.remove('active');
+            }
+        });
+    }
+
+    // 详情页退出及收藏按钮逻辑
+    window.closeTakeoutShopDetail = () => {
+        document.getElementById('takeout-shop-detail-page').classList.remove('active');
+    };
+
+    window.toggleTakeoutShopFav = () => {
+        if (!currentTakeoutShopData) return;
+        let favs = getTakeoutFavorites();
+        const favIndex = favs.findIndex(f => f.name === currentTakeoutShopData.name);
+        const btn = document.getElementById('takeout-shop-fav-btn');
+
+        if (favIndex > -1) {
+            favs.splice(favIndex, 1);
+            btn.src = 'https://img.heliar.top/file/1773236036735_星星_star.png';
+            showToast('已取消收藏');
+        } else {
+            // 存入最新的包含菜单和评价的完整数据
+            favs.unshift(currentTakeoutShopData);
+            btn.src = 'https://img.heliar.top/file/1773236031457_星星_star_2.png';
+            showToast('已收藏该店铺');
+        }
+        saveTakeoutFavorites(favs);
+        renderTakeoutMePage(); // 刷新我的页面
+        
+        // 如果收藏列表页正开着，也同步刷新一下
+        const favPage = document.getElementById('takeout-favorite-list-container');
+        if(favPage && favPage.innerHTML.length > 0) {
+            window.openTakeoutFavPage();
+        }
+    };
+        // --- 新增：创建自定义外卖店铺逻辑 ---
+    let tempTakeoutShopAvatar = '';
+    let tempTakeoutShopRoleIds = []; // 暂存绑定的角色
+
+    // 打开专属的角色绑定弹窗
+    window.openTakeoutShopRoleBindModal = () => {
+        wbBindMultiSelect = true;
+        document.getElementById('wb-bind-modal-title').textContent = '选择绑定的角色(外卖店铺)';
+        wbBindCallback = (selectedIds) => {
+            tempTakeoutShopRoleIds = selectedIds;
+            const displayEl = document.getElementById('takeout-create-role-selection-display');
+            if (selectedIds.length > 0) {
+                const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+                const names = selectedIds.map(id => {
+                    const contact = contacts.find(c => c.id === id);
+                    return contact ? (contact.alias || contact.name) : '未知';
+                }).join(', ');
+                displayEl.textContent = `已绑定好友: ${names}`;
+            } else {
+                displayEl.textContent = '未绑定角色';
+            }
+        };
+        openWorldBookBindModal('roles');
+    };
+
+    window.openCreateTakeoutShopModal = () => {
+        tempTakeoutShopAvatar = '';
+        tempTakeoutShopRoleIds = []; // 每次打开清空
+        
+        document.getElementById('takeout-shop-avatar-preview').src = '';
+        document.getElementById('takeout-shop-avatar-preview').style.display = 'none';
+        document.getElementById('takeout-shop-avatar-placeholder').style.display = 'block';
+        
+        document.getElementById('takeout-create-name').value = '';
+        document.getElementById('takeout-create-rating').value = '';
+        document.getElementById('takeout-create-sales').value = '';
+        document.getElementById('takeout-create-time').value = '';
+        document.getElementById('takeout-create-distance').value = '';
+        document.getElementById('takeout-create-desc').value = ''; // 清空内容简介
+        document.getElementById('takeout-create-role-selection-display').textContent = '未绑定角色';
+
+        document.getElementById('create-takeout-shop-modal').classList.add('active');
+    };
+
+
+    window.closeCreateTakeoutShopModal = () => {
+        document.getElementById('create-takeout-shop-modal').classList.remove('active');
+    };
+
+    window.handleTakeoutShopAvatarUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        compressImage(file, 300, (base64) => {
+            tempTakeoutShopAvatar = base64;
+            document.getElementById('takeout-shop-avatar-preview').src = base64;
+            document.getElementById('takeout-shop-avatar-preview').style.display = 'block';
+            document.getElementById('takeout-shop-avatar-placeholder').style.display = 'none';
+        });
+        event.target.value = '';
+    };
+
+    window.saveNewTakeoutShop = () => {
+        const name = document.getElementById('takeout-create-name').value.trim();
+        const rating = document.getElementById('takeout-create-rating').value.trim() || "4.5";
+        const sales = document.getElementById('takeout-create-sales').value.trim() || "0";
+        const time = document.getElementById('takeout-create-time').value.trim() || "30";
+        const distance = document.getElementById('takeout-create-distance').value.trim() || "1.0";
+        const desc = document.getElementById('takeout-create-desc').value.trim();
+
+        if (!name) {
+            showToast("店铺名称不能为空");
+            return;
+        }
+
+        const newShop = {
+            isCustom: true,
+            name: name,
+            // 如果上传了照片，就包一个img标签，这样可以和普通的Emoji完美兼容渲染
+            emoji: tempTakeoutShopAvatar ? `<img src="${tempTakeoutShopAvatar}" style="width:100%; height:100%; border-radius:10px; object-fit:cover;">` : '🍽️',
+            rating: rating,
+            sales: parseInt(sales),
+            time: parseInt(time),
+            distance: distance,
+            description: desc, // 新增：保存店铺内容
+            boundRoleIds: tempTakeoutShopRoleIds, // 新增：保存绑定的老板角色
+            minOrder: 15,
+            deliveryFee: 0,
+            condition: 30,
+            discount: 5
+        };
+
+        let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
+        shops.unshift(newShop);
+        localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(shops));
+        
+        renderTakeoutShopList(shops);
+        closeCreateTakeoutShopModal();
+        showToast("店铺创建成功");
+    };
 
     // --- Recollection App Logic (REWORKED & MODIFIED) ---
     function getRecollectionStorageKey(contactId) {
@@ -8217,17 +9915,16 @@ window.deleteSelectedCartItems = () => {
 window.openMallApp = () => {
     body.classList.add('mall-active');
     currentMallCategoryId = 'default-recommend';
-    renderMallCategories();
-    // 默认显示主页
-    switchMallPage('home');
-    
-    // 初始化主页内容
-    const contentArea = document.getElementById('mall-home-page');
-    contentArea.innerHTML = `<div class="mall-product-grid" id="mall-product-grid"></div><p style="text-align:center; color:#ccc; padding-top: 50px;">点击右上角刷新按钮生成商品</p>`;
     
     // 绑定按钮事件
     document.getElementById('mall-add-category-btn').onclick = () => openMallCategoryModal(false);
     document.getElementById('mall-refresh-btn').onclick = () => generateMallProducts();
+    
+    // 默认显示主页
+    switchMallPage('home');
+    
+    // 渲染分类时，会自动调用 switchMallCategory 读取并显示缓存的商品
+    renderMallCategories(); 
 };
 
 window.closeMallApp = () => {
@@ -11663,13 +13360,16 @@ window.openTransferConfirmPopup = (amount) => {
                 if (currentPaymentContext && currentPaymentContext.type === 'mall_buy') {
                     executeMallPurchase(amount, currentPaymentContext.data);
                 } else if (currentPaymentContext && currentPaymentContext.type === 'mall_cart_buy') {
-                    executeMallCartPurchase(amount, currentPaymentContext.data); // <-- 插入合并购买逻辑
+                    executeMallCartPurchase(amount, currentPaymentContext.data);
+                } else if (currentPaymentContext && currentPaymentContext.type === 'takeout_buy') {
+                    executeTakeoutPurchase(amount); // <-- 新增外卖购买分支
                 } else {
                     executeTransfer(amount); 
                 }
             }
 
         } else {
+
             document.getElementById('password-error-tip').textContent = '密码错误，请重试';
             setTimeout(() => {
                 currentPasswordInput = '';
@@ -11678,6 +13378,54 @@ window.openTransferConfirmPopup = (amount) => {
         }
     }
 
+    // --- 新增：处理外卖订单的扣钱与保存 ---
+    function executeTakeoutPurchase(amount) {
+        // 1. 扣除余额并记录账单
+        let walletData = getWalletData();
+        walletData.balance -= amount;
+        walletData.transactions.push({
+            id: Date.now().toString(), type: 'expense', amount: amount, desc: `点外卖: ${currentTakeoutShopData.name}`, timestamp: Date.now()
+        });
+        saveWalletData(walletData);
+
+        // 2. 将购物车内容打包成订单
+        let appState = JSON.parse(localStorage.getItem(TAKEOUT_APP_DATA_KEY) || '{"menus":[]}');
+        if (!appState.menus) appState.menus = [];
+        
+        const orderedDishes = Object.keys(window.currentShopCart).map(name => {
+            return {
+                name: name,
+                price: window.currentShopCart[name].price,
+                quantity: window.currentShopCart[name].quantity
+            };
+        });
+
+        const newMenu = { 
+            id: Date.now(), 
+            shopName: currentTakeoutShopData.name, 
+            shopEmoji: currentTakeoutShopData.emoji, 
+            timestamp: Date.now(), 
+            totalPrice: amount,
+            dishes: orderedDishes 
+        };
+        appState.menus.push(newMenu);
+        localStorage.setItem(TAKEOUT_APP_DATA_KEY, JSON.stringify(appState));
+
+        // 3. 清理状态并跳转页面
+        window.currentShopCart = {};
+        closeTransferConfirmPopup();
+        window.closeTakeoutShopDetail(); // 关掉店铺页面
+        
+        // 强制外卖App切换到订单 Tab 并重新渲染
+        const takeoutAppContainer = document.getElementById('takeout-app-page');
+        if (takeoutAppContainer) {
+            const orderTabBtn = takeoutAppContainer.querySelector('.nav-item[data-page="takeout-page-menu"]');
+            if (orderTabBtn) orderTabBtn.click();
+            // 重新渲染订单列表 (通过全局触发)
+            if (window.forceRenderTakeoutMenus) window.forceRenderTakeoutMenus();
+        }
+        showToast("下单成功！");
+    }
 
     function executeTransfer(amount) {
         
@@ -12042,6 +13790,8 @@ window.openTransferConfirmPopup = (amount) => {
             tempSelectedRoles = tempForumBoundRoleIds || [];
         } else if (modalTitle.includes('种类')) {
             tempSelectedRoles = tempMallCategoryRoleIds || [];
+        } else if (modalTitle.includes('外卖店铺')) {
+            tempSelectedRoles = tempTakeoutShopRoleIds || [];
         }
 
         contacts.forEach(c => {
@@ -12057,18 +13807,24 @@ window.openTransferConfirmPopup = (amount) => {
                     checkbox.classList.remove('checked');
                     tempForumBoundRoleIds = tempForumBoundRoleIds.filter(id => id !== c.id);
                     tempMallCategoryRoleIds = tempMallCategoryRoleIds.filter(id => id !== c.id);
+                    if(typeof tempTakeoutShopRoleIds !== 'undefined') tempTakeoutShopRoleIds = tempTakeoutShopRoleIds.filter(id => id !== c.id);
                 } else {
                     checkbox.classList.add('checked');
                     if (modalTitle.includes('论坛')) tempForumBoundRoleIds.push(c.id);
                     if (modalTitle.includes('种类')) tempMallCategoryRoleIds.push(c.id);
+                    if (modalTitle.includes('外卖店铺')) tempTakeoutShopRoleIds.push(c.id);
                 }
                 // 更新总的回调ID列表
-                tempSelectedWorldBookIds = modalTitle.includes('论坛') ? tempForumBoundRoleIds : tempMallCategoryRoleIds;
+                if (modalTitle.includes('论坛')) tempSelectedWorldBookIds = tempForumBoundRoleIds;
+                else if (modalTitle.includes('种类')) tempSelectedWorldBookIds = tempMallCategoryRoleIds;
+                else if (modalTitle.includes('外卖店铺')) tempSelectedWorldBookIds = tempTakeoutShopRoleIds;
             };
             listContainer.appendChild(item);
         });
         // 同步一下，确保 tempSelectedWorldBookIds 是最新的
-        tempSelectedWorldBookIds = modalTitle.includes('论坛') ? tempForumBoundRoleIds : tempMallCategoryRoleIds;
+        if (modalTitle.includes('论坛')) tempSelectedWorldBookIds = tempForumBoundRoleIds;
+        else if (modalTitle.includes('种类')) tempSelectedWorldBookIds = tempMallCategoryRoleIds;
+        else if (modalTitle.includes('外卖店铺')) tempSelectedWorldBookIds = tempTakeoutShopRoleIds;
     }
     
     // 根据是否是多选模式，决定是否显示“确定”按钮
@@ -13530,7 +15286,7 @@ window.renderMallMePage = () => {
                     <img src="https://img.heliar.top/file/1772473595482_微信电商_weixin-market.png">
                     <span>已购买</span>
                 </div>
-                <div class="order-icon-item" onclick="showToast('送出的物品待开发')">
+                <div class="order-icon-item" onclick="openMallSentGiftsPage()">
                     <img src="https://img.heliar.top/file/1772473602219_关注_concern.png">
                     <span>送出的物品</span>
                 </div>
