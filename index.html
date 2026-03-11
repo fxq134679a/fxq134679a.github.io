@@ -5932,22 +5932,22 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </div>
         </div>
     </div>
-    <!-- 新增：修改外卖个人资料弹窗 -->
+        <!-- 新增：修改外卖个人资料弹窗 -->
     <div id="takeout-profile-modal" class="delete-confirm-modal" style="z-index: 1000;">
         <div class="delete-card" onclick="event.stopPropagation()">
             <div class="delete-card-title">修改外卖资料</div>
-            <div class="create-forum-avatar-upload" style="margin: 0 auto 15px; width: 80px; height: 80px; border-radius: 50%;" onclick="document.getElementById('input-takeout-my-avatar').click()">
-                <span id="takeout-my-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:30px;">+</span>
-                <img id="takeout-my-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; border-radius:50%;">
+            <div class="create-forum-avatar-upload" style="margin: 0 auto 15px; width: 80px; height: 80px; border-radius: 50%; cursor: default;">
+                <span id="takeout-my-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:30px; display:none;"></span>
+                <img id="takeout-my-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;">
             </div>
-            <input type="text" id="takeout-my-nickname-input" class="add-friend-input" placeholder="外卖昵称">
+            <input type="text" id="takeout-my-avatar-url-input" class="add-friend-input" placeholder="外卖头像 URL" oninput="document.getElementById('takeout-my-avatar-preview').src = this.value || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'">
+            <input type="text" id="takeout-my-nickname-input" class="add-friend-input" placeholder="外卖昵称" style="margin-top: 5px;">
             <div class="delete-card-actions" style="margin-top: 20px;">
                 <button class="delete-card-btn btn-cancel" onclick="closeTakeoutProfileModal()">取消</button>
                 <button class="delete-card-btn wb-btn-ok" style="background:var(--takeout-primary-color); color:white;" onclick="saveTakeoutProfile()">保存</button>
             </div>
         </div>
     </div>
-
     <!-- 新增：全部收藏列表页 -->
     <div id="takeout-favorite-page">
         <div class="takeout-detail-header">
@@ -8360,31 +8360,30 @@ function renderCategories() {
         document.getElementById('takeout-favorite-page').classList.remove('active');
     };
 
-    // 设置资料
-    let tempTakeoutMyAvatar = '';
+        // 设置资料
     window.openTakeoutProfileModal = () => {
         const profile = JSON.parse(localStorage.getItem('takeoutProfile_v1') || '{"nickname":"外卖吃货", "avatar":"https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"}');
         document.getElementById('takeout-my-nickname-input').value = profile.nickname;
         document.getElementById('takeout-my-avatar-preview').src = profile.avatar;
         document.getElementById('takeout-my-avatar-preview').style.display = 'block';
         document.getElementById('takeout-my-avatar-placeholder').style.display = 'none';
-        tempTakeoutMyAvatar = profile.avatar;
+        
+        const urlInput = document.getElementById('takeout-my-avatar-url-input');
+        if (urlInput) urlInput.value = profile.avatar;
+
         document.getElementById('takeout-profile-modal').classList.add('active');
     };
     window.closeTakeoutProfileModal = () => {
         document.getElementById('takeout-profile-modal').classList.remove('active');
     };
     window.handleTakeoutMyAvatarUpload = (e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        compressImage(file, 200, (base64) => {
-            tempTakeoutMyAvatar = base64;
-            document.getElementById('takeout-my-avatar-preview').src = base64;
-        });
+        // 保留该函数防止旧事件报错，但功能已不再需要
     };
     window.saveTakeoutProfile = () => {
         const nickname = document.getElementById('takeout-my-nickname-input').value.trim() || '外卖吃货';
-        localStorage.setItem('takeoutProfile_v1', JSON.stringify({ nickname, avatar: tempTakeoutMyAvatar }));
+        const avatarUrl = document.getElementById('takeout-my-avatar-url-input').value.trim() || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
+        
+        localStorage.setItem('takeoutProfile_v1', JSON.stringify({ nickname, avatar: avatarUrl }));
         closeTakeoutProfileModal();
         renderTakeoutMePage();
         showToast('资料已保存');
@@ -8450,9 +8449,10 @@ function renderCategories() {
         }
         // -----------------------------------------------------------------------
 
-        document.getElementById('takeout-shop-detail-rating').innerText = '-';
-        document.getElementById('takeout-shop-detail-sales').innerText = '-';
-        document.getElementById('takeout-shop-detail-time').innerText = '-';
+                        document.getElementById('takeout-shop-detail-rating').innerText = shop.rating || '4.5';
+        document.getElementById('takeout-shop-detail-sales').innerText = (shop.sales || 0) + '+';
+        let initTimeStr = shop.time || 30;
+        document.getElementById('takeout-shop-detail-time').innerText = initTimeStr.toString().includes('分钟') ? initTimeStr : (initTimeStr + '分钟');
         document.getElementById('takeout-shop-fav-btn').src = starIconUrl;
         // 重置菜单与评价区域
         sidebar.innerHTML = '';
@@ -8500,14 +8500,11 @@ function renderCategories() {
             descContext = `\n\n【店铺内容简介】：\n${shop.description}\n**极度重要：请结合这段店铺简介生成特色菜品和相关评价！**`;
         }
 
-        const prompt = `用户进店了。当前店铺名称是"${shop.name}"，主要视觉元素是：${shop.emoji}。${descContext}${roleContext}
+                const prompt = `用户进店了。当前店铺名称是"${shop.name}"，主要视觉元素是：${shop.emoji}。${descContext}${roleContext}
         
-请为该店铺生成头部核心数据、点菜菜单，以及食客的评价。
+请为该店铺生成点菜菜单，以及食客的评价。
 严格以 JSON 格式输出，不要带Markdown标记，结构必须如下：
 {
-  "rating": "${shop.rating || '4.8'}",
-  "sales": "${shop.sales || '2000'}",
-  "time": "${shop.time || '35'}",
   "menu": [
      {
        "category": "热销套餐",
@@ -8557,14 +8554,14 @@ function renderCategories() {
             
             const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
             if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
-            const apiData = JSON.parse(reply);
+                        const apiData = JSON.parse(reply);
 
-            // 3. 填入头部数据 (销量后面强制加 +)
-            let finalRating = apiData.rating || shop.rating || '4.5';
-            let finalSales = apiData.sales || shop.sales || 0;
-            let finalTime = apiData.time || shop.time || 30;
+            // 3. 填入头部数据 (完全使用列表原本生成的数据，不再依赖AI二次瞎编)
+            let finalRating = shop.rating || '4.5';
+            let finalSales = shop.sales || 0;
+            let finalTime = shop.time || 30;
 
-                       document.getElementById('takeout-shop-detail-rating').innerText = finalRating;
+            document.getElementById('takeout-shop-detail-rating').innerText = finalRating;
             document.getElementById('takeout-shop-detail-sales').innerText = finalSales + '+';
             let timeStr = finalTime;
             document.getElementById('takeout-shop-detail-time').innerText = timeStr.toString().includes('分钟') ? timeStr : (timeStr + '分钟');
@@ -8917,7 +8914,7 @@ function renderCategories() {
         document.getElementById('takeout-shop-detail-page').classList.remove('active');
     };
 
-    window.toggleTakeoutShopFav = () => {
+        window.toggleTakeoutShopFav = () => {
         if (!currentTakeoutShopData) return;
         let favs = getTakeoutFavorites();
         const favIndex = favs.findIndex(f => f.name === currentTakeoutShopData.name);
@@ -8936,10 +8933,36 @@ function renderCategories() {
         saveTakeoutFavorites(favs);
         renderTakeoutMePage(); // 刷新我的页面
         
-        // 如果收藏列表页正开着，也同步刷新一下
-        const favPage = document.getElementById('takeout-favorite-list-container');
-        if(favPage && favPage.innerHTML.length > 0) {
-            window.openTakeoutFavPage();
+        // 如果收藏列表页此时处于打开状态，只静默刷新它，不再触发跳转
+        const favPageWrapper = document.getElementById('takeout-favorite-page');
+        if (favPageWrapper && favPageWrapper.classList.contains('active')) {
+            const container = document.getElementById('takeout-favorite-list-container');
+            const currentFavs = getTakeoutFavorites();
+            if (currentFavs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding-top: 100px; font-size: 14px;">暂无收藏店铺~</div>';
+            } else {
+                let html = '';
+                currentFavs.forEach((s, i) => {
+                    html += `
+                    <div class="takeout-shop-item" onclick="openTakeoutShopFromFav(getTakeoutFavorites()[${i}])">
+                        <div class="shop-emoji-box">${s.emoji || '🍽️'}</div>
+                        <div class="shop-info">
+                            <div class="shop-name">${escapeHtml(s.name)}</div>
+                            <div class="shop-meta">
+                                <span class="shop-rating">${s.rating || '4.5'}分</span>
+                                <span class="shop-sales">月售${s.sales || 0}+</span>
+                            </div>
+                            <div class="shop-delivery">起送 ￥${s.minOrder || 15} | 配送费 ￥${s.deliveryFee || 0}</div>
+                            <div class="shop-tags"><span class="shop-coupon">神劵满${s.condition || 30}减${s.discount || 5}</span></div>
+                        </div>
+                        <div class="shop-distance">
+                            <span>${s.distance || '2.0'}km</span>
+                            <span>${s.time || 30}分钟</span>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            }
         }
     };
         // --- 新增：创建自定义外卖店铺逻辑 ---
