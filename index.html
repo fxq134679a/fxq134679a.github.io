@@ -8574,11 +8574,20 @@ function renderCategories() {
             let timeStr = finalTime;
             document.getElementById('takeout-shop-detail-time').innerText = timeStr.toString().includes('分钟') ? timeStr : (timeStr + '分钟');
             
-            // 4. 渲染菜单和评价，并保存到缓存
+                        // 4. 渲染菜单和评价，并保存到缓存
             if (apiData.menu && Array.isArray(apiData.menu)) {
                 renderShopMenu(apiData.menu);
                 let finalReviews = apiData.reviews || [];
                 if (window.renderShopReviews) window.renderShopReviews(finalReviews);
+
+                // --- 【修复：同步更新当前数据对象，保证此时点击收藏能存入完整数据】 ---
+                if (currentTakeoutShopData) {
+                    currentTakeoutShopData.menu = apiData.menu;
+                    currentTakeoutShopData.reviews = finalReviews;
+                    currentTakeoutShopData.rating = finalRating;
+                    currentTakeoutShopData.sales = finalSales;
+                    currentTakeoutShopData.time = finalTime;
+                }
 
                 // --- 【关键修改：持久化保存菜单和评价，保证下次进来秒开】 ---
                 let cachedShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
@@ -8591,6 +8600,14 @@ function renderCategories() {
                     localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(cachedShops));
                     
                     window.currentTakeoutShops[index] = cachedShops[index]; // 同步运行内存
+                }
+                
+                // 【新增：如果该店铺已经被收藏过，同步更新收藏库里的数据】
+                let favs = getTakeoutFavorites();
+                let favIndex = favs.findIndex(f => f.name === shop.name);
+                if (favIndex > -1) {
+                    favs[favIndex] = currentTakeoutShopData;
+                    saveTakeoutFavorites(favs);
                 }
                 // ------------------------------------------------------------------
 
@@ -9655,17 +9672,26 @@ window.updateCartItemStyle = (productId, oldStyle, newStyle, newQuantity) => {
 };
 
 window.openPurchasePanel = (productId, mode = 'buy', oldStyle = null) => { // 增加 oldStyle 参数
-    // 【关键修复】从 productId 中解析出真正的 categoryId
+    // 【修复】扩大搜索范围：不仅在首页缓存找，还要去收藏库、购买库里找，防止因为跨页面导致的没反应
     const categoryId = productId.split('-').slice(1, -2).join('-');
     const cache = getMallProductsCache();
-    const products = cache[categoryId]; // 使用解析出来的 categoryId
-    if (!products) {
-        showToast("商品信息已失效，请刷新页面");
-        return;
+    const products = cache[categoryId]; 
+    
+    let product = null;
+    if (products) {
+        product = products.find(p => p.id === String(productId));
     }
-    const product = products.find(p => p.id === productId);
     if (!product) {
-        showToast("找不到该商品");
+        const favorites = getMallFavorites();
+        product = favorites.find(p => p.id === String(productId));
+    }
+    if (!product) {
+        const purchases = getMallPurchases();
+        product = purchases.find(p => p.productId === String(productId) || p.id === String(productId));
+    }
+
+    if (!product) {
+        showToast("商品信息已失效，请刷新页面");
         return;
     }
 
