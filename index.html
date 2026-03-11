@@ -3744,9 +3744,7 @@
         /* 平板尺寸调整后，内部主页图标间距适配 */
         body.tablet-mode-active #grid-area { max-width: 550px; }
         body.tablet-mode-active .dock-container { max-width: 400px; }
-        /* 平板不适合猫耳朵，强制隐藏 */
-        body.tablet-mode-active .cute-cat-ear { display: none !important; }
-        /* ========================================================================= */
+
 
         .phone-container {
           position: fixed;
@@ -5455,25 +5453,18 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     </div>
     <div class="wb-color-content" id="wb-color-list"></div>
 </div>
-
 <!-- *** START: Takeout App *** -->
 <div id="takeout-app-page">
     <div class="takeout-header">
         <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="takeout-back-btn" onclick="closeTakeoutApp()">
-        <div class="takeout-title" id="takeout-top-bar-title">点菜</div>
-        <button id="takeout-toggle-edit-btn">编辑</button>
+        <div class="takeout-title" id="takeout-top-bar-title">商家</div>
+        <img id="takeout-search-btn" src="https://img.heliar.top/file/1773227369973_搜索_search.png" style="width: 24px; height: 24px; object-fit: contain; cursor: pointer;" onclick="showToast('搜索功能待开发')">
     </div>
 
     <div class="takeout-content-wrapper">
         <div id="takeout-page-order" class="page active">
-            <div class="order-layout">
-                <div class="category-sidebar"><div id="takeout-category-list"></div></div>
-                <div class="dishes-main"><div id="takeout-dish-list"></div></div>
-            </div>
-            <div id="takeout-order-footer" class="order-footer hidden">
-                <div class="total-info">已选 <span id="takeout-total-quantity">0</span> 件</div>
-                <button id="takeout-place-order-btn">下单</button>
-            </div>
+            <!-- 内容已清空 -->
+            <div style="text-align: center; color: #999; padding-top: 100px; font-size: 14px;">附近暂无商家~</div>
         </div>
         <div id="takeout-page-menu" class="page"><div id="takeout-menu-list"></div></div>
         <div id="takeout-page-my" class="page">
@@ -5490,10 +5481,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
     
-    <nav class="bottom-nav">
-        <button class="nav-item active" data-page="takeout-page-order"><svg viewBox="0 0 24 24"><path d="M16 6V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H2v13c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6h-6zm-6-2h4v2h-4V4zM4 8h16v11H4V8zm2 1v3h3V9H6zm5 0v3h3V9h-3zm5 0v3h3V9h-3z"></path></svg><span>点菜</span></button>
+        <nav class="bottom-nav">
+        <button class="nav-item active" data-page="takeout-page-order"><svg viewBox="0 0 24 24"><path d="M16 6V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H2v13c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6h-6zm-6-2h4v2h-4V4zM4 8h16v11H4V8zm2 1v3h3V9H6zm5 0v3h3V9h-3zm5 0v3h3V9h-3z"></path></svg><span>商家</span></button>
         <button class="nav-item" data-page="takeout-page-menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg><span>菜单</span></button>
-        <button class="nav-item" data-page="takeout-page-my"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg><span>我的</span></button>
+    <button class="nav-item" data-page="takeout-page-my"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg><span>我的</span></button>
     </nav>
     
     <div id="takeout-dish-detail-modal" class="modal"><div class="modal-content"><button class="close-modal-btn">&times;</button><img id="takeout-dish-detail-image" src=""><h3 id="takeout-dish-detail-name"></h3><h4>制作步骤</h4><div id="takeout-dish-detail-steps" class="steps-content"></div></div></div>
@@ -6710,11 +6701,17 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
       }
       localStorage.setItem(TABLET_MODE_KEY, enabled);
+      // 新增：每次切换平板模式时，重新应用一次猫耳朵状态
+      const catEars = document.getElementById('cat-ears-switch').checked;
+      applyCatEars(catEars);
     }
+
     
     function applyCatEars(enabled) {
         const isPhoneFrameActive = document.body.classList.contains('phone-frame-active');
-        if (enabled && isPhoneFrameActive) {
+        const isTabletModeActive = document.body.classList.contains('tablet-mode-active');
+        // 修改：现在无论是手机框还是平板模式，只要开启都可以显示猫耳朵
+        if (enabled && (isPhoneFrameActive || isTabletModeActive)) {
             document.body.classList.add('cat-ears-active');
         } else {
             document.body.classList.remove('cat-ears-active');
@@ -7048,16 +7045,14 @@ function renderPurchasedProducts() {
         const $ = (selector) => takeoutAppContainer.querySelector(selector);
         const $$ = (selector) => takeoutAppContainer.querySelectorAll(selector);
 
-        function renderAll() {
-            renderCategories();
-            renderDishes();
-            renderOrderFooter();
+function renderAll() {
+            // 移除被删除界面的渲染调用
             renderMenuList();
             renderMyPage();
         }
-
-        function renderCategories() {
-            $('#takeout-category-list').innerHTML = '';
+function renderCategories() {
+            const list = $('#takeout-category-list');
+            if (list) list.innerHTML = '';
             appState.categories.forEach(cat => {
                 const item = document.createElement('div');
                 item.className = `category-item ${cat.id === appState.activeCategoryId ? 'active' : ''}`;
@@ -7174,13 +7169,14 @@ function renderPurchasedProducts() {
             if (!appState.partnerId) $('#takeout-friend-id-input').value = '';
         }
 
-        function switchPage(pageId) {
+function switchPage(pageId) {
             $$('.page').forEach(p => p.classList.remove('active'));
             $('#' + pageId).classList.add('active');
             $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.page === pageId));
-            $('#takeout-top-bar-title').textContent = { 'takeout-page-order': '点菜', 'takeout-page-menu': '菜单', 'takeout-page-my': '我' }[pageId];
-            $('#takeout-toggle-edit-btn').style.display = pageId === 'takeout-page-order' ? 'block' : 'none';
-            if (appState.isEditMode && pageId !== 'takeout-page-order') toggleEditMode();
+            $('#takeout-top-bar-title').textContent = { 'takeout-page-order': '商家', 'takeout-page-menu': '菜单', 'takeout-page-my': '我' }[pageId];
+            
+            const searchBtn = $('#takeout-search-btn');
+            if (searchBtn) searchBtn.style.display = pageId === 'takeout-page-order' ? 'block' : 'none';
         }
 
         function updateQuantity(dishId, newQuantity) {
@@ -7304,11 +7300,10 @@ function renderPurchasedProducts() {
             reader.readAsText(file);
             event.target.value = '';
         }
-
         $$('.nav-item').forEach(item => item.addEventListener('click', () => switchPage(item.dataset.page)));
         $$('.modal').forEach(modal => modal.addEventListener('click', e => { if (e.target === modal || e.target.classList.contains('close-modal-btn')) closeModal(modal.id); }));
-        $('#takeout-toggle-edit-btn').addEventListener('click', toggleEditMode);
-        $('#takeout-place-order-btn').addEventListener('click', placeOrder);
+        
+        // 删除了与旧按钮相关的事件绑定，避免报错
         $('#takeout-save-dish-full-btn').addEventListener('click', saveDish);
         
         $('#takeout-get-my-id-btn').addEventListener('click', () => { 
@@ -9578,7 +9573,7 @@ Strictly adhere to the JSON format. Example:
                 let imageGridHtml = '';
                 let images = moment.images || (moment.imageUrl ? [moment.imageUrl] : []);
                 
-                // 渲染用户发的老版真实图片
+                        // 渲染用户发的老版真实图片
                 if (images.length > 0) {
                     let gridClass = 'single-img';
                     if (images.length === 1) gridClass = 'single-img';
@@ -9590,7 +9585,13 @@ Strictly adhere to the JSON format. Example:
                             // 兼容以前的旧数据（纯字符串）和新数据（对象）
                             let url = typeof item === 'string' ? item : item.url;
                             let desc = typeof item === 'string' ? '没有画面描述' : (item.desc || '没有画面描述');
-                            let safeDesc = desc.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                            
+                            // 修复致命BUG：全面转义换行符和回车，防止代码被截断崩溃
+                            let safeDesc = desc.replace(/\\/g, "\\\\")
+                                               .replace(/'/g, "\\'")
+                                               .replace(/"/g, "&quot;")
+                                               .replace(/\n/g, "\\n")
+                                               .replace(/\r/g, "\\r");
                             
                             // 绑定我们上一次写好的 AI Emoji 描述弹窗事件，完美复用
                             return `<img src="${url}" class="moment-grid-img" onclick="showEmojiImageDesc('📷', '${safeDesc}'); event.stopPropagation();">`;
@@ -9600,7 +9601,13 @@ Strictly adhere to the JSON format. Example:
                 
                 // 渲染 AI 生成的 Emoji 图片
                 if (moment.emojiImage) {
-                    let desc = (moment.emojiDescription || '一张图片').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    // 同步修复 AI 生成的描述换行问题
+                    let desc = (moment.emojiDescription || '一张图片')
+                                       .replace(/\\/g, "\\\\")
+                                       .replace(/'/g, "\\'")
+                                       .replace(/"/g, "&quot;")
+                                       .replace(/\n/g, "\\n")
+                                       .replace(/\r/g, "\\r");
                     let emoji = (moment.emojiImage).replace(/'/g, "\\'").replace(/"/g, "&quot;");
                     imageGridHtml += `
                     <div class="moment-emoji-container" onclick="showEmojiImageDesc('${emoji}', '${desc}'); event.stopPropagation();" style="font-size: 60px; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; background-color: #f9f9f9; border-radius: 8px; cursor: pointer; margin-top: 8px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); border: 1px solid #eee; transition: background 0.2s;">
