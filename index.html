@@ -905,14 +905,63 @@
         .role-wb-binding-area button#role-wb-clear-btn { background-color: #eee; color: #999; }
         
         /* --- Chat List & Contact List Styles --- */
-        .chat-list-container { width: 100%; }
-        .chat-list-item { display: flex; align-items: center; padding: 12px 20px; background-color: white; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: background-color 0.2s; }
-        .chat-list-item:active { background-color: #f0f0f0; }
-        .chat-list-avatar { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; margin-right: 15px; background-color: #eee; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .chat-list-info { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
-        .chat-list-name { font-size: 16px; color: #111; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chat-list-msg { font-size: 13px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
+        .chat-list-container { 
+            width: 100%; 
+            padding: 10px 15px; /* 增加页面两边的留白 */
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* 卡片之间的间距 */
+        }
+        .chat-list-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 15px; /* 更丰满的内边距 */
+            background-color: white; 
+            border-radius: 20px; /* 大圆角设计 */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* 柔和干净的悬浮白底阴影 */
+            cursor: pointer; 
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s; 
+        }
+        .chat-list-item:active { 
+            background-color: #fcfcfc; 
+            transform: scale(0.96); /* 点击时Q弹缩小的动画反馈 */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        .chat-list-avatar { 
+            width: 52px; /* 头像稍微放大一点 */
+            height: 52px; 
+            border-radius: 18px; /* 头像变得更圆滑 */
+            object-fit: cover; 
+            margin-right: 15px; 
+            background-color: #f5f5f5; 
+            flex-shrink: 0; 
+            box-shadow: 0 4px 12px rgba(229, 138, 171, 0.15); /* 加一点淡淡的粉色高级光影 */
+        }
+        .chat-list-info { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            min-width: 0; 
+        }
+        .chat-list-name { 
+            font-size: 16px; 
+            color: #333; 
+            font-weight: 600; /* 加粗提神 */
+            margin-bottom: 6px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            letter-spacing: 0.5px;
+        }
+        .chat-list-msg { 
+            font-size: 13px; 
+            color: #999; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            line-height: 1.2;
+        }
         .contact-list-container { width: 100%; padding-bottom: 80px; padding-right: 25px; }
         .contact-section-title {
             padding: 8px 20px; font-size: 13px; font-weight: 600; color: #999;
@@ -3674,7 +3723,6 @@
             width: 100%;
             height: 100%;
         }
-
         /* 平板外观与尺寸 */
         body.tablet-mode-active .phone-container {
             display: flex;
@@ -3687,6 +3735,11 @@
             /* 限制最大占屏幕的 75%，确保四周留有足够缝隙，绝对碰不到边缘 */
             transform: scale(min(calc(75vw / 640), calc(75vh / 675)));
             transform-origin: center center;
+            overflow: hidden; /* 新增：强制裁剪一切溢出外框的元素，消除尖角 */
+        }
+        /* 新增：匹配外壳缩小后的屏幕内圆角，防止黑边 */
+        body.tablet-mode-active .screen {
+            border-radius: 20px; 
         }
         /* 平板尺寸调整后，内部主页图标间距适配 */
         body.tablet-mode-active #grid-area { max-width: 550px; }
@@ -9479,28 +9532,44 @@ Strictly adhere to the JSON format. Example:
 
                 let likesHtml = '';
                 if (moment.likes && moment.likes.length > 0) {
-                    const likerProfile = getUserProfile(); 
-                    const likerName = likerProfile.nickname || "User";
-                    likesHtml = `<div class="moment-likes"><img src="https://img.heliar.top/file/1770356881218_喜欢_like_4.png" style="width:14px;height:14px;object-fit:contain;"> ${escapeHtml(likerName)}</div>`;
+                    // 遍历点赞数组，动态匹配最新昵称/备注
+                    const likerNames = moment.likes.map(likerId => {
+                        if (String(likerId) === String(userProfile.qqId)) {
+                            return userProfile.nickname || "User";
+                        } else {
+                            const contact = contacts.find(c => String(c.id) === String(likerId));
+                            return contact ? (contact.alias || contact.name) : "未知";
+                        }
+                    }).join('，');
+                    
+                    likesHtml = `<div class="moment-likes"><img src="https://img.heliar.top/file/1770356881218_喜欢_like_4.png" style="width:14px;height:14px;object-fit:contain;"> ${escapeHtml(likerNames)}</div>`;
                 }
 
                 let commentsHtml = '';
                 if (moment.comments && moment.comments.length > 0) {
                     commentsHtml = `<div class="moment-comments-list">` +
                         moment.comments.map(c => {
-                            const profile = getUserProfile();
+                            // 动态匹配评论者最新昵称/备注
+                            let currentUserName = c.user; 
+                            if (String(c.userId) === String(userProfile.qqId)) {
+                                currentUserName = userProfile.nickname || c.user;
+                            } else {
+                                const contact = contacts.find(contact => String(contact.id) === String(c.userId));
+                                if (contact) {
+                                    currentUserName = contact.alias || contact.name;
+                                }
+                            }
+
                             let clickHandler = '';
                             // 只有当评论不是你自己发的时候，才允许点击回复
-                            if (c.userId !== profile.qqId) {
-                                // 把要回复的用户名传给 openCommentInput 函数
-                                const safeUsername = c.user.replace(/'/g, "\\'");
+                            if (String(c.userId) !== String(userProfile.qqId)) {
+                                const safeUsername = currentUserName.replace(/'/g, "\\'");
                                 clickHandler = `onclick="openCommentInput(${moment.id}, '${safeUsername}')"`;
                             }
 
                             let replyHtml = c.replyTo ? `<span style="color:#333; font-weight:normal; margin: 0 4px;">回复</span><span class="user">${escapeHtml(c.replyTo)}</span>` : '';
                             
-                            // 在最外层的 div 上加上我们刚生成的 clickHandler
-                            return `<div class="moment-comment-item" ${clickHandler}><span class="user">${escapeHtml(c.user)}</span>${replyHtml}<span style="color:#333;">：</span><span class="text">${escapeHtml(c.text)}</span></div>`;
+                            return `<div class="moment-comment-item" ${clickHandler}><span class="user">${escapeHtml(currentUserName)}</span>${replyHtml}<span style="color:#333;">：</span><span class="text">${escapeHtml(c.text)}</span></div>`;
                         }).join('') +
                     `</div>`;
                 }
@@ -9995,37 +10064,38 @@ Strictly adhere to the JSON format. Example:
                     latestReplyTo = lastComment.replyTo;
                 }
 
-                // --- 新增代码：拦截用户对角色的连续追问 ---
-                // 如果这条最新评论是当前用户发的，且明确回复了当前遍历的这个角色
-                if (isReplyToComment && latestCommenter === uName && latestReplyTo === (contact.alias || contact.name)) {
-                    // 抛硬币：有 50% 的概率，角色选择“已读不回”，直接退出函数，不触发 AI 请求
-                    if (Math.random() >= 0.5) {
-                        console.log(`[AutoReact] 角色 ${contact.alias || contact.name} 50%概率决定已读不回。`);
-                        return; 
-                    }
-                }
-                // --- 新增代码结束 ---
-
                 let triggerReason = "";
                 let actionInstruction = "";
 
-                    if (isReplyToComment) {
-                        triggerReason = `“${latestCommenter}”刚刚在下面发表了新评论：“${latestCommentText}”。`;
-                        if (isMyMoment) {
-                            actionInstruction = `【最高强制指令】：这是你(你自己)发布的动态，现在你的好友 ${latestCommenter} 评论了你！你作为动态主人【必须】在评论区回复ta！\n你必须在JSON中返回 "action": "comment" (或"both")，并且务必填写 "replyTo": "${latestCommenter}"。如果不回复，不符合人类社交常理！`;
-                        } else {
-                            actionInstruction = `【互动提示】：这是 ${momentAuthorName} 发布的动态，现在 ${latestCommenter} 评论了。你可以选择跟评凑热闹，或者忽略。如果决定回复某人，请提供 "replyTo": "对方昵称"。`;
-                        }
+                if (isReplyToComment) {
+                    if (latestReplyTo === (contact.alias || contact.name)) {
+                        // 1. 最新评论明确是指名道姓回复【当前角色】的！
+                        triggerReason = `“${latestCommenter}”刚刚在动态下直接回复了你：“${latestCommentText}”。`;
+                        actionInstruction = `【最高强制指令】：${latestCommenter} 正在明确回复你！你【必须】在JSON中返回 "action": "comment" (或"both")，并且务必填写 "replyTo": "${latestCommenter}"。如果不回复，显得非常不礼貌！`;
+                    } else if (isMyMoment && !latestReplyTo) {
+                        // 2. 这是当前角色自己的动态，且别人进行了一般性评论
+                        triggerReason = `“${latestCommenter}”刚刚在你的动态下发表了新评论：“${latestCommentText}”。`;
+                        actionInstruction = `【最高强制指令】：这是你发布的动态，现在 ${latestCommenter} 评论了你！你作为动态主人【必须】在评论区回复ta！\n你必须在JSON中返回 "action": "comment" (或"both")，并且务必填写 "replyTo": "${latestCommenter}"。`;
                     } else {
-                        triggerReason = `${momentAuthorName} 刚刚发布了这条新动态。`;
-                        if (isMyMoment) {
-                            actionInstruction = `【互动提示】：这是你自己刚发的动态，没人评论前不需要自己评论自己，必须返回 "action": "ignore"。`;
+                        // 3. 其他人的动态，或者别人的评论是在回复另一个人（与当前角色无关）
+                        if (latestReplyTo) {
+                             return; // 别人在互相聊天，当前角色直接忽略，不消耗 API
                         } else {
-                            actionInstruction = `【互动提示】：请根据你的人设和关系，决定是否要给 ${momentAuthorName} 的这条新动态点赞或评论。`;
+                             triggerReason = `“${latestCommenter}”刚刚在 ${momentAuthorName} 的动态下评论：“${latestCommentText}”。`;
+                             actionInstruction = `【互动提示】：这是 ${momentAuthorName} 发布的动态，现在 ${latestCommenter} 评论了。如果符合你的性格，你可以选择跟评凑热闹，或者忽略("action": "ignore")。如果决定回复，请提供 "replyTo": "${latestCommenter}"。`;
                         }
                     }
+                } else {
+                    // 新发布动态的情况
+                    triggerReason = `${momentAuthorName} 刚刚发布了这条新动态。`;
+                    if (isMyMoment) {
+                        actionInstruction = `【互动提示】：这是你自己刚发的动态，没人评论前绝对不需要自己评论自己，必须返回 "action": "ignore"！`;
+                    } else {
+                        actionInstruction = `【互动提示】：请根据你的人设和关系，决定是否要给 ${momentAuthorName} 的这条新动态点赞或评论。`;
+                    }
+                }
 
-                    const sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
+                const sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
 ${worldbookContext ? `背景设定(世界书)：\n${worldbookContext}\n` : ''}
 ${recollectionContext ? `回忆总结(发生过的事)：\n${recollectionContext}\n` : ''}
@@ -10079,15 +10149,21 @@ ${actionInstruction}
 
                         const jsonReply = JSON.parse(reply);
 
-                        // 即使AI选了 ignore，如果是必须回复的情况，我们用兜底机制强行拉起回复（防偷懒）
+                        // 兜底机制：判断当前情况是否必须回复，如果AI偷懒，我们强行拉起它！
                         let finalAction = jsonReply.action;
-                        if (isReplyToComment && isMyMoment && finalAction === 'ignore') {
+                        let isMustReply = false;
+                        if (isReplyToComment) {
+                             if (latestReplyTo === (contact.alias || contact.name)) isMustReply = true;
+                             if (isMyMoment && !latestReplyTo) isMustReply = true;
+                        }
+                        
+                        if (isMustReply && finalAction === 'ignore') {
                             finalAction = 'comment';
-                            jsonReply.commentText = "收到~"; 
+                            jsonReply.commentText = "收到~"; // 强行拉起
                         }
 
                         let targetReplyTo = jsonReply.replyTo || null;
-                        if (isReplyToComment && isMyMoment && !targetReplyTo) {
+                        if (isMustReply && !targetReplyTo) {
                             targetReplyTo = latestCommenter;
                         }
 
