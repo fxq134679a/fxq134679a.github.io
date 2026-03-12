@@ -5379,14 +5379,92 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .takeout-shop-data-label {
             font-size: 11px; color: #888;
         }
-        .takeout-shop-data-value {
+                .takeout-shop-data-value {
             font-size: 16px; font-weight: bold; color: #333;
+        }
+
+        /* ========================= 新增：锁屏页面样式 ========================= */
+        #lock-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: 9500; /* 盖在主屏幕上，但在各种弹窗之下 */
+            display: none; /* 默认隐藏 */
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+        }
+        #lock-screen.unlocked {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .lock-top-status {
+            margin-top: calc(env(safe-area-inset-top, 20px) + 30px);
+            color: #e0e0e0;
+            font-size: 13px;
+            font-weight: 300;
+            font-family: sans-serif;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+        }
+        .lock-big-time {
+            font-size: 110px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.35); /* 35%透明度白色，作为底纹 */
+            margin-top: 10px;
+            line-height: 1;
+            text-align: center;
+            user-select: none;
+        }
+        .lock-bottom-actions {
+            position: absolute;
+            bottom: calc(env(safe-area-inset-bottom, 20px) + 40px);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 45px;
+        }
+        .lock-action-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3); /* 半透明白色背景 */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .lock-action-btn:active {
+            transform: scale(0.9);
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        /* 手机框模式下的顶部间距适配 */
+        body.phone-frame-active #lock-screen .lock-top-status,
+        body.tablet-mode-active #lock-screen .lock-top-status {
+            margin-top: calc(30px + var(--status-bar-height));
         }
 
     </style>
 </head>
 <body>
 <div id="app-wrapper">
+<!-- 新增：锁屏页面 -->
+<div id="lock-screen">
+    <div class="lock-top-status" id="lock-top-status">加载中...</div>
+    <div class="lock-big-time" id="lock-big-time">00:00</div>
+    <div class="lock-bottom-actions">
+        <div class="lock-action-btn flashlight">🔦</div>
+        <div class="lock-action-btn camera">📷</div>
+    </div>
+</div>
+
 <div id="home-screen">
     <div id="time-section">
         <div id="time-container" onclick="handleTimeBgClick(event)">
@@ -6293,9 +6371,18 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     </div>
                 
     <div class="settings-content">
-                <div class="settings-module">
+                        <div class="settings-module">
             <h3>通用</h3>
+            <!-- 新增锁屏开关 -->
             <div class="settings-row-with-switch">
+                <label for="lock-screen-switch">开启锁屏界面</label>
+                <label class="ios-switch">
+                    <input type="checkbox" id="lock-screen-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            
+            <div class="settings-row-with-switch" style="margin-top: 10px;">
                 <label for="ios-mode-switch">iOS 模式 (刘海屏适配)</label>
                 <label class="ios-switch">
                     <input type="checkbox" id="ios-mode-switch">
@@ -7291,7 +7378,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     const TAKEOUT_APP_DATA_KEY = 'couple_order_data_v2'; 
     /* --- 新增的代码 --- */
     const ICON_FONT_LIGHT_MODE_KEY = 'iconFontLightMode_v1';
-    const MOMENTS_UNREAD_COUNT_KEY = 'momentsUnreadCount_v1'; // 新增：红点计数缓存
+        const MOMENTS_UNREAD_COUNT_KEY = 'momentsUnreadCount_v1'; // 新增：红点计数缓存
+    const LOCK_SCREEN_KEY = 'lockScreenEnabled_v1'; // 新增：锁屏开关状态
     /* --- 新增结束 --- */
     // 下面这些是被不小心删掉的重要变量，现在全部补回来啦！
     let customDateText = ""; 
@@ -14532,10 +14620,11 @@ window.openTransferConfirmPopup = (amount) => {
 
 
     // --- Global Settings & OS Features ---
-        window.showSettingsPage = () => {
+            window.showSettingsPage = () => {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
+        document.getElementById('lock-screen-switch').checked = localStorage.getItem(LOCK_SCREEN_KEY) === 'true'; // 回显锁屏状态
         document.getElementById('ios-mode-switch').checked = localStorage.getItem(IOS_MODE_KEY) === 'true';
-        document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
+document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
         document.getElementById('tablet-mode-switch').checked = localStorage.getItem(TABLET_MODE_KEY) === 'true'; // 新增：回显平板模式开关状态
         document.getElementById('cat-ears-switch').checked = localStorage.getItem(CAT_EARS_KEY) === 'true';
 
@@ -14626,7 +14715,11 @@ window.openTransferConfirmPopup = (amount) => {
         settings.visual.mainAvatar2 = document.getElementById('main-avatar2-url').value.trim();
         settings.visual.clockColor = document.getElementById('clock-color-input').value.trim();
         
-        localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
+                localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
+        
+        // 保存并应用锁屏开关
+        const isLockScreen = document.getElementById('lock-screen-switch').checked;
+        localStorage.setItem(LOCK_SCREEN_KEY, isLockScreen);
         
         const iosMode = document.getElementById('ios-mode-switch').checked;
         applyIOSMode(iosMode);
@@ -14730,13 +14823,17 @@ window.openTransferConfirmPopup = (amount) => {
         const wp = settings.visual?.wallpaper || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
         
         // 【关键修改】：加上平板模式的判断，只要开启了其中一个框，壁纸就要贴在屏幕内
-        if (document.body.classList.contains('phone-frame-active') || document.body.classList.contains('tablet-mode-active')) {
+                if (document.body.classList.contains('phone-frame-active') || document.body.classList.contains('tablet-mode-active')) {
             phoneScreen.style.backgroundImage = `url(${wp})`;
             document.body.style.backgroundImage = 'none';
         } else {
             document.body.style.backgroundImage = `url(${wp})`;
             phoneScreen.style.backgroundImage = 'none';
         }
+        
+        // 新增：让锁屏同步壁纸
+        const lockScreen = document.getElementById('lock-screen');
+        if (lockScreen) lockScreen.style.backgroundImage = `url(${wp})`;
 
         const avatar1 = document.getElementById('chat-avatar-1');
         const avatar2 = document.getElementById('chat-avatar-2');
@@ -15535,7 +15632,7 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
 
         applyVisualSettings();
 
-        // 2. 监听“开关灯”按钮的点击，立即生效
+                // 2. 监听“开关灯”按钮的点击，立即生效
         document.getElementById('icon-font-color-switch').addEventListener('change', (e) => {
             applyIconFontLightMode(e.target.checked);
         });
@@ -15543,12 +15640,81 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
         
         updateMomentsBadgeUI(); // 新增：页面加载时刷新一次红点状态
         
-        setInterval(updatePhoneTime, 1000);
+        /* ========================= 新增：锁屏逻辑 ========================= */
+        const lockScreen = document.getElementById('lock-screen');
+        if (localStorage.getItem(LOCK_SCREEN_KEY) === 'true') {
+            lockScreen.style.display = 'flex';
+        }
+
+        function updateLockScreenTimeAndDate() {
+            if (lockScreen.style.display === 'none') return;
+            
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('lock-big-time').innerText = `${h}:${m}`;
+            
+            // 使用原生 Intl 提取农历 (例: "甲辰年二月十一")
+            const lunarFormatter = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', { year: 'numeric', month: 'long', day: 'numeric' });
+            const lunarStr = lunarFormatter.format(now);
+            
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const weeks = ['日', '一', '二', '三', '四', '五', '六'];
+            const dayStr = weeks[now.getDay()];
+            
+            // 拼合日期格式：3月12日周四 · 丙午年正月廿四
+            document.getElementById('lock-top-status').innerText = `${month}月${date}日周${dayStr} · ${lunarStr}`;
+        }
+
+        // 上滑解锁手势逻辑
+        let lsStartY = 0;
+        let isDraggingLs = false;
+
+        lockScreen.addEventListener('touchstart', (e) => {
+            lsStartY = e.touches[0].clientY;
+            isDraggingLs = true;
+            lockScreen.style.transition = 'none'; // 拖动时去掉过渡，跟手
+        });
+
+        lockScreen.addEventListener('touchmove', (e) => {
+            if (!isDraggingLs) return;
+            let currentY = e.touches[0].clientY;
+            let diff = currentY - lsStartY;
+            if (diff < 0) { // 只能往上拉
+                lockScreen.style.transform = `translateY(${diff}px)`;
+            }
+        });
+
+        lockScreen.addEventListener('touchend', (e) => {
+            if (!isDraggingLs) return;
+            isDraggingLs = false;
+            let currentY = e.changedTouches[0].clientY;
+            lockScreen.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease'; // 恢复过渡
+
+            if (lsStartY - currentY > 150) { 
+                // 滑动超过150px，判定为解锁
+                lockScreen.classList.add('unlocked');
+                setTimeout(() => { lockScreen.style.display = 'none'; }, 400); // 动画结束后彻底隐藏
+            } else {
+                // 没滑够，弹回去
+                lockScreen.style.transform = `translateY(0)`;
+            }
+        });
+        
+        // 初始更新一次锁屏时间
+        updateLockScreenTimeAndDate();
+        /* ========================= 锁屏逻辑结束 ========================= */
+
+        setInterval(() => {
+            updatePhoneTime();
+            updateLockScreenTimeAndDate(); // 每秒同步更新锁屏时间
+        }, 1000);
         updatePhoneTime();
 
         loadHomeBubbles(); // 新增：加载主页气泡的文字
 
-                setTimeout(() => {
+        setTimeout(() => {
              initializeAllAutoPosts();
         }, 2000);
     });
