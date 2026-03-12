@@ -6025,62 +6025,41 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
-        <!-- 创建外卖店铺弹窗 -->
+            <!-- 创建外卖店铺弹窗 (圆滑可爱版) -->
     <div id="create-takeout-shop-modal" class="delete-confirm-modal" style="z-index: 1000;">
-        <div class="wb-modal-card" onclick="event.stopPropagation()">
-          <div class="wb-modal-header" style="color: var(--takeout-primary-color);">创建外卖店铺</div>
-            <div class="wb-modal-scroll-area" style="padding-top: 5px;">
-                <!-- 移除文件上传的 onclick 事件 -->
-                <div class="create-forum-avatar-upload" style="margin: 0 auto 10px; width: 85px; height: 85px; border-radius: 12px; background: #f9f9f9; border: 1px dashed var(--takeout-primary-color); cursor: default;">
-                    <span id="takeout-shop-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:16px;">封面预览</span>
-                    <img id="takeout-shop-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; border-radius:12px;">
+        <div class="wb-modal-card" style="background: #ffffff; border-radius: 28px; padding: 25px 20px; box-shadow: 0 10px 40px rgba(255, 182, 193, 0.3);" onclick="event.stopPropagation()">
+            <div class="wb-modal-header" style="color: var(--takeout-primary-color); font-size: 18px; font-weight: bold; border-bottom: none; margin-bottom: 15px; padding-bottom: 0;">🎀 创建专属店铺 🎀</div>
+            
+            <div class="wb-modal-scroll-area" style="padding: 0 5px; margin-bottom: 0;">
+                <!-- 封面预览 -->
+                <div style="margin: 0 auto 15px; width: 90px; height: 90px; border-radius: 24px; background: #fffafb; border: 2px dashed #ffcce0; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                    <span id="takeout-shop-avatar-placeholder" style="color:#ffb3c6; font-size:14px; font-weight: 500;">封面预览</span>
+                    <img id="takeout-shop-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
                 </div>
-                <!-- 新增 URL 输入框，输入时实时预览 -->
-                <input type="text" id="takeout-create-avatar-url" class="wb-main-input" placeholder="输入店铺封面图URL(可选)" style="border-color: #eee; margin-bottom: 15px;" oninput="updateTakeoutShopAvatarPreview(this.value)">
                 
-                <input type="text" id="takeout-create-name" class="wb-main-input" placeholder="店铺名称" style="border-color: #eee;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                    <input type="number" id="takeout-create-rating" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="评分 (如: 4.8)" step="0.1" max="5">
-                    <input type="number" id="takeout-create-sales" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="月售量 (如: 2000)">
-                    <input type="number" id="takeout-create-time" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="配送时间(分钟)">
-                    <input type="number" id="takeout-create-distance" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="距离(km)" step="0.1">
+                <!-- URL和名称 -->
+                <input type="text" id="takeout-create-avatar-url" placeholder="封面图URL (可选)" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 14px; outline: none; transition: all 0.2s;" oninput="updateTakeoutShopAvatarPreview(this.value)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                <input type="text" id="takeout-create-name" placeholder="店铺名称" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 14px; outline: none; font-weight: bold; transition: all 0.2s;" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                
+                <!-- 4个小数据网格 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <input type="number" id="takeout-create-rating" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="评分(如 4.8)" step="0.1" max="5" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-sales" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="月售(如 2000)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-time" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="配送(分钟)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-distance" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="距离(km)" step="0.1" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
                 </div>
-                <!-- 新增：店铺内容输入框和绑定角色区 -->
-                <textarea id="takeout-create-desc" class="wb-entry-input val" style="min-height: 80px; width: 100%; border: 1px solid #eee; background: #f9f9f9; margin-bottom: 10px; padding: 10px; font-size: 14px;" placeholder="填写店铺内容"></textarea>
-                <div id="takeout-create-role-selection-display" style="width: 100%; padding: 10px; font-size: 13px; color: #999; background-color: #f9f9f9; border-radius: 8px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 10px; border: 1px solid #eee;">未绑定角色</div>
-                <button class="create-forum-wb-btn" style="background: var(--takeout-primary-color); color: white; opacity: 0.8; margin-bottom: 5px;" onclick="openTakeoutShopRoleBindModal()">绑定角色 (可选)</button>
-            </div>
-            <div class="wb-modal-actions" style="margin-top: 5px;">
-                <button class="wb-action-btn wb-btn-cancel" onclick="closeCreateTakeoutShopModal()">取消</button>
-                <button class="wb-action-btn wb-btn-ok" style="background:var(--takeout-primary-color); color:white;" onclick="saveNewTakeoutShop()">创建</button>
-            </div>
-        </div>
-    </div>
-            <!-- 新增：外卖个人设置全屏页 (包含资料修改和店铺编辑) -->
-    <div id="takeout-profile-page">
-        <div class="takeout-profile-header">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeTakeoutProfileModal()">
-            <div class="takeout-profile-title">外卖设置</div>
-            <div style="font-size: 15px; font-weight: 600; color: var(--takeout-primary-color); cursor: pointer;" onclick="saveTakeoutProfile()">保存</div>
-        </div>
-        <div style="flex: 1; overflow-y: auto; padding: 20px;">
-            <!-- 个人资料部分 -->
-            <div style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 20px;">
-                <div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; color: #333;">个人资料</div>
-                <div class="create-forum-avatar-upload" style="margin: 0 auto 15px; width: 80px; height: 80px; border-radius: 50%; cursor: default; background: #f9f9f9; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed var(--takeout-primary-color);">
-                    <span id="takeout-my-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:30px; display:none;"></span>
-                    <img id="takeout-my-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;">
-                </div>
-                <input type="text" id="takeout-my-avatar-url-input" class="add-friend-input" placeholder="外卖头像 URL" oninput="document.getElementById('takeout-my-avatar-preview').src = this.value || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'" style="width: 100%; padding: 12px 15px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 12px; margin-bottom: 12px; font-size: 14px; outline: none; transition: border-color 0.2s;">
-                <input type="text" id="takeout-my-nickname-input" class="add-friend-input" placeholder="外卖昵称" style="width: 100%; padding: 12px 15px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 12px; font-size: 14px; outline: none; transition: border-color 0.2s;">
+
+                <!-- 店铺内容 -->
+                <textarea id="takeout-create-desc" style="width: 100%; min-height: 80px; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 14px; outline: none; resize: none; transition: all 0.2s; line-height: 1.5;" placeholder="写点什么来介绍这家店吧~ (会影响AI生成的菜品和评价)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'"></textarea>
+                
+                <!-- 角色绑定 -->
+                <div id="takeout-create-role-selection-display" style="width: 100%; padding: 12px; font-size: 13px; color: #ff8fb3; background-color: #fff5f8; border-radius: 16px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 12px; font-weight: 500;">未绑定角色</div>
+                <button style="width: 100%; padding: 12px; border-radius: 16px; border: 1px dashed #ffcce0; background-color: transparent; color: #ff8fb3; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; margin-bottom: 5px;" onclick="openTakeoutShopRoleBindModal()">+ 绑定角色 (可选)</button>
             </div>
             
-            <!-- 我创建的店铺部分 -->
-            <div style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                <div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; color: #333;">我创建的店铺</div>
-                <div id="takeout-my-shops-list">
-                    <!-- 动态生成 -->
-                </div>
+            <div class="wb-modal-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                <button style="flex: 1; padding: 12px; border-radius: 20px; background: #f5f5f5; color: #888; border: none; font-size: 15px; font-weight: bold; cursor: pointer;" onclick="closeCreateTakeoutShopModal()">取消</button>
+                <button style="flex: 1; padding: 12px; border-radius: 20px; background: var(--takeout-primary-color); color: white; border: none; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);" onclick="saveNewTakeoutShop()">开店！</button>
             </div>
         </div>
     </div>
@@ -8695,7 +8674,7 @@ function renderCategories() {
         showToast('资料已保存');
     };
 
-    // ================== 新增：渲染、编辑和删除我的店铺 ==================
+        // ================== 新增：渲染、编辑和删除我的店铺 ==================
     window.renderTakeoutMyShops = () => {
         const listContainer = document.getElementById('takeout-my-shops-list');
         let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
@@ -8708,7 +8687,6 @@ function renderCategories() {
         
         let html = '';
         customShops.forEach(shop => {
-            // 找到它在原缓存数组中的真实位置，方便精准修改和删除
             const originalIndex = shops.findIndex(s => s.name === shop.name && s.isCustom);
             
             let rolesText = '未绑定角色';
@@ -8721,7 +8699,6 @@ function renderCategories() {
                 rolesText = '已绑定: ' + names;
             }
 
-            // 从表情标签里提取出原来填写的图片URL
             let imgUrl = '';
             if(shop.emoji && shop.emoji.includes('<img src="')) {
                 const match = shop.emoji.match(/<img src="([^"]+)"/);
@@ -8729,33 +8706,39 @@ function renderCategories() {
             }
 
             html += `
-            <div style="border: 1px solid #f0f0f0; border-radius: 16px; padding: 15px; margin-bottom: 15px; background: #fafafa; position: relative;">
+            <div style="border: 1px solid #f0f0f0; border-radius: 20px; padding: 20px; margin-bottom: 15px; background: #fafafa; position: relative;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
                     <span style="font-weight:bold; font-size: 16px; color: #333;">设置此店铺</span>
-                    <span style="color: #F44336; font-size: 13px; cursor: pointer; padding: 4px 8px; border: 1px solid #ffcccc; background: #fff0f0; border-radius: 8px;" onclick="deleteTakeoutShop(${originalIndex})">删除店铺</span>
+                    <span style="color: #F44336; font-size: 13px; cursor: pointer; padding: 6px 10px; border: 1px solid #ffcccc; background: #fff0f0; border-radius: 12px;" onclick="deleteTakeoutShop(${originalIndex})">删除店铺</span>
                 </div>
                 
-                <div style="margin-bottom: 10px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 6px;">店铺名称</div>
-                    <input type="text" id="edit-shop-name-${originalIndex}" value="${escapeHtml(shop.name)}" style="width: 100%; padding: 10px 12px; border: 1px solid #eee; border-radius: 10px; font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;">
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">店铺名称</div>
+                    <input type="text" id="edit-shop-name-${originalIndex}" value="${escapeHtml(shop.name)}" style="width: 100%; padding: 12px 15px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;">
                 </div>
                 
-                <div style="margin-bottom: 10px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 6px;">封面图 URL (可选)</div>
-                    <input type="text" id="edit-shop-url-${originalIndex}" value="${imgUrl}" style="width: 100%; padding: 10px 12px; border: 1px solid #eee; border-radius: 10px; font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;">
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">封面图 URL (可选)</div>
+                    <input type="text" id="edit-shop-url-${originalIndex}" value="${imgUrl}" style="width: 100%; padding: 12px 15px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;">
                 </div>
                 
-                <div style="margin-bottom: 15px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 6px;">绑定角色 (可选)</div>
+                <!-- 新增：修改店铺内容 -->
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">店铺内容 (AI生成依据)</div>
+                    <textarea id="edit-shop-desc-${originalIndex}" style="width: 100%; min-height: 80px; padding: 12px 15px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; outline: none; background: #fff; resize: none; transition: border-color 0.2s;">${escapeHtml(shop.description || '')}</textarea>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">绑定角色 (可选)</div>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div id="edit-shop-roles-text-${originalIndex}" style="flex: 1; padding: 10px 12px; font-size: 13px; color: #666; background: #fff; border: 1px solid #eee; border-radius: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <div id="edit-shop-roles-text-${originalIndex}" style="flex: 1; padding: 12px 15px; font-size: 13px; color: #666; background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             ${rolesText}
                         </div>
-                        <button style="padding: 10px 15px; background: var(--takeout-primary-color); color: white; border: none; border-radius: 10px; font-size: 13px; cursor: pointer; white-space: nowrap;" onclick="openEditShopRoleBind(${originalIndex})">重新选择</button>
+                        <button style="padding: 12px 18px; background: var(--takeout-primary-color); color: white; border: none; border-radius: 12px; font-size: 13px; cursor: pointer; white-space: nowrap;" onclick="openEditShopRoleBind(${originalIndex})">重新选择</button>
                     </div>
                 </div>
                 
-                <button style="width: 100%; padding: 12px; background: var(--takeout-primary-color); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer;" onclick="saveTakeoutShopEdit(${originalIndex}, '${escapeHtml(shop.name.replace(/'/g, "\\'"))}')">更新店铺信息</button>
+                <button style="width: 100%; padding: 14px; background: var(--takeout-primary-color); color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);" onclick="saveTakeoutShopEdit(${originalIndex}, '${escapeHtml(shop.name.replace(/'/g, "\\'"))}')">保存店铺修改</button>
             </div>
             `;
         });
@@ -8797,13 +8780,14 @@ function renderCategories() {
         openWorldBookBindModal('roles');
     };
 
-    window.saveTakeoutShopEdit = (originalIndex, oldShopName) => {
+        window.saveTakeoutShopEdit = (originalIndex, oldShopName) => {
         let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
         let shop = shops[originalIndex];
         if(!shop) return;
         
         const newName = document.getElementById(`edit-shop-name-${originalIndex}`).value.trim();
         const newUrl = document.getElementById(`edit-shop-url-${originalIndex}`).value.trim();
+        const newDesc = document.getElementById(`edit-shop-desc-${originalIndex}`).value.trim(); // 获取新描述
         
         if(!newName) {
             showToast("店铺名称不能为空");
@@ -8811,6 +8795,8 @@ function renderCategories() {
         }
         
         shop.name = newName;
+        shop.description = newDesc; // 写入新描述
+        
         if(newUrl) {
             shop.emoji = `<img src="${newUrl}" style="width:100%; height:100%; border-radius:10px; object-fit:cover;">`;
         } else {
@@ -8824,11 +8810,12 @@ function renderCategories() {
         shops[originalIndex] = shop;
         localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(shops));
         
-        // 智能同步修改“收藏”库里的该店铺数据（根据老名字寻找并覆盖）
+        // 同步修改收藏库里的数据
         let favs = getTakeoutFavorites();
         let favIndex = favs.findIndex(f => f.name === oldShopName);
         if(favIndex > -1) {
             favs[favIndex].name = newName;
+            favs[favIndex].description = newDesc; // 同步收藏里的描述
             favs[favIndex].emoji = shop.emoji;
             if(shop.boundRoleIds !== undefined) favs[favIndex].boundRoleIds = shop.boundRoleIds;
             saveTakeoutFavorites(favs);
@@ -8836,7 +8823,7 @@ function renderCategories() {
         
         showToast("店铺修改成功");
         renderTakeoutMyShops();
-        renderTakeoutShopList(shops); // 即时更新外卖主页的商家列表
+        renderTakeoutShopList(shops);
     };
 
     window.deleteTakeoutShop = (originalIndex) => {
