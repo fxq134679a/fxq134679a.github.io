@@ -2044,32 +2044,79 @@
         
         .wb-content {
             flex: 1; padding: 20px; overflow-y: auto;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 20px; align-content: start;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 30px 15px; align-content: start;
+            perspective: 1000px; 
         }
         .wb-book-item {
             display: flex; flex-direction: column; align-items: center; cursor: pointer;
-            transition: transform 0.2s;
+            width: 100%;
+            transform-style: preserve-3d; 
+            /* 恢复正面摆放 */
+            transform: rotateY(0deg) rotateX(0deg); 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .wb-book-item:active { transform: scale(0.95); }
+             /* 长按时，沿另外的对角线翻转 */
+        .wb-book-item:active { 
+            transform: rotateY(30deg) rotateX(-10deg) scale(0.95); 
+        }
+
         
         .wb-book-cover {
-            width: 90px; height: 120px;
-            background: linear-gradient(135deg, #f5f5f5 0%, #EAEAEA 100%);
-            border-radius: 4px 8px 8px 4px;
-            box-shadow: 2px 4px 10px rgba(0,0,0,0.1), inset 4px 0 10px rgba(0,0,0,0.05);
+            width: 100%; aspect-ratio: 3/4.2; 
+            background: linear-gradient(135deg, #fdfdfd 0%, #e5e5e5 100%); 
+            /* 稍微收敛一点圆角，正面看更自然 */
+            border-radius: 2px 6px 6px 2px; 
+            /* 正面摆放时削弱右侧厚度，阴影也变得正向掉落 */
+            box-shadow: 
+                inset 4px 0 8px rgba(0,0,0,0.1), /* 左侧书脊内阴影 */
+                inset -1px 0 2px rgba(255,255,255,0.8), /* 封面右侧高光 */
+                1px 0 0 #f4f4f4, 2px 0 0 #e8e8e8, 3px 0 0 #f4f4f4, /* 右侧收敛的厚度 */
+                4px 6px 12px rgba(0,0,0,0.15); /* 向下/右下倾斜的投影 */
             display: flex; justify-content: center; align-items: center; padding: 10px;
-            position: relative; overflow: hidden; border: 1px solid rgba(0,0,0,0.08);
-            transition: background 0.3s;
+            position: relative; 
+            /* 左侧书脊深槽 */
+            border-left: 4px solid rgba(0,0,0,0.12); 
             background-size: cover;
             background-position: center;
+            transform-style: preserve-3d;
         }
-                .wb-book-cover::before {
-            content: ''; position: absolute; left: 4px; top: 0; width: 2px; height: 100%;
-            background: rgba(0,0,0,0.05); box-shadow: 2px 0 0 rgba(0,0,0,0.05);
+
+        /* 模拟书脊装订凹槽 */
+        .wb-book-cover::before {
+            content: ''; position: absolute; left: 4px; top: 0; bottom: 0; width: 3px;
+            background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(0,0,0,0.1), rgba(255,255,255,0.2));
+            z-index: 2; border-left: 1px solid rgba(255,255,255,0.3);
         }
-        .wb-book-name { font-size: 13px; font-weight: 600; color: #555; text-align: center; word-break: break-all; line-height: 1.4; }
+
+        /* 封面反光遮罩层 */
+        .wb-book-cover::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(110deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 45%, rgba(0,0,0,0.08) 100%);
+            border-radius: inherit; pointer-events: none; z-index: 2;
+        }
+
+
+
+        .wb-book-name { 
+            font-size: 13px; font-weight: 600; color: #555; text-align: center; 
+            word-break: break-all; line-height: 1.4; position: relative; z-index: 3; 
+            transform: translateZ(5px); 
+        }
         
+        /* 书名朝下模式的独立样式 */
+        .wb-content.title-bottom-mode .wb-book-cover .wb-book-name {
+            display: none; 
+        }
+        .wb-book-name-outer {
+            display: none;
+            font-size: 13px; font-weight: 600; color: #555; text-align: center;
+            margin-top: 8px; width: 100%; word-break: break-all; line-height: 1.3;
+        }
+        .wb-content.title-bottom-mode .wb-book-name-outer {
+            display: block; 
+        }
+
         /* 新增：世界书内容超过6行折叠样式 */
         .wb-detail-val.collapsed {
             display: -webkit-box;
@@ -2209,10 +2256,12 @@
 
         #worldbook-bind-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); z-index: 3000; /* 解决被其他高层级弹窗挡住的问题 */ backdrop-filter: blur(8px);
+            /* 修改：将层级从 3000 提升到 10100，确保压过所有 10050 的编辑弹窗 */
+            background: rgba(0,0,0,0.4); z-index: 10100; backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
+
 
         #worldbook-bind-modal.active { opacity: 1; pointer-events: auto; }
         .wb-bind-modal-card {
@@ -2345,6 +2394,158 @@
         .action-sheet-cancel:active { background-color: #f9f9f9; }
 
         /* --- NEW/MODIFIED: Forum App Styles --- */
+        /* --- NEW/MODIFIED: Forum App Styles --- */
+        
+        /* ==================== 新增：论坛首页布局重构 ==================== */
+        .forum-home-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 15px 10px 15px;
+            background-color: #fff;
+            position: relative;
+            flex-shrink: 0;
+            z-index: 15;
+        }
+
+        /* 适配刘海屏和手机外框 */
+        body.ios-mode-active .forum-home-header {
+            padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important;
+        }
+        body.phone-frame-active .forum-home-header, 
+        body.tablet-mode-active .forum-home-header {
+            padding-top: calc(15px + var(--status-bar-height)) !important;
+        }
+
+        .forum-home-tabs {
+            display: flex;
+            gap: 40px;
+        }
+
+        .forum-home-tab {
+            font-size: 16px;
+            color: #999;
+            font-weight: bold;
+            position: relative;
+            cursor: pointer;
+            padding-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .forum-home-tab.active {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .forum-tab-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 4px;
+            background-color: var(--theme-pink-btn); /* 浅粉色指示条 */
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .forum-home-tab.active .forum-tab-indicator {
+            opacity: 1;
+        }
+
+        .forum-home-search-wrapper {
+            background-color: #fff;
+            padding: 5px 20px 15px 20px;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);
+            flex-shrink: 0;
+            z-index: 14;
+        }
+
+        .forum-home-search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #f5f6f8;
+            border-radius: 999px; /* 胶囊圆滑状 */
+            padding: 10px 15px;
+            gap: 10px;
+        }
+
+        .forum-search-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            opacity: 0.5;
+        }
+
+        .forum-search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .forum-search-input::placeholder {
+            color: #aaa;
+        }
+
+        .forum-search-btn-text {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            padding-left: 12px;
+            border-left: 1px solid #ddd;
+        }
+
+               .forum-home-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 20px 100px 20px; /* 底部100px预留给胶囊导航栏 */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #FFF5F7; /* 1.改成极浅粉色背景 */
+        }
+
+        /* 热门页面专属：帖子头部样式 */
+        .forum-hot-post-header {
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 10px;
+        }
+        .forum-hot-forum-avatar {
+            width: 42px; 
+            height: 42px; 
+            border-radius: 12px; 
+            object-fit: cover; 
+            background: #eee;
+            box-shadow: 0 2px 8px rgba(229, 138, 171, 0.2);
+            cursor: pointer;
+        }
+        .forum-hot-forum-info {
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+        }
+        .forum-hot-forum-name {
+            font-size: 15px; 
+            font-weight: bold; 
+            color: #333;
+            cursor: pointer;
+        }
+        .forum-hot-forum-stats {
+            font-size: 11px; 
+            color: #999; 
+            margin-top: 4px;
+        }
+
+        /* ==================== 新增结束 ==================== */
+
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes shake {
           10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -2412,44 +2613,60 @@
             font-size: 18px; font-weight: 600; color: #f5b3c9;
         }
 
-        /* 论坛列表 (4xN Grid) */
+               /* ==================== 论坛列表 (2xN Grid 重构) ==================== */
+        .forum-section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 20px 10px; flex-shrink: 0;
+        }
+        .forum-section-title {
+            display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: bold; color: #333;
+        }
+        .forum-section-title img { width: 22px; height: 22px; object-fit: contain; }
+        .forum-section-more { font-size: 13px; color: #999; cursor: pointer; }
+
         #forum-list-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            padding: 20px 15px;
+            padding: 0 20px 20px;
             flex-shrink: 0;
         }
         
         .forum-list-item {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            gap: 8px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 16px;
+            gap: 10px;
             cursor: pointer;
             transition: transform 0.2s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
         .forum-list-item:active {
             transform: scale(0.95);
         }
         .forum-list-avatar {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 18px;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
             object-fit: cover;
             background-color: #f0f0f0;
-            box-shadow: 0 4px 10px rgba(229, 138, 171, 0.2);
+            box-shadow: none;
+            flex-shrink: 0;
+        }
+        .forum-list-info {
+            display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1;
         }
         .forum-list-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            width: 100%;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 14px; font-weight: bold; color: #333;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
+        .forum-list-level {
+            font-size: 11px; color: #888; margin-top: 4px; font-weight: bold;
+        }
+
         
         /* 帖子区 */
         #forum-posts-area, #forum-detail-posts-area {
@@ -2580,65 +2797,84 @@
             font-weight: 500;
         }
 
-        /* Forum Detail Page Styles */
+               /* 论坛详情页重构：大尺寸、磨砂、颜色互换 */
+        #forum-page-detail {
+            background-color: #fff; /* 替换内容区原本的浅粉，改成纯白 */
+        }
         #forum-detail-header {
-            padding: 15px; background-color: #fff;
-            display: flex; align-items: center; justify-content: space-between;
+            height: 25vh; /* 占页面四分之一 */
+            min-height: 180px; /* 保证最低高度 */
+            background-color: #FFF5F7; /* 顶栏换成了极浅粉 */
+            padding: 15px 20px 20px;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; /* 上下排布：图标在上，头像信息在下 */
             position: sticky; top: 0; z-index: 15;
-            box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);
+            box-shadow: 0 4px 20px rgba(200, 150, 160, 0.1);
             border-radius: 0 0 24px 24px;
             flex-shrink: 0;
-            gap: 10px; /* MODIFIED: Added gap for spacing */
-        }
-        /* Forum Square Avatar */
-        .forum-detail-header-avatar {
-             width: 32px; height: 32px;
-             border-radius: 6px; 
-             object-fit: cover; 
-             margin-right: 10px; margin-left: 5px;
-             background-color: #eee;
-             flex-shrink: 0;
-        }
-        #forum-detail-header-name {
-            font-size: 18px; 
-            font-weight: 600; 
-            color: #555;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            flex-shrink: 1; /* MODIFIED: Allow name to shrink */
-        }
-        #forum-detail-signin-btn {
-            padding: 6px 12px; border: 1px solid var(--theme-pink-btn);
-            color: var(--theme-pink-btn); background-color: transparent;
-            border-radius: 15px; font-size: 13px; font-weight: 600;
-            cursor: pointer; white-space: nowrap;
-        }
-        #forum-detail-signin-btn:disabled {
-            border-color: #ccc; color: #ccc; cursor: not-allowed;
-        }
-        #forum-detail-header .actions { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            margin-left: auto; /* MODIFIED: Pushes to the right */
         }
         
-        /* NEW: Level and XP Bar Styles */
-        #forum-detail-level-display { display: flex; align-items: center; gap: 8px; }
+        .forum-detail-top-nav {
+            display: flex; justify-content: space-between; align-items: center; width: 100%;
+        }
+
+        .forum-detail-info-row {
+            display: flex; align-items: center; width: 100%; gap: 15px; position: relative;
+        }
+
+        .forum-detail-header-avatar {
+             width: 65px; height: 65px; /* 放大头像 */
+             border-radius: 12px; object-fit: cover; background-color: #eee;
+             flex-shrink: 0; box-shadow: 0 4px 10px rgba(229, 138, 171, 0.2);
+        }
+
+        .forum-detail-text-col {
+            flex: 1; display: flex; flex-direction: column; min-width: 0; justify-content: center;
+        }
+
+        #forum-detail-header-name {
+            font-size: 19px; font-weight: bold; color: #333;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 6px;
+        }
+
+        #forum-detail-level-display { display: flex; flex-direction: column; width: 100%; }
+
         .forum-exp-bar-wrapper { 
-            position: relative; 
-            width: 70px; 
-            height: 8px; 
-            background-color: #f0f0f0; 
-            border-radius: 4px; 
-            overflow: hidden; 
+            position: relative; width: 100%; /* 变长填满可用空间 */
+            height: 6px; /* 变细 */
+            background-color: rgba(245, 179, 201, 0.3); border-radius: 3px; 
+            overflow: hidden; margin-bottom: 4px;
         }
+        
         .forum-exp-bar-progress { 
-            height: 100%; 
-            background-color: var(--theme-pink-btn); 
-            border-radius: 4px;
-            width: 0%; /* JS will set this */
-            transition: width 0.3s ease;
+            height: 100%; background-color: var(--theme-pink-btn); 
+            border-radius: 3px; width: 0%; transition: width 0.3s ease;
         }
+
+        .forum-exp-text-row {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 11px; color: #888;
+        }
+        #forum-detail-level { font-weight: bold; color: var(--theme-pink-text); }
+
+        /* 高级磨砂签到按钮 */
+        #forum-detail-signin-btn {
+            padding: 8px 16px; 
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            color: var(--theme-pink-text); 
+            border-radius: 20px; font-size: 14px; font-weight: bold;
+            cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(229, 138, 171, 0.15);
+            transition: all 0.2s;
+        }
+        #forum-detail-signin-btn:disabled {
+            color: #aaa; background: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.5); 
+            box-shadow: none; cursor: not-allowed;
+        }
+
 
 
         /* New Forum Post Interface Styles */
@@ -3846,9 +4082,10 @@
         body.phone-frame-active .wallet-header,
         body.phone-frame-active .wb-header,
         body.phone-frame-active .mall-header,
-        body.phone-frame-active .forum-header-home,
-        body.phone-frame-active #forum-detail-header,
-        body.phone-frame-active .forum-post-top-bar,
+        body.ios-mode-active .forum-header-home, 
+        body.ios-mode-active #forum-detail-header,
+        body.ios-mode-active #edit-forum-page .forum-header-home, /* 新增编辑页适配 */
+        body.ios-mode-active .forum-post-top-bar { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.phone-frame-active #settings-page > .settings-header,
         body.phone-frame-active #me-settings-modal > .me-settings-header-bar,
         body.phone-frame-active #worldbook-detail-modal > .wb-detail-header,
@@ -5274,25 +5511,6 @@ body.phone-frame-active #mall-favorite-page .mall-favorite-header {
 .mall-favorite-footer .delete-btn { background: #ffebee; color: #F44336; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 600; cursor: pointer; }
 
 /* ========================= 新增：已购买页面样式 ========================= */
-/* ========================= 新增：已购买页面样式 ========================= */
-#mall-purchased-page {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background-color: #f7f7f7; z-index: 556;
-    display: flex; flex-direction: column;
-    transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-}
-#mall-purchased-page.active { transform: translateX(0); }
-body.ios-mode-active #mall-purchased-page .mall-favorite-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top: calc(15px + var(--status-bar-height)); }
-
-.purchased-item-checkbox {
-    display: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd;
-    justify-content: center; align-items: center; transition: all 0.2s; cursor: pointer; background: white;
-}
-.manage-mode .purchased-item-checkbox { display: flex; }
-.purchased-item-checkbox.checked { background: var(--theme-pink-btn); border-color: var(--theme-pink-btn); }
-.purchased-item-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
-
 /* ========================= 新增：送出的物品页面样式 ========================= */
 #mall-sent-gifts-page {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -5402,14 +5620,15 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
         .lock-top-status {
             margin-top: calc(env(safe-area-inset-top, 20px) + 30px);
-            color: #e0e0e0;
+            color: #333333;
             font-size: 13px;
             font-weight: 300;
             font-family: sans-serif;
             text-align: center;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            text-shadow: none;
             letter-spacing: 0.5px;
         }
+
                 .lock-big-time {
             font-size: 110px;
             font-weight: 900;
@@ -5454,11 +5673,20 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             display: flex; flex-direction: column; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-            z-index: 10; padding-top: 12vh;
+            z-index: 10; padding-top: 0; /* 修改：由内部wrapper控制间距 */
         }
         .lock-pwd-overlay.active {
             opacity: 1; pointer-events: auto;
         }
+        
+        .lock-pwd-main-area {
+            display: flex; flex-direction: column; align-items: center;
+            transform: scale(1.7); /* 整体放大，1.7倍适应普通手机屏幕宽度最大值 */
+            transform-origin: top center;
+            margin-top: 25vh; /* 整体往下移动 */
+            margin-bottom: auto; /* 将底部的取消和紧急按钮挤到底部 */
+        }
+
         .lock-pwd-title {
             color: white; font-size: 20px; margin-bottom: 25px; letter-spacing: 1px; font-weight: 500;
         }
@@ -5481,8 +5709,9 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .shake-anim { animation: shakePwd 0.4s ease-in-out; }
         
         .lock-pwd-keypad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 30px; margin-bottom: auto;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 30px; 
         }
+
         .lock-key {
             width: 75px; height: 75px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -5505,6 +5734,27 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         body.tablet-mode-active #lock-screen .lock-top-status {
             margin-top: calc(30px + var(--status-bar-height));
         }
+        /* ========================= 新增：帖子详情与评论页 ========================= */
+        #forum-post-detail-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #FFF5F7; z-index: 900;
+            display: flex; flex-direction: column;
+            transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+        }
+        #forum-post-detail-page.active { transform: translateX(0); }
+        .forum-post-detail-header {
+            padding: 35px 20px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            background-color: #fff; flex-shrink: 0; border-bottom: 1px solid #f0f0f0;
+            border-radius: 0 0 24px 24px; box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);
+            position: relative;
+        }
+        body.ios-mode-active .forum-post-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.phone-frame-active .forum-post-detail-header, body.tablet-mode-active .forum-post-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
+        
+        .forum-post-detail-title { font-size: 17px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
+        .forum-detail-main-scroll { flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
+        .post-detail-comments-title { font-size: 15px; font-weight: bold; color: #333; padding-left: 5px; border-left: 4px solid var(--theme-pink-btn); margin-top: 5px; margin-bottom: 5px; }
 
     </style>
 </head>
@@ -5516,9 +5766,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     <div class="lock-top-status" id="lock-top-status">加载中...</div>
     <div class="lock-big-time" id="lock-big-time">00:00</div>
         <div class="lock-bottom-actions">
-        <div class="lock-action-btn flashlight">
+        <div class="lock-action-btn flashlight" onclick="openDisableLockModal(event)">
             <img src="https://img.heliar.top/file/1773283023953_手电筒_flashlight.png" style="width: 22px; height: 22px; object-fit: contain;">
         </div>
+
         <div class="lock-action-btn camera">
             <img src="https://img.heliar.top/file/1773283024522_相机_camera_2.png" style="width: 24px; height: 24px; object-fit: contain;">
         </div>
@@ -5526,32 +5777,49 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     
     <!-- 锁屏密码输入层 -->
     <div id="lock-pwd-overlay" class="lock-pwd-overlay">
-        <div class="lock-pwd-title">输入密码</div>
-        <div class="lock-pwd-dots" id="lock-pwd-dots">
-            <div class="pwd-dot"></div><div class="pwd-dot"></div><div class="pwd-dot"></div>
-            <div class="pwd-dot"></div><div class="pwd-dot"></div><div class="pwd-dot"></div>
-        </div>
-        <div class="lock-pwd-keypad">
-            <div class="lock-key" onclick="inputLockPwd('1')"><span class="lock-key-num">1</span><span class="lock-key-letter"></span></div>
-            <div class="lock-key" onclick="inputLockPwd('2')"><span class="lock-key-num">2</span><span class="lock-key-letter">ABC</span></div>
-            <div class="lock-key" onclick="inputLockPwd('3')"><span class="lock-key-num">3</span><span class="lock-key-letter">DEF</span></div>
-            <div class="lock-key" onclick="inputLockPwd('4')"><span class="lock-key-num">4</span><span class="lock-key-letter">GHI</span></div>
-            <div class="lock-key" onclick="inputLockPwd('5')"><span class="lock-key-num">5</span><span class="lock-key-letter">JKL</span></div>
-            <div class="lock-key" onclick="inputLockPwd('6')"><span class="lock-key-num">6</span><span class="lock-key-letter">MNO</span></div>
-            <div class="lock-key" onclick="inputLockPwd('7')"><span class="lock-key-num">7</span><span class="lock-key-letter">PQRS</span></div>
-            <div class="lock-key" onclick="inputLockPwd('8')"><span class="lock-key-num">8</span><span class="lock-key-letter">TUV</span></div>
-            <div class="lock-key" onclick="inputLockPwd('9')"><span class="lock-key-num">9</span><span class="lock-key-letter">WXYZ</span></div>
-            <div style="visibility:hidden;"></div>
-            <div class="lock-key" onclick="inputLockPwd('0')"><span class="lock-key-num">0</span><span class="lock-key-letter"></span></div>
-            <div style="visibility:hidden;"></div>
+        <div class="lock-pwd-main-area">
+            <div class="lock-pwd-title">输入密码</div>
+            <div class="lock-pwd-dots" id="lock-pwd-dots">
+                <div class="pwd-dot"></div><div class="pwd-dot"></div><div class="pwd-dot"></div>
+                <div class="pwd-dot"></div><div class="pwd-dot"></div><div class="pwd-dot"></div>
+            </div>
+            <div class="lock-pwd-keypad">
+                <div class="lock-key" onclick="inputLockPwd('1')"><span class="lock-key-num">1</span><span class="lock-key-letter"></span></div>
+                <div class="lock-key" onclick="inputLockPwd('2')"><span class="lock-key-num">2</span><span class="lock-key-letter">ABC</span></div>
+                <div class="lock-key" onclick="inputLockPwd('3')"><span class="lock-key-num">3</span><span class="lock-key-letter">DEF</span></div>
+                <div class="lock-key" onclick="inputLockPwd('4')"><span class="lock-key-num">4</span><span class="lock-key-letter">GHI</span></div>
+                <div class="lock-key" onclick="inputLockPwd('5')"><span class="lock-key-num">5</span><span class="lock-key-letter">JKL</span></div>
+                <div class="lock-key" onclick="inputLockPwd('6')"><span class="lock-key-num">6</span><span class="lock-key-letter">MNO</span></div>
+                <div class="lock-key" onclick="inputLockPwd('7')"><span class="lock-key-num">7</span><span class="lock-key-letter">PQRS</span></div>
+                <div class="lock-key" onclick="inputLockPwd('8')"><span class="lock-key-num">8</span><span class="lock-key-letter">TUV</span></div>
+                <div class="lock-key" onclick="inputLockPwd('9')"><span class="lock-key-num">9</span><span class="lock-key-letter">WXYZ</span></div>
+                <div style="visibility:hidden;"></div>
+                <div class="lock-key" onclick="inputLockPwd('0')"><span class="lock-key-num">0</span><span class="lock-key-letter"></span></div>
+                <div style="visibility:hidden;"></div>
+            </div>
         </div>
         <div class="lock-pwd-footer">
             <div class="lock-pwd-emergency">紧急情况</div>
             <div class="lock-pwd-cancel" onclick="cancelLockPwd()">取消</div>
         </div>
     </div>
+
 </div>
+
+<!-- 新增：手电筒快捷关闭锁屏确认弹窗 -->
+<div id="disable-lock-confirm-modal" class="delete-confirm-modal" style="z-index: 10000;">
+    <div class="delete-card">
+        <div class="delete-card-title">快捷指令</div>
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">是否要一键关闭“锁屏”和“锁屏密码”功能，并直接进入主屏幕？</p>
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeDisableLockModal()">取消</button>
+            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="executeDisableLock()">确定关闭</button>
+        </div>
+    </div>
+</div>
+
 <div id="home-screen">
+
     <div id="time-section">
         <div id="time-container" onclick="handleTimeBgClick(event)">
             <div id="clock-time">12:00</div>
@@ -6126,8 +6394,20 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         <div class="wb-color-title">世界书设置</div>
         <button class="wb-color-save-btn" onclick="saveWorldBookColors()">OK</button>
     </div>
-    <div class="wb-color-content" id="wb-color-list"></div>
+    <div class="wb-color-content">
+        <!-- 新增：书名朝下 开关 -->
+        <div style="background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <span style="font-size: 15px; color: #333; font-weight: 500;">书名朝下显示</span>
+            <label class="ios-switch" style="transform: scale(0.8); transform-origin: right;">
+                <input type="checkbox" id="wb-title-bottom-switch">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        
+        <div id="wb-color-list"></div>
+    </div>
 </div>
+
 <!-- *** START: Takeout App *** -->
 <div id="takeout-app-page">
     <div class="takeout-header">
@@ -6227,9 +6507,81 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </div>
         </div>
     </div>
+
+    <!-- 补回：外卖个人资料与自定义店铺设置页 -->
+    <div id="takeout-profile-page">
+        <div class="takeout-profile-header">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeTakeoutProfileModal()">
+            <div class="takeout-profile-title">设置</div>
+            <div style="width: 30px;"></div>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 20px;">
+            <div style="background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px;">
+                <div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; color: #333;">个人资料</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="font-size: 14px; color: #666;">头像</span>
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: #f0f0f0; display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden;" onclick="document.getElementById('input-takeout-my-avatar').click()">
+                        <span id="takeout-my-avatar-placeholder" style="color: #999; font-size: 20px;">+</span>
+                        <img id="takeout-my-avatar-preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                    </div>
+                </div>
+                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <span style="font-size: 14px; color: #666;">昵称</span>
+                    <input type="text" id="takeout-my-nickname-input" style="text-align: right; border: none; outline: none; font-size: 14px; color: #333;" placeholder="输入昵称">
+                    <input type="hidden" id="takeout-my-avatar-url-input">
+                </div>
+                <button style="width: 100%; padding: 12px; border-radius: 12px; background: var(--takeout-primary-color); color: white; border: none; font-size: 15px; font-weight: bold; cursor: pointer;" onclick="saveTakeoutProfile()">保存资料</button>
+            </div>
+            
+            <div id="takeout-my-shops-list">
+                <!-- 渲染自定义店铺编辑区 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增：外卖店铺编辑弹窗 -->
+    <div id="takeout-edit-shop-modal" class="delete-confirm-modal" style="z-index: 10050;">
+        <div class="wb-modal-card" style="background: #ffffff; border-radius: 28px; padding: 25px 20px; box-shadow: 0 10px 40px rgba(255, 182, 193, 0.3);" onclick="event.stopPropagation()">
+            <div class="wb-modal-header" style="color: var(--takeout-primary-color); font-size: 18px; font-weight: bold; border-bottom: none; margin-bottom: 10px;">设置店铺</div>
+            <div class="wb-modal-scroll-area" style="padding: 0 5px; margin-bottom: 0;">
+                <input type="hidden" id="takeout-edit-shop-index">
+                <input type="hidden" id="takeout-edit-shop-oldname">
+                
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px;">店铺名称</div>
+                    <input type="text" id="modal-edit-shop-name" style="width:100%; padding:12px 15px; border:1px solid #ffeff4; background:#fffcfd; border-radius:12px; outline:none; font-weight:bold;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px;">封面图 URL (可选)</div>
+                    <input type="text" id="modal-edit-shop-url" style="width:100%; padding:12px 15px; border:1px solid #ffeff4; background:#fffcfd; border-radius:12px; outline:none;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px;">店铺内容 (AI生成依据)</div>
+                    <textarea id="modal-edit-shop-desc" style="width:100%; min-height:80px; padding:12px 15px; border:1px solid #ffeff4; background:#fffcfd; border-radius:12px; outline:none; resize:none; line-height:1.5;"></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 6px;">绑定角色 (可选)</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div id="modal-edit-shop-roles-text" style="flex:1; padding:12px 15px; font-size:13px; color:#ff8fb3; background:#fff5f8; border:1px solid #ffcce0; border-radius:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500;">未绑定角色</div>
+                        <button style="padding:12px 15px; background:var(--takeout-primary-color); color:white; border:none; border-radius:12px; font-size:13px; font-weight:bold; cursor:pointer;" onclick="openEditShopRoleBindModal()">重新选择</button>
+                    </div>
+                </div>
+            </div>
+            <div class="wb-modal-actions" style="margin-top: 15px; display: flex; flex-direction:column; gap: 10px;">
+                <div style="display:flex; gap:10px;">
+                    <button style="flex:1; padding:12px; border-radius:20px; background:#f5f5f5; color:#888; border:none; font-weight:bold; font-size:15px; cursor:pointer;" onclick="closeTakeoutShopEditModal()">取消</button>
+                    <button style="flex:1; padding:12px; border-radius:20px; background:var(--takeout-primary-color); color:white; border:none; font-weight:bold; font-size:15px; cursor:pointer; box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);" onclick="saveTakeoutShopEditFromModal()">保存修改</button>
+                </div>
+                <button style="width:100%; padding:10px; border-radius:20px; background:transparent; color:#F44336; border:1px solid #ffcccc; font-weight:bold; font-size:14px; cursor:pointer;" onclick="deleteTakeoutShopFromModal()">删除此店铺</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 新增：全部收藏列表页 -->
+
     <div id="takeout-favorite-page">
         <div class="takeout-detail-header">
+
             <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeTakeoutFavPage()">
             <div class="takeout-title" style="font-size: 18px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%);">全部收藏</div>
             <div style="width: 30px;"></div>
@@ -6570,6 +6922,19 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 </div>
             </div>
         </div>
+        <!-- 新增：全局字体设置 -->
+        <div class="settings-module">
+            <h3>全局字体设置</h3>
+            <div class="settings-row">
+                <label for="global-font-url">字体链接 (.ttf, .otf, .woff 等)</label>
+                <input type="text" id="global-font-url" placeholder="例如: https://image.uglycat.cc/rra3ux.ttf" oninput="applyFontPreview(this.value.trim())">
+            </div>
+            <div id="font-preview-area" style="font-size: 16px; margin-top: 10px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 1px dashed #ddd; text-align: center; color: #333; word-break: break-all;">
+                圈圈机喜欢你 Quanquan phone love you
+            </div>
+            <style id="preview-font-style"></style>
+        </div>
+
                 <div class="settings-module">
             <h3>界面美化</h3>
             <div class="settings-row">
@@ -6728,45 +7093,102 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 <!-- Forum App 页面 -->
 <div id="forum-app-page">
     <div id="forum-content-wrapper">
-            <div id="forum-page-home" class="forum-page active">
-            <div class="forum-header-home">
-                 <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumApp()">
-                <h1 class="forum-header-title">论坛</h1>
-                <div style="width: 30px;"></div> <!-- 占位平衡 -->
+                   <div id="forum-page-home" class="forum-page active" style="background-color: #f7f8fa; overflow: hidden; padding-bottom: 0;">
+            <!-- 顶部导航区 -->
+            <div class="forum-home-header">
+                <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumApp()" style="position: absolute; left: 15px;">
+                <div class="forum-home-tabs">
+                    <div class="forum-home-tab active" onclick="switchForumHomeTab('hot')">热门<div class="forum-tab-indicator"></div></div>
+                    <div class="forum-home-tab" onclick="switchForumHomeTab('live')">直播<div class="forum-tab-indicator"></div></div>
+                </div>
             </div>
-            <!-- 首页内容已被移动到星球页 -->
+            
+            <!-- 搜索栏区 -->
+            <div class="forum-home-search-wrapper">
+                <div class="forum-home-search-bar">
+                    <img src="https://img.heliar.top/file/1773227369973_搜索_search.png" class="forum-search-icon">
+                    <input type="text" class="forum-search-input" placeholder="搜索..." readonly>
+                    <span class="forum-search-btn-text">搜索</span>
+                </div>
+            </div>
+            
+                <!-- 热门内容区 (动态渲染全站帖子) -->
+            <div class="forum-home-content" id="forum-home-hot-content">
+                <!-- 帖子将由JS随机抽取并渲染在这里 -->
+            </div>
+
+
+            
+                      <!-- 直播内容区 (先隐藏) -->
+            <div class="forum-home-content" id="forum-home-live-content" style="display: none;">
+                <div style="text-align: center; color: #999; padding-top: 50px; width: 100%;">直播内容区暂无</div>
+            </div>
         </div>
 
-        <!-- 新增：星球页 -->
+        <!-- 新增：星球页 (进论坛主页) -->
         <div id="forum-page-planet" class="forum-page">
+
             <div class="forum-header-home">
-                 <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumApp()">
-                <h1 class="forum-header-title">星球</h1>
+                 <!-- 左上角换成设置图标，触发编辑 -->
+                 <img src="https://img.heliar.top/file/1773321083875_汉堡图标_hamburger-button_2.png" class="forum-header-back-btn" onclick="openEditForumPage()">
+                <h1 class="forum-header-title">进论坛</h1>
                 <img src="https://img.heliar.top/file/1770413434847_添加_add-one.png" class="forum-header-create-btn" onclick="openCreateForumModal()">
             </div>
+            
+            <div class="forum-section-header">
+                <div class="forum-section-title">
+                    <img src="https://img.heliar.top/file/1773321369217_人群_peoples-two.png">
+                    <span>我关注的论坛</span>
+                </div>
+                <div class="forum-section-more" onclick="showAllForums()">全部 ></div>
+            </div>
             <div id="forum-list-container"></div>
+            
+            <!-- 新增：like的帖子 区块 -->
+            <div class="forum-section-header" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f0e6ea;">
+                <div class="forum-section-title">
+                    <img src="https://img.heliar.top/file/1773348514588_收藏音乐_collection-records.png" style="width: 20px; height: 20px;">
+                    <span>like的帖子</span>
+                </div>
+                <div class="forum-section-more" onclick="showAllLikedPosts()">全部 ></div>
+            </div>
+                        <div id="forum-liked-posts-preview-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 20px 20px;">
+                <!-- 点赞的帖子长方形小巧卡片会在这里动态生成 -->
+            </div>
+
+
             <div id="forum-posts-area"></div>
         </div>
 
         <div id="forum-page-detail" class="forum-page">
             <div id="forum-detail-header">
-                <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumDetail()">
-                <img id="forum-detail-header-avatar" class="forum-detail-header-avatar" src="">
-                <span id="forum-detail-header-name"></span>
-                <div class="actions">
-                    <div id="forum-detail-level-display">
-                        <span id="forum-detail-level" style="font-weight: bold; color: var(--theme-pink-text); font-size: 13px;"></span>
-                        <div class="forum-exp-bar-wrapper">
-                            <div id="forum-detail-exp-bar" class="forum-exp-bar-progress"></div>
+                <!-- 顶层工具栏：返回和刷新(邮件图标) -->
+                <div class="forum-detail-top-nav">
+                    <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumDetail()">
+                    <img src="https://img.heliar.top/file/1773321089463_邮件_mail.png" class="forum-header-refresh-btn" id="forum-detail-refresh-btn">
+                </div>
+                <!-- 底层信息展示区 -->
+                <div class="forum-detail-info-row">
+                    <img id="forum-detail-header-avatar" class="forum-detail-header-avatar" src="">
+                    <div class="forum-detail-text-col">
+                        <div id="forum-detail-header-name"></div>
+                        <div id="forum-detail-level-display">
+                            <div class="forum-exp-bar-wrapper">
+                                <div id="forum-detail-exp-bar" class="forum-exp-bar-progress"></div>
+                            </div>
+                            <div class="forum-exp-text-row">
+                                <span id="forum-detail-level">Lv.1</span>
+                                <span id="forum-detail-exp-text">0/30</span>
+                            </div>
                         </div>
                     </div>
-                     <span id="forum-detail-exp-text" style="font-size: 11px; color: #aaa; white-space: nowrap;"></span>
                     <button id="forum-detail-signin-btn">签到</button>
-                    <img src="https://img.heliar.top/file/1770580892666_刷新_refresh.png" class="forum-header-refresh-btn" id="forum-detail-refresh-btn">
                 </div>
             </div>
             <div id="forum-detail-posts-area"></div>
         </div>
+
+
         
         <div id="forum-page-post" class="forum-page">
              <div class="forum-post-top-bar">
@@ -6775,12 +7197,13 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                  <button class="forum-post-submit" onclick="submitForumPost()">发布</button>
              </div>
              <div class="forum-post-editor">
-                 <div class="forum-selector-wrapper">
+                               <div class="forum-selector-wrapper">
                      <span class="forum-selector-label">发布到</span>
                      <select id="forum-post-target-select" class="forum-selector-select">
-                         <option value="">请选择吧群...</option>
+                         <option value="">请选择论坛...</option>
                      </select>
                  </div>
+
                  <textarea id="forum-post-textarea" class="forum-post-textarea" placeholder="分享你的新鲜事..."></textarea>
                  <div class="forum-post-image-grid" id="forum-post-image-grid">
                      <div class="forum-post-add-img" onclick="triggerForumPostImageUpload()">+</div>
@@ -6803,22 +7226,26 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                         </div>
                     </div>
                     
-                    <div id="forum-me-stats" style="display: flex; gap: 25px; margin-top: 15px; padding: 0 10px;">
-                        <div style="text-align: center;"><span style="font-weight: 700; font-size: 16px; color: #333;">12</span><div style="font-size: 12px; color: #999;">帖子</div></div>
-                        <div style="text-align: center;"><span style="font-weight: 700; font-size: 16px; color: #333;">482</span><div style="font-size: 12px; color: #999;">关注</div></div>
-                        <div style="text-align: center;"><span style="font-weight: 700; font-size: 16px; color: #333;">9.8k</span><div style="font-size: 12px; color: #999;">粉丝</div></div>
+                                <div id="forum-me-stats" style="display: flex; gap: 25px; margin-top: 15px; padding: 0 10px;">
+                        <div style="text-align: center;"><span id="forum-me-post-count" style="font-weight: 700; font-size: 16px; color: #333;">0</span><div style="font-size: 12px; color: #999;">帖子</div></div>
+                        <div style="text-align: center;"><span id="forum-me-contact-count" style="font-weight: 700; font-size: 16px; color: #333;">0</span><div style="font-size: 12px; color: #999;">关注</div></div>
+                        <div style="text-align: center;"><span id="forum-me-fans-count" style="font-weight: 700; font-size: 16px; color: #333;">9.8k</span><div style="font-size: 12px; color: #999;">粉丝</div></div>
                     </div>
+
+
                 </div>
 
-                <div class="forum-me-menu-list">
-                     <div class="forum-me-menu-item">
+                               <div class="forum-me-menu-list">
+                     <div class="forum-me-menu-item" onclick="openForumMyPostsPage()">
                         <span class="menu-item-left">我的帖子</span>
                         <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
                     </div>
-                    <div class="forum-me-menu-item">
+                                     <div class="forum-me-menu-item" onclick="openForumFavoritePostsPage()">
                         <span class="menu-item-left">收藏列表</span>
                         <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
                     </div>
+
+
                     <div class="forum-me-menu-item">
                         <span class="menu-item-left">关注的人</span>
                         <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
@@ -6832,7 +7259,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 
-    <!-- 悬浮胶囊底栏 -->
+       <!-- 悬浮胶囊底栏 -->
     <div id="forum-bottom-nav">
         <div class="forum-nav-item active" onclick="switchForumTab(0)">
             <img src="https://img.heliar.top/file/1770411000514_首页_home.png" class="forum-nav-icon">
@@ -6847,9 +7274,169 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <img src="https://img.heliar.top/file/1770411008745_用户_user.png" class="forum-nav-icon">
         </div>
     </div>
+    
+        <!-- 新增：我的帖子页面 -->
+    <div id="forum-my-posts-page" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #FFF5F7; z-index: 800; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);">
+        <div class="forum-header-home" id="forum-my-posts-header" style="border-radius: 0 0 24px 24px; position: relative;">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumMyPostsPage()">
+            <h1 class="forum-header-title" style="position:absolute; left:50%; transform:translateX(-50%);">我的帖子</h1>
+            <div style="position:absolute; right:20px; display:flex; align-items:center;">
+                <img src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" style="width:24px; height:24px; cursor:pointer;" onclick="toggleForumMyPostsManageMode()">
+            </div>
+        </div>
+        <div id="forum-my-posts-area" style="flex: 1; overflow-y: auto; padding-top: 15px; display: flex; flex-direction: column; gap: 15px; padding-left: 20px; padding-right: 20px; padding-bottom: env(safe-area-inset-bottom, 20px);">
+            <!-- 我的帖子列表渲染在这里 -->
+        </div>
+               <!-- 底部删除栏 -->
+        <div class="mall-favorite-footer" id="forum-my-posts-footer" style="background:#fff; border-top:1px solid #f0f0f0; border-radius: 20px 20px 0 0; z-index: 10;">
+            <div class="select-all-btn" onclick="toggleSelectAllMyPosts()">
+                <div class="purchased-item-checkbox" id="my-posts-select-all-checkbox" style="position:static; display:flex;"></div>
+                <span>全选</span>
+            </div>
+            <button class="delete-btn" onclick="deleteSelectedMyPosts()">删除</button>
+        </div>
+    </div>
+
+    <!-- 新增：全部关注论坛页面 -->
+    <div id="forum-all-forums-page" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #FFF5F7; z-index: 800; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);">
+        <div class="forum-header-home" id="forum-all-forums-header" style="border-radius: 0 0 24px 24px; position: relative;">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeAllForumsPage()">
+            <h1 class="forum-header-title" style="position:absolute; left:50%; transform:translateX(-50%);">全部论坛</h1>
+            <div style="width:30px;"></div>
+        </div>
+        <div id="forum-all-list-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; flex: 1; overflow-y: auto; align-content: start;">
+            <!-- 全部论坛列表渲染在这里 -->
+        </div>
+    </div>
+
+    <!-- 新增：论坛收藏的帖子页面 -->
+    <div id="forum-favorite-posts-page" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #FFF5F7; z-index: 800; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);">
+        <div class="forum-header-home" id="forum-favorite-posts-header" style="border-radius: 0 0 24px 24px; position: relative;">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumFavoritePostsPage()">
+            <h1 class="forum-header-title" style="position:absolute; left:50%; transform:translateX(-50%);">收藏的帖子</h1>
+            <div style="position:absolute; right:20px; display:flex; align-items:center;">
+                <img src="https://img.heliar.top/file/1772477040843_删除_delete-one.png" style="width:24px; height:24px; cursor:pointer;" onclick="toggleForumFavPostsManageMode()">
+            </div>
+        </div>
+        <div id="forum-favorite-posts-area" style="flex: 1; overflow-y: auto; padding-top: 15px; display: flex; flex-direction: column; gap: 15px; padding-left: 20px; padding-right: 20px; padding-bottom: env(safe-area-inset-bottom, 20px);">
+            <!-- 收藏的帖子列表渲染在这里 -->
+        </div>
+        <!-- 底部删除栏 -->
+        <div class="mall-favorite-footer" id="forum-favorite-posts-footer" style="background:#fff; border-top:1px solid #f0f0f0; border-radius: 20px 20px 0 0; z-index: 10;">
+            <div class="select-all-btn" onclick="toggleSelectAllFavPosts()">
+                <div class="purchased-item-checkbox" id="fav-posts-select-all-checkbox" style="position:static; display:flex;"></div>
+                <span>全选</span>
+            </div>
+            <button class="delete-btn" onclick="deleteSelectedFavPosts()">移除收藏</button>
+        </div>
+    </div>
+
+    <!-- 新增：全部点赞帖子页面 -->
+    <div id="forum-all-liked-posts-page" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #FFF5F7; z-index: 800; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);">
+        <div class="forum-header-home" id="forum-all-liked-posts-header" style="border-radius: 0 0 24px 24px; position: relative;">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeAllLikedPostsPage()">
+            <h1 class="forum-header-title" style="position:absolute; left:50%; transform:translateX(-50%);">like的帖子</h1>
+            <div style="width:30px;"></div>
+        </div>
+        <div id="forum-all-liked-posts-area" style="flex: 1; overflow-y: auto; padding-top: 15px; display: flex; flex-direction: column; gap: 15px; padding-left: 20px; padding-right: 20px; padding-bottom: env(safe-area-inset-bottom, 20px);">
+            <!-- 点赞的帖子列表渲染在这里 -->
+        </div>
+    </div>
+
 </div>
+    <!-- 新增：帖子详情与评论页 -->
+
+    <div id="forum-post-detail-page">
+        <div class="forum-post-detail-header">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumPostDetail()">
+            <div class="forum-post-detail-title">帖子详情</div>
+            <div style="display:flex; align-items:center; gap:15px; z-index:2;">
+                <img id="forum-post-generate-comment-btn" src="https://img.heliar.top/file/1773348516843_评论_comments.png" style="width: 24px; height: 24px; object-fit: contain; cursor: pointer;" onclick="generateMoreComments()">
+                <img id="forum-post-fav-btn" src="https://img.heliar.top/file/1773236036735_星星_star.png" style="width: 26px; height: 26px; object-fit: contain; cursor: pointer;" onclick="toggleForumPostFav()">
+            </div>
+        </div>
+        <div class="forum-detail-main-scroll" id="forum-post-detail-content">
+            <!-- 动态渲染帖子主体和评论列表 -->
+        </div>
+    </div>
+
+<!-- 新增：为我的帖子页单独添加顶部安全区适配 -->
+<style>
+    body.ios-mode-active #forum-my-posts-header, body.ios-mode-active #forum-all-forums-header, body.ios-mode-active #forum-favorite-posts-header, body.ios-mode-active #forum-all-liked-posts-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important; }
+    body.phone-frame-active #forum-my-posts-header, body.tablet-mode-active #forum-my-posts-header,
+    body.phone-frame-active #forum-all-forums-header, body.tablet-mode-active #forum-all-forums-header,
+    body.phone-frame-active #forum-favorite-posts-header, body.tablet-mode-active #forum-favorite-posts-header,
+    body.phone-frame-active #forum-all-liked-posts-header, body.tablet-mode-active #forum-all-liked-posts-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
+    /* like的帖子 长方形预览区样式 (双列精简版) */
+    .forum-liked-post-card {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(200, 150, 160, 0.08);
+        padding: 10px;
+        cursor: pointer;
+        transition: transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* 内部间距缩小 */
+        min-width: 0;
+    }
+    .forum-liked-post-card:active { transform: scale(0.96); }
+    .forum-liked-post-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow: hidden;
+    }
+    .forum-liked-post-avatar {
+        width: 24px; /* 头像大幅缩小 */
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    .forum-liked-post-info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0; /* 关键：防止名字过长撑破卡片 */
+    }
+    .forum-liked-post-nickname {
+        font-size: 12px; /* 字号缩小 */
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .forum-liked-post-forum-name {
+        font-size: 10px; /* 字号极小 */
+        color: #999; 
+        margin-top: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .forum-liked-post-content {
+        font-size: 11px; /* 内容字号缩小 */
+        color: #444;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
+    }
+    .forum-liked-post-image-preview {
+        width: 100%;
+        height: 70px; /* 图片高度砍半 */
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+</style>
+
 
 <!-- 创建论坛弹窗 -->
+
 <div id="create-forum-modal-overlay">
     <div id="create-forum-modal-card">
         <h2 class="create-forum-title">创建新论坛</h2>
@@ -6871,6 +7458,50 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
+<!-- 新增：编辑修改论坛页面 -->
+<div id="edit-forum-page" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #FFF5F7; z-index: 800; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);">
+    <div class="forum-header-home" style="border-radius: 0 0 24px 24px;">
+        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeEditForumPage()">
+        <h1 class="forum-header-title">管理论坛</h1>
+        <div style="width: 30px;"></div>
+    </div>
+    <div style="flex: 1; overflow-y: auto; padding: 20px;">
+        <div class="forum-selector-wrapper" style="margin-bottom: 20px;">
+            <span class="forum-selector-label">选择修改的论坛</span>
+            <select id="edit-forum-select" class="forum-selector-select" onchange="loadForumToEdit(this.value)">
+                <option value="">请选择...</option>
+            </select>
+        </div>
+
+        <div id="edit-forum-content" style="display: none; flex-direction: column; align-items: center; gap: 15px; background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);">
+            <div class="create-forum-avatar-upload" onclick="triggerEditForumAvatarUpload()">
+                <span id="edit-forum-avatar-placeholder" style="display:none;">+</span>
+                <img id="edit-forum-avatar-preview" src="" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <input type="text" id="edit-forum-name-input" class="create-forum-input" placeholder="论坛名称">
+            <textarea id="edit-forum-worldview-input" class="create-forum-textarea" placeholder="论坛世界观... (可选)"></textarea>
+            <div id="edit-forum-wb-selection-display" style="width: 100%; padding: 10px; font-size: 13px; color: #999; background-color: #f9f9f9; border-radius: 8px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">未绑定世界书</div>
+            <button class="create-forum-wb-btn" onclick="openEditForumWbBindModal()">重新绑定世界书</button>
+                      <div id="edit-forum-role-selection-display" style="width: 100%; padding: 10px; font-size: 13px; color: #999; background-color: #f9f9f9; border-radius: 8px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">未绑定角色</div>
+            <button class="create-forum-wb-btn" onclick="openEditForumRoleBindModal()">重新绑定角色</button>
+            
+            <!-- 新增：自定义路人头像库 -->
+            <div style="width: 100%; border-top: 1px dashed #f0f0f0; margin-top: 10px; padding-top: 15px;">
+                <div style="font-size: 13px; color: #666; margin-bottom: 8px; font-weight: bold;">自定义路人头像库 (将随机应用到路人发帖及评论)</div>
+                <div id="edit-forum-passerby-avatars-list" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;"></div>
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <input type="text" id="edit-forum-new-avatar-input" class="create-forum-input" placeholder="输入路人图片URL" style="flex: 1;">
+                    <button class="create-forum-btn confirm" style="width: 45px; padding: 0; border-radius: 12px; font-size: 24px;" onclick="addPasserbyAvatar()">+</button>
+                </div>
+            </div>
+            
+            <button class="create-forum-btn confirm" style="width: 100%; margin-top: 10px;" onclick="saveEditedForum()">保存修改并应用</button>
+
+        </div>
+    </div>
+</div>
+<!-- 为了编辑页上传头像，新增一个隐形 input -->
+<input type="file" id="input-edit-forum-avatar" class="file-input-hidden" accept="image/*" onchange="handleEditForumAvatarUpload(event)">
 
 <!-- Forum Me Settings Modal -->
 <div id="forum-me-settings-modal" class="delete-confirm-modal" style="display: none;">
@@ -6893,12 +7524,17 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                     </div>
                     <input type="text" id="forum-me-settings-bg-url" class="me-settings-input" placeholder="背景 URL">
                 </div>
-                <div class="me-settings-row" style="margin-top: 15px;">
+                             <div class="me-settings-row" style="margin-top: 15px;">
                     <div class="me-settings-label">昵称</div>
                     <input type="text" id="forum-me-settings-nickname" class="me-settings-input" placeholder="论坛专属昵称">
                 </div>
+                <div class="me-settings-row" style="margin-top: 15px;">
+                    <div class="me-settings-label">粉丝数</div>
+                    <input type="text" id="forum-me-settings-fans" class="me-settings-input" placeholder="例如: 9.8k 或 120">
+                </div>
             </div>
         </div>
+
         <div class="wb-modal-actions" style="border:none; padding-top: 0;">
             <button class="wb-action-btn wb-btn-cancel" onclick="closeForumMeSettings()">取消</button>
                         <button class="wb-action-btn wb-btn-ok" onclick="saveForumMeSettings()">保存</button>
@@ -8493,7 +9129,7 @@ function renderCategories() {
             if (!appState.partnerId) $('#takeout-friend-id-input').value = '';
         }
 
-                function switchPage(pageId) {
+             function switchPage(pageId) {
             $$('.page').forEach(p => p.classList.remove('active'));
             $('#' + pageId).classList.add('active');
             $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.page === pageId));
@@ -8502,23 +9138,29 @@ function renderCategories() {
             const searchBtn = $('#takeout-search-btn');
             if (searchBtn) searchBtn.style.display = pageId === 'takeout-page-order' ? 'block' : 'none';
 
-            // 1. 解决问题一：每次切换到“订单”页面时，强制从底层数据库拉取最新订单并渲染，防止丢失
+            // 1. 每次切换到“订单”页面时，强制从底层拉取最新订单
             if (pageId === 'takeout-page-menu' && window.forceRenderTakeoutMenus) {
                 window.forceRenderTakeoutMenus();
             }
 
-            // 2. 解决问题二：每次进入或切换到“商家”页面时，强制恢复上次生成的店铺缓存
+            // 2. 每次切换到“商家”页面时，强制恢复上次生成的店铺缓存
             if (pageId === 'takeout-page-order' && window.renderTakeoutShopList) {
                 try {
                     let cachedShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
                     if (!Array.isArray(cachedShops)) cachedShops = [];
-                    // 确保每次切回来都有内容显示
                     window.renderTakeoutShopList(cachedShops);
                 } catch(e) {
                     console.error("恢复外卖店铺缓存失败", e);
                 }
             }
+            
+            // 3. 【修补】：每次切换到“我的”页面时，强制执行UI同步，防止旧收藏丢失或白屏
+            if (pageId === 'takeout-page-my') {
+                if (window.renderTakeoutMePage) window.renderTakeoutMePage();
+                if (window.renderTakeoutMyShops) window.renderTakeoutMyShops();
+            }
         }
+
 
         function updateQuantity(dishId, newQuantity) {
             const quantity = Math.max(0, newQuantity);
@@ -8761,12 +9403,30 @@ function renderCategories() {
     let currentTakeoutShopData = null; // 用于记录当前打开的店铺数据
     window.currentTakeoutShops = [];
 
-    function getTakeoutFavorites() {
+       function getTakeoutFavorites() {
         try { return JSON.parse(localStorage.getItem('takeoutFavoritesData_v1') || '[]'); } catch(e) { return []; }
     }
     function saveTakeoutFavorites(favs) {
-        localStorage.setItem('takeoutFavoritesData_v1', JSON.stringify(favs));
+        try {
+            localStorage.setItem('takeoutFavoritesData_v1', JSON.stringify(favs));
+        } catch (e) {
+            console.warn("外卖收藏体积超限，正在尝试压缩保存...", e);
+            if (favs.length > 0) {
+                // 紧急瘦身：删除所有长篇大论的评价，并精简菜单以腾出空间
+                favs.forEach(f => {
+                    if (f.reviews) f.reviews = []; 
+                    if (f.menu) f.menu.length = Math.min(f.menu.length, 3); // 菜单只保留前3个分类
+                });
+                try {
+                    localStorage.setItem('takeoutFavoritesData_v1', JSON.stringify(favs));
+                    showToast("存储空间紧张，已精简评价等数据完成收藏", 3000);
+                } catch (err) {
+                    showToast("手机存储彻底爆满！请删除多余照片或聊天记录后再试");
+                }
+            }
+        }
     }
+
 
     // 渲染我的页面
     window.renderTakeoutMePage = () => {
@@ -8871,7 +9531,7 @@ function renderCategories() {
         showToast('资料已保存');
     };
 
-        // ================== 新增：渲染、编辑和删除我的店铺 ==================
+    // ================== 优化：外卖店铺精简列表与弹窗编辑逻辑 ==================
     window.renderTakeoutMyShops = () => {
         const listContainer = document.getElementById('takeout-my-shops-list');
         let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
@@ -8882,167 +9542,187 @@ function renderCategories() {
             return;
         }
         
-        let html = '';
+        let html = '<div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; color: #333;">我创建的店铺</div>';
         customShops.forEach(shop => {
+            // 获取该店铺在真实全局缓存数组中的绝对索引
             const originalIndex = shops.findIndex(s => s.name === shop.name && s.isCustom);
             
-            let rolesText = '未绑定角色';
-            if (shop.boundRoleIds && shop.boundRoleIds.length > 0) {
-                const contacts = JSON.parse(localStorage.getItem('chatData_v5_final') || '[]');
-                const names = shop.boundRoleIds.map(id => {
-                    const c = contacts.find(c => c.id === id);
-                    return c ? (c.alias || c.name) : '未知';
-                }).join(', ');
-                rolesText = '已绑定: ' + names;
-            }
-
-            let imgUrl = '';
-            if(shop.emoji && shop.emoji.includes('<img src="')) {
-                const match = shop.emoji.match(/<img src="([^"]+)"/);
-                if(match) imgUrl = match[1];
-            }
-
             html += `
-            <div style="border: 1px solid #f0f0f0; border-radius: 20px; padding: 20px; margin-bottom: 15px; background: #fafafa; position: relative;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-                    <span style="font-weight:bold; font-size: 16px; color: #333;">设置此店铺</span>
-                    <span style="color: #F44336; font-size: 13px; cursor: pointer; padding: 6px 10px; border: 1px solid #ffcccc; background: #fff0f0; border-radius: 12px;" onclick="deleteTakeoutShop(${originalIndex})">删除店铺</span>
-                </div>
-                
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">店铺名称</div>
-                    <input type="text" id="edit-shop-name-${originalIndex}" value="${escapeHtml(shop.name)}" style="width: 100%; padding: 12px 15px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;">
-                </div>
-                
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">封面图 URL (可选)</div>
-                    <input type="text" id="edit-shop-url-${originalIndex}" value="${imgUrl}" style="width: 100%; padding: 12px 15px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;">
-                </div>
-                
-                <!-- 新增：修改店铺内容 -->
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">店铺内容 (AI生成依据)</div>
-                    <textarea id="edit-shop-desc-${originalIndex}" style="width: 100%; min-height: 80px; padding: 12px 15px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; outline: none; background: #fff; resize: none; transition: border-color 0.2s;">${escapeHtml(shop.description || '')}</textarea>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500;">绑定角色 (可选)</div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div id="edit-shop-roles-text-${originalIndex}" style="flex: 1; padding: 12px 15px; font-size: 13px; color: #666; background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${rolesText}
-                        </div>
-                        <button style="padding: 12px 18px; background: var(--takeout-primary-color); color: white; border: none; border-radius: 12px; font-size: 13px; cursor: pointer; white-space: nowrap;" onclick="openEditShopRoleBind(${originalIndex})">重新选择</button>
+            <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; padding:12px 15px; border-radius:16px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03);">
+                <div style="display:flex; align-items:center; gap:12px; overflow:hidden; flex:1; min-width:0;">
+                    <div style="width:40px; height:40px; border-radius:8px; background:#f9f9f9; display:flex; justify-content:center; align-items:center; font-size:20px; flex-shrink:0; border: 1px solid #eee;">
+                        ${shop.emoji || '🍽️'}
                     </div>
+                    <span style="font-size:15px; font-weight:600; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(shop.name)}</span>
                 </div>
-                
-                <button style="width: 100%; padding: 14px; background: var(--takeout-primary-color); color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);" onclick="saveTakeoutShopEdit(${originalIndex}, '${escapeHtml(shop.name.replace(/'/g, "\\'"))}')">保存店铺修改</button>
+                <button style="padding:6px 14px; background:#fff0f5; color:var(--takeout-primary-color); border:none; border-radius:12px; font-size:13px; font-weight:bold; cursor:pointer; flex-shrink:0; margin-left: 10px;" onclick="openTakeoutShopEditModal(${originalIndex})">编辑</button>
             </div>
             `;
         });
-        
         listContainer.innerHTML = html;
     };
 
-    window.tempEditingShopRoles = {};
+    window.tempModalEditingShopRoles = [];
 
-    window.openEditShopRoleBind = (originalIndex) => {
+    // 1. 打开弹窗，灌入数据
+    window.openTakeoutShopEditModal = (originalIndex) => {
         let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
         let shop = shops[originalIndex];
         if(!shop) return;
         
+        document.getElementById('takeout-edit-shop-index').value = originalIndex;
+        document.getElementById('takeout-edit-shop-oldname').value = shop.name;
+        
+        document.getElementById('modal-edit-shop-name').value = shop.name;
+        
+        let imgUrl = '';
+        if(shop.emoji && shop.emoji.includes('<img src="')) {
+            const match = shop.emoji.match(/<img src="([^"]+)"/);
+            if(match) imgUrl = match[1];
+        }
+        document.getElementById('modal-edit-shop-url').value = imgUrl;
+        document.getElementById('modal-edit-shop-desc').value = shop.description || '';
+        
+        window.tempModalEditingShopRoles = shop.boundRoleIds ? [...shop.boundRoleIds] : [];
+        updateModalEditShopRolesText();
+
+        document.getElementById('takeout-edit-shop-modal').classList.add('active');
+    };
+
+    window.closeTakeoutShopEditModal = () => {
+        document.getElementById('takeout-edit-shop-modal').classList.remove('active');
+    };
+
+    function updateModalEditShopRolesText() {
+        const displayEl = document.getElementById('modal-edit-shop-roles-text');
+        if (window.tempModalEditingShopRoles.length > 0) {
+            const contacts = JSON.parse(localStorage.getItem('chatData_v5_final') || '[]');
+            const names = window.tempModalEditingShopRoles.map(id => {
+                const c = contacts.find(c => c.id === id);
+                return c ? (c.alias || c.name) : '未知';
+            }).join(', ');
+            displayEl.textContent = '已绑定: ' + names;
+            displayEl.style.color = '#ff8fb3';
+        } else {
+            displayEl.textContent = '未绑定角色';
+            displayEl.style.color = '#999';
+        }
+    }
+
+    // 2. 弹窗内的角色重新绑定逻辑
+    window.openEditShopRoleBindModal = () => {
         wbBindMultiSelect = true;
         document.getElementById('wb-bind-modal-title').textContent = '重新绑定角色(外卖店铺)';
-        
-        if (!window.tempEditingShopRoles[originalIndex]) {
-            window.tempEditingShopRoles[originalIndex] = shop.boundRoleIds ? [...shop.boundRoleIds] : [];
-        }
-        
-        tempTakeoutShopRoleIds = [...window.tempEditingShopRoles[originalIndex]];
+        // 将弹窗中的临时变量交接给全局弹窗选择器
+        tempTakeoutShopRoleIds = [...window.tempModalEditingShopRoles];
         
         wbBindCallback = (selectedIds) => {
-            window.tempEditingShopRoles[originalIndex] = selectedIds;
-            const displayEl = document.getElementById(`edit-shop-roles-text-${originalIndex}`);
-            if (selectedIds.length > 0) {
-                const contacts = JSON.parse(localStorage.getItem('chatData_v5_final') || '[]');
-                const names = selectedIds.map(id => {
-                    const contact = contacts.find(c => c.id === id);
-                    return contact ? (contact.alias || contact.name) : '未知';
-                }).join(', ');
-                displayEl.textContent = `已绑定: ${names}`;
-            } else {
-                displayEl.textContent = '未绑定角色';
-            }
+            window.tempModalEditingShopRoles = selectedIds;
+            updateModalEditShopRolesText();
         };
-        
         openWorldBookBindModal('roles');
     };
 
-        window.saveTakeoutShopEdit = (originalIndex, oldShopName) => {
+    // 3. 点击保存：关键所在，保存后必须清空商品缓存强制AI重新读取人设生成
+    window.saveTakeoutShopEditFromModal = () => {
+        const originalIndex = parseInt(document.getElementById('takeout-edit-shop-index').value);
+        const oldShopName = document.getElementById('takeout-edit-shop-oldname').value;
+        
         let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
         let shop = shops[originalIndex];
         if(!shop) return;
         
-        const newName = document.getElementById(`edit-shop-name-${originalIndex}`).value.trim();
-        const newUrl = document.getElementById(`edit-shop-url-${originalIndex}`).value.trim();
-        const newDesc = document.getElementById(`edit-shop-desc-${originalIndex}`).value.trim(); // 获取新描述
+        const newName = document.getElementById('modal-edit-shop-name').value.trim();
+        const newUrl = document.getElementById('modal-edit-shop-url').value.trim();
+        const newDesc = document.getElementById('modal-edit-shop-desc').value.trim(); 
         
         if(!newName) {
             showToast("店铺名称不能为空");
             return;
         }
         
+        // 更新基础字段
         shop.name = newName;
-        shop.description = newDesc; // 写入新描述
-        
+        shop.description = newDesc;
         if(newUrl) {
             shop.emoji = `<img src="${newUrl}" style="width:100%; height:100%; border-radius:10px; object-fit:cover;">`;
         } else {
             shop.emoji = '🍽️';
         }
+        shop.boundRoleIds = [...window.tempModalEditingShopRoles];
         
-        if(window.tempEditingShopRoles[originalIndex] !== undefined) {
-            shop.boundRoleIds = window.tempEditingShopRoles[originalIndex];
-        }
-        
+        // === 【核心逻辑】清空生成的菜单和评价。下一次用户点进去时，系统发现没缓存，就会根据新描述和新角色走AI重新生成 ===
+        delete shop.menu;
+        delete shop.reviews;
+
         shops[originalIndex] = shop;
         localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(shops));
         
-        // 同步修改收藏库里的数据
-        let favs = getTakeoutFavorites();
+        // 4. 同步更新收藏库，防止收藏库里存了老数据引发错乱
+        let favs = JSON.parse(localStorage.getItem('takeoutFavoritesData_v1') || '[]');
         let favIndex = favs.findIndex(f => f.name === oldShopName);
         if(favIndex > -1) {
             favs[favIndex].name = newName;
-            favs[favIndex].description = newDesc; // 同步收藏里的描述
+            favs[favIndex].description = newDesc; 
             favs[favIndex].emoji = shop.emoji;
-            if(shop.boundRoleIds !== undefined) favs[favIndex].boundRoleIds = shop.boundRoleIds;
-            saveTakeoutFavorites(favs);
+            favs[favIndex].boundRoleIds = [...shop.boundRoleIds];
+            
+            delete favs[favIndex].menu;
+            delete favs[favIndex].reviews;
+
+            localStorage.setItem('takeoutFavoritesData_v1', JSON.stringify(favs));
         }
         
-        showToast("店铺修改成功");
+        showToast("已保存！进店将重新生成全新菜单");
         renderTakeoutMyShops();
         renderTakeoutShopList(shops);
+        closeTakeoutShopEditModal();
     };
 
-    window.deleteTakeoutShop = (originalIndex) => {
-        if(!confirm("确定要删除这个自定义店铺吗？")) return;
+    // 5. 点击删除 (使用自定义确认弹窗防止被系统拦截)
+    window.deleteTakeoutShopFromModal = () => {
+        // 利用系统内已有的确认组件进行拦截
+        document.getElementById('wb-delete-confirm-title').innerText = "确定要永久删除该自定义店铺吗？";
         
-        let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
-        let shopName = shops[originalIndex] ? shops[originalIndex].name : null;
+        // 临时强行拔高确认弹窗的层级，盖过当前编辑面板 (10050)
+        const confirmModal = document.getElementById('wb-delete-confirm-modal');
+        confirmModal.style.zIndex = "10200"; 
         
-        shops.splice(originalIndex, 1);
-        localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(shops));
+        window.pendingWbDeleteCallback = () => {
+            const originalIndex = parseInt(document.getElementById('takeout-edit-shop-index').value);
+            let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
+            let shopName = shops[originalIndex] ? shops[originalIndex].name : null;
+            
+            shops.splice(originalIndex, 1);
+            localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(shops));
+            
+            if(shopName) {
+                let favs = JSON.parse(localStorage.getItem('takeoutFavoritesData_v1') || '[]');
+                favs = favs.filter(f => f.name !== shopName);
+                localStorage.setItem('takeoutFavoritesData_v1', JSON.stringify(favs));
+            }
+            
+            showToast("店铺已删除");
+            renderTakeoutMyShops();
+            renderTakeoutShopList(shops); 
+            closeTakeoutShopEditModal();
+            
+            // 删除完后恢复原本的层级
+            confirmModal.style.zIndex = "900";
+        };
         
-        // 如果该店铺之前被加入了收藏列表，也一并剔除
-        if(shopName) {
-            let favs = getTakeoutFavorites();
-            favs = favs.filter(f => f.name !== shopName);
-            saveTakeoutFavorites(favs);
-        }
-        
-        showToast("店铺已删除");
-        renderTakeoutMyShops();
-        renderTakeoutShopList(shops); // 即时更新外卖主页的商家列表，店铺消失
+        // 点击取消时也得把层级降回去
+        const cancelBtn = confirmModal.querySelector('.btn-cancel');
+        const oldCancel = cancelBtn.onclick;
+        cancelBtn.onclick = (e) => {
+            if (oldCancel) oldCancel(e);
+            confirmModal.style.zIndex = "900";
+        };
+
+        confirmModal.classList.add('active');
     };
+
+
     
     // --- 拦截 switchPage，渲染“我的”页面 ---
     // 为了不破坏原有的绑定，这里直接覆盖原来的函数
@@ -9129,7 +9809,6 @@ function renderCategories() {
         if (shop.boundRoleIds && shop.boundRoleIds.length > 0) {
             const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
             const allWorldBooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-            
             const roleDetails = shop.boundRoleIds.map(roleId => {
                 const contact = allContacts.find(c => c.id === roleId);
                 if (!contact) return '';
@@ -9142,12 +9821,17 @@ function renderCategories() {
                         wb.entries.forEach(e => { wbText += `${e.key ? e.key+':' : ''}${e.content} `; });
                     });
                 }
-                return `【特定评价者】昵称: ${contact.alias || contact.name}\n- 人设: ${contact.persona || '无'}\n- 世界书设定: ${wbText || '无'}`;
+                return `【外卖顾客身份】昵称: ${contact.alias || contact.name}\n- 顾客人设/性格: ${contact.persona || '无'}\n- 顾客背景: ${wbText || '无'}`;
             }).filter(Boolean).join('\n\n');
             
             if (roleDetails) {
-                roleContext = `\n\n【特别指令】：以下角色是本店的特殊食客，请你务必在生成的评价列表(reviews)中，为他们每人单独生成一条评价（昵称必须完全一致）。评价内容必须极度符合他们各自的人设、说话口吻以及世界书设定：\n${roleDetails}\n`;
+                roleContext = `\n\n【极其重要的身份修正指令】：
+以下列出的角色是这家外卖店的【顾客】。请你务必在生成的评价列表(reviews)中，为他们每人单独生成一条评价（昵称必须完全一致）。
+警告：他们是在外卖软件的公共评论区留言评价“刚吃过的饭菜”，**绝对不能**像在聊天窗口一样对着用户说话（禁止使用“你这家店”、“我跟你说”等对话口吻）。
+他们必须站在一个普通食客的视角，针对菜品的味道、分量、包装或配送等进行吐槽或夸奖，但同时用词和关注点又要极度符合他们自身的人设和背景：
+${roleDetails}\n`;
             }
+
         }
 
         let descContext = "";
@@ -9234,23 +9918,37 @@ function renderCategories() {
                     currentTakeoutShopData.time = finalTime;
                 }
 
-                // --- 【关键修改：增加 try-catch 防止缓存爆满导致整个页面崩溃】 ---
+                // --- 【修复：根据店铺名称精准匹配并保存缓存，防止索引错乱导致重复刷新】 ---
                 try {
                     let cachedShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
-                    if (cachedShops[index]) {
-                        cachedShops[index].menu = apiData.menu;
-                        cachedShops[index].reviews = finalReviews; // 保存评价
-                        cachedShops[index].rating = finalRating;
-                        cachedShops[index].sales = finalSales;
-                        cachedShops[index].time = finalTime;
-                        localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(cachedShops));
-                        
-                        window.currentTakeoutShops[index] = cachedShops[index]; // 同步运行内存
+                    
+                    // 用当前店铺的唯一名字去找它在主缓存里的真实位置
+                    let targetCacheIndex = cachedShops.findIndex(s => s.name === shop.name);
+                    
+                    if (targetCacheIndex !== -1) {
+                        cachedShops[targetCacheIndex].menu = apiData.menu;
+                        cachedShops[targetCacheIndex].reviews = finalReviews;
+                        cachedShops[targetCacheIndex].rating = finalRating;
+                        cachedShops[targetCacheIndex].sales = finalSales;
+                        cachedShops[targetCacheIndex].time = finalTime;
+                    } else {
+                        // 如果因为空间不足被清理了，我们把它重新加回顶部
+                        cachedShops.unshift(currentTakeoutShopData);
                     }
+                    localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(cachedShops));
+                    
+                    // 同步更新当前正在运行的内存数组，保持一致
+                    if (window.currentTakeoutShops[index]) {
+                        window.currentTakeoutShops[index] = currentTakeoutShopData;
+                    }
+
                 } catch(e) {
                     console.warn("外卖缓存已满，无法保存:", e);
-                    window.currentTakeoutShops[index] = currentTakeoutShopData; // 内存里依旧保留，保证本次正常浏览
+                    if (window.currentTakeoutShops[index]) {
+                        window.currentTakeoutShops[index] = currentTakeoutShopData; // 内存里依旧保留，保证本次正常浏览
+                    }
                 }
+
                 
                 // 【新增：如果该店铺已经被收藏过，同步更新收藏库里的数据】
                 try {
@@ -11039,12 +11737,86 @@ window.toggleMallProductFavorite = (productId) => {
 
 
 
-    // --- Forum App Logic ---
-    window.openForumApp = () => {
+       window.openForumApp = () => {
         body.classList.add('forum-active');
         switchForumPage('home'); 
         renderForumList();
         renderAllForumPosts();
+        // 每次打开论坛App，重新随机抽取热门帖子
+        renderHotForumPosts(); 
+    };
+
+    // --- 随机抽取并渲染热门帖子大杂烩 ---
+    window.renderHotForumPosts = () => {
+        const container = document.getElementById('forum-home-hot-content');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const allForums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
+        
+        if (allPosts.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:50px 20px;">暂无热门帖子，请先去星球里创建论坛并生成内容吧~</div>';
+            return;
+        }
+
+        let shuffled = [...allPosts].sort(() => 0.5 - Math.random());
+        let selectedPosts = shuffled.slice(0, 10);
+        const mainProfile = getUserProfile();
+
+        selectedPosts.forEach(post => {
+            const forum = allForums.find(f => f.id === post.forumId) || { name: '未知论坛', avatar: 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png' };
+            const followCount = Math.floor(Math.random() * 50) + 1;
+            const postCount = Math.floor(Math.random() * 50) + 1;
+
+            let imgHtml = '';
+            if (post.images && post.images.length > 0) {
+                let gridClass = 'single-img';
+                if (post.images.length === 2 || post.images.length === 4) gridClass = `grid-${post.images.length}`; 
+                else if (post.images.length > 1) gridClass = `grid-${post.images.length > 9 ? 9 : post.images.length}`; 
+                
+                imgHtml = `<div class="moments-img-grid ${gridClass}" style="margin-bottom:10px;">` +
+                    post.images.slice(0, 9).map(src => `<img src="${src}" class="moment-grid-img">`).join('') +
+                    `</div>`;
+            }
+
+            const tagsHtml = (post.tags && post.tags.length > 0) 
+                ? `<div class="forum-post-tags">${post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join(' ')}</div>` 
+                : '';
+
+            const userHasLiked = post.likes && post.likes.includes(mainProfile.qqId);
+            const likeIcon = userHasLiked ? "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png" : "https://img.heliar.top/file/1770582828275_赞_thumbs-up_3.png";
+
+            const card = document.createElement('div');
+            card.className = 'forum-post-card';
+            card.innerHTML = `
+                <div class="forum-hot-post-header">
+                    <img src="${forum.avatar}" class="forum-hot-forum-avatar" onclick="openForumDetail(${forum.id})">
+                    <div class="forum-hot-forum-info">
+                        <div class="forum-hot-forum-name" onclick="openForumDetail(${forum.id})">${escapeHtml(forum.name)}</div>
+                        <div class="forum-hot-forum-stats">关注${followCount}w 帖子${postCount}w</div>
+                    </div>
+                </div>
+                ${post.content ? `<div class="forum-post-content">${escapeHtml(post.content)}</div>` : ''}
+                ${imgHtml}
+                ${tagsHtml}
+                <div class="forum-post-actions">
+                    <div class="forum-post-action-btn" onclick="shareForumPost(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582835252_分享_share.png">
+                        <span>分享</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="openForumPostDetail(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582828238_未读消息_message-unread.png">
+                        <span>${post.comments ? post.comments.length : 0}</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="toggleForumPostLike(${post.id})">
+                        <img src="${likeIcon}">
+                        <span>${(post.baseLikes || 0) + (post.likes ? post.likes.length : 0)}</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
     };
 
     window.closeForumApp = () => {
@@ -11060,60 +11832,38 @@ window.toggleMallProductFavorite = (productId) => {
             pageToShow.classList.add('active');
         }
     }
-    // --- 新增：主屏幕聊天气泡保存与读取 ---
-    window.adjustInputWidth = (el) => {
-        const minWidth = 60;
-        const maxWidth = 150;
-        let tempSpan = document.createElement('span');
-        tempSpan.style.visibility = 'hidden';
-        tempSpan.style.position = 'absolute';
-        tempSpan.style.fontSize = '13px';
-        tempSpan.style.whiteSpace = 'pre';
-        tempSpan.innerText = el.value || el.placeholder || 'Say Hi~';
-        document.body.appendChild(tempSpan);
-        let textWidth = tempSpan.getBoundingClientRect().width + 30; 
-        document.body.removeChild(tempSpan);
+
+    window.switchForumHomeTab = (tabName) => {
+        const tabs = document.querySelectorAll('.forum-home-tab');
+        const hotContent = document.getElementById('forum-home-hot-content');
+        const liveContent = document.getElementById('forum-home-live-content');
         
-        if (textWidth < minWidth) textWidth = minWidth;
-        if (textWidth > maxWidth) textWidth = maxWidth;
-        el.style.width = textWidth + 'px';
-    };
-
-    window.saveHomeBubble = (index, value) => {
-        let data = JSON.parse(localStorage.getItem('homeBubblesData_v1') || '{}');
-        data['bubble' + index] = value;
-        localStorage.setItem('homeBubblesData_v1', JSON.stringify(data));
-    };
-
-    function loadHomeBubbles() {
-        let data = JSON.parse(localStorage.getItem('homeBubblesData_v1') || '{}');
-        const b1 = document.getElementById('home-chat-bubble-1');
-        const b2 = document.getElementById('home-chat-bubble-2');
-        if (b1) {
-            if (data.bubble1 !== undefined) b1.value = data.bubble1;
-            window.adjustInputWidth(b1);
+        if (tabName === 'hot') {
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+            hotContent.style.display = 'flex';
+            liveContent.style.display = 'none';
+        } else {
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+            hotContent.style.display = 'none';
+            liveContent.style.display = 'flex';
         }
-        if (b2) {
-            if (data.bubble2 !== undefined) b2.value = data.bubble2;
-            window.adjustInputWidth(b2);
-        }
-    }
-    // --- 新增结束 ---
+    };
 
     window.switchForumTab = (index) => {
         const pageNames = ['home', 'planet', 'post', 'me'];
         switchForumPage(pageNames[index]);
         
-        // 修复：只针对论坛底栏的图标做高亮切换，防止影响到其他App
         document.querySelectorAll('#forum-bottom-nav .forum-nav-item').forEach((el, i) => {
             el.classList.toggle('active', i === index);
         });
         
         if (index === 0) { 
-            // 首页留空
         } else if (index === 1) { 
-            renderForumList();
+            renderForumList(false); 
             renderAllForumPosts();
+            renderLikedPostsPreview(); // 渲染点赞帖子预览区
         } else if (index === 2) { 
             prepareForumPostPage();
         } else if (index === 3) { 
@@ -11125,16 +11875,28 @@ window.toggleMallProductFavorite = (productId) => {
         const forumProfile = getForumUserData();
         const mainProfile = getUserProfile();
 
-        const avatar = forumProfile.avatar || mainProfile.avatar || 'https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png';
+        const avatar = forumProfile.avatar || mainProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         const nickname = forumProfile.nickname || mainProfile.nickname;
         const background = forumProfile.backgroundUrl || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1000&q=80';
+        const fans = forumProfile.fans || '9.8k';
 
         document.getElementById('forum-me-avatar').src = avatar;
         document.getElementById('forum-me-nickname').textContent = nickname;
         document.getElementById('forum-me-bg').style.backgroundImage = `url('${background}')`;
         document.getElementById('forum-me-bg').onclick = triggerForumMeBgUpload;
-    }
+        
+        const fansCountEl = document.getElementById('forum-me-fans-count');
+        if (fansCountEl) fansCountEl.textContent = fans;
 
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const myPostsCount = allPosts.filter(p => p.authorId === mainProfile.qqId).length;
+        const postCountEl = document.getElementById('forum-me-post-count');
+        if (postCountEl) postCountEl.textContent = myPostsCount;
+
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contactCountEl = document.getElementById('forum-me-contact-count');
+        if (contactCountEl) contactCountEl.textContent = contacts.length;
+    }
 
     window.openCreateForumModal = () => {
         tempForumAvatarUrl = '';
@@ -11152,7 +11914,7 @@ window.toggleMallProductFavorite = (productId) => {
     };
 
     window.closeCreateForumModal = () => {
-                document.getElementById('create-forum-modal-overlay').classList.remove('active');
+        document.getElementById('create-forum-modal-overlay').classList.remove('active');
     };
 
     window.triggerForumAvatarUpload = () => {
@@ -11234,30 +11996,255 @@ window.toggleMallProductFavorite = (productId) => {
         renderForumList();
     };
 
-    window.renderForumList = () => {
+    window.renderForumList = (showAll = false) => {
         const container = document.getElementById('forum-list-container');
         container.innerHTML = '';
         let forums = [];
         try { forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]'); } catch(e) {}
         
         if (forums.length === 0) {
-            container.innerHTML = `<p style="color: #999; width: 100%; text-align: center; font-size:13px; padding:10px; grid-column: span 4;">点击右上角 + 创建第一个论坛</p>`;
+            container.innerHTML = `<p style="color: #999; width: 100%; text-align: center; font-size:13px; padding:10px; grid-column: span 2;">点击右上角 + 创建第一个论坛</p>`;
             return;
         }
-        forums.forEach(forum => {
+
+        const userData = getForumUserData();
+        let displayForums = showAll ? forums : forums.slice(0, 6);
+
+        displayForums.forEach(forum => {
+            const userForumData = (userData.signIns && userData.signIns[forum.id]) || { xp: 0 };
+            const { level } = calculateLevelInfo(userForumData.xp);
+
             const item = document.createElement('div');
             item.className = 'forum-list-item';
             item.onclick = () => openForumDetail(forum.id);
             item.innerHTML = `
                 <img src="${forum.avatar}" class="forum-list-avatar">
-                <span class="forum-list-name">${escapeHtml(forum.name)}</span>
+                <div class="forum-list-info">
+                    <span class="forum-list-name">${escapeHtml(forum.name)}</span>
+                    <span class="forum-list-level">💎Lv.${level}</span>
+                </div>
             `;
             container.appendChild(item);
         });
     };
-    
-    // --- Forum Post & Detail Page Logic ---
-    const XP_PER_LEVEL = 30; 
+
+    window.showAllForums = () => {
+        document.getElementById('forum-all-forums-page').classList.add('active');
+        document.getElementById('forum-all-forums-page').style.transform = 'translateX(0)';
+        renderAllForumsList();
+    };
+
+    window.closeAllForumsPage = () => {
+        document.getElementById('forum-all-forums-page').classList.remove('active');
+        document.getElementById('forum-all-forums-page').style.transform = 'translateX(100%)';
+    };
+
+    window.renderAllForumsList = () => {
+        const container = document.getElementById('forum-all-list-container');
+        container.innerHTML = '';
+        let forums = [];
+        try { forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]'); } catch(e) {}
+        
+        if (forums.length === 0) {
+            container.innerHTML = `<p style="color: #999; width: 100%; text-align: center; font-size:13px; padding:10px; grid-column: span 2;">暂无论坛</p>`;
+            return;
+        }
+
+        const userData = getForumUserData();
+
+        forums.forEach(forum => {
+            const userForumData = (userData.signIns && userData.signIns[forum.id]) || { xp: 0 };
+            const { level } = calculateLevelInfo(userForumData.xp);
+
+            const item = document.createElement('div');
+            item.className = 'forum-list-item';
+            item.onclick = () => {
+                closeAllForumsPage();
+                openForumDetail(forum.id);
+            };
+            item.innerHTML = `
+                <img src="${forum.avatar}" class="forum-list-avatar">
+                <div class="forum-list-info">
+                    <span class="forum-list-name">${escapeHtml(forum.name)}</span>
+                    <span class="forum-list-level">💎Lv.${level}</span>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    };
+
+    let currentEditForumId = null;
+    let tempEditForumAvatarUrl = '';
+    let tempEditForumWbIds = [];
+    let tempEditForumRoleIds = [];
+    let tempEditForumPasserbyAvatars = []; 
+
+    window.openEditForumPage = () => {
+        const select = document.getElementById('edit-forum-select');
+        select.innerHTML = '<option value="">请选择要修改的论坛...</option>';
+        let forums = [];
+        try { forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]'); } catch(e) {}
+        
+        forums.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f.id;
+            opt.innerText = f.name;
+            select.appendChild(opt);
+        });
+
+        document.getElementById('edit-forum-content').style.display = 'none';
+        document.getElementById('edit-forum-page').style.transform = 'translateX(0)';
+    };
+
+    window.closeEditForumPage = () => {
+        document.getElementById('edit-forum-page').style.transform = 'translateX(-100%)';
+    };
+
+    window.loadForumToEdit = (id) => {
+        if (!id) {
+            document.getElementById('edit-forum-content').style.display = 'none';
+            return;
+        }
+        const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
+        const forum = forums.find(f => f.id == id);
+        if (!forum) return;
+
+        currentEditForumId = forum.id;
+        tempEditForumAvatarUrl = forum.avatar || '';
+        tempEditForumWbIds = forum.worldbookIds || [];
+        tempEditForumRoleIds = forum.boundRoleIds || [];
+        tempEditForumPasserbyAvatars = forum.passerbyAvatars || []; 
+
+        document.getElementById('edit-forum-avatar-preview').src = tempEditForumAvatarUrl;
+        document.getElementById('edit-forum-avatar-preview').style.display = 'block';
+        document.getElementById('edit-forum-name-input').value = forum.name || '';
+        document.getElementById('edit-forum-worldview-input').value = forum.worldview || '';
+
+        updateEditForumWbDisplay();
+        updateEditForumRoleDisplay();
+        renderPasserbyAvatars(); 
+
+        document.getElementById('edit-forum-content').style.display = 'flex';
+    };
+
+    window.renderPasserbyAvatars = () => {
+        const container = document.getElementById('edit-forum-passerby-avatars-list');
+        container.innerHTML = '';
+        if (tempEditForumPasserbyAvatars.length === 0) {
+            container.innerHTML = '<span style="font-size: 12px; color: #aaa;">使用默认路人库</span>';
+            return;
+        }
+        tempEditForumPasserbyAvatars.forEach((url, index) => {
+            container.innerHTML += `
+                <div style="position: relative; width: 45px; height: 45px; flex-shrink: 0;">
+                    <img src="${url}" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover; border: 1px solid #eee;">
+                    <div style="position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; background: #F44336; color: white; border-radius: 50%; font-size: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 5;" onclick="removePasserbyAvatar(${index})">✕</div>
+                </div>
+            `;
+        });
+    };
+
+    window.addPasserbyAvatar = () => {
+        const input = document.getElementById('edit-forum-new-avatar-input');
+        const url = input.value.trim();
+        if (url) {
+            tempEditForumPasserbyAvatars.push(url);
+            input.value = '';
+            renderPasserbyAvatars();
+        } else {
+            showToast("请输入图片URL");
+        }
+    };
+
+    window.removePasserbyAvatar = (index) => {
+        tempEditForumPasserbyAvatars.splice(index, 1);
+        renderPasserbyAvatars();
+    };
+
+    function updateEditForumWbDisplay() {
+        const displayEl = document.getElementById('edit-forum-wb-selection-display');
+        if (tempEditForumWbIds.length > 0) {
+            const worldbooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+            const names = tempEditForumWbIds.map(id => {
+                const book = worldbooks.find(b => b.id === id);
+                return book ? book.title : '未知';
+            });
+            displayEl.textContent = `已绑定: ${names.join(', ')}`;
+        } else {
+            displayEl.textContent = '未绑定世界书';
+        }
+    }
+
+    function updateEditForumRoleDisplay() {
+        const displayEl = document.getElementById('edit-forum-role-selection-display');
+        if (tempEditForumRoleIds.length > 0) {
+            const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+            const names = tempEditForumRoleIds.map(id => {
+                const contact = contacts.find(c => c.id === id);
+                return contact ? (contact.alias || contact.name) : '未知';
+            }).join(', ');
+            displayEl.textContent = `已绑定: ${names}`;
+        } else {
+            displayEl.textContent = '未绑定角色';
+        }
+    }
+
+    window.triggerEditForumAvatarUpload = () => { document.getElementById('input-edit-forum-avatar').click(); };
+    window.handleEditForumAvatarUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        compressImage(file, 300, (base64) => {
+            tempEditForumAvatarUrl = base64;
+            document.getElementById('edit-forum-avatar-preview').src = base64;
+        });
+    };
+
+    window.openEditForumWbBindModal = () => {
+        wbBindMultiSelect = true;
+        document.getElementById('wb-bind-modal-title').textContent = '编辑绑定世界书';
+        tempSelectedWorldBookIds = [...tempEditForumWbIds];
+        wbBindCallback = (selectedIds) => {
+            tempEditForumWbIds = selectedIds;
+            updateEditForumWbDisplay();
+        };
+        openWorldBookBindModal('worldbook');
+    };
+
+    window.openEditForumRoleBindModal = () => {
+        wbBindMultiSelect = true;
+        document.getElementById('wb-bind-modal-title').textContent = '编辑论坛角色';
+        tempForumBoundRoleIds = [...tempEditForumRoleIds];
+        wbBindCallback = (selectedIds) => {
+            tempEditForumRoleIds = selectedIds;
+            updateEditForumRoleDisplay();
+        };
+        openWorldBookBindModal('roles');
+    };
+
+    window.saveEditedForum = () => {
+        const name = document.getElementById('edit-forum-name-input').value.trim();
+        const worldview = document.getElementById('edit-forum-worldview-input').value.trim();
+        if (!name || !tempEditForumAvatarUrl) {
+            showToast(!name ? "论坛名称不能为空" : "请上传论坛头像");
+            return;
+        }
+        
+        let forums = [];
+        try { forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]'); } catch(e) {}
+        const idx = forums.findIndex(f => f.id == currentEditForumId);
+        if (idx > -1) {
+            forums[idx].name = name;
+            forums[idx].worldview = worldview;
+            forums[idx].avatar = tempEditForumAvatarUrl;
+            forums[idx].worldbookIds = [...tempEditForumWbIds];
+            forums[idx].boundRoleIds = [...tempEditForumRoleIds];
+            forums[idx].passerbyAvatars = [...tempEditForumPasserbyAvatars]; 
+            localStorage.setItem(FORUMS_DATA_KEY, JSON.stringify(forums));
+            showToast("修改已保存！下次生成将应用新设定。");
+            renderForumList();
+            closeEditForumPage();
+        }
+    };
 
     function getForumUserData() {
         try { 
@@ -11272,25 +12259,45 @@ window.toggleMallProductFavorite = (productId) => {
     }
 
     function calculateLevelInfo(xp) {
-        const currentXP = xp || 0;
-        const level = Math.floor(currentXP / XP_PER_LEVEL) + 1;
-        const xpInCurrentLevel = currentXP % XP_PER_LEVEL;
-        const progressPercent = (xpInCurrentLevel / XP_PER_LEVEL) * 100;
-        return { level, xpInCurrentLevel, progressPercent };
+        let currentXP = xp || 0;
+        let level = 1;
+        let requiredXP = 30; 
+        
+        while (currentXP >= requiredXP) {
+            currentXP -= requiredXP;
+            level++;
+            requiredXP += 5; 
+        }
+        
+        const xpInCurrentLevel = currentXP;
+        const progressPercent = (xpInCurrentLevel / requiredXP) * 100;
+        return { level, xpInCurrentLevel, requiredXP, progressPercent };
     }
+    
+    window.addForumXP = (forumId, amount) => {
+        const userData = getForumUserData();
+        if (!userData.signIns) userData.signIns = {};
+        if (!userData.signIns[forumId]) userData.signIns[forumId] = { xp: 0, lastSignIn: '' };
+        
+        userData.signIns[forumId].xp = (userData.signIns[forumId].xp || 0) + amount;
+        saveForumUserData(userData);
+        
+        if (currentForumDetailId === forumId) {
+            updateForumLevelDisplay(forumId);
+        }
+    };
     
     function updateForumLevelDisplay(forumId) {
         const userData = getForumUserData();
         const userForumData = (userData.signIns && userData.signIns[forumId]) || { xp: 0 };
-        const { level, xpInCurrentLevel, progressPercent } = calculateLevelInfo(userForumData.xp);
+        const { level, xpInCurrentLevel, requiredXP, progressPercent } = calculateLevelInfo(userForumData.xp);
 
         document.getElementById('forum-detail-level').textContent = `Lv.${level}`;
         document.getElementById('forum-detail-exp-bar').style.width = `${progressPercent}%`;
-        document.getElementById('forum-detail-exp-text').textContent = `${xpInCurrentLevel}/${XP_PER_LEVEL}`;
+        document.getElementById('forum-detail-exp-text').textContent = `${xpInCurrentLevel}/${requiredXP}`;
         
         document.querySelector('#forum-detail-level-display').style.display = 'flex';
     }
-
 
     window.openForumDetail = (forumId) => {
         currentForumDetailId = forumId;
@@ -11324,7 +12331,7 @@ window.toggleMallProductFavorite = (productId) => {
     };
 
     window.closeForumDetail = () => {
-        switchForumPage('home');
+        switchForumPage('planet');
         currentForumDetailId = null;
     };
     
@@ -11342,16 +12349,15 @@ window.toggleMallProductFavorite = (productId) => {
             return;
         }
         
-        userData.signIns[forumId].xp = (userData.signIns[forumId].xp || 0) + 10;
         userData.signIns[forumId].lastSignIn = today;
         saveForumUserData(userData);
         
+        window.addForumXP(forumId, 10);
         showToast(`签到成功！经验 +10`);
+        
         const signinBtn = document.getElementById('forum-detail-signin-btn');
         signinBtn.textContent = '已签到';
         signinBtn.disabled = true;
-        
-        updateForumLevelDisplay(forumId);
     };
 
     window.prepareForumPostPage = () => {
@@ -11360,7 +12366,7 @@ window.toggleMallProductFavorite = (productId) => {
         renderForumPostImages();
         
         const select = document.getElementById('forum-post-target-select');
-        select.innerHTML = '<option value="">请选择吧群...</option>';
+        select.innerHTML = '<option value="">选择论坛</option>';
         let forums = [];
         try { forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]'); } catch(e) {}
         
@@ -11375,9 +12381,7 @@ window.toggleMallProductFavorite = (productId) => {
         }
     };
 
-    window.triggerForumPostImageUpload = () => {
-        document.getElementById('input-forum-post-image').click();
-    };
+    window.triggerForumPostImageUpload = () => { document.getElementById('input-forum-post-image').click(); };
 
     window.handleForumPostImageUpload = (event) => {
         const files = Array.from(event.target.files);
@@ -11397,7 +12401,7 @@ window.toggleMallProductFavorite = (productId) => {
         event.target.value = '';
     };
 
-        function renderForumPostImages() {
+    function renderForumPostImages() {
         const grid = document.getElementById('forum-post-image-grid');
         const uploadBtn = document.createElement('div');
         uploadBtn.className = 'forum-post-add-img';
@@ -11409,7 +12413,7 @@ window.toggleMallProductFavorite = (productId) => {
         tempForumPostImages.forEach((src, index) => {
             const div = document.createElement('div');
             div.className = 'forum-post-img-preview';
-                        div.innerHTML = `<img src="${src}"><div class="forum-post-img-remove" onclick="removeForumPostImage(${index})">✕</div>`;
+            div.innerHTML = `<img src="${src}"><div class="forum-post-img-remove" onclick="removeForumPostImage(${index})">✕</div>`;
             grid.appendChild(div);
         });
         
@@ -11428,7 +12432,7 @@ window.toggleMallProductFavorite = (productId) => {
         const forumId = document.getElementById('forum-post-target-select').value;
         
         if (!forumId || (!content && tempForumPostImages.length === 0)) {
-            showToast(!forumId ? "请选择要发布的吧群" : "请输入内容或上传图片");
+            showToast(!forumId ? "请选择要发布的论坛" : "请输入内容或上传图片");
             return;
         }
         
@@ -11447,6 +12451,7 @@ window.toggleMallProductFavorite = (productId) => {
             authorXP: forumSignIns.xp, 
             timestamp: Date.now(),
             likes: [], 
+            baseLikes: 0, 
             tags: [], 
             comments: [] 
         };
@@ -11460,6 +12465,184 @@ window.toggleMallProductFavorite = (productId) => {
         openForumDetail(parseInt(forumId));
     };
 
+    let isMyPostsManageMode = false;
+    let selectedMyPostsIds = new Set();
+
+    window.toggleForumMyPostsManageMode = () => {
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const myPosts = allPosts.filter(p => p.authorId === getUserProfile().qqId);
+        if (myPosts.length === 0) {
+            showToast("暂无帖子可管理");
+            return;
+        }
+
+        isMyPostsManageMode = !isMyPostsManageMode;
+        const footer = document.getElementById('forum-my-posts-footer');
+        if (isMyPostsManageMode) {
+            footer.classList.add('active');
+        } else {
+            footer.classList.remove('active');
+            selectedMyPostsIds.clear();
+        }
+        window.renderMyForumPosts();
+    };
+
+    window.toggleMyPostSelection = (postId, checkboxEl) => {
+        if (selectedMyPostsIds.has(postId)) {
+            selectedMyPostsIds.delete(postId);
+            if (checkboxEl) checkboxEl.classList.remove('checked');
+        } else {
+            selectedMyPostsIds.add(postId);
+            if (checkboxEl) checkboxEl.classList.add('checked');
+        }
+        updateMyPostsSelectAllCheckbox();
+    };
+
+    window.toggleSelectAllMyPosts = () => {
+        const mainProfile = getUserProfile();
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const myPosts = allPosts.filter(p => p.authorId === mainProfile.qqId);
+        
+        if (selectedMyPostsIds.size === myPosts.length) {
+            selectedMyPostsIds.clear();
+        } else {
+            myPosts.forEach(p => selectedMyPostsIds.add(p.id));
+        }
+        window.renderMyForumPosts();
+        updateMyPostsSelectAllCheckbox();
+    };
+
+    function updateMyPostsSelectAllCheckbox() {
+        const mainProfile = getUserProfile();
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const myPostsCount = allPosts.filter(p => p.authorId === mainProfile.qqId).length;
+        
+        const selectAllBox = document.getElementById('my-posts-select-all-checkbox');
+        if (myPostsCount > 0 && selectedMyPostsIds.size === myPostsCount) {
+            selectAllBox.classList.add('checked');
+        } else {
+            selectAllBox.classList.remove('checked');
+        }
+    }
+
+    window.deleteSelectedMyPosts = () => {
+        if (selectedMyPostsIds.size === 0) {
+            showToast("请先选择要删除的帖子");
+            return;
+        }
+        let allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        allPosts = allPosts.filter(p => !selectedMyPostsIds.has(p.id));
+        localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allPosts));
+        
+        // 同步从收藏中删除
+        let favs = getForumFavoritePosts();
+        favs = favs.filter(p => !selectedMyPostsIds.has(p.id));
+        saveForumFavoritePosts(favs);
+        
+        selectedMyPostsIds.clear();
+        showToast("删除成功");
+        
+        const mainProfile = getUserProfile();
+        if (allPosts.filter(p => p.authorId === mainProfile.qqId).length === 0) {
+            isMyPostsManageMode = false;
+            document.getElementById('forum-my-posts-footer').classList.remove('active');
+        }
+        
+        window.renderMyForumPosts();
+        updateMyPostsSelectAllCheckbox();
+        if (typeof renderForumMePage === 'function') renderForumMePage();
+    };
+
+    window.openForumMyPostsPage = () => {
+        isMyPostsManageMode = false;
+        selectedMyPostsIds.clear();
+        document.getElementById('forum-my-posts-footer').classList.remove('active');
+        window.renderMyForumPosts();
+        document.getElementById('forum-my-posts-page').classList.add('active');
+        document.getElementById('forum-my-posts-page').style.transform = 'translateX(0)';
+    };
+
+    window.closeForumMyPostsPage = () => {
+        document.getElementById('forum-my-posts-page').classList.remove('active');
+        document.getElementById('forum-my-posts-page').style.transform = 'translateX(100%)';
+    };
+
+    window.renderMyForumPosts = () => {
+        const container = document.getElementById('forum-my-posts-area');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const mainProfile = getUserProfile();
+        const myPosts = allPosts.filter(p => p.authorId === mainProfile.qqId).sort((a,b) => b.timestamp - a.timestamp);
+        
+        if (myPosts.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:50px 20px;">你还没有发布过帖子哦~</div>';
+            return;
+        }
+
+        myPosts.forEach(post => {
+            const isChecked = selectedMyPostsIds.has(post.id);
+            let imgHtml = '';
+            if (post.images && post.images.length > 0) {
+                let gridClass = 'single-img';
+                if (post.images.length === 2 || post.images.length === 4) gridClass = `grid-${post.images.length}`; 
+                else if (post.images.length > 1) gridClass = `grid-${post.images.length > 9 ? 9 : post.images.length}`; 
+                
+                imgHtml = `<div class="moments-img-grid ${gridClass}" style="margin-bottom:10px;">` +
+                    post.images.slice(0, 9).map(src => `<img src="${src}" class="moment-grid-img">`).join('') +
+                    `</div>`;
+            }
+            
+            const dateStr = formatTimestamp(post.timestamp);
+            const { level } = calculateLevelInfo(post.authorXP);
+            const userHasLiked = post.likes && post.likes.includes(mainProfile.qqId);
+            const likeIcon = userHasLiked ? "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png" : "https://img.heliar.top/file/1770582828275_赞_thumbs-up_3.png";
+
+            const tagsHtml = (post.tags && post.tags.length > 0) 
+                ? `<div class="forum-post-tags">${post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join(' ')}</div>` 
+                : '';
+
+            const card = document.createElement('div');
+            card.className = 'forum-post-card';
+            card.style.position = 'relative';
+            if (isMyPostsManageMode) {
+                card.onclick = () => window.toggleMyPostSelection(post.id, card.querySelector('.purchased-item-checkbox'));
+            }
+
+            card.innerHTML = `
+                <div class="purchased-item-checkbox ${isChecked ? 'checked' : ''}" style="${isMyPostsManageMode ? 'display:flex;' : 'display:none;'} position: absolute; top: 15px; right: 15px; z-index: 10;"></div>
+                <div class="forum-post-header">
+                   <img src="${post.authorAvatar || getRandomCustomAvatar(post.forumId)}" class="forum-post-avatar">
+                    <div class="forum-post-user-info">
+                        <div class="forum-post-user">${escapeHtml(post.authorName)}</div>
+                    </div>
+                    <span class="forum-post-level">Lv.${level}</span>
+                    <div class="forum-post-time">${dateStr}</div>
+                </div>
+                ${post.content ? `<div class="forum-post-content">${escapeHtml(post.content)}</div>` : ''}
+                ${imgHtml}
+                ${tagsHtml}
+                <div class="forum-post-actions">
+                    <div class="forum-post-action-btn" onclick="if(!isMyPostsManageMode) shareForumPost(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582835252_分享_share.png">
+                        <span>分享</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="if(!isMyPostsManageMode) openForumPostDetail(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582828238_未读消息_message-unread.png">
+                        <span>${post.comments ? post.comments.length : 0}</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="if(!isMyPostsManageMode) toggleForumPostLike(${post.id})">
+                        <img src="${likeIcon}">
+                        <span>${(post.baseLikes || 0) + (post.likes ? post.likes.length : 0)}</span>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+    };
+
     window.renderAllForumPosts = () => {
         document.getElementById('forum-posts-area').innerHTML = ''; 
     };
@@ -11471,10 +12654,19 @@ window.toggleMallProductFavorite = (productId) => {
         "https://img.heliar.top/file/1770619023973_IMG_4158.jpeg",
     ];
 
-    const getRandomCustomAvatar = () => {
-        if (customAvatarList.length === 0) return "https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"; 
-        return customAvatarList[Math.floor(Math.random() * customAvatarList.length)];
+    const getRandomCustomAvatar = (forumId) => {
+        let avatarList = customAvatarList;
+        if (forumId) {
+            const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
+            const currentForum = forums.find(f => f.id === forumId);
+            if (currentForum && currentForum.passerbyAvatars && currentForum.passerbyAvatars.length > 0) {
+                avatarList = currentForum.passerbyAvatars; 
+            }
+        }
+        if (avatarList.length === 0) return "https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"; 
+        return avatarList[Math.floor(Math.random() * avatarList.length)];
     };
+
 
     window.renderForumDetailPosts = (forumId) => {
         const container = document.getElementById('forum-detail-posts-area');
@@ -11511,33 +12703,11 @@ window.toggleMallProductFavorite = (productId) => {
                 ? `<div class="forum-post-tags">${post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join(' ')}</div>` 
                 : '';
 
-            const commentsHtml = (post.comments && post.comments.length > 0)
-                ? post.comments.map(comment => {
-                    const avatarSrc = comment.author_avatar || getRandomCustomAvatar();
-                    
-                    let commentText = escapeHtml(comment.text);
-                    if (comment.reply_to_nickname) {
-                        const replyTag = `<span class="comment-reply-tag">@${escapeHtml(comment.reply_to_nickname)}</span>`;
-                        commentText = commentText.replace(`@${comment.reply_to_nickname}`, replyTag);
-                    }
-                    
-                    return `
-                        <div class="forum-post-comment-item">
-                            <img src="${avatarSrc}" class="comment-avatar">
-                            <div class="comment-body">
-                                <div class="comment-nickname">${escapeHtml(comment.author_nickname)}</div>
-                                <div class="comment-text">${commentText}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('')
-                : '';
-
             const card = document.createElement('div');
             card.className = 'forum-post-card';
             card.innerHTML = `
                 <div class="forum-post-header">
-                    <img src="${post.authorAvatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png'}" class="forum-post-avatar">
+                    <img src="${post.authorAvatar || getRandomCustomAvatar(post.forumId)}" class="forum-post-avatar">
                     <div class="forum-post-user-info">
                         <div class="forum-post-user">${escapeHtml(post.authorName)}</div>
                     </div>
@@ -11552,28 +12722,558 @@ window.toggleMallProductFavorite = (productId) => {
                         <img src="https://img.heliar.top/file/1770582835252_分享_share.png">
                         <span>分享</span>
                     </div>
-                    <div class="forum-post-action-btn" onclick="commentOnForumPost(${post.id})">
+                    <div class="forum-post-action-btn" onclick="openForumPostDetail(${post.id})">
                         <img src="https://img.heliar.top/file/1770582828238_未读消息_message-unread.png">
                         <span>${post.comments ? post.comments.length : 0}</span>
                     </div>
                     <div class="forum-post-action-btn" onclick="toggleForumPostLike(${post.id})">
                         <img src="${likeIcon}">
-                        <span>${post.likes ? post.likes.length : 0}</span>
-                    </div>
-                </div>
-                <div class="forum-post-feedback ${!commentsHtml ? 'hidden' : ''}">
-                    <div class="forum-post-comments-list">
-                        ${commentsHtml}
+                        <span>${(post.baseLikes || 0) + (post.likes ? post.likes.length : 0)}</span>
                     </div>
                 </div>
             `;
-                        container.appendChild(card);
+
+            container.appendChild(card);
         });
     };
 
     window.shareForumPost = (postId) => { showToast("分享功能待开发"); };
-    window.commentOnForumPost = (postId) => { showToast("评论功能待开发"); };
-    
+
+    // =================== 新增：帖子收藏与动态交互逻辑 ===================
+    const FORUM_FAVORITES_KEY = 'forumFavoritePosts_v1';
+
+    function getForumFavoritePosts() {
+        try { return JSON.parse(localStorage.getItem(FORUM_FAVORITES_KEY) || '[]'); } catch(e) { return []; }
+    }
+    function saveForumFavoritePosts(favs) {
+        localStorage.setItem(FORUM_FAVORITES_KEY, JSON.stringify(favs));
+    }
+
+    let currentForumPostData = null;
+
+    window.openForumPostDetail = (postId) => {
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        let post = allPosts.find(p => p.id === postId);
+        
+        // 如果普通列表里找不到，可能是被删了或者是永久收藏里的，去收藏库找
+        if (!post) {
+            const favs = getForumFavoritePosts();
+            post = favs.find(p => p.id === postId);
+        }
+        
+        if (!post) {
+            showToast('该帖子不存在或已被删除');
+            return;
+        }
+        currentForumPostData = post;
+
+        const container = document.getElementById('forum-post-detail-content');
+        const mainProfile = getUserProfile();
+        
+        // 构造帖子主体
+        let imgHtml = '';
+        if (post.images && post.images.length > 0) {
+            let gridClass = 'single-img';
+            if (post.images.length === 2 || post.images.length === 4) gridClass = `grid-${post.images.length}`; 
+            else if (post.images.length > 1) gridClass = `grid-${post.images.length > 9 ? 9 : post.images.length}`; 
+            
+            imgHtml = `<div class="moments-img-grid ${gridClass}" style="margin-bottom:10px;">` +
+                post.images.slice(0, 9).map(src => `<img src="${src}" class="moment-grid-img">`).join('') +
+                `</div>`;
+        }
+        
+        const dateStr = formatTimestamp(post.timestamp);
+        const { level } = calculateLevelInfo(post.authorXP);
+        const userHasLiked = post.likes && post.likes.includes(mainProfile.qqId);
+        const likeIcon = userHasLiked ? "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png" : "https://img.heliar.top/file/1770582828275_赞_thumbs-up_3.png";
+
+        const tagsHtml = (post.tags && post.tags.length > 0) 
+            ? `<div class="forum-post-tags">${post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join(' ')}</div>` 
+            : '';
+            
+        const commentsCount = post.comments ? post.comments.length : 0;
+
+        const postCardHtml = `
+            <div class="forum-post-card" style="box-shadow: none; border-radius: 16px;">
+                <div class="forum-post-header">
+                    <img src="${post.authorAvatar || getRandomCustomAvatar(post.forumId)}" class="forum-post-avatar">
+                    <div class="forum-post-user-info">
+                        <div class="forum-post-user">${escapeHtml(post.authorName)}</div>
+                    </div>
+                    <span class="forum-post-level">Lv.${level}</span>
+                    <div class="forum-post-time">${dateStr}</div>
+                </div>
+                ${post.content ? `<div class="forum-post-content" style="white-space: pre-wrap;">${escapeHtml(post.content)}</div>` : ''}
+                ${imgHtml}
+                ${tagsHtml}
+                <div class="forum-post-actions">
+                    <div class="forum-post-action-btn" onclick="shareForumPost(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582835252_分享_share.png">
+                        <span>分享</span>
+                    </div>
+                    <div class="forum-post-action-btn">
+                        <img src="https://img.heliar.top/file/1770582828238_未读消息_message-unread.png">
+                        <span>${commentsCount}</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="toggleForumPostLike(${post.id}); openForumPostDetail(${post.id});">
+                        <img src="${likeIcon}">
+                        <span>${(post.baseLikes || 0) + (post.likes ? post.likes.length : 0)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 构造评论区
+        let commentsHtml = `<div class="post-detail-comments-title">全部评论 (${commentsCount})</div>`;
+        
+        if (commentsCount === 0) {
+            commentsHtml += `<div style="text-align:center; color:#ccc; padding:30px 0;">还没有人评论哦，快来抢沙发~</div>`;
+        } else {
+            commentsHtml += `<div class="forum-post-card" style="box-shadow: none; border-radius: 16px;">`;
+            commentsHtml += post.comments.map(comment => {
+              const avatarSrc = comment.author_avatar || getRandomCustomAvatar(post.forumId);
+
+                let commentText = escapeHtml(comment.text);
+                if (comment.reply_to_nickname) {
+                    const replyTag = `<span class="comment-reply-tag">@${escapeHtml(comment.reply_to_nickname)}</span>`;
+                    commentText = commentText.replace(`@${comment.reply_to_nickname}`, replyTag);
+                }
+                return `
+                    <div class="forum-post-comment-item" style="margin-bottom: 15px; border-bottom: 1px solid #f9f9f9; padding-bottom: 10px;">
+                        <img src="${avatarSrc}" class="comment-avatar" style="border-radius: 50%;">
+                        <div class="comment-body">
+                            <div class="comment-nickname" style="color: #666; font-size: 13px; font-weight: bold;">${escapeHtml(comment.author_nickname)}</div>
+                            <div class="comment-text" style="font-size: 14px; margin-top: 6px;">${commentText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            commentsHtml += `</div>`;
+        }
+
+        container.innerHTML = postCardHtml + commentsHtml;
+
+        // 同步右上角星星状态
+        const favBtn = document.getElementById('forum-post-fav-btn');
+        if (favBtn) {
+            const favs = getForumFavoritePosts();
+            const isFav = favs.some(f => f.id === postId);
+            favBtn.src = isFav ? "https://img.heliar.top/file/1773236031457_星星_star_2.png" : "https://img.heliar.top/file/1773236036735_星星_star.png";
+        }
+
+        document.getElementById('forum-post-detail-page').classList.add('active');
+    };
+
+    window.closeForumPostDetail = () => {
+        document.getElementById('forum-post-detail-page').classList.remove('active');
+    };
+
+    // 收藏/取消收藏帖子
+    window.toggleForumPostFav = () => {
+        if (!currentForumPostData) return;
+        let favs = getForumFavoritePosts();
+        const favIndex = favs.findIndex(f => f.id === currentForumPostData.id);
+        const btn = document.getElementById('forum-post-fav-btn');
+
+        if (favIndex > -1) {
+            favs.splice(favIndex, 1);
+            btn.src = 'https://img.heliar.top/file/1773236036735_星星_star.png';
+            showToast('已取消收藏');
+        } else {
+            favs.unshift(currentForumPostData);
+            btn.src = 'https://img.heliar.top/file/1773236031457_星星_star_2.png';
+            showToast('已收藏该帖子，永久保存');
+        }
+        saveForumFavoritePosts(favs);
+        
+        // 如果收藏页面目前处于打开状态，同步刷新
+        const favPage = document.getElementById('forum-favorite-posts-page');
+        if (favPage && favPage.classList.contains('active')) {
+            window.renderFavoriteForumPosts();
+        }
+    };
+
+    // 生成更多评论
+    window.generateMoreComments = async () => {
+        if (!currentForumPostData) return;
+        
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
+            showToast('请先在设置中配置完整的 API 信息');
+            return;
+        }
+
+        const btn = document.getElementById('forum-post-generate-comment-btn');
+        btn.style.animation = 'spin 1s linear infinite';
+        showToast('正在生成新评论，请稍候...', 4000);
+
+        const postContext = `作者：${currentForumPostData.authorName}\n内容：${currentForumPostData.content || '无'}\n标签：${(currentForumPostData.tags||[]).join(' ')}`;
+        
+        const prompt = `这是一条论坛帖子：
+${postContext}
+
+请扮演路人网友，为这篇帖子生成 10 到 15 条独特的、不重复的评论。语气要像真实的社交媒体评论，可以赞同、吐槽、疑问或开玩笑。
+如果你觉得合适，某几条评论可以是回复上面某个人的评论，此时请附带 reply_to_nickname。
+严格输出JSON，包含 "comments" 数组，每个对象字段：
+- author_nickname: 路人昵称
+- text: 评论内容
+- reply_to_nickname: (可选，回复谁的昵称，如果是顶级评论则为 null)
+`;
+
+        try {
+            let newCommentsData = await callApiForJson(prompt);
+            let newComments = newCommentsData.comments || [];
+            if (newComments.length === 0) throw new Error("返回的评论为空");
+
+            newComments = newComments.map(c => ({
+                ...c,
+                author_avatar: c.author_avatar || getRandomCustomAvatar(currentForumPostData.forumId)
+            }));
+
+            if (!currentForumPostData.comments) currentForumPostData.comments = [];
+            currentForumPostData.comments = currentForumPostData.comments.concat(newComments);
+
+            // 更新普通库
+            let allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+            const pIdx = allPosts.findIndex(p => p.id === currentForumPostData.id);
+            if (pIdx > -1) {
+                allPosts[pIdx].comments = currentForumPostData.comments;
+                localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allPosts));
+            }
+
+            // 更新收藏库
+            let favs = getForumFavoritePosts();
+            const fIdx = favs.findIndex(p => p.id === currentForumPostData.id);
+            if (fIdx > -1) {
+                favs[fIdx].comments = currentForumPostData.comments;
+                saveForumFavoritePosts(favs);
+            }
+
+            openForumPostDetail(currentForumPostData.id);
+            showToast(`已生成 ${newComments.length} 条新评论`);
+
+        } catch (e) {
+            console.error('Comment generation failed:', e);
+            showToast('生成评论失败: ' + e.message);
+        } finally {
+            btn.style.animation = '';
+        }
+    };
+
+    // =================== 新增：收藏列表管理与渲染逻辑 ===================
+    let isFavPostsManageMode = false;
+    let selectedFavPostsIds = new Set();
+
+    window.openForumFavoritePostsPage = () => {
+        isFavPostsManageMode = false;
+        selectedFavPostsIds.clear();
+        document.getElementById('forum-favorite-posts-footer').classList.remove('active');
+        window.renderFavoriteForumPosts();
+        document.getElementById('forum-favorite-posts-page').classList.add('active');
+        document.getElementById('forum-favorite-posts-page').style.transform = 'translateX(0)';
+    };
+
+    window.closeForumFavoritePostsPage = () => {
+        document.getElementById('forum-favorite-posts-page').classList.remove('active');
+        document.getElementById('forum-favorite-posts-page').style.transform = 'translateX(100%)';
+    };
+
+    window.toggleForumFavPostsManageMode = () => {
+        const favs = getForumFavoritePosts();
+        if (favs.length === 0) {
+            showToast("暂无收藏帖子可管理");
+            return;
+        }
+        isFavPostsManageMode = !isFavPostsManageMode;
+        const footer = document.getElementById('forum-favorite-posts-footer');
+        if (isFavPostsManageMode) {
+            footer.classList.add('active');
+        } else {
+            footer.classList.remove('active');
+            selectedFavPostsIds.clear();
+        }
+        window.renderFavoriteForumPosts();
+    };
+
+    window.toggleFavPostSelection = (postId, checkboxEl) => {
+        if (selectedFavPostsIds.has(postId)) {
+            selectedFavPostsIds.delete(postId);
+            if (checkboxEl) checkboxEl.classList.remove('checked');
+        } else {
+            selectedFavPostsIds.add(postId);
+            if (checkboxEl) checkboxEl.classList.add('checked');
+        }
+        updateFavPostsSelectAllCheckbox();
+    };
+
+    window.toggleSelectAllFavPosts = () => {
+        const favs = getForumFavoritePosts();
+        if (selectedFavPostsIds.size === favs.length) {
+            selectedFavPostsIds.clear();
+        } else {
+            favs.forEach(p => selectedFavPostsIds.add(p.id));
+        }
+        window.renderFavoriteForumPosts();
+        updateFavPostsSelectAllCheckbox();
+    };
+
+    function updateFavPostsSelectAllCheckbox() {
+        const favs = getForumFavoritePosts();
+        const selectAllBox = document.getElementById('fav-posts-select-all-checkbox');
+        if (favs.length > 0 && selectedFavPostsIds.size === favs.length) {
+            selectAllBox.classList.add('checked');
+        } else {
+            selectAllBox.classList.remove('checked');
+        }
+    }
+
+    window.deleteSelectedFavPosts = () => {
+        if (selectedFavPostsIds.size === 0) {
+            showToast("请先选择要移除的帖子");
+            return;
+        }
+        let favs = getForumFavoritePosts();
+        favs = favs.filter(p => !selectedFavPostsIds.has(p.id));
+        saveForumFavoritePosts(favs);
+        
+        selectedFavPostsIds.clear();
+        showToast("已移除收藏");
+        
+        if (favs.length === 0) {
+            isFavPostsManageMode = false;
+            document.getElementById('forum-favorite-posts-footer').classList.remove('active');
+        }
+        
+        window.renderFavoriteForumPosts();
+        updateFavPostsSelectAllCheckbox();
+    };
+
+    window.renderFavoriteForumPosts = () => {
+        const container = document.getElementById('forum-favorite-posts-area');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        const favs = getForumFavoritePosts();
+        const mainProfile = getUserProfile();
+        
+        if (favs.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:50px 20px;">这里空空如也，快去收藏喜欢的帖子吧~</div>';
+            return;
+        }
+
+        favs.forEach(post => {
+            const isChecked = selectedFavPostsIds.has(post.id);
+            let imgHtml = '';
+            if (post.images && post.images.length > 0) {
+                let gridClass = 'single-img';
+                if (post.images.length === 2 || post.images.length === 4) gridClass = `grid-${post.images.length}`; 
+                else if (post.images.length > 1) gridClass = `grid-${post.images.length > 9 ? 9 : post.images.length}`; 
+                
+                imgHtml = `<div class="moments-img-grid ${gridClass}" style="margin-bottom:10px;">` +
+                    post.images.slice(0, 9).map(src => `<img src="${src}" class="moment-grid-img">`).join('') +
+                    `</div>`;
+            }
+            
+            const dateStr = formatTimestamp(post.timestamp);
+            const { level } = calculateLevelInfo(post.authorXP);
+            const userHasLiked = post.likes && post.likes.includes(mainProfile.qqId);
+            const likeIcon = userHasLiked ? "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png" : "https://img.heliar.top/file/1770582828275_赞_thumbs-up_3.png";
+
+            const tagsHtml = (post.tags && post.tags.length > 0) 
+                ? `<div class="forum-post-tags">${post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join(' ')}</div>` 
+                : '';
+
+            const card = document.createElement('div');
+            card.className = 'forum-post-card';
+            card.style.position = 'relative';
+            if (isFavPostsManageMode) {
+                card.onclick = () => window.toggleFavPostSelection(post.id, card.querySelector('.purchased-item-checkbox'));
+            } else {
+                card.onclick = () => openForumPostDetail(post.id);
+            }
+
+            // 新增右上角独立取消收藏按钮
+            const rightPos = isFavPostsManageMode ? '45px' : '15px';
+            const starHtml = `<img src="https://img.heliar.top/file/1773236031457_星星_star_2.png" style="position: absolute; top: 15px; right: ${rightPos}; width: 24px; height: 24px; cursor: pointer; z-index: 10;" onclick="unfavoritePost(${post.id}, event)">`;
+
+                     card.innerHTML = `
+                <div class="purchased-item-checkbox ${isChecked ? 'checked' : ''}" style="${isFavPostsManageMode ? 'display:flex;' : 'display:none;'} position: absolute; top: 15px; right: 15px; z-index: 10;"></div>
+                ${starHtml}
+                <div class="forum-post-header">
+                   <img src="${post.authorAvatar || getRandomCustomAvatar(post.forumId)}" class="forum-post-avatar">
+                    <div class="forum-post-user-info">
+                        <div class="forum-post-user">${escapeHtml(post.authorName)}</div>
+                    </div>
+                    <span class="forum-post-level">Lv.${level}</span>
+                </div>
+                ${post.content ? `<div class="forum-post-content">${escapeHtml(post.content)}</div>` : ''}
+
+                ${imgHtml}
+                ${tagsHtml}
+                <div class="forum-post-actions" onclick="event.stopPropagation()">
+                    <div class="forum-post-action-btn" onclick="shareForumPost(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582835252_分享_share.png">
+                        <span>分享</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="openForumPostDetail(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582828238_未读消息_message-unread.png">
+                        <span>${post.comments ? post.comments.length : 0}</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="toggleForumPostLike(${post.id}); openForumPostDetail(${post.id});">
+                        <img src="${likeIcon}">
+                        <span>${(post.baseLikes || 0) + (post.likes ? post.likes.length : 0)}</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    };
+
+    window.unfavoritePost = (postId, event) => {
+        if (event) event.stopPropagation();
+        let favs = getForumFavoritePosts();
+        favs = favs.filter(p => p.id !== postId);
+        saveForumFavoritePosts(favs);
+        showToast("已取消收藏并删除");
+        renderFavoriteForumPosts();
+        
+        if (currentForumPostData && currentForumPostData.id === postId) {
+            const btn = document.getElementById('forum-post-fav-btn');
+            if (btn) btn.src = 'https://img.heliar.top/file/1773236036735_星星_star.png';
+        }
+    };
+
+       // =================== 新增：点赞的帖子预览与全屏逻辑 ===================
+    window.renderLikedPostsPreview = () => {
+        const container = document.getElementById('forum-liked-posts-preview-container');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const allForums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]'); // 获取论坛库用于查名
+        const mainProfile = getUserProfile();
+        
+        const likedPosts = allPosts.filter(p => p.likes && p.likes.includes(mainProfile.qqId)).sort((a,b) => b.timestamp - a.timestamp);
+        
+        if(likedPosts.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #999; font-size: 13px; padding: 10px;">暂无点赞的帖子</div>';
+            return;
+        }
+        
+        // 限制展示前4个
+        const previewPosts = likedPosts.slice(0, 4);
+        
+        previewPosts.forEach(post => {
+            // 获取该帖子所属的论坛名称
+            const forum = allForums.find(f => f.id === post.forumId);
+            const forumName = forum ? forum.name : '未知论坛';
+
+            const item = document.createElement('div');
+            item.className = 'forum-liked-post-card';
+            item.onclick = () => openForumPostDetail(post.id); // 点击直接进入帖子详情
+            
+            let imgHtml = '';
+            if (post.images && post.images.length > 0) {
+                imgHtml = `<img src="${post.images[0]}" class="forum-liked-post-image-preview">`;
+            }
+            
+            // 组装长方形卡片HTML
+            item.innerHTML = `
+                <div class="forum-liked-post-header">
+                    <img src="${post.authorAvatar || getRandomCustomAvatar(post.forumId)}" class="forum-liked-post-avatar">
+                    <div class="forum-liked-post-info">
+                        <div class="forum-liked-post-nickname">${escapeHtml(post.authorName)}</div>
+                        <div class="forum-liked-post-forum-name">来自 ${escapeHtml(forumName)}</div>
+                    </div>
+                </div>
+                ${post.content ? `<div class="forum-liked-post-content">${escapeHtml(post.content)}</div>` : ''}
+                ${imgHtml}
+            `;
+            container.appendChild(item);
+        });
+    };
+
+
+    window.showAllLikedPosts = () => {
+        document.getElementById('forum-all-liked-posts-page').classList.add('active');
+        document.getElementById('forum-all-liked-posts-page').style.transform = 'translateX(0)';
+        renderAllLikedPosts();
+    };
+
+    window.closeAllLikedPostsPage = () => {
+        document.getElementById('forum-all-liked-posts-page').classList.remove('active');
+        document.getElementById('forum-all-liked-posts-page').style.transform = 'translateX(100%)';
+    };
+
+    window.renderAllLikedPosts = () => {
+        const container = document.getElementById('forum-all-liked-posts-area');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        const mainProfile = getUserProfile();
+        const likedPosts = allPosts.filter(p => p.likes && p.likes.includes(mainProfile.qqId)).sort((a,b) => b.timestamp - a.timestamp);
+        
+        if (likedPosts.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:50px 20px;">这里还空空如也，快去给别人点赞吧~</div>';
+            return;
+        }
+
+        likedPosts.forEach(post => {
+            let imgHtml = '';
+            if (post.images && post.images.length > 0) {
+                let gridClass = 'single-img';
+                if (post.images.length === 2 || post.images.length === 4) gridClass = `grid-${post.images.length}`; 
+                else if (post.images.length > 1) gridClass = `grid-${post.images.length > 9 ? 9 : post.images.length}`; 
+                
+                imgHtml = `<div class="moments-img-grid ${gridClass}" style="margin-bottom:10px;">` +
+                    post.images.slice(0, 9).map(src => `<img src="${src}" class="moment-grid-img">`).join('') +
+                    `</div>`;
+            }
+            
+            const dateStr = formatTimestamp(post.timestamp);
+            const { level } = calculateLevelInfo(post.authorXP);
+            const likeIcon = "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png";
+
+            const tagsHtml = (post.tags && post.tags.length > 0) 
+                ? `<div class="forum-post-tags">${post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join(' ')}</div>` 
+                : '';
+
+            const card = document.createElement('div');
+            card.className = 'forum-post-card';
+            card.onclick = () => openForumPostDetail(post.id);
+
+            card.innerHTML = `
+                <div class="forum-post-header">
+                   <img src="${post.authorAvatar || getRandomCustomAvatar(post.forumId)}" class="forum-post-avatar">
+                    <div class="forum-post-user-info">
+                        <div class="forum-post-user">${escapeHtml(post.authorName)}</div>
+                    </div>
+                    <span class="forum-post-level">Lv.${level}</span>
+                    <div class="forum-post-time">${dateStr}</div>
+                </div>
+                ${post.content ? `<div class="forum-post-content">${escapeHtml(post.content)}</div>` : ''}
+                ${imgHtml}
+                ${tagsHtml}
+                <div class="forum-post-actions">
+                    <div class="forum-post-action-btn" onclick="event.stopPropagation(); shareForumPost(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582835252_分享_share.png">
+                        <span>分享</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="event.stopPropagation(); openForumPostDetail(${post.id})">
+                        <img src="https://img.heliar.top/file/1770582828238_未读消息_message-unread.png">
+                        <span>${post.comments ? post.comments.length : 0}</span>
+                    </div>
+                    <div class="forum-post-action-btn" onclick="event.stopPropagation(); toggleForumPostLike(${post.id})">
+                        <img src="${likeIcon}">
+                        <span>${(post.baseLikes || 0) + (post.likes ? post.likes.length : 0)}</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    };
+
     window.toggleForumPostLike = (postId) => {
         let posts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
         const postIndex = posts.findIndex(p => p.id === postId);
@@ -11583,11 +13283,17 @@ window.toggleMallProductFavorite = (productId) => {
         const likeIndex = (posts[postIndex].likes || []).indexOf(mainProfile.qqId);
 
         if (!posts[postIndex].likes) posts[postIndex].likes = [];
+        if (!posts[postIndex].rewardedLikes) posts[postIndex].rewardedLikes = [];
 
         if (likeIndex > -1) {
             posts[postIndex].likes.splice(likeIndex, 1); 
         } else {
             posts[postIndex].likes.push(mainProfile.qqId); 
+            
+            if (!posts[postIndex].rewardedLikes.includes(mainProfile.qqId)) {
+                posts[postIndex].rewardedLikes.push(mainProfile.qqId);
+                window.addForumXP(posts[postIndex].forumId, 2);
+            }
         }
 
         localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(posts));
@@ -11595,253 +13301,19 @@ window.toggleMallProductFavorite = (productId) => {
         if(currentForumDetailId) {
             renderForumDetailPosts(currentForumDetailId);
         }
-    };
-    
-    window.openForumMeSettings = () => {
-        const modal = document.getElementById('forum-me-settings-modal');
-        const profile = getForumUserData();
-        const mainProfile = getUserProfile();
-
-        tempForumMeAvatarUrl = profile.avatar || '';
-        tempForumMeBgUrl = profile.backgroundUrl || '';
-
-        document.getElementById('forum-me-settings-avatar-preview').src = profile.avatar || mainProfile.avatar || 'https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png';
-        document.getElementById('forum-me-settings-avatar-url').value = profile.avatar || '';
-        document.getElementById('forum-me-settings-bg-preview').src = profile.backgroundUrl || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1000&q=80';
-        document.getElementById('forum-me-settings-bg-url').value = profile.backgroundUrl || '';
-        document.getElementById('forum-me-settings-nickname').value = profile.nickname || '';
-
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('active'), 10);
-    };
-
-    window.closeForumMeSettings = () => {
-        const modal = document.getElementById('forum-me-settings-modal');
-        modal.classList.remove('active');
-        setTimeout(() => modal.style.display = 'none', 200);
-    };
-    
-    window.triggerForumMeAvatarUpload = () => {
-        document.getElementById('input-forum-me-avatar').click();
-    };
-
-    window.handleForumMeAvatarUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        compressImage(file, 200, (base64) => {
-            tempForumMeAvatarUrl = base64;
-            document.getElementById('forum-me-settings-avatar-preview').src = base64;
-            document.getElementById('forum-me-settings-avatar-url').value = '（已上传本地图片）';
-        });
-    };
-
-    window.triggerForumMeBgUpload = () => {
-        document.getElementById('input-forum-me-bg').click();
-    };
-    
-    window.handleForumMeBgUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        compressImage(file, 1000, (base64) => {
-            const isSettingsModalActive = document.getElementById('forum-me-settings-modal').classList.contains('active');
-            if (isSettingsModalActive) {
-                tempForumMeBgUrl = base64;
-                document.getElementById('forum-me-settings-bg-preview').src = base64;
-                document.getElementById('forum-me-settings-bg-url').value = '（已上传本地图片）';
-            } else {
-                const userData = getForumUserData();
-                userData.backgroundUrl = base64;
-                saveForumUserData(userData);
-                renderForumMePage();
-                showToast("个人主页背景已更新");
-            }
-        });
-    };
-
-    window.saveForumMeSettings = () => {
-        const profile = getForumUserData();
         
-        profile.nickname = document.getElementById('forum-me-settings-nickname').value.trim();
-        
-        const avatarUrlFromInput = document.getElementById('forum-me-settings-avatar-url').value.trim();
-        if (tempForumMeAvatarUrl) {
-            profile.avatar = tempForumMeAvatarUrl;
-                } else if (avatarUrlFromInput !== '（已上传本地图片）') {
-            profile.avatar = avatarUrlFromInput;
+        const myPostsPage = document.getElementById('forum-my-posts-page');
+        if (myPostsPage && myPostsPage.classList.contains('active')) {
+            window.renderMyForumPosts();
         }
         
-        const bgUrlFromInput = document.getElementById('forum-me-settings-bg-url').value.trim();
-        if (tempForumMeBgUrl) {
-            profile.backgroundUrl = tempForumMeBgUrl;
-        } else if (bgUrlFromInput !== '（已上传本地图片）') {
-            profile.backgroundUrl = bgUrlFromInput;
+        renderLikedPostsPreview();
+        const likedPage = document.getElementById('forum-all-liked-posts-page');
+        if (likedPage && likedPage.classList.contains('active')) {
+            renderAllLikedPosts();
         }
-
-        saveForumUserData(profile);
-        showToast('论坛设置已保存');
-        closeForumMeSettings();
-        renderForumMePage();
     };
 
-    window.expandPostContent = (element) => {
-        element.classList.remove('truncated');
-    };
-
-    async function callApiForJson(prompt) {
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        let url = settings.api.url;
-        const key = settings.api.key;
-        let model = settings.api.model || 'gemini-pro'; 
-        let body;
-        let headers = { 'Content-Type': 'application/json' };
-        
-        if (url.includes('generativelanguage')) {
-            url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-            body = JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    temperature: parseFloat(settings.api.temp || 0.9),
-                },
-            });
-        } else {
-            url = `${url.endsWith('/v1') ? url : url+'/v1'}/chat/completions`;
-            headers['Authorization'] = `Bearer ${key}`;
-            body = JSON.stringify({
-                model: model,
-                messages: [{ role: 'user', content: prompt }], 
-                temperature: parseFloat(settings.api.temp || 0.9),
-                response_format: { "type": "json_object" }
-            });
-        }
-        
-        const response = await fetch(url, { method: 'POST', headers: headers, body: body });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            const errorMessage = errorData?.error?.message || JSON.stringify(errorData);
-            throw new Error(`API Error: ${response.status} - ${errorMessage}`);
-        }
-        
-        const data = await response.json();
-        let content;
-
-        if (url.includes('generativelanguage')) { 
-            if (!data.candidates || !data.candidates[0].content.parts[0].text) throw new Error('Invalid Gemini response format.');
-            content = data.candidates[0].content.parts[0].text;
-        } else { 
-            content = data.choices[0].message.content;
-        }
-        
-        const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-        if (!jsonMatch) {
-            console.error("API did not return valid JSON. Raw response:", content);
-            throw new Error("API did not return valid JSON.");
-        }
-        
-        const jsonString = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
-        
-        try {
-            return JSON.parse(jsonString);
-        } catch (parseError) {
-            console.error("Failed to parse JSON string:", jsonString, "Original content:", content);
-            throw new Error("Failed to parse JSON from API response.");
-        }
-    }
-
-
-    async function handleForumRefresh(forumId) {
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
-            showToast('请先在设置中配置完整的 API 信息');
-            return;
-        }
-
-        const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
-        const currentForum = forums.find(f => f.id === forumId);
-        if (!currentForum) return;
-
-        const refreshBtn = document.getElementById('forum-detail-refresh-btn');
-        refreshBtn.style.animation = 'spin 1s linear infinite';
-        showToast('正在生成内容，请稍候...', 4000);
-
-        try {
-            const allWorldBooks = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-            const worldBookContext = (currentForum.worldbookIds || [])
-                .map(id => {
-                    const book = allWorldBooks.find(b => b.id === id);
-                    return book ? `[世界书: ${book.title}]\n${book.entries.map(e => `${e.key}: ${e.content}`).join('\n')}` : '';
-                }).filter(Boolean).join('\n\n') || '无';
-
-            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-            const boundRoles = (currentForum.boundRoleIds || [])
-                .map(id => allContacts.find(c => c.id === id)).filter(Boolean);
-
-            const generalPostPrompt = `You are a content creator for a fictional forum.
-Forum Name: "${currentForum.name}"
-Worldview: "${currentForum.worldview || 'A standard fantasy world.'}"
-World Book Facts (Highest Priority):
-${worldBookContext}
-
-Generate a JSON object with a key "posts" containing an array of 5-6 original posts.
-For each post, provide:
-- author_nickname: A plausible, unique, non-repeating nickname suitable for the forum's atmosphere.
-- content: The post text. Must be original, engaging, natural-sounding, and strictly adhere to the worldview and world book facts.
-- tags: An array of 1-3 relevant string tags in "#tag" format.
-- comments: An array of 5-10 unique comment objects. Each comment must have:
-    - author_nickname: A unique, non-repeating passerby nickname.
-    - text: The comment content, which should be a realistic reaction to the post, a question, or a reply to another comment. To reply, use the format "@[nickname] [your_reply_text]".
-    - reply_to_nickname: (Optional) The nickname of the user they are replying to. If it's a top-level comment, this should be null.
-
-Strictly adhere to the JSON format. Example:
-{ "posts": [ { "author_nickname": "User1", "content": "Text", "tags": ["#Tag"], "comments": [ { "author_nickname": "User2", "text": "Comment", "reply_to_nickname": null } ] } ] }`;
-
-            let generatedData = await callApiForJson(generalPostPrompt);
-            let newPosts = generatedData.posts || [];
-            
-            if (boundRoles.length > 0) {
-                for (const role of boundRoles) {
-                    if (Math.random() < 0.5) {
-                        const rolePostPrompt = `Act as character "${role.alias || role.name}". Persona: "${role.persona}". Forum: "${currentForum.name}". Worldview: "${currentForum.worldview}". Facts: ${worldBookContext}. Generate JSON key "post" with fields: author_nickname (exact character name), content, tags, comments (empty array).`;
-                        try {
-                            const rolePostData = await callApiForJson(rolePostPrompt);
-                            if (rolePostData.post) {
-                                rolePostData.post.author_avatar = role.avatar;
-                                newPosts.unshift(rolePostData.post);
-                            }
-                        } catch (e) { console.warn(`Role post failed`, e); }
-                    }
-                }
-            }
-
-            const processedPosts = newPosts.map((p, index) => ({
-                id: Date.now() + index, 
-                forumId: forumId,
-                authorName: p.author_nickname,
-                authorAvatar: p.author_avatar || '', 
-                content: p.content,
-                tags: p.tags || [],
-                comments: p.comments || [],
-                timestamp: Date.now(),
-                likes: [],
-                authorXP: Math.floor(Math.random() * 500) 
-            }));
-
-            let allStoredPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
-            allStoredPosts = [...processedPosts, ...allStoredPosts];
-            
-            localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allStoredPosts));
-
-            renderForumDetailPosts(forumId);
-            showToast(`刷新成功！更新了 ${processedPosts.length} 条内容`);
-
-        } catch (error) {
-            console.error('Forum refresh failed:', error);
-            showToast('内容生成失败: ' + error.message, 4000);
-        } finally {
-            refreshBtn.style.animation = '';
-        }
-    }
 
     // --- Chat App Logic ---
     window.openChatApp = () => { body.classList.add('chat-active'); switchChatTab(0, 'Chat'); renderChatList(); };
@@ -12823,18 +14295,32 @@ ${actionInstruction}
     window.closeWorldBookAddModal = () => { document.getElementById('worldbook-add-modal').classList.remove('active'); };
     window.addWorldBookEntryRow = () => { const container = document.getElementById('wb-dynamic-entries'); const row = document.createElement('div'); row.className = 'wb-entry-row wb-dynamic-row'; row.innerHTML = `<input type="text" class="wb-entry-input key" placeholder="名称（可选）"><textarea class="wb-entry-input val" placeholder="世界书内容"></textarea>`; container.appendChild(row); };
     window.saveWorldBook = () => { const title = document.getElementById('wb-title-input').value.trim(); if(!title) { showToast("请输入世界书名"); return; } const rows = document.querySelectorAll('.wb-dynamic-row'); const entries = []; let hasContent = false; rows.forEach(row => { const key = row.querySelector('.key').value.trim(); const val = row.querySelector('.val').value.trim(); if(val) { entries.push({ key: key, content: val }); hasContent = true; } }); if (!hasContent) { showToast("请至少输入一条世界书内容"); return; } const newBook = { id: Date.now(), title: title, entries: entries, coverColor: '#EAEAEA', coverImage: '' }; let books = []; try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) {} books.push(newBook); localStorage.setItem(WORLDBOOK_DATA_KEY, JSON.stringify(books)); showToast("世界书已保存"); closeWorldBookAddModal(); renderWorldBooks(); };
-    window.renderWorldBooks = () => { 
+       window.renderWorldBooks = () => { 
         const container = document.getElementById('worldbook-list'); 
         container.innerHTML = ''; 
+        
+        // 新增：读取并赋予书名朝下的整体模式状态
+        const isTitleBottom = localStorage.getItem('wbTitleBottomMode_v1') === 'true';
+        if (isTitleBottom) {
+            container.classList.add('title-bottom-mode');
+        } else {
+            container.classList.remove('title-bottom-mode');
+        }
+
         let books = []; 
         try { books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); } catch(e) { books = []; } 
         books.sort((a,b) => b.id - a.id).forEach(book => { 
             const item = document.createElement('div'); 
             item.className = 'wb-book-item'; 
             item.onclick = () => viewWorldBook(book.id); 
-            item.innerHTML = `<div class="wb-book-cover"><div class="wb-book-name">${escapeHtml(book.title)}</div></div>`; 
+            // 新增：添加下方位置的名称文字层
+            item.innerHTML = `
+                <div class="wb-book-cover"><div class="wb-book-name">${escapeHtml(book.title)}</div></div>
+                <div class="wb-book-name-outer">${escapeHtml(book.title)}</div>
+            `; 
             const coverEl = item.querySelector('.wb-book-cover'); 
             const nameEl = item.querySelector('.wb-book-name');
+            const nameOuterEl = item.querySelector('.wb-book-name-outer');
             
             if (book.coverImage) {
                 coverEl.style.backgroundImage = `url(${book.coverImage})`;
@@ -12845,14 +14331,16 @@ ${actionInstruction}
                 coverEl.style.background = book.coverColor; 
             } 
             
-            // 新增：如果用户设置了自定义的标题颜色，优先使用该颜色
+            // 确保两种文字元素颜色都能同步调整
             if (book.titleColor) {
                 nameEl.style.color = book.titleColor;
+                nameOuterEl.style.color = book.titleColor;
             }
             
             container.appendChild(item); 
         }); 
     };
+
    
          // 切换右上角的编辑菜单模式
     window.toggleWbDetailEdit = () => {
@@ -12989,11 +14477,16 @@ ${actionInstruction}
         document.getElementById('wb-delete-confirm-modal').classList.add('active');
     };
 
-    window.openWorldBookColorSettings = () => { 
+       window.openWorldBookColorSettings = () => { 
         const page = document.getElementById('worldbook-color-page'); 
+        
+        // 新增：回显书名朝下开关状态
+        document.getElementById('wb-title-bottom-switch').checked = localStorage.getItem('wbTitleBottomMode_v1') === 'true';
+
         const container = document.getElementById('wb-color-list'); 
         container.innerHTML = ''; 
         let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); 
+
         if (books.length === 0) { 
             container.innerHTML = '<p style="text-align:center; color:#999;">还没有创建世界书哦</p>'; 
         } else { 
@@ -13029,11 +14522,16 @@ ${actionInstruction}
     };
     window.closeWorldBookColorSettings = () => { document.getElementById('worldbook-color-page').classList.remove('active'); };
     
-    window.saveWorldBookColors = () => { 
+       window.saveWorldBookColors = () => { 
+        // 新增：保存书名朝下开关状态
+        const isTitleBottom = document.getElementById('wb-title-bottom-switch').checked;
+        localStorage.setItem('wbTitleBottomMode_v1', isTitleBottom);
+
         let books = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]'); 
         
         // 1. 保存背景颜色
         const colorInputs = document.querySelectorAll('.wb-color-input'); 
+
         colorInputs.forEach(input => { 
             const bookId = parseInt(input.dataset.bookId); 
             const newColor = input.value; 
@@ -14773,11 +16271,18 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             document.getElementById('wallpaper-url').value = settings.visual.wallpaper || '';
             if(settings.visual.wallpaper) document.getElementById('wallpaper-preview').style.backgroundImage = `url(${settings.visual.wallpaper})`;
             document.getElementById('main-avatar1-url').value = settings.visual.mainAvatar1 || '';
-            if(settings.visual.mainAvatar1) document.getElementById('main-avatar1-preview').style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
+                      if(settings.visual.mainAvatar1) document.getElementById('main-avatar1-preview').style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
             document.getElementById('main-avatar2-url').value = settings.visual.mainAvatar2 || '';
             if(settings.visual.mainAvatar2) document.getElementById('main-avatar2-preview').style.backgroundImage = `url(${settings.visual.mainAvatar2})`;
             document.getElementById('clock-color-input').value = settings.visual.clockColor || '#FFFFFF';
+            
+            // 回显字体设置并触发预览
+            if (document.getElementById('global-font-url')) {
+                document.getElementById('global-font-url').value = settings.visual.globalFontUrl || '';
+                window.applyFontPreview(settings.visual.globalFontUrl || '');
+            }
         }
+
                 renderSettingsAppList(settings.apps || {});
         body.classList.add('settings-active'); // 修改了这里
         
@@ -14830,11 +16335,17 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             temp: parseFloat(document.getElementById('temp-slider').value)
         };
                         settings.visual = settings.visual || {};
-        settings.visual.wallpaper = document.getElementById('wallpaper-url').value.trim();
+            settings.visual.wallpaper = document.getElementById('wallpaper-url').value.trim();
         settings.visual.mainAvatar1 = document.getElementById('main-avatar1-url').value.trim();
         settings.visual.mainAvatar2 = document.getElementById('main-avatar2-url').value.trim();
         settings.visual.clockColor = document.getElementById('clock-color-input').value.trim();
-                settings.visual.lockWallpaper = document.getElementById('lock-wallpaper-url').value.trim();
+        settings.visual.lockWallpaper = document.getElementById('lock-wallpaper-url').value.trim();
+        
+        // 抓取并保存字体链接
+        if (document.getElementById('global-font-url')) {
+            settings.visual.globalFontUrl = document.getElementById('global-font-url').value.trim();
+        }
+
         localStorage.setItem(LOCK_PWD_ENABLED_KEY, document.getElementById('lock-pwd-switch').checked);
         localStorage.setItem(LOCK_PWD_VALUE_KEY, document.getElementById('lock-pwd-input').value.trim());
                 localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
@@ -15029,7 +16540,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             }
         });
 
-        if (settings.visual?.photoWidget) {
+             if (settings.visual?.photoWidget) {
             document.getElementById('photo-widget-img').src = settings.visual.photoWidget;
             document.getElementById('photo-widget-img').style.display = 'block';
             document.getElementById('photo-widget-placeholder').style.display = 'none';
@@ -15037,7 +16548,50 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
 
         const clockColor = settings.visual?.clockColor || '#FFFFFF';
         document.documentElement.style.setProperty('--clock-text-color', clockColor);
+
+        // ==== 核心：应用全局自定义字体 ====
+        const fontUrl = settings.visual?.globalFontUrl || '';
+        let fontStyleTag = document.getElementById('dynamic-global-font');
+        if (!fontStyleTag) {
+            fontStyleTag = document.createElement('style');
+            fontStyleTag.id = 'dynamic-global-font';
+            document.head.appendChild(fontStyleTag);
+        }
+        if (fontUrl) {
+            // 使用 * 选择器配合 !important 强制覆盖系统所有角落的字体
+            fontStyleTag.innerHTML = `
+                @font-face {
+                    font-family: 'CustomGlobalFont';
+                    src: url('${fontUrl}');
+                }
+                body * {
+                    font-family: 'CustomGlobalFont', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif !important;
+                }
+            `;
+        } else {
+            fontStyleTag.innerHTML = '';
+        }
     }
+
+    // ==== 辅助：实时预览字体函数 ====
+    window.applyFontPreview = (url) => {
+        const styleTag = document.getElementById('preview-font-style');
+        if (!styleTag) return;
+        if (url) {
+            styleTag.innerHTML = `
+                @font-face {
+                    font-family: 'PreviewFontTemp';
+                    src: url('${url}');
+                }
+                #font-preview-area {
+                    font-family: 'PreviewFontTemp' !important;
+                }
+            `;
+        } else {
+            styleTag.innerHTML = '';
+        }
+    };
+
 
         // [修改] 同时更新 renderSettingsAppList 和 resetAppSetting 以使用图标ID
     function renderSettingsAppList(appSettings) {
@@ -15902,17 +17456,17 @@ function renderShoppingCartPage() {
     const pageContainer = document.getElementById('mall-cart-page');
     const cartData = getCartData();
 
-    // 如果购物车是空的，显示提示信息
+       // 如果购物车是空的，显示提示信息
     if (cartData.length === 0) {
         pageContainer.innerHTML = `
             <div class="cart-empty-state">
-                <img src="https://img.heliar.top/file/1772457999124_购物车空_shopping-cart-null.png" alt="Empty Cart">
                 <p>购物车还是空的哦</p>
                 <button onclick="switchMallPage('home')">去逛逛</button>
             </div>
         `;
         return;
     }
+
 
     // ...
     // 动态生成每个商品条目的HTML
@@ -16473,6 +18027,48 @@ window.deleteSelectedFavorites = () => {
     }
 };
 
+// ========================= 新增：手电筒快捷关闭锁屏逻辑 =========================
+window.openDisableLockModal = (e) => {
+    if (e) e.stopPropagation(); // 防止点击穿透触发屏幕滑动
+    document.getElementById('disable-lock-confirm-modal').classList.add('active');
+};
+
+window.closeDisableLockModal = () => {
+    document.getElementById('disable-lock-confirm-modal').classList.remove('active');
+};
+
+window.executeDisableLock = () => {
+    // 1. 修改本地缓存状态，彻底关闭功能
+    localStorage.setItem(LOCK_SCREEN_KEY, 'false');
+    localStorage.setItem(LOCK_PWD_ENABLED_KEY, 'false');
+
+    // 2. 同步更新设置页面的开关UI状态
+    const lockScreenSwitch = document.getElementById('lock-screen-switch');
+    if (lockScreenSwitch) lockScreenSwitch.checked = false;
+    
+    const lockPwdSwitch = document.getElementById('lock-pwd-switch');
+    if (lockPwdSwitch) {
+        lockPwdSwitch.checked = false;
+        document.getElementById('lock-pwd-setting-row').style.display = 'none';
+    }
+
+    // 3. 关闭当前确认弹窗
+    closeDisableLockModal();
+
+    // 4. 关闭密码输入面板（如果点手电筒时密码面板碰巧开着）
+    document.getElementById('lock-pwd-overlay').classList.remove('active');
+
+    // 5. 执行解锁动画并隐藏锁屏界面
+    const lockScreen = document.getElementById('lock-screen');
+    lockScreen.classList.add('unlocked');
+    setTimeout(() => { 
+        lockScreen.style.display = 'none'; 
+    }, 400);
+
+    // 6. 提示用户
+    showToast("已成功关闭锁屏及密码功能");
+};
+// ========================= 新增结束 =========================
 
 </script>
 </body>
