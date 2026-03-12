@@ -15,6 +15,91 @@
     <link rel="icon" href="https://img.heliar.top/file/1773263760361_IMG_4342.jpeg">
     
     <style>
+        /* ========================= 外卖订单历史页面美化 ========================= */
+        .takeout-order-card {
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(255, 182, 193, 0.15); /* 柔和的粉色阴影 */
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+        .takeout-order-card:active {
+            transform: scale(0.98);
+        }
+        .takeout-order-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #f0e6ea;
+            cursor: pointer;
+        }
+        .takeout-order-shop-icon {
+            width: 50px; height: 50px;
+            border-radius: 14px;
+            background: #fff9fb;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; border: 1px solid #ffeff4;
+            flex-shrink: 0; margin-right: 15px;
+        }
+        .takeout-order-shop-info {
+            flex: 1; min-width: 0;
+        }
+        .takeout-order-shop-name {
+            font-size: 16px; font-weight: bold; color: #333;
+            margin-bottom: 4px; display: flex; align-items: center;
+        }
+        .takeout-order-time {
+            font-size: 12px; color: #999;
+        }
+        .takeout-order-status {
+            font-size: 13px; color: var(--takeout-primary-color);
+            font-weight: 500; margin-left: 10px;
+        }
+        
+        /* 展开的菜品列表区 */
+        .takeout-order-dishes-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .takeout-order-dishes-wrapper.expanded {
+            max-height: 1000px; /* 展开动画足够大 */
+        }
+        .takeout-order-dishes-inner {
+            padding-top: 15px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .takeout-order-dish-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fdfafb; /* 独立的菜品小区块背景 */
+            padding: 12px 15px;
+            border-radius: 12px; /* 圆滑处理 */
+            border: 1px solid #fef5f7;
+        }
+        .takeout-order-dish-name {
+            font-size: 14px; color: #444; flex: 1; font-weight: 500;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .takeout-order-dish-qty {
+            font-size: 13px; color: #888; width: 40px; text-align: right;
+        }
+        .takeout-order-dish-price {
+            font-size: 14px; font-weight: bold; color: #333; width: 65px; text-align: right;
+        }
+        
+        /* 底部总价区 */
+        .takeout-order-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 15px; margin-top: 10px; border-top: 1px dashed #f0e6ea;
+        }
+        .takeout-order-total-text {
+            font-size: 13px; color: #666;
+        }
+        .takeout-order-total-price {
+            font-size: 18px; font-weight: bold; color: #ff5000;
+        }
         /* ========================= 外卖详情页：Tabs & 双栏菜单 ========================= */
         .takeout-shop-tabs {
             display: flex; background: #fff; border-bottom: 1px solid #f0f0f0;
@@ -7978,25 +8063,32 @@ function renderCategories() {
         // 挂载到全局方便外部下单后强行触发刷新
         window.forceRenderTakeoutMenus = renderMenuList;
 
-        function renderMenuList() {
+                function renderMenuList() {
             // 每次渲染前从本地重新读取最新状态，防丢失
             const freshData = JSON.parse(localStorage.getItem(TAKEOUT_APP_DATA_KEY) || '{"menus":[]}');
             appState.menus = freshData.menus || [];
             
             const menuListEl = $('#takeout-menu-list');
-            if (appState.menus.length === 0) { menuListEl.innerHTML = '<p class="status-text">还没有下过单哦，快去点菜吧！</p>'; return; }
+            if (appState.menus.length === 0) { 
+                menuListEl.innerHTML = `
+                    <div style="text-align: center; padding-top: 100px; color: #ccc;">
+                        <div style="font-size: 60px; margin-bottom: 10px;">🧾</div>
+                        <p>还没有下过单哦，快去挑点好吃的吧！</p>
+                    </div>`; 
+                return; 
+            }
             menuListEl.innerHTML = '';
             
             [...appState.menus].reverse().forEach(menu => {
                 const totalDishes = menu.dishes.reduce((sum, dish) => sum + dish.quantity, 0);
                 const card = document.createElement('div');
-                card.className = 'menu-item-card';
+                card.className = 'takeout-order-card';
                 card.dataset.menuId = menu.id;
                 
                 // 兼容旧版的情侣头像和新版的店铺Emoji
                 const avatarHtml = menu.shopEmoji 
-                    ? `<div class="menu-avatar" style="display:flex; justify-content:center; align-items:center; font-size: 30px; border:1px solid #eee; background:#f9f9f9;">${menu.shopEmoji}</div>`
-                    : `<img src="${menu.avatar}" class="menu-avatar">`;
+                    ? `<div class="takeout-order-shop-icon">${menu.shopEmoji}</div>`
+                    : `<img src="${menu.avatar}" class="takeout-order-shop-icon" style="object-fit:cover;">`;
                     
                 const displayName = escapeHtml(menu.shopName || menu.name);
                 
@@ -8004,30 +8096,37 @@ function renderCategories() {
                 const dateObj = new Date(menu.timestamp);
                 const timeStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
                 
-                // 菜品列表
+                // 菜品列表区块化
                 const dishesHtml = menu.dishes.map(d => `
-                    <div class="menu-dish-item" style="padding: 10px 0; display:flex; justify-content:space-between; align-items:center;">
-                        <span class="name" style="flex:1; font-size:14px; color:#333;">${escapeHtml(d.name)}</span>
-                        <span class="quantity" style="width:40px; text-align:right; font-size:13px; color:#888;">x ${d.quantity}</span>
-                        ${d.price !== undefined ? `<span style="width:60px; text-align:right; font-size:14px; font-weight:bold; color:#333;">¥${(d.price * d.quantity).toFixed(2)}</span>` : ''}
+                    <div class="takeout-order-dish-item">
+                        <span class="takeout-order-dish-name">${escapeHtml(d.name)}</span>
+                        <span class="takeout-order-dish-qty">x ${d.quantity}</span>
+                        ${d.price !== undefined ? `<span class="takeout-order-dish-price">¥${(d.price * d.quantity).toFixed(2)}</span>` : ''}
                     </div>
                 `).join('');
 
                 card.innerHTML = `
-                    <div class="menu-header" style="align-items: flex-start;">
+                    <div class="takeout-order-header">
                         ${avatarHtml}
-                        <div class="menu-title-wrapper">
-                            <h4 class="menu-title" style="margin-bottom:4px;">${displayName} ></h4>
-                            <p class="menu-summary">${timeStr}</p>
-                            ${menu.totalPrice ? `<p style="font-size:13px; color:#333; margin-top:6px; font-weight:bold;">总价: ¥${parseFloat(menu.totalPrice).toFixed(2)}</p>` : ''}
+                        <div class="takeout-order-shop-info">
+                            <div class="takeout-order-shop-name">${displayName} <span style="color:#ccc; font-size:14px; margin-left:6px;">></span></div>
+                            <div class="takeout-order-time">${timeStr}</div>
                         </div>
-                        <div class="menu-expand-icon" style="margin-top:2px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--takeout-light-text-color)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg></div>
+                        <div class="takeout-order-status">订单已完成</div>
                     </div>
-                    <div class="menu-dishes-list">${dishesHtml}</div>`;
+                    <div class="takeout-order-dishes-wrapper expanded">
+                        <div class="takeout-order-dishes-inner">
+                            ${dishesHtml}
+                        </div>
+                        <div class="takeout-order-footer">
+                            <span class="takeout-order-total-text">共 ${totalDishes} 件商品</span>
+                            ${menu.totalPrice ? `<span class="takeout-order-total-price">¥${parseFloat(menu.totalPrice).toFixed(2)}</span>` : ''}
+                        </div>
+                    </div>`;
                 
-                card.querySelector('.menu-header').addEventListener('click', (e) => {
+                // 点击头部折叠/展开
+                card.querySelector('.takeout-order-header').addEventListener('click', (e) => {
                     e.currentTarget.nextElementSibling.classList.toggle('expanded'); 
-                    e.currentTarget.querySelector('.menu-expand-icon').classList.toggle('expanded');
                 });
 
                 // 双击删除订单
@@ -8035,13 +8134,13 @@ function renderCategories() {
                     if (confirm('确定要删除这条外卖订单记录吗？')) {
                         const menuId = parseInt(card.dataset.menuId);
                         appState.menus = appState.menus.filter(m => m.id !== menuId);
-                        saveState(); renderMenuList();
+                        localStorage.setItem(TAKEOUT_APP_DATA_KEY, JSON.stringify(appState)); 
+                        renderMenuList();
                     }
                 });
                 menuListEl.appendChild(card);
             });
         }
-
 
         function renderMyPage() {
             $('#takeout-my-avatar-img').src = appState.myAvatar;
@@ -8053,7 +8152,7 @@ function renderCategories() {
             if (!appState.partnerId) $('#takeout-friend-id-input').value = '';
         }
 
-        function switchPage(pageId) {
+                function switchPage(pageId) {
             $$('.page').forEach(p => p.classList.remove('active'));
             $('#' + pageId).classList.add('active');
             $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.page === pageId));
@@ -8061,6 +8160,23 @@ function renderCategories() {
             
             const searchBtn = $('#takeout-search-btn');
             if (searchBtn) searchBtn.style.display = pageId === 'takeout-page-order' ? 'block' : 'none';
+
+            // 1. 解决问题一：每次切换到“订单”页面时，强制从底层数据库拉取最新订单并渲染，防止丢失
+            if (pageId === 'takeout-page-menu' && window.forceRenderTakeoutMenus) {
+                window.forceRenderTakeoutMenus();
+            }
+
+            // 2. 解决问题二：每次进入或切换到“商家”页面时，强制恢复上次生成的店铺缓存
+            if (pageId === 'takeout-page-order' && window.renderTakeoutShopList) {
+                try {
+                    let cachedShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
+                    if (!Array.isArray(cachedShops)) cachedShops = [];
+                    // 确保每次切回来都有内容显示
+                    window.renderTakeoutShopList(cachedShops);
+                } catch(e) {
+                    console.error("恢复外卖店铺缓存失败", e);
+                }
+            }
         }
 
         function updateQuantity(dishId, newQuantity) {
