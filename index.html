@@ -5679,14 +5679,13 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             opacity: 1; pointer-events: auto;
         }
         
-        .lock-pwd-main-area {
+                .lock-pwd-main-area {
             display: flex; flex-direction: column; align-items: center;
-            transform: scale(1.7); /* 整体放大，1.7倍适应普通手机屏幕宽度最大值 */
+            transform: scale(1.3); /* 将1.7缩小到1.3，整体按键和密码点就会等比缩小 */
             transform-origin: top center;
             margin-top: 25vh; /* 整体往下移动 */
             margin-bottom: auto; /* 将底部的取消和紧急按钮挤到底部 */
         }
-
         .lock-pwd-title {
             color: white; font-size: 20px; margin-bottom: 25px; letter-spacing: 1px; font-weight: 500;
         }
@@ -5708,12 +5707,13 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
         .shake-anim { animation: shakePwd 0.4s ease-in-out; }
         
-        .lock-pwd-keypad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 30px; 
+                .lock-pwd-keypad {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 20px; /* 把30px改成了20px，缩小左右间距 */
         }
 
         .lock-key {
-            width: 75px; height: 75px; border-radius: 50%;
+            width: 65px; height: 65px; /* 把75px改成了65px，让按键圈圈变小一点 */
+            border-radius: 50%;
             background: rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: white; cursor: pointer; transition: background 0.2s;
             user-select: none; -webkit-tap-highlight-color: transparent;
