@@ -5913,15 +5913,19 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
-    <!-- 创建外卖店铺弹窗 -->
+        <!-- 创建外卖店铺弹窗 -->
     <div id="create-takeout-shop-modal" class="delete-confirm-modal" style="z-index: 1000;">
         <div class="wb-modal-card" onclick="event.stopPropagation()">
           <div class="wb-modal-header" style="color: var(--takeout-primary-color);">创建外卖店铺</div>
             <div class="wb-modal-scroll-area" style="padding-top: 5px;">
-                <div class="create-forum-avatar-upload" style="margin: 0 auto 15px; width: 85px; height: 85px; border-radius: 12px; background: #f9f9f9; border: 1px dashed var(--takeout-primary-color);" onclick="document.getElementById('input-takeout-shop-avatar').click()">
-                    <span id="takeout-shop-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:30px;">+</span>
+                <!-- 移除文件上传的 onclick 事件 -->
+                <div class="create-forum-avatar-upload" style="margin: 0 auto 10px; width: 85px; height: 85px; border-radius: 12px; background: #f9f9f9; border: 1px dashed var(--takeout-primary-color); cursor: default;">
+                    <span id="takeout-shop-avatar-placeholder" style="color:var(--takeout-primary-color); font-size:16px;">封面预览</span>
                     <img id="takeout-shop-avatar-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; border-radius:12px;">
                 </div>
+                <!-- 新增 URL 输入框，输入时实时预览 -->
+                <input type="text" id="takeout-create-avatar-url" class="wb-main-input" placeholder="输入店铺封面图URL(可选)" style="border-color: #eee; margin-bottom: 15px;" oninput="updateTakeoutShopAvatarPreview(this.value)">
+                
                 <input type="text" id="takeout-create-name" class="wb-main-input" placeholder="店铺名称" style="border-color: #eee;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                     <input type="number" id="takeout-create-rating" class="wb-entry-input" style="border: 1px solid #eee; background: #f9f9f9; width: 100%;" placeholder="评分 (如: 4.8)" step="0.1" max="5">
@@ -7200,8 +7204,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
     }
     // --- 新增结束 ---
-    function compressImage(file, maxSize, callback) {
-        if (!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let width = img.width; let height = img.height; if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } } canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/png')); }; img.src = e.target.result; }; reader.readAsDataURL(file); // <-- 【修改】使用无损的PNG格式
+        function compressImage(file, maxSize, callback) {
+        if (!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let width = img.width; let height = img.height; if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } } canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height); 
+        // 【关键修复：使用 webp 格式并设置0.8画质，大幅降低体积并保留透明度，防爆满】
+        callback(canvas.toDataURL('image/webp', 0.8)); 
+        }; img.src = e.target.result; }; reader.readAsDataURL(file);
     }
     
     // --- 手机框、平板模式与猫耳朵功能 ---
@@ -9015,10 +9022,25 @@ function renderCategories() {
         openWorldBookBindModal('roles');
     };
 
+        // 实时预览图片
+    window.updateTakeoutShopAvatarPreview = (url) => {
+        const preview = document.getElementById('takeout-shop-avatar-preview');
+        const placeholder = document.getElementById('takeout-shop-avatar-placeholder');
+        if (url.trim()) {
+            preview.src = url.trim();
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+            placeholder.style.display = 'block';
+        }
+    };
+
     window.openCreateTakeoutShopModal = () => {
-        tempTakeoutShopAvatar = '';
         tempTakeoutShopRoleIds = []; // 每次打开清空
         
+        document.getElementById('takeout-create-avatar-url').value = ''; // 清空 URL
         document.getElementById('takeout-shop-avatar-preview').src = '';
         document.getElementById('takeout-shop-avatar-preview').style.display = 'none';
         document.getElementById('takeout-shop-avatar-placeholder').style.display = 'block';
@@ -9028,66 +9050,88 @@ function renderCategories() {
         document.getElementById('takeout-create-sales').value = '';
         document.getElementById('takeout-create-time').value = '';
         document.getElementById('takeout-create-distance').value = '';
-        document.getElementById('takeout-create-desc').value = ''; // 清空内容简介
+        document.getElementById('takeout-create-desc').value = ''; 
         document.getElementById('takeout-create-role-selection-display').textContent = '未绑定角色';
 
         document.getElementById('create-takeout-shop-modal').classList.add('active');
     };
 
-
     window.closeCreateTakeoutShopModal = () => {
         document.getElementById('create-takeout-shop-modal').classList.remove('active');
     };
 
-    window.handleTakeoutShopAvatarUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        compressImage(file, 300, (base64) => {
-            tempTakeoutShopAvatar = base64;
-            document.getElementById('takeout-shop-avatar-preview').src = base64;
-            document.getElementById('takeout-shop-avatar-preview').style.display = 'block';
-            document.getElementById('takeout-shop-avatar-placeholder').style.display = 'none';
-        });
-        event.target.value = '';
-    };
+        window.saveNewTakeoutShop = () => {
+        try {
+            const name = document.getElementById('takeout-create-name').value.trim();
+            const rating = document.getElementById('takeout-create-rating').value.trim() || "4.5";
+            const sales = document.getElementById('takeout-create-sales').value.trim() || "0";
+            const time = document.getElementById('takeout-create-time').value.trim() || "30";
+            const distance = document.getElementById('takeout-create-distance').value.trim() || "1.0";
+            const desc = document.getElementById('takeout-create-desc').value.trim();
+            // 获取用户输入的 URL
+            const avatarUrl = document.getElementById('takeout-create-avatar-url').value.trim();
 
-    window.saveNewTakeoutShop = () => {
-        const name = document.getElementById('takeout-create-name').value.trim();
-        const rating = document.getElementById('takeout-create-rating').value.trim() || "4.5";
-        const sales = document.getElementById('takeout-create-sales').value.trim() || "0";
-        const time = document.getElementById('takeout-create-time').value.trim() || "30";
-        const distance = document.getElementById('takeout-create-distance').value.trim() || "1.0";
-        const desc = document.getElementById('takeout-create-desc').value.trim();
+            if (!name) {
+                showToast("店铺名称不能为空");
+                return;
+            }
 
-        if (!name) {
-            showToast("店铺名称不能为空");
-            return;
+            const newShop = {
+                isCustom: true,
+                name: name,
+                // 直接使用图片URL，占用极小，永远不会爆满
+                emoji: avatarUrl ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:10px; object-fit:cover;">` : '🍽️',
+                rating: rating,
+                sales: parseInt(sales) || 0,
+                time: parseInt(time) || 30,
+                distance: distance,
+                description: desc,
+                boundRoleIds: typeof tempTakeoutShopRoleIds !== 'undefined' ? tempTakeoutShopRoleIds : [],
+                minOrder: 15,
+                deliveryFee: 0,
+                condition: 30,
+                discount: 5
+            };
+
+            let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
+            shops.unshift(newShop);
+            
+            try {
+                localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(shops));
+            } catch(err) {
+                // 【触发紧急瘦身策略】：如果满了，丢弃不是自定义的，并且没有被收藏的旧AI临时数据
+                let favs = [];
+                try { favs = JSON.parse(localStorage.getItem('takeoutFavoritesData_v1') || '[]'); } catch(e){}
+                let favNames = favs.map(f => f.name);
+                
+                // 只保留自己创建的店，以及被收藏过的店
+                let slimShops = shops.filter(s => s.isCustom || favNames.includes(s.name));
+                
+                try {
+                    localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(slimShops));
+                    shops = slimShops;
+                    showToast("空间紧张，已自动为你清理部分无用的历史数据");
+                } catch(fatalErr) {
+                    showToast("存储彻底爆满！请去论坛或朋友圈删除几张旧图片后再试");
+                    return;
+                }
+            }
+            
+            renderTakeoutShopList(shops);
+            closeCreateTakeoutShopModal();
+            showToast("店铺创建成功");
+            
+            // 创建完毕后强行跳转到商家列表页面，保证用户能直接看到
+            const takeoutAppContainer = document.getElementById('takeout-app-page');
+            if (takeoutAppContainer) {
+                const orderTabBtn = takeoutAppContainer.querySelector('.nav-item[data-page="takeout-page-order"]');
+                if (orderTabBtn) orderTabBtn.click();
+            }
+            
+        } catch(e) {
+            console.error("创建外卖店铺失败", e);
+            showToast("创建失败，发生未知错误");
         }
-
-        const newShop = {
-            isCustom: true,
-            name: name,
-            // 如果上传了照片，就包一个img标签，这样可以和普通的Emoji完美兼容渲染
-            emoji: tempTakeoutShopAvatar ? `<img src="${tempTakeoutShopAvatar}" style="width:100%; height:100%; border-radius:10px; object-fit:cover;">` : '🍽️',
-            rating: rating,
-            sales: parseInt(sales),
-            time: parseInt(time),
-            distance: distance,
-            description: desc, // 新增：保存店铺内容
-            boundRoleIds: tempTakeoutShopRoleIds, // 新增：保存绑定的老板角色
-            minOrder: 15,
-            deliveryFee: 0,
-            condition: 30,
-            discount: 5
-        };
-
-        let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
-        shops.unshift(newShop);
-        localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(shops));
-        
-        renderTakeoutShopList(shops);
-        closeCreateTakeoutShopModal();
-        showToast("店铺创建成功");
     };
 
     // --- Recollection App Logic (REWORKED & MODIFIED) ---
@@ -10136,9 +10180,9 @@ async function generateMallProducts() {
 ${roleContext}
 ---
 **生成要求**:
-1.  **商品名称 (name)**: 必须模仿拼多多或淘宝的风格。使用吸引人的前缀、夸张的修饰词、利益点和情绪价值词汇。例如："【官方补贴】XX同款爆改！ins风绝美奶油XX" 或 "太好用了吧！无限回购的XX神器！"
+1.  **商品名称 (name)**: 必须模仿拼多多或淘宝的风格。使用吸引人的前缀、夸张的修饰词、利益点和情绪价值词汇。例如："【官方补贴】XX同款爆改 ins风绝美奶油XX" 或 "太好用了吧！无限回购的XX神器"
 2.  **Emoji (emoji)**: 一个最能代表该商品的emoji表情。
-3.  **价格 (price)**: 一个在1到1000之间的数字。
+3.  **价格 (price)**: 【核心指令】完全根据“分类补充说明”中的设定来决定价格范围和大小。如果说明中明确了价格（例如几千万、几百块或几毛钱），请绝对遵循！如果说明中未提及价格，请根据常理自由发挥合适的数字。支持小数。
 4.  **销量 (sales)**: 一个在0到100000之间的随机整数。
 5.  **商品评价 (reviews)**: 一个包含3到6条评价对象的数组。每条评价对象包含: 'nickname' (一个随机的买家昵称), 'content' (评价内容), 'rating' (一个1-5的数字，代表星级)。请确保评价内容和风格多样，有好评，有中性评价，也有抱怨的差评。
 6.  **款式 (styles)**: 一个包含3到6个字符串的数组，每个字符串代表一个商品款式或规格。例如：["樱花粉", "天空蓝", "磨砂黑"]。
@@ -10147,7 +10191,7 @@ ${roleContext}
 **示例**:
 {
   "products": [
-    { "name": "【月销10w+】熬夜党狂喜！XX同款一秒隐匿黑眼圈遮瑕液", "emoji": "👁️", "price": 39.9, "sales": 128567, "styles": ["象牙白", "自然色"], "reviews": [{ "nickname": "小熊不吃糖", "content": "真的绝了，黑眼圈瞬间消失...", "rating": 5 }] }
+    { "name": "【月销10w+】女明星同款 一秒隐匿黑眼圈遮瑕液", "emoji": "👁️", "price": 39.9, "sales": 128567, "styles": ["象牙白", "自然色"], "reviews": [{ "nickname": "小熊不吃糖", "content": "真的绝了，黑眼圈瞬间消失...", "rating": 5 }] }
   ]
 }`;
     try {
