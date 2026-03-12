@@ -5647,10 +5647,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             justify-content: space-between;
             padding: 0 45px;
         }
-                .lock-action-btn {
+                        .lock-action-btn {
             width: 50px; height: 50px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.25); /* 将0.3改成0.25，即25%透明度 */
+            background-color: rgba(255, 206, 225, 0.25); /* 改为 #ffcee1 且保持 25% 透明度 */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: flex;
@@ -5660,6 +5660,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             color: white;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
+        }
+        .lock-action-btn:active {
+            transform: scale(0.9);
+            background-color: rgba(255, 206, 225, 0.5); /* 按下时加深一点的同款粉色 */
         }
                 .lock-action-btn:active {
             transform: scale(0.9);
@@ -6485,12 +6489,12 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 <input type="text" id="takeout-create-avatar-url" placeholder="封面图URL (可选)" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 14px; outline: none; transition: all 0.2s;" oninput="updateTakeoutShopAvatarPreview(this.value)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
                 <input type="text" id="takeout-create-name" placeholder="店铺名称" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 14px; outline: none; font-weight: bold; transition: all 0.2s;" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
                 
-                <!-- 4个小数据网格 -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                    <input type="number" id="takeout-create-rating" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="评分(如 4.8)" step="0.1" max="5" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-                    <input type="number" id="takeout-create-sales" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="月售(如 2000)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-                    <input type="number" id="takeout-create-time" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="配送(分钟)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-                    <input type="number" id="takeout-create-distance" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="距离(km)" step="0.1" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                                <!-- 4个小数据网格 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; width: 100%;">
+                    <input type="number" id="takeout-create-rating" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="评分(4.8)" step="0.1" max="5" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-sales" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="月售(2000)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-time" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="配送(分钟)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-distance" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="距离(km)" step="0.1" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
                 </div>
 
                 <!-- 店铺内容 -->
@@ -9679,7 +9683,7 @@ function renderCategories() {
         closeTakeoutShopEditModal();
     };
 
-    // 5. 点击删除 (使用自定义确认弹窗防止被系统拦截)
+        // 5. 点击删除 (使用自定义确认弹窗防止被系统拦截)
     window.deleteTakeoutShopFromModal = () => {
         // 利用系统内已有的确认组件进行拦截
         document.getElementById('wb-delete-confirm-title').innerText = "确定要永久删除该自定义店铺吗？";
@@ -9688,7 +9692,7 @@ function renderCategories() {
         const confirmModal = document.getElementById('wb-delete-confirm-modal');
         confirmModal.style.zIndex = "10200"; 
         
-        window.pendingWbDeleteCallback = () => {
+        pendingWbDeleteCallback = () => {  /* 👈 去掉了这里的 window. */
             const originalIndex = parseInt(document.getElementById('takeout-edit-shop-index').value);
             let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
             let shopName = shops[originalIndex] ? shops[originalIndex].name : null;
