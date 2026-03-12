@@ -5647,28 +5647,25 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             justify-content: space-between;
             padding: 0 45px;
         }
-                        .lock-action-btn {
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            background-color: rgba(255, 206, 225, 0.25); /* 改为 #ffcee1 且保持 25% 透明度 */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 22px;
-            color: white;
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .lock-action-btn:active {
-            transform: scale(0.9);
-            background-color: rgba(255, 206, 225, 0.5); /* 按下时加深一点的同款粉色 */
-        }
-                .lock-action-btn:active {
-            transform: scale(0.9);
-            background-color: rgba(255, 255, 255, 0.5);
-        }
+               .lock-action-btn {
+    width: 50px; 
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.08); /* 白色 8% 透明度 */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+.lock-action-btn:active {
+    transform: scale(0.9);
+    background-color: rgba(255, 255, 255, 0.2); /* 按下变白一点 */
+}
         
         /* 锁屏密码页样式 */
         .lock-pwd-overlay {
