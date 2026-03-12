@@ -5410,10 +5410,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
             letter-spacing: 0.5px;
         }
-        .lock-big-time {
+                .lock-big-time {
             font-size: 110px;
             font-weight: 900;
-            color: rgba(255, 255, 255, 0.35); /* 35%透明度白色，作为底纹 */
+            color: rgba(255, 255, 255, 0.9); /* 提高不透明度到90%，非常清晰 */
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); /* 增加柔和阴影，防止在浅色壁纸上看不清 */
             margin-top: 10px;
             line-height: 1;
             text-align: center;
@@ -5441,10 +5442,64 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
         }
-        .lock-action-btn:active {
+                .lock-action-btn:active {
             transform: scale(0.9);
             background-color: rgba(255, 255, 255, 0.5);
         }
+        
+        /* 锁屏密码页样式 */
+        .lock-pwd-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.65); /* 覆盖一层深灰色 */
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; flex-direction: column; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            z-index: 10; padding-top: 12vh;
+        }
+        .lock-pwd-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .lock-pwd-title {
+            color: white; font-size: 20px; margin-bottom: 25px; letter-spacing: 1px; font-weight: 500;
+        }
+        .lock-pwd-dots {
+            display: flex; gap: 20px; margin-bottom: 60px;
+        }
+        .pwd-dot {
+            width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid white; transition: background-color 0.1s;
+        }
+        .pwd-dot.filled {
+            background-color: white;
+        }
+        @keyframes shakePwd {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-12px); }
+            40% { transform: translateX(12px); }
+            60% { transform: translateX(-12px); }
+            80% { transform: translateX(12px); }
+        }
+        .shake-anim { animation: shakePwd 0.4s ease-in-out; }
+        
+        .lock-pwd-keypad {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 30px; margin-bottom: auto;
+        }
+        .lock-key {
+            width: 75px; height: 75px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; cursor: pointer; transition: background 0.2s;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .lock-key:active { background: rgba(255, 255, 255, 0.3); }
+        .lock-key-num { font-size: 32px; font-weight: 400; line-height: 1; margin-top: 4px; }
+        .lock-key-letter { font-size: 10px; font-weight: 600; letter-spacing: 1px; margin-top: 2px; opacity: 0.8; height: 12px; }
+        
+        .lock-pwd-footer {
+            width: 100%; display: flex; justify-content: space-between; padding: 0 45px calc(env(safe-area-inset-bottom, 20px) + 30px);
+        }
+        .lock-pwd-emergency, .lock-pwd-cancel {
+            color: white; font-size: 15px; cursor: pointer; font-weight: 500; padding: 10px;
+        }
+
         /* 手机框模式下的顶部间距适配 */
         body.phone-frame-active #lock-screen .lock-top-status,
         body.tablet-mode-active #lock-screen .lock-top-status {
@@ -5456,15 +5511,46 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 <body>
 <div id="app-wrapper">
 <!-- 新增：锁屏页面 -->
+
 <div id="lock-screen">
     <div class="lock-top-status" id="lock-top-status">加载中...</div>
     <div class="lock-big-time" id="lock-big-time">00:00</div>
-    <div class="lock-bottom-actions">
-        <div class="lock-action-btn flashlight">🔦</div>
-        <div class="lock-action-btn camera">📷</div>
+        <div class="lock-bottom-actions">
+        <div class="lock-action-btn flashlight">
+            <img src="https://img.heliar.top/file/1773283023953_手电筒_flashlight.png" style="width: 22px; height: 22px; object-fit: contain;">
+        </div>
+        <div class="lock-action-btn camera">
+            <img src="https://img.heliar.top/file/1773283024522_相机_camera_2.png" style="width: 24px; height: 24px; object-fit: contain;">
+        </div>
+    </div>
+    
+    <!-- 锁屏密码输入层 -->
+    <div id="lock-pwd-overlay" class="lock-pwd-overlay">
+        <div class="lock-pwd-title">输入密码</div>
+        <div class="lock-pwd-dots" id="lock-pwd-dots">
+            <div class="pwd-dot"></div><div class="pwd-dot"></div><div class="pwd-dot"></div>
+            <div class="pwd-dot"></div><div class="pwd-dot"></div><div class="pwd-dot"></div>
+        </div>
+        <div class="lock-pwd-keypad">
+            <div class="lock-key" onclick="inputLockPwd('1')"><span class="lock-key-num">1</span><span class="lock-key-letter"></span></div>
+            <div class="lock-key" onclick="inputLockPwd('2')"><span class="lock-key-num">2</span><span class="lock-key-letter">ABC</span></div>
+            <div class="lock-key" onclick="inputLockPwd('3')"><span class="lock-key-num">3</span><span class="lock-key-letter">DEF</span></div>
+            <div class="lock-key" onclick="inputLockPwd('4')"><span class="lock-key-num">4</span><span class="lock-key-letter">GHI</span></div>
+            <div class="lock-key" onclick="inputLockPwd('5')"><span class="lock-key-num">5</span><span class="lock-key-letter">JKL</span></div>
+            <div class="lock-key" onclick="inputLockPwd('6')"><span class="lock-key-num">6</span><span class="lock-key-letter">MNO</span></div>
+            <div class="lock-key" onclick="inputLockPwd('7')"><span class="lock-key-num">7</span><span class="lock-key-letter">PQRS</span></div>
+            <div class="lock-key" onclick="inputLockPwd('8')"><span class="lock-key-num">8</span><span class="lock-key-letter">TUV</span></div>
+            <div class="lock-key" onclick="inputLockPwd('9')"><span class="lock-key-num">9</span><span class="lock-key-letter">WXYZ</span></div>
+            <div style="visibility:hidden;"></div>
+            <div class="lock-key" onclick="inputLockPwd('0')"><span class="lock-key-num">0</span><span class="lock-key-letter"></span></div>
+            <div style="visibility:hidden;"></div>
+        </div>
+        <div class="lock-pwd-footer">
+            <div class="lock-pwd-emergency">紧急情况</div>
+            <div class="lock-pwd-cancel" onclick="cancelLockPwd()">取消</div>
+        </div>
     </div>
 </div>
-
 <div id="home-screen">
     <div id="time-section">
         <div id="time-container" onclick="handleTimeBgClick(event)">
@@ -6370,10 +6456,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 <button id="save-settings-btn">OK</button>
     </div>
                 
-    <div class="settings-content">
-                        <div class="settings-module">
-            <h3>通用</h3>
-            <!-- 新增锁屏开关 -->
+        <div class="settings-content">
+                <!-- 独立的锁屏设置区块 -->
+        <div class="settings-module">
+            <h3>锁屏设置</h3>
             <div class="settings-row-with-switch">
                 <label for="lock-screen-switch">开启锁屏界面</label>
                 <label class="ios-switch">
@@ -6381,8 +6467,29 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                     <span class="slider round"></span>
                 </label>
             </div>
-            
-            <div class="settings-row-with-switch" style="margin-top: 10px;">
+            <div class="settings-row" style="margin-top: 10px;">
+                <label for="lock-wallpaper-url">修改锁屏壁纸</label>
+                <div class="input-with-preview">
+                    <input type="text" id="lock-wallpaper-url" placeholder="留空则与主屏幕一致">
+                    <div class="url-preview" id="lock-wallpaper-preview"></div>
+                </div>
+            </div>
+            <div class="settings-row-with-switch" style="margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 15px;">
+                <label for="lock-pwd-switch">开启锁屏密码</label>
+                <label class="ios-switch">
+                    <input type="checkbox" id="lock-pwd-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="settings-row" id="lock-pwd-setting-row" style="display: none; padding-top: 10px; flex-direction: row; align-items: center; justify-content: space-between;">
+                <label for="lock-pwd-input" style="margin-bottom:0;">密码设置 (6位数字)</label>
+                <input type="text" id="lock-pwd-input" placeholder="默认: 123456" maxlength="6" inputmode="numeric" style="width: 100px; text-align: center;">
+            </div>
+        </div>
+
+        <div class="settings-module">
+            <h3>通用</h3>
+            <div class="settings-row-with-switch">
                 <label for="ios-mode-switch">iOS 模式 (刘海屏适配)</label>
                 <label class="ios-switch">
                     <input type="checkbox" id="ios-mode-switch">
@@ -7378,8 +7485,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     const TAKEOUT_APP_DATA_KEY = 'couple_order_data_v2'; 
     /* --- 新增的代码 --- */
     const ICON_FONT_LIGHT_MODE_KEY = 'iconFontLightMode_v1';
-        const MOMENTS_UNREAD_COUNT_KEY = 'momentsUnreadCount_v1'; // 新增：红点计数缓存
+                const MOMENTS_UNREAD_COUNT_KEY = 'momentsUnreadCount_v1'; // 新增：红点计数缓存
     const LOCK_SCREEN_KEY = 'lockScreenEnabled_v1'; // 新增：锁屏开关状态
+    const LOCK_PWD_ENABLED_KEY = 'lockPwdEnabled_v1'; // 锁屏密码开关
+    const LOCK_PWD_VALUE_KEY = 'lockPwdValue_v1'; // 锁屏密码内容
     /* --- 新增结束 --- */
     // 下面这些是被不小心删掉的重要变量，现在全部补回来啦！
     let customDateText = ""; 
@@ -14622,8 +14731,19 @@ window.openTransferConfirmPopup = (amount) => {
     // --- Global Settings & OS Features ---
             window.showSettingsPage = () => {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-        document.getElementById('lock-screen-switch').checked = localStorage.getItem(LOCK_SCREEN_KEY) === 'true'; // 回显锁屏状态
-        document.getElementById('ios-mode-switch').checked = localStorage.getItem(IOS_MODE_KEY) === 'true';
+        document.getElementById('lock-screen-switch').checked = localStorage.getItem(LOCK_SCREEN_KEY) === 'true'; 
+        
+        // 密码开关及内容回显
+        const isPwdEnabled = localStorage.getItem(LOCK_PWD_ENABLED_KEY) === 'true';
+        document.getElementById('lock-pwd-switch').checked = isPwdEnabled;
+        document.getElementById('lock-pwd-setting-row').style.display = isPwdEnabled ? 'flex' : 'none';
+        document.getElementById('lock-pwd-input').value = localStorage.getItem(LOCK_PWD_VALUE_KEY) || '';
+
+        // 绑定密码开关事件，实时显示/隐藏输入框
+        document.getElementById('lock-pwd-switch').addEventListener('change', (e) => {
+            document.getElementById('lock-pwd-setting-row').style.display = e.target.checked ? 'flex' : 'none';
+        });
+document.getElementById('ios-mode-switch').checked = localStorage.getItem(IOS_MODE_KEY) === 'true';
 document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
         document.getElementById('tablet-mode-switch').checked = localStorage.getItem(TABLET_MODE_KEY) === 'true'; // 新增：回显平板模式开关状态
         document.getElementById('cat-ears-switch').checked = localStorage.getItem(CAT_EARS_KEY) === 'true';
@@ -14714,7 +14834,9 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         settings.visual.mainAvatar1 = document.getElementById('main-avatar1-url').value.trim();
         settings.visual.mainAvatar2 = document.getElementById('main-avatar2-url').value.trim();
         settings.visual.clockColor = document.getElementById('clock-color-input').value.trim();
-        
+                settings.visual.lockWallpaper = document.getElementById('lock-wallpaper-url').value.trim();
+        localStorage.setItem(LOCK_PWD_ENABLED_KEY, document.getElementById('lock-pwd-switch').checked);
+        localStorage.setItem(LOCK_PWD_VALUE_KEY, document.getElementById('lock-pwd-input').value.trim());
                 localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
         
         // 保存并应用锁屏开关
@@ -14831,9 +14953,16 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             phoneScreen.style.backgroundImage = 'none';
         }
         
-        // 新增：让锁屏同步壁纸
+                // 新增：如果有独立锁屏壁纸则优先使用，否则同步主屏壁纸
+        const lockWp = settings.visual?.lockWallpaper || wp;
         const lockScreen = document.getElementById('lock-screen');
-        if (lockScreen) lockScreen.style.backgroundImage = `url(${wp})`;
+        if (lockScreen) lockScreen.style.backgroundImage = `url(${lockWp})`;
+        
+        // 设置页的回显预览
+        if (document.getElementById('lock-wallpaper-url')) {
+            document.getElementById('lock-wallpaper-url').value = settings.visual?.lockWallpaper || '';
+            document.getElementById('lock-wallpaper-preview').style.backgroundImage = settings.visual?.lockWallpaper ? `url(${settings.visual.lockWallpaper})` : '';
+        }
 
         const avatar1 = document.getElementById('chat-avatar-1');
         const avatar2 = document.getElementById('chat-avatar-2');
@@ -15693,14 +15822,64 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
             lockScreen.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease'; // 恢复过渡
 
             if (lsStartY - currentY > 150) { 
-                // 滑动超过150px，判定为解锁
-                lockScreen.classList.add('unlocked');
-                setTimeout(() => { lockScreen.style.display = 'none'; }, 400); // 动画结束后彻底隐藏
+                // 滑动超过150px
+                if (localStorage.getItem(LOCK_PWD_ENABLED_KEY) === 'true') {
+                    // 如果开启了密码，弹出密码界面，底图归位
+                    lockScreen.style.transform = `translateY(0)`;
+                    document.getElementById('lock-pwd-overlay').classList.add('active');
+                    window.currentLockPwdInput = '';
+                    window.updateLockPwdDots();
+                } else {
+                    // 没开密码，直接解锁
+                    lockScreen.classList.add('unlocked');
+                    setTimeout(() => { lockScreen.style.display = 'none'; }, 400); 
+                }
             } else {
                 // 没滑够，弹回去
                 lockScreen.style.transform = `translateY(0)`;
             }
         });
+
+        // 密码盘相关逻辑
+        window.currentLockPwdInput = '';
+        window.updateLockPwdDots = () => {
+            const dots = document.querySelectorAll('#lock-pwd-dots .pwd-dot');
+            const len = window.currentLockPwdInput.length;
+            dots.forEach((dot, index) => {
+                if (index < len) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+        };
+        
+        window.inputLockPwd = (num) => {
+            if (window.currentLockPwdInput.length < 6) {
+                window.currentLockPwdInput += num;
+                window.updateLockPwdDots();
+                
+                if (window.currentLockPwdInput.length === 6) {
+                    const correctPwd = localStorage.getItem(LOCK_PWD_VALUE_KEY) || '123456';
+                    if (window.currentLockPwdInput === correctPwd) {
+                        // 密码正确，解除遮罩，解锁桌面
+                        document.getElementById('lock-pwd-overlay').classList.remove('active');
+                        lockScreen.classList.add('unlocked');
+                        setTimeout(() => { lockScreen.style.display = 'none'; }, 400); 
+                    } else {
+                        // 密码错误，执行抖动动画并清空
+                        const dotsContainer = document.getElementById('lock-pwd-dots');
+                        dotsContainer.classList.add('shake-anim');
+                        setTimeout(() => {
+                            dotsContainer.classList.remove('shake-anim');
+                            window.currentLockPwdInput = '';
+                            window.updateLockPwdDots();
+                        }, 400);
+                    }
+                }
+            }
+        };
+        
+                window.cancelLockPwd = () => {
+            document.getElementById('lock-pwd-overlay').classList.remove('active');
+        };
         
         // 初始更新一次锁屏时间
         updateLockScreenTimeAndDate();
