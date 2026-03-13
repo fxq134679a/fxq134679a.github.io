@@ -295,11 +295,42 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* --- 网格区域 --- */
+              /* --- 网格区域与滑动主屏 --- */
+        .home-swiper-container {
+            flex: 1;
+            display: flex;
+            width: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .home-swiper-container::-webkit-scrollbar {
+            display: none;
+        }
+        .home-page-slide {
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+        }
+        .second-page-grid {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 25px 10px 25px; 
+            display: flex;
+            justify-content: flex-start;
+            gap: 20px;
+        }
+
         #grid-area {
              flex: 1;
              display: grid;
              grid-template-columns: 1fr 1fr;
+
              grid-template-rows: 1fr 1fr;
              padding: 0 15px 10px 15px;
              gap: 15px;
@@ -2048,14 +2079,19 @@
             gap: 30px 15px; align-content: start;
             perspective: 1000px; 
         }
-        .wb-book-item {
+             .wb-book-item {
             display: flex; flex-direction: column; align-items: center; cursor: pointer;
             width: 100%;
             transform-style: preserve-3d; 
             /* 恢复正面摆放 */
             transform: rotateY(0deg) rotateX(0deg); 
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* --- 新增：禁止长按出现系统拷贝框或选中文字 --- */
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
+
              /* 长按时，沿另外的对角线翻转 */
         .wb-book-item:active { 
             transform: rotateY(30deg) rotateX(-10deg) scale(0.95); 
@@ -3194,16 +3230,16 @@
             transform: translateY(0);
         }
 
-        .mall-header {
+              .mall-header {
             padding: 35px 20px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #fff; /* 纯白色背景 */
+            background-color: #fff; 
             flex-shrink: 0;
-            border-bottom: 1px solid var(--text-light-gray, #f0f0f0);
+            border-bottom: none; 
             transition: padding-top 0.3s ease;
-            position: relative; /* For title centering */
+            position: relative; 
             z-index: 10;
         }
         .mall-header .back-btn {
@@ -3215,7 +3251,7 @@
         .mall-header-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--theme-pink-title); /* 浅粉色 #f5b3c9 */
+            color: var(--theme-pink-title); 
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
@@ -3234,10 +3270,10 @@
         .mall-add-btn {
             width: 32px;
             height: 32px;
-            background-color: var(--theme-pink-btn); /* 粉色背景 #F5B3C9 */
+            background-color: var(--theme-pink-btn); 
             border: none;
             border-radius: 50%;
-            color: white; /* 白色图标 */
+            color: white; 
             font-size: 22px;
             font-weight: bold;
             display: flex;
@@ -3245,18 +3281,22 @@
             align-items: center;
             cursor: pointer;
             line-height: 1;
-            padding-bottom: 2px; /* Visual centering for '+' */
+            padding-bottom: 2px; 
         }
 
         .mall-category-nav {
             display: flex;
             overflow-x: auto;
             background-color: #fff;
-            padding: 0 15px;
+            padding: 0 15px 12px 15px; 
             flex-shrink: 0;
-            border-bottom: 1px solid #f0f0f0; /* 浅灰色分割线 */
+            border-bottom: none; 
+            border-radius: 0 0 24px 24px; 
+            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.08); 
+            margin-bottom: 8px; 
+            position: relative;
+            z-index: 9;
         }
-        /* Hide scrollbar */
         .mall-category-nav::-webkit-scrollbar { display: none; }
         .mall-category-nav { scrollbar-width: none; }
 
@@ -3264,13 +3304,13 @@
             padding: 12px 10px;
             font-size: 15px;
             font-weight: 500;
-            color: var(--theme-pink-text); /* 未选中：浅粉色文字 #E58AAB */
+            color: var(--theme-pink-text); 
             cursor: pointer;
             white-space: nowrap;
             position: relative;
             flex-shrink: 0;
             margin: 0 5px;
-            user-select: text; /* Allow text selection for double click */
+            user-select: text; 
         }
         .mall-category-item.active {
             font-weight: 700;
@@ -3291,13 +3331,12 @@
         .mall-content {
             flex: 1;
             overflow-y: auto;
-            background-color: var(--theme-pink-bg-soft); /* 柔和粉色系背景 */
+            background-color: var(--theme-pink-bg-soft); 
             padding: 20px;
-            color: #333; /* 深灰色常规文字 */
+            color: #333; 
             padding-bottom: 80px;
         }
         
-        /* NEW: Mall Product Grid */
         .mall-product-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -3318,7 +3357,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 50px; /* For Emoji */
+            font-size: 50px; 
         }
         .product-details {
             padding: 10px;
@@ -3328,13 +3367,12 @@
             color: #333;
             font-weight: 500;
             margin-bottom: 8px;
-            /* MODIFIED FOR TAOBAO STYLE */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            height: 2.8em; /* 1.4em * 2 lines */
+            height: 2.8em; 
             line-height: 1.4em;
             white-space: normal;
         }
@@ -3367,7 +3405,6 @@
             color: #a19f9b;
         }
 
-        /* NEW: Mall Modals */
         #mall-category-modal .wb-entry-input.val,
         #mall-category-desc-input {
             background-color: #ffffff;
@@ -3384,7 +3421,7 @@
             color: #aaa;
             font-style: italic;
         }
-                 /* --- NEW: Mall Detail Page Styles --- */
+        
         #mall-detail-page {
             position: fixed;
             top: 0;
@@ -3392,7 +3429,7 @@
             width: 100%;
             height: 100%;
             background-color: #f7f7f7;
-            z-index: 558; /* [提升层级，防止被收藏页遮挡] */
+            z-index: 558; 
             display: flex;
             flex-direction: column;
             transform: translateX(100%);
@@ -3408,8 +3445,11 @@
             align-items: center;
             background-color: #fff;
             flex-shrink: 0;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: none; 
+            border-radius: 0 0 24px 24px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
             position: relative;
+            z-index: 10;
         }
         body.ios-mode-active #mall-detail-page .mall-detail-header {
              padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
@@ -3423,18 +3463,21 @@
         .mall-detail-content {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 80px; /* 为底部按钮留出空间 */
+            padding-bottom: 80px; 
         }
         .mall-detail-img-container {
             background-color: #fff;
             padding: 40px 20px;
             text-align: center;
             font-size: 120px;
+            border-radius: 16px;
+            margin: 10px 10px 0 10px;
         }
         .mall-detail-info-card {
             background-color: #fff;
             padding: 20px;
-            margin-top: 10px;
+            margin: 10px 10px 0 10px;
+            border-radius: 16px;
         }
         .mall-detail-price {
             color: #ff5000;
@@ -3461,7 +3504,8 @@
         .mall-detail-reviews-card {
             background-color: #fff;
             padding: 20px;
-            margin-top: 10px;
+            margin: 10px 10px 0 10px;
+            border-radius: 16px;
         }
         .mall-detail-reviews-card h3 {
             font-size: 16px;
@@ -3488,7 +3532,7 @@
         }
         .review-stars {
             font-size: 14px;
-            color: #ffd700; /* 星星颜色 */
+            color: #ffd700; 
         }
         .review-content {
             font-size: 14px;
@@ -3503,7 +3547,9 @@
             height: calc(60px + env(safe-area-inset-bottom, 0));
             padding-bottom: env(safe-area-inset-bottom, 0);
             background-color: #fff;
-            border-top: 1px solid #f0f0f0;
+            border-top: none; 
+            border-radius: 24px 24px 0 0; 
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05); 
             display: flex;
             align-items: flex-start;
             padding-top: 5px;
@@ -3517,8 +3563,8 @@
             cursor: pointer;
             width: 60px;
         }
-                .mall-detail-footer .footer-btn.favorite img,
-        .mall-detail-footer .footer-btn.cart img { /* <-- 新增这一行 */
+        .mall-detail-footer .footer-btn.favorite img,
+        .mall-detail-footer .footer-btn.cart img { 
             width: 24px;
             height: 24px;
             margin-top: 4px;
@@ -3546,11 +3592,15 @@
         }
         .mall-bottom-nav {
             background-color: #ffffff;
-            border-top: 1px solid #f0f0f0;
+            border-top: none; 
+            border-radius: 30px 30px 0 0; 
+            box-shadow: 0 -4px 20px rgba(229, 138, 171, 0.08); 
             display: flex;
             justify-content: space-around;
-            padding: 5px 0 calc(5px + env(safe-area-inset-bottom, 0));
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0));
             flex-shrink: 0;
+            position: relative;
+            z-index: 20;
         }
         .mall-nav-item {
             display: flex;
@@ -3560,6 +3610,10 @@
             cursor: pointer;
             flex: 1;
             padding: 5px 0;
+            transition: transform 0.2s;
+        }
+        .mall-nav-item:active {
+            transform: scale(0.9);
         }
         .mall-nav-icon {
             width: 24px;
@@ -3573,7 +3627,9 @@
         }
         .mall-nav-item.active .mall-nav-text {
             color: var(--theme-pink-text);
+            font-weight: bold;
         }
+
         
 /* ========================= 新增：商品购买弹窗样式 ========================= */
 #mall-purchase-overlay {
@@ -4601,11 +4657,11 @@
             animation-duration: 2s;
         }
         
-        .crystal-ball-name {
+               .crystal-ball-name {
             color: white;
             font-size: 14px;
             font-weight: 600;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+            /* 删除字体阴影 */
             z-index: 5;
             position: absolute;
             top: 40%; /* Adjust vertical position inside sphere */
@@ -4615,6 +4671,7 @@
             text-align: center;
             width: 100%;
         }
+
         
         /* --- NEW: Recollection Detail Page (MODIFIED) --- */
         #recollection-detail-page {
@@ -5049,11 +5106,33 @@
         .takeout-me-profile span {
             font-size: 18px; font-weight: 600; color: #333; flex: 1;
         }
-        .takeout-me-setting-icon {
+               .takeout-me-setting-icon {
             width: 24px !important; height: 24px !important; border: none !important; border-radius: 0 !important; object-fit: contain; cursor: pointer;
         }
 
+        /* --- 新增：外卖订单区块样式 --- */
+        .takeout-me-orders-section {
+            background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .takeout-me-orders-title {
+            font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px;
+        }
+        .takeout-me-orders-grid {
+            display: flex; justify-content: space-between; align-items: center; padding: 0 5px;
+        }
+        .takeout-me-order-item {
+            display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s;
+        }
+        .takeout-me-order-item:active { transform: scale(0.95); }
+        .takeout-me-order-item img {
+            width: 32px; height: 32px; object-fit: contain;
+        }
+        .takeout-me-order-item span {
+            font-size: 12px; color: #555; font-weight: 500;
+        }
+
         .takeout-me-fav-section {
+
             background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         .takeout-me-fav-header {
@@ -5074,7 +5153,7 @@
         .takeout-me-fav-item:active { transform: scale(0.95); }
         .takeout-me-fav-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 外卖收藏列表页 */
+               /* 外卖收藏列表页 */
         #takeout-favorite-page {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #f7f8fa; z-index: 556; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
         }
@@ -5082,7 +5161,17 @@
         body.ios-mode-active #takeout-favorite-page .takeout-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.phone-frame-active #takeout-favorite-page .takeout-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
 
+        /* 外卖全部订单独立页 */
+        #takeout-all-orders-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #f7f8fa; z-index: 556; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+        }
+        #takeout-all-orders-page.active { transform: translateX(0); }
+        body.ios-mode-active #takeout-all-orders-page .takeout-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.phone-frame-active #takeout-all-orders-page .takeout-detail-header,
+        body.tablet-mode-active #takeout-all-orders-page .takeout-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
+
         /* 外卖底部购物车结算栏 */
+
         .takeout-cart-footer {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 65px;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
@@ -5341,13 +5430,17 @@
 .mall-cart-footer {
     flex-shrink: 0;
     background-color: white;
-    border-top: 1px solid #f0f0f0;
-    padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 0));
+    border-top: none; 
+    border-radius: 24px 24px 0 0; 
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.04); 
+    padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0));
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+    position: relative;
+    z-index: 10;
 }
+
 .cart-footer-select-all {
     display: flex;
     align-items: center;
@@ -5466,8 +5559,12 @@
     padding: 35px 20px 15px;
     display: flex; align-items: center; justify-content: space-between;
     background-color: #fff; flex-shrink: 0; position: relative;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: none; 
+    border-radius: 0 0 24px 24px; 
+    box-shadow: 0 4px 15px rgba(229, 138, 171, 0.08); 
+    margin-bottom: 5px; 
 }
+
 body.ios-mode-active #mall-favorite-page .mall-favorite-header {
     padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
 }
@@ -5753,11 +5850,140 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         body.ios-mode-active .forum-post-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.phone-frame-active .forum-post-detail-header, body.tablet-mode-active .forum-post-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
         
-        .forum-post-detail-title { font-size: 17px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
+              .forum-post-detail-title { font-size: 17px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
         .forum-detail-main-scroll { flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
         .post-detail-comments-title { font-size: 15px; font-weight: bold; color: #333; padding-left: 5px; border-left: 4px solid var(--theme-pink-btn); margin-top: 5px; margin-bottom: 5px; }
 
+              /* ========================= 新增：外卖订单发送到聊天的卡片样式 ========================= */
+        .takeout-chat-card {
+            width: 240px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .takeout-chat-card-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 10px;
+        }
+        .takeout-chat-card-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+        .takeout-chat-card-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .takeout-chat-shop-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .takeout-chat-shop-emoji {
+            width: 40px;
+            height: 40px;
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            border: 1px solid #eee;
+        }
+        .takeout-chat-shop-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .takeout-chat-shop-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .takeout-chat-price {
+            font-size: 14px;
+            color: #ff5000;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .takeout-chat-dishes-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .takeout-chat-card.expanded .takeout-chat-dishes-wrapper {
+            max-height: 600px;
+            margin-top: 10px;
+        }
+        .takeout-chat-dish-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            background: #fdfafb;
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+        .takeout-chat-dish-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .takeout-chat-dish-qty {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .takeout-chat-expand-hint {
+            font-size: 11px;
+            color: #ccc;
+            text-align: center;
+            margin-top: 8px;
+        }
+        .takeout-chat-card.expanded .takeout-chat-expand-hint {
+            display: none;
+        }
+
+        /* 给他下单按钮样式 */
+
+        .takeout-send-to-friend-btn {
+            background-color: var(--takeout-primary-color);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,182,193,0.4);
+            display: none; /* 默认隐藏 */
+            transition: all 0.2s;
+        }
+        .takeout-send-to-friend-btn.active {
+            background-color: #ff8fb3;
+            transform: scale(0.95);
+        }
+        /* ========================= 新增结束 ========================= */
     </style>
+
 </head>
 <body>
 <div id="app-wrapper">
@@ -5820,65 +6046,93 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 </div>
 
 <div id="home-screen">
-
     <div id="time-section">
         <div id="time-container" onclick="handleTimeBgClick(event)">
             <div id="clock-time">12:00</div>
             <div id="clock-date" onclick="handleDateEdit(event)">2026年02月27日 星期五</div>
         </div>
     </div>
-    <div id="grid-area">
-        <div class="grid-quadrant" id="avatar-quadrant-1">
-            <div id="chat-dual-container">
-                <div class="chat-row left">
-                    <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-1')">
-                        <div class="avatar-ring">
-                            <div class="avatar-img-circle" id="chat-avatar-1" style="background-image: url('https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');"></div>
+    
+    <!-- 新增滑动容器包裹网格 -->
+    <div class="home-swiper-container">
+        <!-- 第一页 (原有页面) -->
+        <div class="home-page-slide">
+            <div id="grid-area">
+                <div class="grid-quadrant" id="avatar-quadrant-1">
+                    <div id="chat-dual-container">
+                        <div class="chat-row left">
+                            <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-1')">
+                                <div class="avatar-ring">
+                                    <div class="avatar-img-circle" id="chat-avatar-1" style="background-image: url('https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');"></div>
+                                </div>
+                            </div>
+                            <input type="text" id="home-chat-bubble-1" class="chat-bubble-input left-bubble" value="Say Hi~" oninput="adjustInputWidth(this); saveHomeBubble(1, this.value)">
+                        </div>
+                        <div class="chat-row right">
+                            <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-2')">
+                                <div class="avatar-ring">
+                                    <div class="avatar-img-circle" id="chat-avatar-2" style="background-image: url('https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png');"></div>
+                                </div>
+                            </div>
+                            <input type="text" id="home-chat-bubble-2" class="chat-bubble-input right-bubble" value="Hello!" oninput="adjustInputWidth(this); saveHomeBubble(2, this.value)">
                         </div>
                     </div>
-                    <input type="text" id="home-chat-bubble-1" class="chat-bubble-input left-bubble" value="Say Hi~" oninput="adjustInputWidth(this); saveHomeBubble(1, this.value)">
                 </div>
-                <div class="chat-row right">
-                    <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-2')">
-                        <div class="avatar-ring">
-                            <div class="avatar-img-circle" id="chat-avatar-2" style="background-image: url('https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png');"></div>
+
+                <div class="grid-quadrant">
+                    <div class="app-group-2x2">
+                        <div class="app-item" onclick="openChatApp()">
+                            <div class="app-icon" id="icon-app1">☁️</div>
+                            <span class="app-name" data-app-name="Chat">Chat</span>
                         </div>
+                        <div class="app-item" onclick="openWorldBookApp()"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
+                        <div class="app-item" onclick="openForumApp()"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="论坛">论坛</span></div>
+                        <div class="app-item" onclick="openRecollectionApp()"><div class="app-icon" id="icon-app4">🔮</div><span class="app-name" data-app-name="备忘录">备忘录</span></div>
                     </div>
-                    <input type="text" id="home-chat-bubble-2" class="chat-bubble-input right-bubble" value="Hello!" oninput="adjustInputWidth(this); saveHomeBubble(2, this.value)">
                 </div>
-            </div>
-        </div>
+                <div class="grid-quadrant">
+                    <div class="app-group-2x2">
+                        <div class="app-item"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
+                        <div class="app-item" onclick="openMallApp()"><div class="app-icon" id="icon-app6">🎮</div><span class="app-name" data-app-name="商城">商城</span></div>
+                        <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
+                        <div class="app-item" onclick="openWalletApp()"><div class="app-icon" id="icon-app8">💰</div><span class="app-name" data-app-name="Wallet">Wallet</span></div>
+                    </div>
+                </div>
 
-        <div class="grid-quadrant">
-            <div class="app-group-2x2">
-                <div class="app-item" onclick="openChatApp()">
-                    <div class="app-icon" id="icon-app1">☁️</div>
-                    <span class="app-name" data-app-name="Chat">Chat</span>
+                <div class="grid-quadrant" id="photo-widget-quadrant">
+                    <div class="photo-widget-container" onclick="triggerPhotoWidgetUpload()">
+                        <div id="photo-widget-placeholder" class="photo-widget-placeholder">
+                            <div class="photo-widget-icon">📷</div>
+                            <div class="photo-widget-text">Add Photo</div>
+                        </div>
+                        <img id="photo-widget-img" class="photo-widget-img" src="">
+                    </div>
                 </div>
-                <div class="app-item" onclick="openWorldBookApp()"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
-                <div class="app-item" onclick="openForumApp()"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="论坛">论坛</span></div>
-                <div class="app-item" onclick="openRecollectionApp()"><div class="app-icon" id="icon-app4">🔮</div><span class="app-name" data-app-name="备忘录">备忘录</span></div>
             </div>
         </div>
-        <div class="grid-quadrant">
-            <div class="app-group-2x2">
-                <div class="app-item"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
-                <div class="app-item" onclick="openMallApp()"><div class="app-icon" id="icon-app6">🎮</div><span class="app-name" data-app-name="商城">商城</span></div>
-                <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
-                <div class="app-item" onclick="openWalletApp()"><div class="app-icon" id="icon-app8">💰</div><span class="app-name" data-app-name="Wallet">Wallet</span></div>
-            </div>
-        </div>
-
-        <div class="grid-quadrant" id="photo-widget-quadrant">
-            <div class="photo-widget-container" onclick="triggerPhotoWidgetUpload()">
-                <div id="photo-widget-placeholder" class="photo-widget-placeholder">
-                    <div class="photo-widget-icon">📷</div>
-                    <div class="photo-widget-text">Add Photo</div>
+        
+        <!-- 第二页 (新增页面，存放图库等) -->
+        <div class="home-page-slide">
+            <div class="second-page-grid">
+                <!-- 这里添加了图库App -->
+                <div class="app-item" onclick="showToast('图库功能待开发~')">
+                    <div class="app-icon" id="icon-app9" style="width: 60px; height: 60px; border-radius: 16px; margin-bottom: 5px; display: flex; justify-content: center; align-items: center; font-size: 28px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: rgba(255, 255, 255, 0.2);">🖼️</div>
+                    <span class="app-name" data-app-name="图库" style="font-size: 11px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.4); white-space: nowrap;">图库</span>
                 </div>
-                <img id="photo-widget-img" class="photo-widget-img" src="">
             </div>
         </div>
     </div>
+
+    <div id="dock-area">
+        <div class="dock-container">
+            <div class="app-item" onclick="showSettingsPage()"><div class="app-icon dock-icon" id="icon-dock-settings">⚙️</div></div>
+            <div class="app-item" onclick="openAIChat()"><div class="app-icon dock-icon" id="icon-dock-ai">🤖</div></div>
+            <div class="app-item"><div class="app-icon dock-icon" id="icon-dock-safari">🧭</div></div>
+            <div class="app-item"><div class="app-icon dock-icon" id="icon-dock-messages">✉️</div></div>
+        </div>
+    </div>
+</div>
+
     <div id="dock-area">
         <div class="dock-container">
             <div class="app-item" onclick="showSettingsPage()"><div class="app-icon dock-icon" id="icon-dock-settings">⚙️</div></div>
@@ -5996,14 +6250,18 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 <span class="chat-menu-text">钱包</span>
             </div>
             
-            <!-- 第二行 -->
+                      <!-- 第二行 -->
             <div class="chat-menu-item" onclick="retryLastAiReply()">
                 <img src="https://img.heliar.top/file/1773078710555_重新_redo_5.png" class="chat-menu-icon">
                 <span class="chat-menu-text">重说</span>
             </div>
+            <div class="chat-menu-item" onclick="openTakeoutAppFromChat()">
+                <img src="https://img.heliar.top/file/1773415285038_叉子勺子_fork-spoon.png" class="chat-menu-icon">
+                <span class="chat-menu-text">外卖</span>
+            </div>
             <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
             <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
-            <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
+
         </div>
     
    
@@ -6427,15 +6685,41 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </div>
         </div>
         <div id="takeout-page-menu" class="page"><div id="takeout-menu-list"></div></div>
-        <div id="takeout-page-my" class="page">
+               <div id="takeout-page-my" class="page">
             <div class="takeout-me-profile">
                 <img id="takeout-my-avatar" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png">
                 <span id="takeout-my-nickname">外卖吃货</span>
                 <img src="https://img.heliar.top/file/1772475392914_设置_setting-two_2.png" class="takeout-me-setting-icon" onclick="openTakeoutProfileModal()">
             </div>
             
+            <!-- 新增：订单功能区块 -->
+            <div class="takeout-me-orders-section">
+                <div class="takeout-me-orders-title">订单</div>
+                <div class="takeout-me-orders-grid">
+                                    <!-- 点击全部订单，打开新的全部订单页面 -->
+                    <div class="takeout-me-order-item" onclick="openTakeoutAllOrdersPage()">
+                        <img src="https://img.heliar.top/file/1773415978468_订单_order.png">
+                        <span>全部订单</span>
+                    </div>
+
+                    <div class="takeout-me-order-item" onclick="showToast('代付功能待开发~')">
+                        <img src="https://img.heliar.top/file/1773415976557_支付码_pay-code-two.png">
+                        <span>我的代付</span>
+                    </div>
+                    <div class="takeout-me-order-item" onclick="showToast('投喂功能待开发~')">
+                        <img src="https://img.heliar.top/file/1773416114859_鸡腿_chicken-leg.png">
+                        <span>投喂</span>
+                    </div>
+                    <div class="takeout-me-order-item" onclick="showToast('待评价功能待开发~')">
+                        <img src="https://img.heliar.top/file/1773416088120_未读消息_message-unread_2.png">
+                        <span>待评价</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="takeout-me-fav-section">
                 <div class="takeout-me-fav-header">
+
                     <div class="takeout-me-fav-title">我的收藏</div>
                     <div class="takeout-me-fav-more" onclick="openTakeoutFavPage()">查看更多 ></div>
                 </div>
@@ -6591,7 +6875,22 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <!-- 渲染收藏的店铺列表 -->
         </div>
     </div>
+
+       <!-- 新增：全部订单独立页面 -->
+    <div id="takeout-all-orders-page">
+        <div class="takeout-detail-header">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeTakeoutAllOrdersPage()">
+            <div class="takeout-title" style="font-size: 18px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%);">全部订单</div>
+            <!-- 修改：添加给他下单按钮 -->
+            <button id="takeout-send-friend-btn" class="takeout-send-to-friend-btn" onclick="toggleTakeoutSendMode()">给他下单</button>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 15px;" id="takeout-all-orders-list-container">
+            <!-- 渲染全部订单列表 -->
+        </div>
+    </div>
+
 <!-- *** END: Takeout App *** -->
+
 
 <!-- ========================= 新增：外卖商家详情页 ========================= -->
 <div id="takeout-shop-detail-page">
@@ -7247,10 +7546,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                     </div>
 
 
-                    <div class="forum-me-menu-item">
-                        <span class="menu-item-left">关注的人</span>
-                        <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
-                    </div>
+                        <div class="forum-me-menu-item" onclick="openForumFollowingPage()">
+        <span class="menu-item-left">关注的人</span>
+        <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
+    </div>
+
                      <div class="forum-me-menu-item" onclick="openForumMeSettings()">
                         <span class="menu-item-left">设置</span>
                         <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
@@ -7345,6 +7645,18 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     </div>
 
 </div>
+    <!-- 新增：关注列表页面 -->
+    <div id="forum-following-page" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #FFF5F7; z-index: 800; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);">
+        <div class="forum-header-home" id="forum-following-header" style="border-radius: 0 0 24px 24px; position: relative;">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumFollowingPage()">
+            <h1 class="forum-header-title" style="position:absolute; left:50%; transform:translateX(-50%);">我的关注</h1>
+            <div style="width:30px;"></div>
+        </div>
+        <div id="forum-following-list-container" style="flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: env(safe-area-inset-bottom, 20px);">
+            <!-- 关注列表渲染在这里 -->
+        </div>
+    </div>
+
     <!-- 新增：帖子详情与评论页 -->
 
     <div id="forum-post-detail-page">
@@ -7363,11 +7675,14 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 
 <!-- 新增：为我的帖子页单独添加顶部安全区适配 -->
 <style>
-    body.ios-mode-active #forum-my-posts-header, body.ios-mode-active #forum-all-forums-header, body.ios-mode-active #forum-favorite-posts-header, body.ios-mode-active #forum-all-liked-posts-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important; }
+      /* 适配顶部安全距离 */
+    body.ios-mode-active #forum-my-posts-header, body.ios-mode-active #forum-all-forums-header, body.ios-mode-active #forum-favorite-posts-header, body.ios-mode-active #forum-all-liked-posts-header, body.ios-mode-active #forum-following-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important; }
     body.phone-frame-active #forum-my-posts-header, body.tablet-mode-active #forum-my-posts-header,
     body.phone-frame-active #forum-all-forums-header, body.tablet-mode-active #forum-all-forums-header,
     body.phone-frame-active #forum-favorite-posts-header, body.tablet-mode-active #forum-favorite-posts-header,
-    body.phone-frame-active #forum-all-liked-posts-header, body.tablet-mode-active #forum-all-liked-posts-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
+    body.phone-frame-active #forum-all-liked-posts-header, body.tablet-mode-active #forum-all-liked-posts-header,
+    body.phone-frame-active #forum-following-header, body.tablet-mode-active #forum-following-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
+    
     /* like的帖子 长方形预览区样式 (双列精简版) */
     .forum-liked-post-card {
         background-color: #fff;
@@ -7382,59 +7697,86 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         min-width: 0;
     }
     .forum-liked-post-card:active { transform: scale(0.96); }
-    .forum-liked-post-header {
+    .forum-liked-post-header { display: flex; align-items: center; gap: 6px; overflow: hidden; }
+    .forum-liked-post-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .forum-liked-post-info { display: flex; flex-direction: column; min-width: 0; }
+    .forum-liked-post-nickname { font-size: 12px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .forum-liked-post-forum-name { font-size: 10px; color: #999; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .forum-liked-post-content { font-size: 11px; color: #444; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; }
+    .forum-liked-post-image-preview { width: 100%; height: 70px; border-radius: 8px; object-fit: cover; }
+
+    /* 新增：关注列表条目样式 */
+    .forum-following-item {
         display: flex;
         align-items: center;
-        gap: 6px;
-        overflow: hidden;
+        background: #fff;
+        padding: 15px;
+        border-radius: 16px;
+        box-shadow: 0 2px 10px rgba(200, 150, 160, 0.04);
+        gap: 12px;
     }
-    .forum-liked-post-avatar {
-        width: 24px; /* 头像大幅缩小 */
-        height: 24px;
+    .forum-following-avatar {
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         object-fit: cover;
         flex-shrink: 0;
+        border: 1px solid #f0f0f0;
     }
-    .forum-liked-post-info {
+    .forum-following-info {
+        flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
-        min-width: 0; /* 关键：防止名字过长撑破卡片 */
+        justify-content: center;
     }
-    .forum-liked-post-nickname {
-        font-size: 12px; /* 字号缩小 */
-        font-weight: 600;
+    .forum-following-name {
+        font-size: 16px;
+        font-weight: bold;
         color: #333;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .forum-liked-post-forum-name {
-        font-size: 10px; /* 字号极小 */
-        color: #999; 
-        margin-top: 1px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .forum-following-right-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
-    .forum-liked-post-content {
-        font-size: 11px; /* 内容字号缩小 */
-        color: #444;
-        display: -webkit-box;
-        -webkit-line-clamp: 2; 
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.4;
+    .forum-following-btn {
+        background-color: #f0f2f5; /* 浅灰色 */
+        color: #888;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: none;
+        cursor: default; /* 无点击反馈 */
     }
-    .forum-liked-post-image-preview {
-        width: 100%;
-        height: 70px; /* 图片高度砍半 */
-        border-radius: 8px;
-        object-fit: cover;
+    .forum-following-dots {
+        font-size: 20px;
+        color: #999;
+        font-weight: bold;
+        line-height: 1;
+        letter-spacing: 1px;
+        cursor: pointer;
+        padding-bottom: 5px;
     }
 
 </style>
 
+<!-- 修改论坛好友昵称弹窗 -->
+<div id="edit-forum-nickname-modal" class="delete-confirm-modal" style="z-index: 10050;">
+    <div class="delete-card" onclick="event.stopPropagation()" style="width: 85%; max-width: 320px; padding: 25px;">
+        <div class="delete-card-title" style="margin-bottom: 15px; color: var(--theme-pink-text); font-weight: 600;">设置论坛昵称</div>
+        <input type="hidden" id="edit-forum-nickname-contact-id">
+        <input type="text" id="edit-forum-nickname-input" class="create-forum-input" placeholder="输入新的论坛昵称" style="margin-bottom: 20px;">
+        <div class="delete-card-actions">
+            <button class="delete-card-btn btn-cancel" onclick="closeEditForumNicknameModal()">取消</button>
+            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="saveForumNickname()">确定</button>
+        </div>
+    </div>
+</div>
 
 <!-- 创建论坛弹窗 -->
 
@@ -7442,11 +7784,13 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     <div id="create-forum-modal-card">
         <h2 class="create-forum-title">创建新论坛</h2>
         <div class="create-forum-content">
-                        <div class="create-forum-avatar-upload" onclick="triggerForumAvatarUpload()">
+                                  <div class="create-forum-avatar-upload" onclick="triggerForumAvatarUpload()">
                 <span id="forum-avatar-placeholder">+</span>
                 <img id="new-forum-avatar-preview" src="">
             </div>
+            <input type="text" id="new-forum-avatar-url-input" class="create-forum-input" placeholder="或输入头像图片 URL" oninput="handleNewForumAvatarUrl(this.value)">
             <input type="text" id="new-forum-name-input" class="create-forum-input" placeholder="论坛名称">
+
             <textarea id="new-forum-worldview-input" class="create-forum-textarea" placeholder="论坛世界观... (可选)"></textarea>
             <div id="new-forum-wb-selection-display">未绑定世界书</div>
             <button class="create-forum-wb-btn" onclick="openForumWbBindModal()">绑定世界书 (可选)</button>
@@ -7474,12 +7818,14 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </select>
         </div>
 
-        <div id="edit-forum-content" style="display: none; flex-direction: column; align-items: center; gap: 15px; background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);">
+            <div id="edit-forum-content" style="display: none; flex-direction: column; align-items: center; gap: 15px; background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);">
             <div class="create-forum-avatar-upload" onclick="triggerEditForumAvatarUpload()">
                 <span id="edit-forum-avatar-placeholder" style="display:none;">+</span>
                 <img id="edit-forum-avatar-preview" src="" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
+            <input type="text" id="edit-forum-avatar-url-input" class="create-forum-input" placeholder="或输入头像图片 URL" oninput="handleEditForumAvatarUrl(this.value)">
             <input type="text" id="edit-forum-name-input" class="create-forum-input" placeholder="论坛名称">
+
             <textarea id="edit-forum-worldview-input" class="create-forum-textarea" placeholder="论坛世界观... (可选)"></textarea>
             <div id="edit-forum-wb-selection-display" style="width: 100%; padding: 10px; font-size: 13px; color: #999; background-color: #f9f9f9; border-radius: 8px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">未绑定世界书</div>
             <button class="create-forum-wb-btn" onclick="openEditForumWbBindModal()">重新绑定世界书</button>
@@ -8176,10 +8522,19 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     let autoPostTimers = {}; 
 
     // --- Utility Functions ---
-
     const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
     function escapeHtml(text) { if(typeof text !== 'string') return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
     
+    // --- 新增：全局 Emoji 随机头像生成器 ---
+    window.generateEmojiAvatarUrl = () => {
+        const emojis = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🐣','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🐢','🐍','🦎','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🐈','🐓','🦃','🦚','🦜','🦢','🕊️','🐇','🦝','🦡','🐁','🐀','🐿️','🦔','🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🥝','🍅','🥥','🥑','🍆','🥔','🥕','🌽','🌶️','🥒','🥬','🥦','🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🍲','🥣','🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜','🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠','🥡','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵','🍶','🍾','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤','🧃','🧉','🧊'];
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        const bgColors = ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff', '#F5B3C9', '#FDCEDF'];
+        const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${randomBg}"/><text x="50" y="55" font-size="50" text-anchor="middle" dominant-baseline="central">${randomEmoji}</text></svg>`;
+        return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+    };
+
     // --- 新增：更新角色最后一条消息预览 ---
     function updateContactLastMsg(contactId) {
         const key = `chat_msgs_${contactId}`;
@@ -8895,17 +9250,39 @@ function renderPurchasedProducts() {
             
             if (generatedShops.length === 0) throw new Error("解析到的店铺为空");
 
-            // --- 【修改：刷新时仅保留用户自定义店铺和最新生成的店铺，去除旧的AI店铺】 ---
+                     // --- 【修改：刷新时仅保留用户自定义店铺和最新生成的店铺，去除旧的AI店铺】 ---
             let existingShops = [];
             try { existingShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]'); } catch(e) { existingShops = []; }
             
             let customShops = existingShops.filter(s => s.isCustom === true); // 提取自定义的店铺，永久保留
             
-            // 只取本次新生成的店铺，丢弃旧的AI店铺，防止列表越来越长
             let mergedAiShops = [...generatedShops];
+            
+            // 【核心修复：检查新生成的店铺，如果它在旧店铺或收藏中曾经生成过菜单，则把旧菜单和评价继承过来，避免重复生成】
+            let favShops = [];
+            try { favShops = JSON.parse(localStorage.getItem('takeoutFavoritesData_v1') || '[]'); } catch(e) { favShops = []; }
+
+            mergedAiShops.forEach(newShop => {
+                // 优先从历史生成的同名店铺里找（必须要有菜单）
+                let oldShop = existingShops.find(s => s.name === newShop.name && s.menu && Array.isArray(s.menu) && s.menu.length > 0);
+                if (!oldShop) {
+                    // 如果找不到了再去收藏库里捞一下
+                    oldShop = favShops.find(s => s.name === newShop.name && s.menu && Array.isArray(s.menu) && s.menu.length > 0);
+                }
+                
+                if (oldShop) {
+                    newShop.menu = oldShop.menu;
+                    newShop.reviews = oldShop.reviews;
+                    // 同步保留它之前的星级和销量信息，保持一致性
+                    if (oldShop.rating) newShop.rating = oldShop.rating;
+                    if (oldShop.sales) newShop.sales = oldShop.sales;
+                    if (oldShop.time) newShop.time = oldShop.time;
+                }
+            });
             
             // 最终顺序：自定义始终置顶 -> 本次最新生成的店铺
             let finalShops = [...customShops, ...mergedAiShops]; 
+
 
             try {
                 localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(finalShops));
@@ -9360,15 +9737,41 @@ function renderCategories() {
         container.innerHTML = html;
     };
 
-    window.openTakeoutApp = () => {
+           // --- 新增：从聊天扩展菜单直接打开外卖的全部订单页面 ---
+    window.openTakeoutAppFromChat = () => {
+        document.getElementById('chat-extra-menu').classList.remove('active');
+        
+        // 1. 正常唤起外卖App大框架
+        openTakeoutApp();
+        
+        // 2. 增加一点延迟，强行覆盖掉App默认跳转“商家”的行为，万无一失
+        setTimeout(() => {
+            const takeoutAppContainer = document.getElementById('takeout-app-page');
+            if (takeoutAppContainer) {
+                // 强制切到底部的“我的”页面，作为垫底
+                const myTabBtn = takeoutAppContainer.querySelector('.nav-item[data-page="takeout-page-my"]');
+                if (myTabBtn) myTabBtn.click();
+            }
+            
+            // 弹起独立的“全部订单”页面
+            if (document.getElementById('takeout-all-orders-page')) {
+                openTakeoutAllOrdersPage();
+            } else {
+                showToast("未找到全部订单页面，请确认已添加对应HTML");
+            }
+        }, 80); // 80毫秒的延迟足以避开冲突，视觉上依然是秒开
+    };
+
+
+      window.openTakeoutApp = (startPage = 'takeout-page-order') => {
         body.classList.add('takeout-active');
         initializeTakeoutApp();
-        
-        // 【关键防御】：强制模拟点击底部“商家”Tab，确保每次点开App，界面都百分百归位到商家列表，防止停留在空白页
+
+        // 【优化】：根据传入的参数，直接锁定到底部对应的Tab
         const takeoutAppContainer = document.getElementById('takeout-app-page');
         if (takeoutAppContainer) {
-            const orderTabBtn = takeoutAppContainer.querySelector('.nav-item[data-page="takeout-page-order"]');
-            if (orderTabBtn) orderTabBtn.click();
+            const targetTabBtn = takeoutAppContainer.querySelector(`.nav-item[data-page="${startPage}"]`);
+            if (targetTabBtn) targetTabBtn.click();
         }
 
         // 强力从缓存中读取并渲染店铺列表
@@ -9383,6 +9786,7 @@ function renderCategories() {
             renderTakeoutShopList([]); 
         }
     };
+
     window.closeTakeoutApp = () => {
         body.classList.remove('takeout-active');
     };
@@ -9498,12 +9902,167 @@ function renderCategories() {
         document.getElementById('takeout-favorite-page').classList.add('active');
     };
 
-    window.closeTakeoutFavPage = () => {
+      window.closeTakeoutFavPage = () => {
         document.getElementById('takeout-favorite-page').classList.remove('active');
     };
+    // --- 新增：全部订单独立页面逻辑 ---
+    let isTakeoutSendMode = false; // 新增全局状态
+
+    window.openTakeoutAllOrdersPage = () => {
+        document.getElementById('takeout-all-orders-page').classList.add('active');
+        
+        // 新增：判断是否从聊天窗口点进来，如果是，显示右上角的“给他下单”
+        const sendBtn = document.getElementById('takeout-send-friend-btn');
+        if (currentChatContactId) {
+            sendBtn.style.display = 'block';
+            sendBtn.textContent = '给他下单';
+            sendBtn.classList.remove('active');
+        } else {
+            sendBtn.style.display = 'none';
+        }
+        isTakeoutSendMode = false; // 每次打开重置状态
+
+        renderTakeoutAllOrders();
+    };
+
+    window.closeTakeoutAllOrdersPage = () => {
+        document.getElementById('takeout-all-orders-page').classList.remove('active');
+        isTakeoutSendMode = false; // 关闭时重置
+    };
+
+    // 新增：切换选择发送模式
+    window.toggleTakeoutSendMode = () => {
+        isTakeoutSendMode = !isTakeoutSendMode;
+        const btn = document.getElementById('takeout-send-friend-btn');
+        if (isTakeoutSendMode) {
+            btn.textContent = '取消下单';
+            btn.classList.add('active');
+            showToast('请点击下方你想发送给ta的外卖记录~');
+        } else {
+            btn.textContent = '给他下单';
+            btn.classList.remove('active');
+        }
+    };
+
+
+    window.renderTakeoutAllOrders = () => {
+        const container = document.getElementById('takeout-all-orders-list-container');
+        const freshData = JSON.parse(localStorage.getItem(TAKEOUT_APP_DATA_KEY) || '{"menus":[]}');
+        const menus = freshData.menus || [];
+
+        if (menus.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding-top: 100px; color: #ccc;">
+                    <div style="font-size: 60px; margin-bottom: 10px;">🧾</div>
+                    <p>还没有下过单哦，快去挑点好吃的吧！</p>
+                </div>`;
+            return;
+        }
+        container.innerHTML = '';
+
+        [...menus].reverse().forEach(menu => {
+            const totalDishes = menu.dishes.reduce((sum, dish) => sum + dish.quantity, 0);
+            const card = document.createElement('div');
+            card.className = 'takeout-order-card';
+
+            const avatarHtml = menu.shopEmoji
+                ? `<div class="takeout-order-shop-icon">${menu.shopEmoji}</div>`
+                : `<img src="${menu.avatar}" class="takeout-order-shop-icon" style="object-fit:cover;">`;
+
+            const displayName = escapeHtml(menu.shopName || menu.name);
+            const dateObj = new Date(menu.timestamp);
+            const timeStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+
+            const dishesHtml = menu.dishes.map(d => `
+                <div class="takeout-order-dish-item">
+                    <span class="takeout-order-dish-name">${escapeHtml(d.name)}</span>
+                    <span class="takeout-order-dish-qty">x ${d.quantity}</span>
+                    ${d.price !== undefined ? `<span class="takeout-order-dish-price">¥${(d.price * d.quantity).toFixed(2)}</span>` : ''}
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="takeout-order-header">
+                    ${avatarHtml}
+                    <div class="takeout-order-shop-info">
+                        <div class="takeout-order-shop-name">${displayName} <span style="color:#ccc; font-size:14px; margin-left:6px;">></span></div>
+                        <div class="takeout-order-time">${timeStr}</div>
+                    </div>
+                    <div class="takeout-order-status">订单已完成</div>
+                </div>
+                <div class="takeout-order-dishes-wrapper expanded">
+                    <div class="takeout-order-dishes-inner">
+                        ${dishesHtml}
+                    </div>
+                    <div class="takeout-order-footer">
+                        <span class="takeout-order-total-text">共 ${totalDishes} 件商品</span>
+                        ${menu.totalPrice ? `<span class="takeout-order-total-price">¥${parseFloat(menu.totalPrice).toFixed(2)}</span>` : ''}
+                    </div>
+                </div>`;
+
+                     card.querySelector('.takeout-order-header').addEventListener('click', (e) => {
+                // 修改：如果处于发送模式，则执行发送动作；否则正常展开/折叠
+                if (typeof isTakeoutSendMode !== 'undefined' && isTakeoutSendMode) {
+                    sendTakeoutOrderToFriend(menu);
+                } else {
+                    e.currentTarget.nextElementSibling.classList.toggle('expanded');
+                }
+            });
+
+
+            card.addEventListener('dblclick', () => {
+                if (confirm('确定要删除这条外卖订单记录吗？')) {
+                    const menuId = parseInt(menu.id);
+                    let appState = JSON.parse(localStorage.getItem(TAKEOUT_APP_DATA_KEY) || '{"menus":[]}');
+                    appState.menus = appState.menus.filter(m => m.id !== menuId);
+                    localStorage.setItem(TAKEOUT_APP_DATA_KEY, JSON.stringify(appState));
+                    renderTakeoutAllOrders();
+                    if (window.forceRenderTakeoutMenus) window.forceRenderTakeoutMenus();
+                }
+            });
+            container.appendChild(card);
+        });
+    };
+    // 新增：发送外卖记录给好友
+    window.sendTakeoutOrderToFriend = (menu) => {
+        if (!currentChatContactId) return;
+
+        const key = getMessagesKey(currentChatContactId);
+        let messages = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        messages.push({
+            id: Date.now(),
+            type: 'sent',
+            isTakeoutOrder: true,  // 核心标识
+            takeoutData: menu,
+            text: `[外卖订单：${menu.shopName || '美味外卖'}]`,
+            timestamp: Date.now()
+        });
+        
+        localStorage.setItem(key, JSON.stringify(messages));
+        
+        // 更新联系人列表最新消息
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const idx = contacts.findIndex(c => c.id === currentChatContactId);
+        if (idx > -1) {
+            contacts[idx].lastMsg = `[外卖订单]`;
+            contacts[idx].timestamp = Date.now();
+            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+        }
+        
+        showToast("外卖订单已发送给好友！");
+        
+              // 关闭外卖APP，回到聊天
+        isTakeoutSendMode = false;
+        closeTakeoutAllOrdersPage();
+    }; 
+    // ↑↑↑ 就是补上这个缺失的括号和分号 ↑↑↑
+        
 
             // 设置资料与编辑店铺
+
     window.openTakeoutProfileModal = () => {
+
         const profile = JSON.parse(localStorage.getItem('takeoutProfile_v1') || '{"nickname":"外卖吃货", "avatar":"https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"}');
         document.getElementById('takeout-my-nickname-input').value = profile.nickname;
         document.getElementById('takeout-my-avatar-preview').src = profile.avatar;
@@ -10014,17 +10573,11 @@ ${roleDetails}\n`;
         if (displayReviews.length === 0) {
             html += '<div style="text-align:center; padding-top:40px; color:#ccc;">暂无此类评价</div>';
         } else {
-            // 用户指定的随机路人头像
-            const avatars = [
-                "https://img.heliar.top/file/1773259046416_IMG_5032.jpeg",
-                "https://img.heliar.top/file/1773259051603_IMG_5031.jpeg",
-                "https://img.heliar.top/file/1773259053273_IMG_5030.jpeg"
-            ];
-            
-            // 获取所有角色数据，用于匹配专属评价者的头像
+                     // 获取所有角色数据，用于匹配专属评价者的头像
             const allContacts = JSON.parse(localStorage.getItem('chatData_v5_final') || '[]');
             displayReviews.forEach(r => {
-                let randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+                let randomAvatar = window.generateEmojiAvatarUrl();
+
                 
                 // --- 新增：如果评价昵称和某个角色匹配，直接使用该角色的真实头像 ---
                 let matchedContact = allContacts.find(c => (c.alias || c.name) === r.nickname);
@@ -11899,15 +12452,19 @@ window.toggleMallProductFavorite = (productId) => {
         if (contactCountEl) contactCountEl.textContent = contacts.length;
     }
 
-    window.openCreateForumModal = () => {
+       window.openCreateForumModal = () => {
         tempForumAvatarUrl = '';
         tempForumWbIds = [];
         tempForumBoundRoleIds = []; 
-        document.getElementById('new-forum-avatar-preview').src = '';
-        document.getElementById('new-forum-avatar-preview').style.display = 'none';
+        const preview = document.getElementById('new-forum-avatar-preview');
+        preview.removeAttribute('data-loaded');
+        preview.src = '';
+        preview.style.display = 'none';
         document.getElementById('forum-avatar-placeholder').style.display = 'flex';
 
+        document.getElementById('new-forum-avatar-url-input').value = '';
         document.getElementById('new-forum-name-input').value = '';
+
         document.getElementById('new-forum-worldview-input').value = '';
         document.getElementById('new-forum-wb-selection-display').textContent = '未绑定世界书';
         document.getElementById('new-forum-role-selection-display').textContent = '未绑定角色'; 
@@ -11922,17 +12479,32 @@ window.toggleMallProductFavorite = (productId) => {
         document.getElementById('input-forum-avatar').click();
     };
 
-    window.handleForumAvatarUpload = (event) => {
+       window.handleForumAvatarUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
         compressImage(file, 300, (base64) => {
             tempForumAvatarUrl = base64;
             const preview = document.getElementById('new-forum-avatar-preview');
+            preview.removeAttribute('data-loaded');
             preview.src = base64;
             preview.style.display = 'block';
             document.getElementById('forum-avatar-placeholder').style.display = 'none';
+            document.getElementById('new-forum-avatar-url-input').value = ''; // 如果上传本地图，清空URL
         });
     };
+
+    window.handleNewForumAvatarUrl = (url) => {
+        const trimmed = url.trim();
+        if (trimmed) {
+            tempForumAvatarUrl = trimmed;
+            const preview = document.getElementById('new-forum-avatar-preview');
+            preview.removeAttribute('data-loaded');
+            preview.src = trimmed;
+            preview.style.display = 'block';
+            document.getElementById('forum-avatar-placeholder').style.display = 'none';
+        }
+    };
+
 
     window.openForumWbBindModal = () => {
         wbBindMultiSelect = true;
@@ -12116,9 +12688,17 @@ window.toggleMallProductFavorite = (productId) => {
         tempEditForumRoleIds = forum.boundRoleIds || [];
         tempEditForumPasserbyAvatars = forum.passerbyAvatars || []; 
 
-        document.getElementById('edit-forum-avatar-preview').src = tempEditForumAvatarUrl;
-        document.getElementById('edit-forum-avatar-preview').style.display = 'block';
+             const preview = document.getElementById('edit-forum-avatar-preview');
+        preview.removeAttribute('data-loaded'); // 同步修复这里可能会卡没图片的bug
+        preview.src = tempEditForumAvatarUrl;
+        preview.style.display = 'block';
+        
+        // 如果是外部网络链接，回显到输入框中
+        const urlInput = document.getElementById('edit-forum-avatar-url-input');
+        urlInput.value = tempEditForumAvatarUrl.startsWith('http') ? tempEditForumAvatarUrl : '';
+        
         document.getElementById('edit-forum-name-input').value = forum.name || '';
+
         document.getElementById('edit-forum-worldview-input').value = forum.worldview || '';
 
         updateEditForumWbDisplay();
@@ -12191,14 +12771,30 @@ window.toggleMallProductFavorite = (productId) => {
     }
 
     window.triggerEditForumAvatarUpload = () => { document.getElementById('input-edit-forum-avatar').click(); };
-    window.handleEditForumAvatarUpload = (event) => {
+      window.handleEditForumAvatarUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
         compressImage(file, 300, (base64) => {
             tempEditForumAvatarUrl = base64;
-            document.getElementById('edit-forum-avatar-preview').src = base64;
+            const preview = document.getElementById('edit-forum-avatar-preview');
+            preview.removeAttribute('data-loaded');
+            preview.src = base64;
+            document.getElementById('edit-forum-avatar-url-input').value = ''; // 如果上传了本地图，清空URL框
         });
     };
+
+    window.handleEditForumAvatarUrl = (url) => {
+        const trimmed = url.trim();
+        if (trimmed) {
+            tempEditForumAvatarUrl = trimmed;
+            const preview = document.getElementById('edit-forum-avatar-preview');
+            preview.removeAttribute('data-loaded');
+            preview.src = trimmed;
+            preview.style.display = 'block';
+            document.getElementById('edit-forum-avatar-placeholder').style.display = 'none';
+        }
+    };
+
 
     window.openEditForumWbBindModal = () => {
         wbBindMultiSelect = true;
@@ -12300,14 +12896,19 @@ window.toggleMallProductFavorite = (productId) => {
         document.querySelector('#forum-detail-level-display').style.display = 'flex';
     }
 
-    window.openForumDetail = (forumId) => {
+      window.openForumDetail = (forumId) => {
         currentForumDetailId = forumId;
         const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
         const forum = forums.find(f => f.id === forumId);
         if (!forum) return;
 
         document.getElementById('forum-detail-header-name').textContent = forum.name;
-        document.getElementById('forum-detail-header-avatar').src = forum.avatar || '';
+        
+        // 【核心修复】：强行移除已加载标记，让底层引擎重新接管并渲染图片
+        const detailAvatar = document.getElementById('forum-detail-header-avatar');
+        detailAvatar.removeAttribute('data-loaded');
+        detailAvatar.src = forum.avatar || '';
+
         
         const signinBtn = document.getElementById('forum-detail-signin-btn');
         signinBtn.onclick = () => handleForumSignIn(forumId);
@@ -12648,15 +13249,8 @@ window.toggleMallProductFavorite = (productId) => {
         document.getElementById('forum-posts-area').innerHTML = ''; 
     };
 
-    const customAvatarList = [
-        "https://img.heliar.top/file/1770618803521_IMG_4118.jpeg", 
-        "https://img.heliar.top/file/1770618839439_IMG_4156.jpeg",
-        "https://img.heliar.top/file/1770618963468_IMG_4157.jpeg",
-        "https://img.heliar.top/file/1770619023973_IMG_4158.jpeg",
-    ];
-
-    const getRandomCustomAvatar = (forumId) => {
-        let avatarList = customAvatarList;
+       const getRandomCustomAvatar = (forumId) => {
+        let avatarList = [];
         if (forumId) {
             const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
             const currentForum = forums.find(f => f.id === forumId);
@@ -12664,9 +13258,13 @@ window.toggleMallProductFavorite = (productId) => {
                 avatarList = currentForum.passerbyAvatars; 
             }
         }
-        if (avatarList.length === 0) return "https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"; 
+        // 如果没有设置自定义路人头像库，就生成带有马卡龙背景色的emoji随机头像
+        if (avatarList.length === 0) {
+            return window.generateEmojiAvatarUrl();
+        } 
         return avatarList[Math.floor(Math.random() * avatarList.length)];
     };
+
 
 
     window.renderForumDetailPosts = (forumId) => {
@@ -12738,10 +13336,233 @@ window.toggleMallProductFavorite = (productId) => {
         });
     };
 
-    window.shareForumPost = (postId) => { showToast("分享功能待开发"); };
+      window.shareForumPost = (postId) => { showToast("分享功能待开发"); };
+
+    // =================== 新增：论坛详情页点击刷新生成 AI 帖子逻辑 ===================
+    window.handleForumRefresh = async (forumId) => {
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
+        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
+            showToast('请先在主页左下角设置中配置 API');
+            return;
+        }
+
+        const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
+        const forum = forums.find(f => f.id === forumId);
+        if (!forum) return;
+
+        const refreshBtn = document.getElementById('forum-detail-refresh-btn');
+        if (refreshBtn) refreshBtn.style.animation = 'spin 1s linear infinite';
+        showToast('正在搜寻时空电波，生成新帖子...', 3000);
+
+        // 整理世界书和绑定角色的上下文
+        let worldbookContext = "";
+        if (forum.worldbookIds && forum.worldbookIds.length > 0) {
+            const allWb = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
+            const activeWbs = allWb.filter(b => forum.worldbookIds.includes(b.id));
+            activeWbs.forEach(wb => {
+                worldbookContext += `\n[世界书: ${wb.title}]\n`;
+                wb.entries.forEach(e => { worldbookContext += `${e.key ? e.key+': ' : ''}${e.content}\n`; });
+            });
+        }
+        
+              let rolesContext = "";
+        let roleNames = [];
+        if (forum.boundRoleIds && forum.boundRoleIds.length > 0) {
+            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+            const activeRoles = allContacts.filter(c => forum.boundRoleIds.includes(c.id));
+            activeRoles.forEach(r => {
+                // 优先使用专属论坛昵称喂给AI
+                const fname = r.forumNickname || r.alias || r.name;
+                roleNames.push(fname);
+                rolesContext += `- 角色: ${fname} (人设: ${r.persona})\n`;
+            });
+        }
+
+
+        const prompt = `你是一个论坛帖子生成器。当前论坛名称是“${forum.name}”。
+论坛简介/世界观：${forum.worldview || '无'}
+${worldbookContext ? `相关世界书设定：\n${worldbookContext}` : ''}
+${rolesContext ? `关注了该论坛的常驻角色：\n${rolesContext}\n请务必让这几个角色中的一两个人参与发帖或在评论区互动！` : ''}
+
+请生成 3 到 5 条符合该论坛氛围的全新帖子，严格以 JSON 格式返回，包含在一个 "posts" 数组中。
+字段要求：
+- authorName: 发帖人昵称 (如果是常驻角色，请务必使用上方给出的名字；如果不是，随机编一个符合该论坛风格的网友昵称)
+- content: 帖子文字内容 (符合世界观，生活化或符合人设)
+- tags: 字符串数组，包含1到3个标签 (如 ["日常", "吐槽"])
+- baseLikes: 随机初始点赞数 (0 到 100)
+- comments: 评论数组。每条包含 author_nickname (评论人昵称) 和 text (评论内容)。随机生成 0 到 5 条评论。
+
+严格输出纯 JSON，不要带 Markdown 标记，示例：
+{
+  "posts": [
+    {
+      "authorName": "用户A",
+      "content": "今天天气真好！",
+      "tags": ["日常"],
+      "baseLikes": 12,
+      "comments": [ {"author_nickname": "用户B", "text": "确实！"} ]
+    }
+  ]
+}`;
+
+        try {
+            let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
+            const isGemini = settings.api.url.includes('generativelanguage');
+            let bodyData, headers = { 'Content-Type': 'application/json' };
+
+            if (isGemini) {
+                fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
+                bodyData = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.9, response_mime_type: "application/json" } });
+            } else {
+                headers['Authorization'] = `Bearer ${settings.api.key}`;
+                bodyData = JSON.stringify({ model: settings.api.model, messages: [{ role: "user", content: prompt }], temperature: 0.9, response_format: { "type": "json_object" } });
+            }
+
+            const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
+            if (!res.ok) throw new Error(`API Error: ${res.status}`);
+            const data = await res.json();
+            
+            let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+            reply = reply.trim();
+            const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
+            if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
+
+            const jsonReply = JSON.parse(reply);
+            const newPosts = jsonReply.posts || [];
+            if (newPosts.length === 0) throw new Error("返回帖子为空");
+
+            let allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+
+            newPosts.forEach((p, i) => {
+                let avatarToUse = "";
+                               const matchedContact = allContacts.find(c => (c.forumNickname || c.alias || c.name) === p.authorName);
+                if (matchedContact && matchedContact.avatar) {
+                    avatarToUse = matchedContact.avatar;
+                } else {
+                    avatarToUse = getRandomCustomAvatar(forumId);
+                }
+
+                let processedComments = [];
+                if (p.comments && Array.isArray(p.comments)) {
+                    processedComments = p.comments.map(c => {
+                        let cAvatar = "";
+                         const cMatched = allContacts.find(contact => (contact.forumNickname || contact.alias || contact.name) === c.author_nickname);
+                        if (cMatched && cMatched.avatar) {
+                            cAvatar = cMatched.avatar;
+                        } else {
+                            cAvatar = getRandomCustomAvatar(forumId);
+                        }
+                        return { ...c, author_avatar: cAvatar };
+                    });
+                }
+
+                allPosts.unshift({
+                    id: Date.now() + i,
+                    forumId: forumId,
+                    content: p.content || '',
+                    images: [], 
+                    authorId: matchedContact ? matchedContact.id : `npc_${Date.now()}_${i}`,
+                    authorName: p.authorName || '匿名用户',
+                    authorAvatar: avatarToUse,
+                    authorXP: Math.floor(Math.random() * 50) + 10,
+                    timestamp: Date.now(),
+                    likes: [],
+                    baseLikes: parseInt(p.baseLikes) || 0,
+                    tags: p.tags || [],
+                    comments: processedComments
+                });
+            });
+
+            localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allPosts));
+            renderForumDetailPosts(forumId);
+            showToast("成功获取新帖子！");
+
+        } catch (e) {
+            console.error("生成帖子失败:", e);
+            showToast("获取新帖子失败，网络或AI罢工了~");
+        } finally {
+            if (refreshBtn) refreshBtn.style.animation = '';
+        }
+    };
+
+
+    // =================== 新增：论坛“我的”主页设置逻辑 ===================
+    window.openForumMeSettings = () => {
+        const forumProfile = getForumUserData();
+        document.getElementById('forum-me-settings-nickname').value = forumProfile.nickname || '';
+        document.getElementById('forum-me-settings-fans').value = forumProfile.fans || '9.8k';
+        document.getElementById('forum-me-settings-avatar-preview').src = forumProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
+        document.getElementById('forum-me-settings-bg-preview').src = forumProfile.backgroundUrl || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1000&q=80';
+        tempForumMeAvatarUrl = forumProfile.avatar || '';
+        tempForumMeBgUrl = forumProfile.backgroundUrl || '';
+        
+        document.getElementById('forum-me-settings-modal').style.display = 'flex';
+        setTimeout(() => document.getElementById('forum-me-settings-modal').classList.add('active'), 10);
+    };
+
+    window.closeForumMeSettings = () => {
+        document.getElementById('forum-me-settings-modal').classList.remove('active');
+        setTimeout(() => document.getElementById('forum-me-settings-modal').style.display = 'none', 300);
+    };
+
+    window.saveForumMeSettings = () => {
+        const forumProfile = getForumUserData();
+        forumProfile.nickname = document.getElementById('forum-me-settings-nickname').value.trim();
+        forumProfile.fans = document.getElementById('forum-me-settings-fans').value.trim();
+        
+        // 如果输入框里有URL，优先采用URL
+        const manualAvatarUrl = document.getElementById('forum-me-settings-avatar-url').value.trim();
+        if (manualAvatarUrl) {
+            forumProfile.avatar = manualAvatarUrl;
+        } else {
+            forumProfile.avatar = tempForumMeAvatarUrl;
+        }
+
+        const manualBgUrl = document.getElementById('forum-me-settings-bg-url').value.trim();
+        if (manualBgUrl) {
+            forumProfile.backgroundUrl = manualBgUrl;
+        } else {
+            forumProfile.backgroundUrl = tempForumMeBgUrl;
+        }
+        
+        saveForumUserData(forumProfile);
+        showToast("论坛个人资料已保存");
+        closeForumMeSettings();
+        // 刷新论坛“我的”页面显示
+        if (document.getElementById('forum-page-me').classList.contains('active')) {
+            renderForumMePage();
+        }
+    };
+
+    // 绑定头像和背景点击上传
+    window.triggerForumMeAvatarUpload = () => { document.getElementById('input-forum-me-avatar').click(); };
+    window.handleForumMeAvatarUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        compressImage(file, 300, (base64) => {
+            tempForumMeAvatarUrl = base64;
+            document.getElementById('forum-me-settings-avatar-preview').src = base64;
+            document.getElementById('forum-me-settings-avatar-url').value = ''; // 清空URL框
+        });
+        event.target.value = '';
+    };
+
+    window.triggerForumMeBgUpload = () => { document.getElementById('input-forum-me-bg').click(); };
+    window.handleForumMeBgUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        compressImage(file, 800, (base64) => {
+            tempForumMeBgUrl = base64;
+            document.getElementById('forum-me-settings-bg-preview').src = base64;
+            document.getElementById('forum-me-settings-bg-url').value = ''; // 清空URL框
+        });
+        event.target.value = '';
+    };
 
     // =================== 新增：帖子收藏与动态交互逻辑 ===================
     const FORUM_FAVORITES_KEY = 'forumFavoritePosts_v1';
+
 
     function getForumFavoritePosts() {
         try { return JSON.parse(localStorage.getItem(FORUM_FAVORITES_KEY) || '[]'); } catch(e) { return []; }
@@ -13145,7 +13966,7 @@ ${postContext}
     };
 
        // =================== 新增：点赞的帖子预览与全屏逻辑 ===================
-    window.renderLikedPostsPreview = () => {
+      window.renderLikedPostsPreview = () => {
         const container = document.getElementById('forum-liked-posts-preview-container');
         if (!container) return;
         container.innerHTML = '';
@@ -13161,8 +13982,9 @@ ${postContext}
             return;
         }
         
-        // 限制展示前4个
-        const previewPosts = likedPosts.slice(0, 4);
+        // 限制展示最多8个，点击“全部”按钮才会跳转查看所有
+        const previewPosts = likedPosts.slice(0, 8);
+
         
         previewPosts.forEach(post => {
             // 获取该帖子所属的论坛名称
@@ -13205,6 +14027,141 @@ ${postContext}
         document.getElementById('forum-all-liked-posts-page').classList.remove('active');
         document.getElementById('forum-all-liked-posts-page').style.transform = 'translateX(100%)';
     };
+    // =================== 新增：论坛“关注的人”页面逻辑 ===================
+    window.openForumFollowingPage = () => {
+        document.getElementById('forum-following-page').classList.add('active');
+        document.getElementById('forum-following-page').style.transform = 'translateX(0)';
+        renderForumFollowingList();
+    };
+
+    window.closeForumFollowingPage = () => {
+        document.getElementById('forum-following-page').classList.remove('active');
+        document.getElementById('forum-following-page').style.transform = 'translateX(100%)';
+    };
+
+       // =================== 论坛“关注的人”与专属昵称逻辑 ===================
+    window.openForumFollowingPage = () => {
+        document.getElementById('forum-following-page').classList.add('active');
+        document.getElementById('forum-following-page').style.transform = 'translateX(0)';
+        renderForumFollowingList();
+    };
+
+    window.closeForumFollowingPage = () => {
+        document.getElementById('forum-following-page').classList.remove('active');
+        document.getElementById('forum-following-page').style.transform = 'translateX(100%)';
+    };
+
+    window.renderForumFollowingList = () => {
+        const container = document.getElementById('forum-following-list-container');
+        container.innerHTML = '';
+        
+        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        
+        if (contacts.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #999; padding: 50px 20px; font-size: 14px;">暂无关注的人</div>';
+            return;
+        }
+
+        contacts.forEach(contact => {
+            // 优先读取论坛专属昵称
+            const name = contact.forumNickname || contact.alias || contact.name || '未知用户';
+            const avatar = contact.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
+            
+            const item = document.createElement('div');
+            item.className = 'forum-following-item';
+            
+            item.innerHTML = `
+                <img src="${avatar}" class="forum-following-avatar">
+                <div class="forum-following-info">
+                    <div class="forum-following-name">${escapeHtml(name)}</div>
+                </div>
+                <div class="forum-following-right-actions">
+                    <button class="forum-following-btn" onclick="event.stopPropagation();">已关注</button>
+                    <!-- 点击三个点触发修改弹窗 -->
+                    <div class="forum-following-dots" onclick="event.stopPropagation(); openEditForumNicknameModal(${contact.id}, '${escapeHtml(name)}')">···</div>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    };
+
+    window.openEditForumNicknameModal = (contactId, currentName) => {
+        document.getElementById('edit-forum-nickname-contact-id').value = contactId;
+        document.getElementById('edit-forum-nickname-input').value = currentName;
+        document.getElementById('edit-forum-nickname-modal').classList.add('active');
+        setTimeout(() => document.getElementById('edit-forum-nickname-input').focus(), 100);
+    };
+
+    window.closeEditForumNicknameModal = () => {
+        document.getElementById('edit-forum-nickname-modal').classList.remove('active');
+    };
+
+    // 保存论坛专属昵称，并全局同步历史帖子与评论
+    window.saveForumNickname = () => {
+        const contactId = parseInt(document.getElementById('edit-forum-nickname-contact-id').value);
+        const newName = document.getElementById('edit-forum-nickname-input').value.trim();
+        if (!newName) {
+            showToast("昵称不能为空");
+            return;
+        }
+
+        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
+        const contactIndex = contacts.findIndex(c => c.id === contactId);
+        if (contactIndex === -1) return;
+        
+        const oldName = contacts[contactIndex].forumNickname || contacts[contactIndex].alias || contacts[contactIndex].name;
+        
+        // 1. 修改通讯录中的论坛专属昵称
+        contacts[contactIndex].forumNickname = newName;
+        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
+        
+        // 2. 遍历并修改大厅所有历史帖子和评论
+        let allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
+        allPosts.forEach(p => {
+            if (p.authorId === contactId) {
+                p.authorName = newName;
+            }
+            if (p.comments && Array.isArray(p.comments)) {
+                p.comments.forEach(c => {
+                    if (c.author_nickname === oldName || c.userId === contactId) {
+                        c.author_nickname = newName;
+                    }
+                });
+            }
+        });
+        localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allPosts));
+        
+        // 3. 遍历并修改收藏库里的帖子和评论
+        const FORUM_FAVORITES_KEY = 'forumFavoritePosts_v1';
+        let favPosts = JSON.parse(localStorage.getItem(FORUM_FAVORITES_KEY) || '[]');
+        favPosts.forEach(p => {
+            if (p.authorId === contactId) {
+                p.authorName = newName;
+            }
+            if (p.comments && Array.isArray(p.comments)) {
+                p.comments.forEach(c => {
+                    if (c.author_nickname === oldName || c.userId === contactId) {
+                        c.author_nickname = newName;
+                    }
+                });
+            }
+        });
+        localStorage.setItem(FORUM_FAVORITES_KEY, JSON.stringify(favPosts));
+
+        showToast("修改成功！历史发帖及评论已同步");
+        closeEditForumNicknameModal();
+        renderForumFollowingList(); // 刷新关注列表UI
+        
+        // 如果当时其他页面恰好开着，顺手静默刷新它们
+        if (document.getElementById('forum-page-planet').classList.contains('active')) {
+            renderAllForumPosts();
+            renderLikedPostsPreview();
+        }
+        if (typeof currentForumDetailId !== 'undefined' && currentForumDetailId) {
+            renderForumDetailPosts(currentForumDetailId);
+        }
+    };
+
 
     window.renderAllLikedPosts = () => {
         const container = document.getElementById('forum-all-liked-posts-area');
@@ -14908,13 +15865,15 @@ ${actionInstruction}
             const avatar = document.createElement('img');
             avatar.src = msg.type === 'sent' ? meAvatar : themAvatar;
             avatar.className = 'msg-bubble-avatar';
-
-                        let contentHtml;
+            let contentHtml;
             if (msg.isTransfer) {
                 contentHtml = createTransferCard(msg);
             } else if (msg.isGift) {
                 // 如果是礼物，渲染我们刚加的粉色盒子
                 contentHtml = createGiftCard(msg);
+            } else if (msg.isTakeoutOrder) {
+                // 新增：如果是外卖订单，渲染外卖卡片
+                contentHtml = createTakeoutMessageCard(msg);
             } else {
                 contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`;
             }
@@ -14922,10 +15881,11 @@ ${actionInstruction}
             const contentElement = document.createRange().createContextualFragment(contentHtml).firstElementChild;
             contentElement.ondblclick = (e) => { 
                 e.stopPropagation(); 
-                // 添加 isGift 参数，让礼物和转账一样不能被编辑文字
-                showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer || msg.isGift); 
+                // 防止外卖卡片被意外编辑导致乱码
+                showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer || msg.isGift || msg.isTakeoutOrder); 
             };
-            // --- 新增：给礼物卡片加单击弹出详情的事件 ---
+
+                     // --- 新增：给礼物卡片加单击弹出详情的事件 ---
             if (msg.isGift) {
                 contentElement.onclick = (e) => {
                     e.stopPropagation();
@@ -14934,8 +15894,17 @@ ${actionInstruction}
                 contentElement.style.cursor = 'pointer';
             }
 
+            // --- 新增：外卖订单卡片点击展开/收起 ---
+            if (msg.isTakeoutOrder) {
+                contentElement.onclick = (e) => {
+                    e.stopPropagation();
+                    contentElement.classList.toggle('expanded');
+                };
+            }
+
             
             if (isMultiSelectMode) {
+
                 row.onclick = (e) => { e.stopPropagation(); toggleMsgSelection(msg.id); };
             }
             
@@ -14961,7 +15930,7 @@ ${actionInstruction}
         }
     };
 
-    function createGiftCard(msg) {
+       function createGiftCard(msg) {
         const item = msg.giftData;
         const name = item.name || '神秘礼物';
         const emoji = item.emoji || '🎁';
@@ -14984,7 +15953,54 @@ ${actionInstruction}
             </div>
         `;
     }
+
+       // ========================= 新增：生成聊天里的外卖卡片 =========================
+    function createTakeoutMessageCard(msg) {
+        const order = msg.takeoutData;
+        const shopName = order.shopName || '美味外卖';
+        const emoji = order.shopEmoji || '🥡';
+        const price = order.totalPrice ? parseFloat(order.totalPrice).toFixed(2) : '0.00';
+        
+        let titleText = msg.type === 'sent' ? '给他下单' : '收到外卖';
+        
+        let dishesHtml = '';
+        let totalItems = 0;
+        if (order.dishes && order.dishes.length > 0) {
+            dishesHtml = order.dishes.map(d => {
+                totalItems += d.quantity;
+                return `
+                <div class="takeout-chat-dish-item">
+                    <span class="takeout-chat-dish-name">${escapeHtml(d.name)}</span>
+                    <span class="takeout-chat-dish-qty">x${d.quantity}</span>
+                </div>`;
+            }).join('');
+        }
+
+        return `
+            <div class="takeout-chat-card">
+                <div class="takeout-chat-card-header">
+                    <img src="https://img.heliar.top/file/1773415285038_叉子勺子_fork-spoon.png" class="takeout-chat-card-icon">
+                    <span class="takeout-chat-card-title">${titleText}</span>
+                </div>
+                <div class="takeout-chat-shop-info">
+                    <div class="takeout-chat-shop-emoji">${emoji}</div>
+                    <div class="takeout-chat-shop-text">
+                        <span class="takeout-chat-shop-name">${escapeHtml(shopName)}</span>
+                        <span class="takeout-chat-price">¥${price}</span>
+                    </div>
+                </div>
+                <div class="takeout-chat-dishes-wrapper">
+                    ${dishesHtml}
+                </div>
+                <div class="takeout-chat-expand-hint">点击展开共 ${totalItems} 件菜品 ▼</div>
+            </div>
+        `;
+    }
+    // ========================= 新增结束 =========================
+
+
     window.openGiftDetailModal = (msg) => {
+
         const item = msg.giftData;
         const titleText = msg.type === 'sent' ? '送给好友的礼物' : '收到的礼物';
         
@@ -16486,9 +17502,10 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             avatar2.style.backgroundImage = `url(${settings.visual.mainAvatar2})`;
         }
         
-        const apps = document.querySelectorAll('.app-item');
-        // [修改] 使用 document.querySelectorAll('.app-item:not(.dock-container .app-item)') 来排除dock栏图标，防止索引错乱
-        const screenApps = document.querySelectorAll('#grid-area .app-item, #dock-area .app-item'); 
+               const apps = document.querySelectorAll('.app-item');
+        // [修改] 将第二页的App也纳入管理范围
+        const screenApps = document.querySelectorAll('#grid-area .app-item, .second-page-grid .app-item, #dock-area .app-item'); 
+
         
         screenApps.forEach((app, index) => {
             const nameEl = app.querySelector('.app-name');
@@ -16520,11 +17537,13 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
                     // 如果只设置了名字没设置图标，需要恢复默认图标内容
                     iconEl.style.backgroundImage = '';
                     // 这里需要一种方式恢复默认的emoji，我们假设ID和默认内容有映射
-                    const defaultIcons = {
+                                    const defaultIcons = {
                         'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '🔮',
                         'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '🥡', 'icon-app8': '💰',
+                        'icon-app9': '🖼️', /* 新增：图库的默认图标 */
                         'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️'
                     };
+
                     if (defaultIcons[appId]) iconEl.innerHTML = defaultIcons[appId];
                 }
             } else {
@@ -16594,12 +17613,11 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
     };
 
 
-        // [修改] 同时更新 renderSettingsAppList 和 resetAppSetting 以使用图标ID
-    function renderSettingsAppList(appSettings) {
+            function renderSettingsAppList(appSettings) {
         const container = document.getElementById('settings-app-list-container');
         container.innerHTML = '';
-        // [修改] 使用更稳定的选择器
-        const screenApps = document.querySelectorAll('#grid-area .app-item, #dock-area .app-item');
+        // [修改] 囊括第二页的 app-item
+        const screenApps = document.querySelectorAll('#grid-area .app-item, .second-page-grid .app-item, #dock-area .app-item');
 
         screenApps.forEach((app) => {
             const nameEl = app.querySelector('.app-name');
@@ -16737,11 +17755,26 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
         }
 
-        let historyStr = recentMsgs.map(m => {
+               let historyStr = recentMsgs.map(m => {
             let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
             if (m.isTransfer) {
                 if (m.type === 'sent') return `[${sender}向${contact.alias || contact.name}转账了 ¥${m.transferData.amount}]`;
                 else return `[${contact.alias || contact.name}向${uName}转账了 ¥${m.transferData.amount}]`;
+            }
+            // --- 新增：让 AI 也能清楚看到你给ta点的外卖订单详情 ---
+            if (m.isTakeoutOrder) {
+                const order = m.takeoutData || {};
+                const shopName = order.shopName || '美味外卖';
+                const price = order.totalPrice ? parseFloat(order.totalPrice).toFixed(2) : '未知';
+                let dishesDesc = '';
+                if (order.dishes && order.dishes.length > 0) {
+                    dishesDesc = order.dishes.map(d => `${d.name} x${d.quantity}`).join('，');
+                }
+                if (m.type === 'sent') {
+                    return `[系统提示：${sender} 给 ${contact.alias || contact.name} 点了一份外卖投喂！店铺：${shopName}，总价：¥${price}，菜品包含：${dishesDesc}]`;
+                } else {
+                    return `[系统提示：${contact.alias || contact.name} 给 ${uName} 点了一份外卖投喂！店铺：${shopName}，总价：¥${price}，菜品包含：${dishesDesc}]`;
+                }
             }
             // --- 新增：让 AI 也能清楚看到你送的礼物具体是什么 ---
             if (m.isGift) {
@@ -17093,13 +18126,15 @@ ${timeContext}
         const globalProfile = getUserProfile();
         const uName = contact.userName || globalProfile.nickname || "User";
 
-        let historyStr = recentMsgs.map(m => {
+              let historyStr = recentMsgs.map(m => {
             let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
             if (m.type === 'recalled') return `[系统提示：撤回了一条消息]`;
             if (m.isTransfer) return `[系统提示：一笔转账]`;
             if (m.isGift) return `[系统提示：送出或收到了一件礼物]`;
+            if (m.isTakeoutOrder) return `[系统提示：送出或收到了一份外卖投喂]`;
             return `${sender}: ${m.text}`;
         }).join('\n');
+
         // --- 新增结束 ---
         
         const sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
