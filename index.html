@@ -6426,7 +6426,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 
     </div>
 
-    <div id="dock-area">
+        <div id="dock-area">
         <div class="dock-container">
             <div class="app-item" onclick="showSettingsPage()"><div class="app-icon dock-icon" id="icon-dock-settings">⚙️</div></div>
             <div class="app-item" onclick="openAIChat()"><div class="app-icon dock-icon" id="icon-dock-ai">🤖</div></div>
@@ -6436,15 +6436,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     </div>
 </div>
 
-    <div id="dock-area">
-        <div class="dock-container">
-            <div class="app-item" onclick="showSettingsPage()"><div class="app-icon dock-icon" id="icon-dock-settings">⚙️</div></div>
-            <div class="app-item" onclick="openAIChat()"><div class="app-icon dock-icon" id="icon-dock-ai">🤖</div></div>
-            <div class="app-item"><div class="app-icon dock-icon" id="icon-dock-safari">🧭</div></div>
-            <div class="app-item"><div class="app-icon dock-icon" id="icon-dock-messages">✉️</div></div>
-        </div>
-    </div>
-</div>
+<!-- Chat App 页面 -->
 
 <!-- Chat App 页面 -->
 <div id="chat-app-page">
@@ -19504,14 +19496,15 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
             lockScreen.style.transition = 'none'; // 拖动时去掉过渡，跟手
         });
 
-        lockScreen.addEventListener('touchmove', (e) => {
+                lockScreen.addEventListener('touchmove', (e) => {
             if (!isDraggingLs) return;
+            e.preventDefault(); // 阻止浏览器默认的网页滑动行为
             let currentY = e.touches[0].clientY;
             let diff = currentY - lsStartY;
             if (diff < 0) { // 只能往上拉
                 lockScreen.style.transform = `translateY(${diff}px)`;
             }
-        });
+        }, { passive: false }); // 确保能成功拦截滑动
 
         lockScreen.addEventListener('touchend', (e) => {
             if (!isDraggingLs) return;
