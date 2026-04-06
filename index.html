@@ -6922,19 +6922,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 </div>
             </div>
         </div>
-        <!-- 新增：全局字体设置 -->
-        <div class="settings-module">
-            <h3>全局字体设置</h3>
-            <div class="settings-row">
-                <label for="global-font-url">字体链接 (.ttf, .otf, .woff 等)</label>
-                <input type="text" id="global-font-url" placeholder="例如: https://image.uglycat.cc/rra3ux.ttf" oninput="applyFontPreview(this.value.trim())">
-            </div>
-            <div id="font-preview-area" style="font-size: 16px; margin-top: 10px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 1px dashed #ddd; text-align: center; color: #333; word-break: break-all;">
-                圈圈机喜欢你 Quanquan phone love you
-            </div>
-            <style id="preview-font-style"></style>
-        </div>
-
                 <div class="settings-module">
             <h3>界面美化</h3>
             <div class="settings-row">
@@ -7152,8 +7139,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 </div>
                 <div class="forum-section-more" onclick="showAllLikedPosts()">全部 ></div>
             </div>
-                        <div id="forum-liked-posts-preview-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 20px 20px;">
-                <!-- 点赞的帖子长方形小巧卡片会在这里动态生成 -->
+            <div id="forum-liked-posts-preview-container" style="display: flex; flex-direction: column; gap: 12px; padding: 0 20px 20px;">
+                <!-- 点赞的帖子长方形卡片会在这里动态生成 -->
             </div>
 
 
@@ -7367,71 +7354,61 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     body.phone-frame-active #forum-all-forums-header, body.tablet-mode-active #forum-all-forums-header,
     body.phone-frame-active #forum-favorite-posts-header, body.tablet-mode-active #forum-favorite-posts-header,
     body.phone-frame-active #forum-all-liked-posts-header, body.tablet-mode-active #forum-all-liked-posts-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
-    /* like的帖子 长方形预览区样式 (双列精简版) */
+
+    /* like的帖子 长方形预览区样式 */
     .forum-liked-post-card {
         background-color: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(200, 150, 160, 0.08);
-        padding: 10px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(200, 150, 160, 0.08);
+        padding: 15px;
         cursor: pointer;
         transition: transform 0.2s;
         display: flex;
         flex-direction: column;
-        gap: 6px; /* 内部间距缩小 */
-        min-width: 0;
+        gap: 10px;
     }
-    .forum-liked-post-card:active { transform: scale(0.96); }
+    .forum-liked-post-card:active { transform: scale(0.98); }
     .forum-liked-post-header {
         display: flex;
         align-items: center;
-        gap: 6px;
-        overflow: hidden;
+        gap: 10px;
     }
     .forum-liked-post-avatar {
-        width: 24px; /* 头像大幅缩小 */
-        height: 24px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         object-fit: cover;
-        flex-shrink: 0;
     }
     .forum-liked-post-info {
         display: flex;
         flex-direction: column;
-        min-width: 0; /* 关键：防止名字过长撑破卡片 */
     }
     .forum-liked-post-nickname {
-        font-size: 12px; /* 字号缩小 */
+        font-size: 14px;
         font-weight: 600;
         color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
     .forum-liked-post-forum-name {
-        font-size: 10px; /* 字号极小 */
-        color: #999; 
-        margin-top: 1px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 11px;
+        color: #999; /* 浅色字体 */
+        margin-top: 2px;
     }
     .forum-liked-post-content {
-        font-size: 11px; /* 内容字号缩小 */
+        font-size: 14px;
         color: #444;
         display: -webkit-box;
-        -webkit-line-clamp: 2; 
+        -webkit-line-clamp: 2; /* 最多显示两行文字 */
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
-        line-height: 1.4;
+        line-height: 1.5;
     }
     .forum-liked-post-image-preview {
         width: 100%;
-        height: 70px; /* 图片高度砍半 */
-        border-radius: 8px;
+        height: 120px;
+        border-radius: 10px;
         object-fit: cover;
     }
-
 </style>
 
 
@@ -16271,18 +16248,11 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             document.getElementById('wallpaper-url').value = settings.visual.wallpaper || '';
             if(settings.visual.wallpaper) document.getElementById('wallpaper-preview').style.backgroundImage = `url(${settings.visual.wallpaper})`;
             document.getElementById('main-avatar1-url').value = settings.visual.mainAvatar1 || '';
-                      if(settings.visual.mainAvatar1) document.getElementById('main-avatar1-preview').style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
+            if(settings.visual.mainAvatar1) document.getElementById('main-avatar1-preview').style.backgroundImage = `url(${settings.visual.mainAvatar1})`;
             document.getElementById('main-avatar2-url').value = settings.visual.mainAvatar2 || '';
             if(settings.visual.mainAvatar2) document.getElementById('main-avatar2-preview').style.backgroundImage = `url(${settings.visual.mainAvatar2})`;
             document.getElementById('clock-color-input').value = settings.visual.clockColor || '#FFFFFF';
-            
-            // 回显字体设置并触发预览
-            if (document.getElementById('global-font-url')) {
-                document.getElementById('global-font-url').value = settings.visual.globalFontUrl || '';
-                window.applyFontPreview(settings.visual.globalFontUrl || '');
-            }
         }
-
                 renderSettingsAppList(settings.apps || {});
         body.classList.add('settings-active'); // 修改了这里
         
@@ -16335,17 +16305,11 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             temp: parseFloat(document.getElementById('temp-slider').value)
         };
                         settings.visual = settings.visual || {};
-            settings.visual.wallpaper = document.getElementById('wallpaper-url').value.trim();
+        settings.visual.wallpaper = document.getElementById('wallpaper-url').value.trim();
         settings.visual.mainAvatar1 = document.getElementById('main-avatar1-url').value.trim();
         settings.visual.mainAvatar2 = document.getElementById('main-avatar2-url').value.trim();
         settings.visual.clockColor = document.getElementById('clock-color-input').value.trim();
-        settings.visual.lockWallpaper = document.getElementById('lock-wallpaper-url').value.trim();
-        
-        // 抓取并保存字体链接
-        if (document.getElementById('global-font-url')) {
-            settings.visual.globalFontUrl = document.getElementById('global-font-url').value.trim();
-        }
-
+                settings.visual.lockWallpaper = document.getElementById('lock-wallpaper-url').value.trim();
         localStorage.setItem(LOCK_PWD_ENABLED_KEY, document.getElementById('lock-pwd-switch').checked);
         localStorage.setItem(LOCK_PWD_VALUE_KEY, document.getElementById('lock-pwd-input').value.trim());
                 localStorage.setItem(ALL_SETTINGS_KEY, JSON.stringify(settings));
@@ -16540,7 +16504,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             }
         });
 
-             if (settings.visual?.photoWidget) {
+        if (settings.visual?.photoWidget) {
             document.getElementById('photo-widget-img').src = settings.visual.photoWidget;
             document.getElementById('photo-widget-img').style.display = 'block';
             document.getElementById('photo-widget-placeholder').style.display = 'none';
@@ -16548,50 +16512,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
 
         const clockColor = settings.visual?.clockColor || '#FFFFFF';
         document.documentElement.style.setProperty('--clock-text-color', clockColor);
-
-        // ==== 核心：应用全局自定义字体 ====
-        const fontUrl = settings.visual?.globalFontUrl || '';
-        let fontStyleTag = document.getElementById('dynamic-global-font');
-        if (!fontStyleTag) {
-            fontStyleTag = document.createElement('style');
-            fontStyleTag.id = 'dynamic-global-font';
-            document.head.appendChild(fontStyleTag);
-        }
-        if (fontUrl) {
-            // 使用 * 选择器配合 !important 强制覆盖系统所有角落的字体
-            fontStyleTag.innerHTML = `
-                @font-face {
-                    font-family: 'CustomGlobalFont';
-                    src: url('${fontUrl}');
-                }
-                body * {
-                    font-family: 'CustomGlobalFont', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif !important;
-                }
-            `;
-        } else {
-            fontStyleTag.innerHTML = '';
-        }
     }
-
-    // ==== 辅助：实时预览字体函数 ====
-    window.applyFontPreview = (url) => {
-        const styleTag = document.getElementById('preview-font-style');
-        if (!styleTag) return;
-        if (url) {
-            styleTag.innerHTML = `
-                @font-face {
-                    font-family: 'PreviewFontTemp';
-                    src: url('${url}');
-                }
-                #font-preview-area {
-                    font-family: 'PreviewFontTemp' !important;
-                }
-            `;
-        } else {
-            styleTag.innerHTML = '';
-        }
-    };
-
 
         // [修改] 同时更新 renderSettingsAppList 和 resetAppSetting 以使用图标ID
     function renderSettingsAppList(appSettings) {
