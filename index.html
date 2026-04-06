@@ -221,23 +221,28 @@
             --takeout-border-radius-l: 20px;
             --takeout-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
-        * {
-             box-sizing: border-box;
+            html, body {
+             width: 100%;
+             height: 100vh; /* 兜底方案 */
+             height: 100dvh; /* 适配安卓动态导航栏，解决高度截断跳动 */
+             overflow: hidden;
              margin: 0;
              padding: 0;
+             background-color: #000; /* 防止滚动漏底导致闪屏 */
+        }
+        * {
+             box-sizing: border-box;
              user-select: none;
              -webkit-tap-highlight-color: transparent;
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
         body {
-             width: 100vw;
-             height: 100vh;
-             overflow: hidden;
              background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
              position: relative;
              transition: background-image 0.3s ease-in-out;
-            z-index: -2;
+             /* 🚨 移除有毒的 z-index: -2，解决安卓大面积内容展示不全的问题 */
         }
+
         #home-screen {
              width: 100%;
              height: 100%;
@@ -253,12 +258,14 @@
         body.forum-active #home-screen,
         body.recollection-active #home-screen,
         body.mall-active #home-screen,
-        body.takeout-active #home-screen,
-        body.gallery-active #home-screen { /* <-- 新增图库App */
+             body.takeout-active #home-screen,
+        body.gallery-active #home-screen,
+        body.hushhh-active #home-screen { /* <-- 新增神秘App */
              opacity: 0;
              transform: scale(0.95);
              pointer-events: none;
          }
+
 
         /* --- 时间区域 --- */
         #time-section {
@@ -317,16 +324,15 @@
             display: flex;
             flex-direction: column;
         }
-         .second-page-grid {
+        .second-page-grid {
             width: 100%;
             max-width: 600px;
-            margin: auto; /* 修改这里：将 0 auto 改为 auto，它会在上下方向自动完美居中 */
+            margin: 0 auto;
             padding: 0 25px 10px 25px; 
             display: flex;
             justify-content: flex-start;
             gap: 20px;
         }
-
 
         #grid-area {
              flex: 1;
@@ -824,11 +830,11 @@
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-                 /* ========================= 全新模拟声波语音条样式 ========================= */
+              /* ========================= 微信同款语音条样式 ========================= */
         .voice-bubble-content {
             display: flex;
             align-items: center;
-            padding: 10px 16px;
+            padding: 12px 16px;
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
@@ -838,47 +844,22 @@
             border-radius: 18px 18px 18px 4px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             position: relative;
-            min-height: 44px; /* 保证语音条有基础厚度 */
         }
-        
-        .msg-bubble-row.me .voice-bubble-content {
-            background: #fcc0d7;
-            color: white;
-            border-radius: 18px 18px 4px 18px;
+        .voice-icon-svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+            margin-right: 6px;
         }
-
-        /* 容纳声波竖线的容器 */
-        .voice-wave-container {
-            display: flex;
-            align-items: center;
-            gap: 3px; /* 竖线之间的间距 */
-            height: 20px;
-            flex: 1;
-            overflow: hidden;
+        .voice-icon-svg.playing .voice-wave-2 {
+            animation: wxVoice2 1s infinite step-start;
         }
-
-        /* 单根声波竖线 */
-        .voice-bar {
-            width: 3px;
-            height: 14px;
-            background-color: currentColor; /* 颜色自动跟随父级(对方黑色，自己白色) */
-            border-radius: 2px;
-            opacity: 0.6; /* 静止时稍微半透明 */
-            transition: all 0.3s ease;
+        .voice-icon-svg.playing .voice-wave-3 {
+            animation: wxVoice3 1s infinite step-start;
         }
-
-        /* 正在播放时的动画触发 */
-        .voice-bubble-content.playing .voice-bar {
-            opacity: 1; /* 播放时高亮 */
-            animation: soundWave 0.5s infinite alternate ease-in-out;
-        }
-
-        /* 声波跳动动画：只做Y轴缩放，不改变DOM高度，性能最好且顺滑 */
-        @keyframes soundWave {
-            0% { transform: scaleY(0.2); }
-            100% { transform: scaleY(1.4); }
-        }
-        /* ========================= 模拟声波语音样式结束 ========================= */
+        @keyframes wxVoice2 { 0% { opacity: 0; } 33% { opacity: 1; } 100% { opacity: 1; } }
+        @keyframes wxVoice3 { 0% { opacity: 0; } 66% { opacity: 1; } 100% { opacity: 1; } }
+        /* ========================= 微信语音样式结束 ========================= */
 
         /* --- 美化后的气泡菜单 (粉白圆滑风格) --- */
 
@@ -4297,14 +4278,24 @@
             transform: translateY(0);
         }
         
-       /* --- 手机外框 - 新增与修改 --- */
+            /* --- 手机外框 - 新增与修改 --- */
         #app-wrapper {
           width: 100%;
           height: 100%;
-          position: relative;
+          position: absolute; /* 改为绝对定位，彻底脱离文档流更稳定 */
+          top: 0;
+          left: 0;
           background-size: cover;
           background-position: center;
+          /* 🚨 强制开启 GPU 硬件加速，彻底解决安卓因毛玻璃和动画引起的闪屏黑屏问题 */
+          transform: translateZ(0); 
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          perspective: 1000;
+          -webkit-perspective: 1000;
         }
+
         
         body.phone-frame-active #home-screen {
             padding-top: var(--status-bar-height);
@@ -6026,7 +6017,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         body.phone-frame-active .forum-post-detail-header, body.tablet-mode-active .forum-post-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
         
               .forum-post-detail-title { font-size: 17px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
-             .forum-detail-main-scroll { flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; /* 新增：给底部的输入框留出空间 */ }
+        .forum-detail-main-scroll { flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
         .post-detail-comments-title { font-size: 15px; font-weight: bold; color: #333; padding-left: 5px; border-left: 4px solid var(--theme-pink-btn); margin-top: 5px; margin-bottom: 5px; }
 
               /* ========================= 新增：外卖订单发送到聊天的卡片样式 ========================= */
@@ -6305,58 +6296,123 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .gallery-grid.manage-mode .gallery-photo-wrapper { animation: jiggle 0.3s infinite; }
         .gallery-grid.manage-mode .gallery-photo-item { border: 2px solid #F44336; }
 
-        /* 2. 顶部相册种类的管理模式样式 */
+           /* 2. 顶部相册种类的管理模式样式 */
         .gallery-albums-capsule.manage-mode .gallery-photo-delete-btn { display: flex; }
         .gallery-albums-capsule.manage-mode .gallery-album-wrapper { animation: jiggle 0.3s infinite; }
         /* ========================= 图库样式结束 ========================= */
-        /* ========================= 新增：帖子详情页底部评论输入框 ========================= */
-        .forum-comment-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #f7f7f7;
-            padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 0px));
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
-            border-top: 1px solid #eee;
-            z-index: 901; /* 保证它在内容上层 */
-        }
 
-        #forum-comment-input {
-            flex: 1;
-            height: 40px;
-            padding: 0 15px;
-            border-radius: 20px;
-            border: 1px solid #EAEAEA;
-            background-color: #FCFCFC;
-            font-size: 15px;
-            outline: none;
+        /* ========================= hushhh App 样式 (大卡片画廊版) ========================= */
+        #hushhh-app-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #FFF8FA; /* 极浅的可爱粉色背景 */
+            z-index: 650;
+            display: flex; flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             color: #333;
         }
-        #forum-comment-input:focus {
-            border-color: var(--theme-pink-btn);
+        body.hushhh-active #hushhh-app-page { transform: translateY(0); }
+        
+        /* 悬浮返回按钮，取代传统顶栏 */
+        .hushhh-float-back-btn {
+            position: absolute; top: 15px; left: 20px;
+            width: 36px; height: 36px; background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.2);
+            z-index: 100; cursor: pointer;
+        }
+        body.ios-mode-active .hushhh-float-back-btn { top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.phone-frame-active .hushhh-float-back-btn, 
+        body.tablet-mode-active .hushhh-float-back-btn { top: calc(15px + var(--status-bar-height)); }
+
+        /* 发光提示文字 */
+        .hushhh-glow-text {
+            text-align: center; font-size: 19px; font-weight: bold; color: #ff8fb3;
+            margin-top: calc(env(safe-area-inset-top, 20px) + 70px);
+            text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.3);
+            animation: pulse-glow 2s infinite ease-in-out;
+            flex-shrink: 0;
+        }
+        body.phone-frame-active .hushhh-glow-text, 
+        body.tablet-mode-active .hushhh-glow-text { margin-top: calc(80px + var(--status-bar-height)); }
+
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.3); transform: scale(1); }
+            50% { text-shadow: 0 0 15px rgba(255, 143, 179, 0.8), 0 0 30px rgba(255, 143, 179, 0.5); transform: scale(1.02); }
         }
 
-        #forum-comment-submit-btn {
-            border: none;
-            background: var(--theme-pink-btn);
-            color: white;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 20px;
-            white-space: nowrap;
+        /* 横向滑动的大卡片画廊 */
+        .hushhh-slider-container {
+            flex: 1; display: flex; align-items: center; overflow-x: auto;
+            scroll-snap-type: x mandatory; padding: 0 15vw; gap: 20px;
+            scrollbar-width: none;
         }
+        .hushhh-slider-container::-webkit-scrollbar { display: none; }
 
-        .comment-reply-tag {
-            color: var(--link-blue);
-            font-weight: 500;
-            margin-right: 4px;
+        .hushhh-card {
+            min-width: 75vw; max-width: 320px; height: 60vh; max-height: 500px;
+            background: #fff; border-radius: 35px; scroll-snap-align: center;
+            position: relative; overflow: hidden; flex-shrink: 0;
+            box-shadow: 0 15px 35px rgba(229, 138, 171, 0.25);
         }
+        
+        .hushhh-card-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 40%;
+            transition: background-color 0.3s; cursor: pointer;
+        }
+        .hushhh-card-content {
+            position: absolute; top: 40%; left: 0; width: 100%; height: 60%;
+            display: flex; flex-direction: column; align-items: center; padding-top: 10px;
+        }
+        
+        .hushhh-card-avatar {
+            width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
+            border: 6px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: -65px; background: #eee; z-index: 10;
+        }
+        .hushhh-card-name {
+            font-size: 22px; font-weight: bold; color: #333; margin-top: 15px;
+        }
+        .hushhh-card-eye-btn {
+            margin-top: auto; margin-bottom: 25px; cursor: pointer;
+            padding: 10px; border-radius: 50%;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .hushhh-card-eye-btn:active { transform: scale(0.9); background: #fff0f5; }
+
+        /* 放大版假手机界面容器 */
+        .hushhh-fake-phone-container {
+            flex: 1; display: flex; justify-content: center; align-items: center; 
+            padding: 20px; position: relative;
+        }
+        /* 放大的手机外壳 */
+        .hushhh-fake-phone {
+            width: 90vw; max-width: 420px; height: 85vh; max-height: 850px;
+            background: #fff; border: 12px solid #ffe6ee; 
+            border-radius: 50px; 
+            padding: 90px 25px 20px; /* 顶部距离加大到 90px，远远避开刘海 */
+            box-shadow: 0 15px 40px rgba(229, 138, 171, 0.4);
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 80px; gap: 15px; align-content: start;
+            position: relative; overflow: hidden;
+        }
+        /* 手机上的刘海 */
+        .hushhh-fake-phone::before {
+            content: ''; position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 30px; background: #ffe6ee; border-radius: 15px; z-index: 10;
+        }
+        
+        .hushhh-fake-app { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; z-index: 5; }
+        .hushhh-fake-app-icon {
+            width: 55px; height: 55px; border-radius: 18px;
+            background: #fdfafb; border: 1px solid #ffeff4;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .hushhh-fake-app:active .hushhh-fake-app-icon { transform: scale(0.9); }
+        .hushhh-fake-app-name { font-size: 12px; color: #555; font-weight: 500; }
+        /* ========================= hushhh App 样式结束 ========================= */
 
     </style>
 
@@ -6466,11 +6522,13 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                         <div class="app-item" onclick="openRecollectionApp()"><div class="app-icon" id="icon-app4">🔮</div><span class="app-name" data-app-name="备忘录">备忘录</span></div>
                     </div>
                 </div>
-                <div class="grid-quadrant">
+                  <div class="grid-quadrant">
                     <div class="app-group-2x2">
-                        <div class="app-item"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
+                        <!-- 只加了 onclick="openHushhhApp()"，不改图标和颜色 -->
+                        <div class="app-item" onclick="openHushhhApp()"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
                         <div class="app-item" onclick="openMallApp()"><div class="app-icon" id="icon-app6">🎮</div><span class="app-name" data-app-name="商城">商城</span></div>
-                        <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
+
+                <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
                         <div class="app-item" onclick="openWalletApp()"><div class="app-icon" id="icon-app8">💰</div><span class="app-name" data-app-name="Wallet">Wallet</span></div>
                     </div>
                 </div>
@@ -6714,19 +6772,19 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <input type="number" id="role-memory-depth" placeholder="10" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
         </div>
 
-        <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px; margin-top: 15px;">
+             <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px; margin-top: 15px;">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <span style="font-size:13px; color:#555;">聊天背景</span>
                 <div id="role-bg-preview" class="role-bg-preview"></div>
             </div>
             <input type="text" id="role-bg-url-input" placeholder="输入背景图片URL" style="width: 100%; padding: 10px; border: 1px solid #FADBE6; border-radius: 8px; font-size: 14px;">
-            <div style="display: flex; gap: 10px;">
-                <button class="role-bg-btn" onclick="triggerRoleBgUpload()">上传图片</button>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="role-bg-btn" onclick="setRoleBgByUrl()">应用URL</button>
             </div>
         </div>
+
     </div>
-      <div class="settings-section-card">
+    <div class="settings-section-card">
         <div class="settings-card-title">角色世界书</div>
         <div class="role-wb-binding-area">
             <div id="role-wb-display" class="unbound">未绑定</div>
@@ -6736,31 +6794,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </div>
         </div>
     </div>
-       <!-- 新增：专属表情包绑定卡片 -->
-    <div class="settings-section-card">
-        <div class="settings-card-title">专属表情包(图库)</div>
-        <div class="role-wb-binding-area">
-            <div id="role-album-display" class="unbound">未绑定相册</div>
-            <div class="actions">
-                <button id="role-album-clear-btn" onclick="clearAlbumBinding()" style="display: none;">清除</button>
-                <button onclick="openRoleAlbumBindModal()">选择</button>
-            </div>
-        </div>
-        <!-- 新增：表情包发送频率设置 -->
-        <div class="settings-row" style="width:100%; padding: 10px 5px 0 5px; border-top: 1px solid #f0f0f0; margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-            <label style="margin-bottom:0;">发表情包频率</label>
-            <select id="role-emotion-freq" style="width: 120px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center; background:#fff; outline:none;">
-                <option value="none">不发(默认)</option>
-                <option value="high">高(几乎每轮)</option>
-                <option value="medium">中(4-8轮/次)</option>
-                <option value="low">低(10-15轮/次)</option>
-            </select>
-        </div>
-    </div>
-
     <div class="settings-section-card">
         <div class="settings-card-title">用户设置 (User)</div>
-
         <div class="user-avatar-row">
             <div class="user-avatar-edit-wrapper" onclick="triggerRoleUserAvatarEdit()">
                 <img id="role-user-avatar" class="role-avatar-edit" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png">
@@ -6806,7 +6841,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 
-      <!-- === 新增：自动撤回设置卡片 === -->
+    <!-- === 新增：自动撤回设置卡片 === -->
     <div class="settings-section-card">
         <div class="settings-card-title">自动撤回消息设置</div>
         <div class="settings-row" style="width:100%; padding: 10px 5px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
@@ -6834,20 +6869,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 <span style="color:#888;">-</span>
                 <input type="number" id="role-recall-max" placeholder="50" style="width: 55px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
             </div>
-        </div>
-    </div>
-    <!-- === 新增结束 === -->
-
-    <!-- === 新增：专属语音设置 === -->
-    <div class="settings-section-card">
-        <div class="settings-card-title">专属语音设置 (Minimax)</div>
-        <div class="settings-row" style="width:100%; padding: 10px 5px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-            <label for="role-voice-id" style="margin-bottom:0;">音色 ID (Voice ID)</label>
-            <input type="text" id="role-voice-id" placeholder="例如: male-qn-qingse" style="width: 150px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
-        </div>
-        <div style="font-size: 11px; color: #888; width: 100%; margin-top: 5px; padding: 0 5px; line-height: 1.5;">
-            * 此功能需先在主页设置中配好 Minimax 的 Key 与模型。<br>
-            * 配置音色ID后，点击它的语音条即可发声播放。
         </div>
     </div>
     <!-- === 新增结束 === -->
@@ -7720,7 +7741,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </div>
         </div>
         
-              <div class="settings-module">
+        <div class="settings-module">
             <h3>AI 参数设置</h3>
             <div class="settings-row">
                 <label>回答温度 (Temperature)</label>
@@ -7730,34 +7751,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 </div>
             </div>
         </div>
-        
-        <!-- 新增：语音条设置 (Minimax) -->
-        <div class="settings-module">
-            <h3>语音条设置 (Minimax)</h3>
-            <div class="settings-row">
-                <label for="minimax-group-id-input">Group ID</label>
-                <input type="text" id="minimax-group-id-input" placeholder="输入您的 Group ID">
-            </div>
-            <div class="settings-row">
-                <label for="minimax-api-key-input">API Key</label>
-                <input type="password" id="minimax-api-key-input" placeholder="输入您的 API Key">
-            </div>
-            <div class="settings-row">
-                <label>模型选择</label>
-                <div class="api-control-wrapper">
-                    <div class="api-control-buttons">
-                        <button id="fetch-minimax-models-btn">拉取模型</button>
-                    </div>
-                    <div class="select-wrapper" id="minimax-model-select-wrapper" style="display: none; margin-top: 10px;">
-                        <select id="minimax-model-select"></select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- 新增：全局字体设置 -->
         <div class="settings-module">
-
             <h3>全局字体设置</h3>
             <div class="settings-row">
                 <label for="global-font-url">字体链接 (.ttf, .otf, .woff 等)</label>
@@ -7842,9 +7837,57 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
+<!-- ========================= hushhh App HTML ========================= -->
+<div id="hushhh-app-page">
+    <!-- 视图1：滑动选择好友卡片 -->
+    <div id="hushhh-view-list" style="display: flex; flex-direction: column; height: 100%; position: relative;">
+        <!-- 悬浮返回按钮，去掉原来占位置的顶栏 -->
+        <div class="hushhh-float-back-btn" onclick="closeHushhhApp()">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" style="width: 20px; height: 20px; object-fit: contain;">
+        </div>
+        
+        <!-- 发光文字移到了这里 -->
+        <div class="hushhh-glow-text">选择查看哪位好友的手机？</div>
+        
+        <!-- 横向滑动的大卡片画廊容器 -->
+        <div class="hushhh-slider-container" id="hushhh-friend-list">
+            <!-- 好友卡片会由JS生成到这里 -->
+        </div>
+    </div>
+
+    <!-- 视图2：目标的手机界面 -->
+    <div id="hushhh-view-target" style="display: none; flex-direction: column; height: 100%; position: relative;">
+        <div class="hushhh-float-back-btn" onclick="backToHushhhList()">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" style="width: 20px; height: 20px; object-fit: contain;">
+        </div>
+        
+        <div class="hushhh-fake-phone-container">
+            <div class="hushhh-fake-phone" id="hushhh-fake-phone-screen">
+                <!-- 模拟对方的手机壁纸层 -->
+                <div id="hushhh-target-wallpaper" style="position: absolute; top:0; left:0; width:100%; height:100%; background: #f9f9f9; background-size: cover; background-position: center; opacity: 0.3; z-index: 0;"></div>
+                
+                <!-- 假手机上面的App -->
+                <div class="hushhh-fake-app" onclick="showToast('相册已被上锁哦~')">
+                    <div class="hushhh-fake-app-icon">🖼️</div><div class="hushhh-fake-app-name">照片</div>
+                </div>
+                <div class="hushhh-fake-app" onclick="showToast('微信聊天记录需要密码')">
+                    <div class="hushhh-fake-app-icon" style="background:#e8f5e9;">💬</div><div class="hushhh-fake-app-name">微信</div>
+                </div>
+                <div class="hushhh-fake-app" onclick="showToast('备忘录空空如也')">
+                    <div class="hushhh-fake-app-icon" style="background:#fffde7;">📝</div><div class="hushhh-fake-app-name">备忘录</div>
+                </div>
+                <div class="hushhh-fake-app" onclick="showToast('浏览器历史记录被清空了')">
+                    <div class="hushhh-fake-app-icon" style="background:#e3f2fd;">🧭</div><div class="hushhh-fake-app-name">Safari</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ========================= hushhh HTML 结束 ========================= -->
 
 <div id="toast-notification"></div>
 <!-- 礼物详情弹窗 -->
+
 <div id="gift-detail-overlay" onclick="closeGiftDetailModal()">
     <div class="gift-detail-card" onclick="event.stopPropagation()">
         <img src="https://img.heliar.top/file/1770767041294_关闭_close-one_2.png" class="gift-detail-close" onclick="closeGiftDetailModal()">
@@ -8190,20 +8233,9 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <!-- 关注列表渲染在这里 -->
         </div>
     </div>
-    <!-- 新增：论坛角色的个人主页 -->
-    <div id="forum-user-profile-page">
-        <div class="forum-user-profile-top">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-user-profile-back" onclick="closeForumUserProfilePage()">
-            <img id="forum-user-profile-avatar" class="forum-user-profile-avatar" src="">
-            <div id="forum-user-profile-name" class="forum-user-profile-name">名字</div>
-            <div id="forum-user-profile-signature" class="forum-user-profile-signature">签名</div>
-        </div>
-        <div id="forum-user-posts-area">
-            <!-- 帖子渲染在此 -->
-        </div>
-    </div>
 
-       <!-- 新增：帖子详情与评论页 -->
+    <!-- 新增：帖子详情与评论页 -->
+
     <div id="forum-post-detail-page">
         <div class="forum-post-detail-header">
             <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumPostDetail()">
@@ -8216,14 +8248,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         <div class="forum-detail-main-scroll" id="forum-post-detail-content">
             <!-- 动态渲染帖子主体和评论列表 -->
         </div>
-        <!-- ====================== ↓↓↓ 新增的代码块 ↓↓↓ ====================== -->
-        <div class="forum-comment-footer">
-            <input type="text" id="forum-comment-input" placeholder="留下你的精彩评论吧~" onkeydown="if(event.key === 'Enter') submitForumComment()">
-            <button id="forum-comment-submit-btn" onclick="submitForumComment()">发送</button>
-        </div>
-        <!-- ====================== ↑↑↑ 新增的代码块 ↑↑↑ ====================== -->
     </div>
-
 
 <!-- 新增：为我的帖子页单独添加顶部安全区适配 -->
 <style>
@@ -8267,56 +8292,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         box-shadow: 0 2px 10px rgba(200, 150, 160, 0.04);
         gap: 12px;
     }
-    /* ========================= 新增：论坛角色个人主页 ========================= */
-    #forum-user-profile-page {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background-color: #FFF5F7; z-index: 900;
-        display: flex; flex-direction: column;
-        transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-    }
-    #forum-user-profile-page.active { transform: translateX(0); }
-
-    .forum-user-profile-top {
-        background-color: #fff;
-        border-radius: 0 0 24px 24px;
-        box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);
-        padding: 15px 20px 25px;
-        display: flex; flex-direction: column; align-items: center;
-        position: relative; flex-shrink: 0;
-    }
-    body.ios-mode-active .forum-user-profile-top { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-    body.phone-frame-active .forum-user-profile-top, body.tablet-mode-active .forum-user-profile-top { padding-top: calc(15px + var(--status-bar-height)); }
-
-    .forum-user-profile-back {
-        position: absolute; left: 15px; top: 15px; width: 30px; height: 30px; object-fit: contain; cursor: pointer;
-    }
-    body.ios-mode-active .forum-user-profile-back { top: calc(env(safe-area-inset-top, 20px) + 15px); }
-    body.phone-frame-active .forum-user-profile-back, body.tablet-mode-active .forum-user-profile-back { top: calc(15px + var(--status-bar-height)); }
-
-    .forum-user-profile-avatar {
-        width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #FFF5F7; box-shadow: 0 4px 10px rgba(229, 138, 171, 0.2); margin-bottom: 10px; margin-top: 20px;
-    }
-    .forum-user-profile-name {
-        font-size: 18px; font-weight: bold; color: #333; margin-bottom: 6px;
-    }
-    .forum-user-profile-signature {
-        font-size: 13px; color: #888; text-align: center; padding: 0 20px;
-    }
-
-    #forum-user-posts-area {
-        flex: 1; overflow-y: auto; padding: 15px 20px calc(env(safe-area-inset-bottom, 20px) + 20px);
-        display: flex; flex-direction: column; gap: 15px;
-    }
-
-    /* 无头像版帖子头部 */
-    .forum-post-simple-header {
-        display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        font-size: 12px; color: #999;
-    }
-    .forum-post-simple-forum-name {
-        color: var(--theme-pink-text); font-weight: bold; background: #fff0f5; padding: 2px 8px; border-radius: 6px;
-    }
-
     .forum-following-avatar {
         width: 48px;
         height: 48px;
@@ -9137,11 +9112,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     let currentForumDetailId = null;
     let tempForumMeAvatarUrl = '';
     let tempForumMeBgUrl = ''; 
+
     let currentWbCoverUploadId = null;
     let wbBindCallback = null;
     let wbBindMultiSelect = false;
-    let tempSelectedAlbumCovers = []; // 新增：用于缓存临时勾选的相册
-
 
     let currentMallCategoryId = null; 
     let tempMallCategoryRoleIds = [];
@@ -14013,6 +13987,7 @@ window.toggleMallProductFavorite = (productId) => {
         const forumProfile = getForumUserData();
         const mainProfile = getUserProfile();
         const forumSignIns = (forumProfile.signIns && forumProfile.signIns[forumId]) || {xp: 0};
+
         const newPost = {
             id: Date.now(),
             forumId: parseInt(forumId),
@@ -14024,12 +13999,10 @@ window.toggleMallProductFavorite = (productId) => {
             authorXP: forumSignIns.xp, 
             timestamp: Date.now(),
             likes: [], 
-            // ================= 修改：用户发帖随机赋予 5 到 84 的初始点赞数 =================
-            baseLikes: Math.floor(Math.random() * 80) + 5, 
+            baseLikes: 0, 
             tags: [], 
             comments: [] 
         };
-
         
         let posts = [];
         try { posts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]'); } catch(e) {}
@@ -14641,36 +14614,30 @@ ${rolesContext ? `关注了该论坛的常驻角色：\n${rolesContext}\n请让�
         // 构造评论区
         let commentsHtml = `<div class="post-detail-comments-title">全部评论 (${commentsCount})</div>`;
         
-              // ...
         if (commentsCount === 0) {
             commentsHtml += `<div style="text-align:center; color:#ccc; padding:30px 0;">还没有人评论哦，快来抢沙发~</div>`;
         } else {
             commentsHtml += `<div class="forum-post-card" style="box-shadow: none; border-radius: 16px;">`;
             commentsHtml += post.comments.map(comment => {
-                const avatarSrc = comment.author_avatar || getRandomCustomAvatar(post.forumId);
-                const safeNickname = escapeHtml(comment.author_nickname);
+              const avatarSrc = comment.author_avatar || getRandomCustomAvatar(post.forumId);
 
-                let commentTextHtml = '';
-                // 检查是不是回复评论
+                let commentText = escapeHtml(comment.text);
                 if (comment.reply_to_nickname) {
-                    commentTextHtml += `<span class="comment-reply-tag">回复 ${escapeHtml(comment.reply_to_nickname)}: </span>`;
+                    const replyTag = `<span class="comment-reply-tag">@${escapeHtml(comment.reply_to_nickname)}</span>`;
+                    commentText = commentText.replace(`@${comment.reply_to_nickname}`, replyTag);
                 }
-                commentTextHtml += escapeHtml(comment.text);
-
                 return `
-                    <div class="forum-post-comment-item" style="margin-bottom: 15px; border-bottom: 1px solid #f9f9f9; padding-bottom: 10px; cursor:pointer;" onclick="prepareForumReply('${safeNickname}')">
+                    <div class="forum-post-comment-item" style="margin-bottom: 15px; border-bottom: 1px solid #f9f9f9; padding-bottom: 10px;">
                         <img src="${avatarSrc}" class="comment-avatar" style="border-radius: 50%;">
                         <div class="comment-body">
-                            <div class="comment-nickname" style="color: #666; font-size: 13px; font-weight: bold;">${safeNickname}</div>
-                            <div class="comment-text" style="font-size: 14px; margin-top: 6px;">${commentTextHtml}</div>
+                            <div class="comment-nickname" style="color: #666; font-size: 13px; font-weight: bold;">${escapeHtml(comment.author_nickname)}</div>
+                            <div class="comment-text" style="font-size: 14px; margin-top: 6px;">${commentText}</div>
                         </div>
                     </div>
                 `;
             }).join('');
             commentsHtml += `</div>`;
         }
-        // ...
-
 
         container.innerHTML = postCardHtml + commentsHtml;
 
@@ -14714,7 +14681,7 @@ ${rolesContext ? `关注了该论坛的常驻角色：\n${rolesContext}\n请让�
         }
     };
 
-       // 生成更多评论
+    // 生成更多评论
     window.generateMoreComments = async () => {
         if (!currentForumPostData) return;
         
@@ -14728,87 +14695,28 @@ ${rolesContext ? `关注了该论坛的常驻角色：\n${rolesContext}\n请让�
         btn.style.animation = 'spin 1s linear infinite';
         showToast('正在生成新评论，请稍候...', 4000);
 
-        // 获取绑定的角色信息
-        const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
-        const currentForum = forums.find(f => f.id === currentForumPostData.forumId) || {};
-        const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-
-        let rolesContext = "";
-        if (currentForum.boundRoleIds && currentForum.boundRoleIds.length > 0) {
-            const activeRoles = allContacts.filter(c => currentForum.boundRoleIds.includes(c.id));
-            activeRoles.forEach(r => {
-                const fname = r.forumNickname || r.alias || r.name;
-                rolesContext += `- 角色: ${fname} (人设/性格: ${r.persona})\n`;
-            });
-        }
-
         const postContext = `作者：${currentForumPostData.authorName}\n内容：${currentForumPostData.content || '无'}\n标签：${(currentForumPostData.tags||[]).join(' ')}`;
         
-        // ================= 修改：强化 Prompt，强制要求角色互相回复 =================
         const prompt = `这是一条论坛帖子：
 ${postContext}
 
-当前论坛关注的常驻角色有：
-${rolesContext ? rolesContext : '无常驻角色。'}
-
-请为这篇帖子生成 10 到 15 条独特的、不重复的评论。
-【关键要求】：
-1. 评论者请混合使用“常驻角色”和“普通路人网友”。
-2. 如果是常驻角色评论，必须严格使用上述给出的角色名字，并且语气必须极度符合他们的人设。
-3. 如果是路人网友评论，请随机编造符合网络风格的昵称。
-4. 【极度重要】：请让评论区热闹起来！除了直接评论帖子的内容，你【必须】安排**角色与角色之间的互相回复、对线、拆台或附和**，也可以安排**角色与路人之间的互动**！
-5. 当 A 在回复 B 的评论时，必须在 JSON 中填写 "reply_to_nickname": "B的昵称"。
-6. 语气要像真实的社交媒体评论，短平快、口语化。
-
-严格输出纯 JSON，包含 "comments" 数组，每个对象字段：
-- author_nickname: 评论人昵称 (常驻角色或随机路人)
+请扮演路人网友，为这篇帖子生成 10 到 15 条独特的、不重复的评论。语气要像真实的社交媒体评论，可以赞同、吐槽、疑问或开玩笑。
+如果你觉得合适，某几条评论可以是回复上面某个人的评论，此时请附带 reply_to_nickname。
+严格输出JSON，包含 "comments" 数组，每个对象字段：
+- author_nickname: 路人昵称
 - text: 评论内容
-- reply_to_nickname: (可选，如果是回复某人，填那个人的昵称；如果是直接评论帖子，填 null)
+- reply_to_nickname: (可选，回复谁的昵称，如果是顶级评论则为 null)
 `;
-        // =======================================================================
 
         try {
-            let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
-            const isGemini = settings.api.url.includes('generativelanguage');
-            let bodyData, headers = { 'Content-Type': 'application/json' };
-
-            if (isGemini) {
-                fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
-                bodyData = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.9, response_mime_type: "application/json" } });
-            } else {
-                headers['Authorization'] = `Bearer ${settings.api.key}`;
-                // 稍微调高了温度(temperature)到 0.9，让角色互动更活跃
-                bodyData = JSON.stringify({ model: settings.api.model, messages: [{ role: "user", content: prompt }], temperature: 0.9, response_format: { "type": "json_object" } });
-            }
-
-            const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
-            if (!res.ok) throw new Error(`API Error`);
-            const data = await res.json();
-            
-            let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-            reply = reply.trim();
-            const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-            if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
-
-            let newCommentsData = JSON.parse(reply);
+            let newCommentsData = await callApiForJson(prompt);
             let newComments = newCommentsData.comments || [];
             if (newComments.length === 0) throw new Error("返回的评论为空");
 
-            // 精准匹配角色真实头像
-            newComments = newComments.map(c => {
-                const matchedContact = allContacts.find(contact => (contact.forumNickname || contact.alias || contact.name) === c.author_nickname);
-                let avatarToUse = "";
-                if (matchedContact && matchedContact.avatar) {
-                    avatarToUse = matchedContact.avatar;
-                } else {
-                    avatarToUse = getRandomCustomAvatar(currentForumPostData.forumId);
-                }
-
-                return {
-                    ...c,
-                    author_avatar: c.author_avatar || avatarToUse
-                };
-            });
+            newComments = newComments.map(c => ({
+                ...c,
+                author_avatar: c.author_avatar || getRandomCustomAvatar(currentForumPostData.forumId)
+            }));
 
             if (!currentForumPostData.comments) currentForumPostData.comments = [];
             currentForumPostData.comments = currentForumPostData.comments.concat(newComments);
@@ -14829,13 +14737,8 @@ ${rolesContext ? rolesContext : '无常驻角色。'}
                 saveForumFavoritePosts(favs);
             }
 
-             openForumPostDetail(currentForumPostData.id);
-            showToast(`已生成 ${newComments.length} 条互动评论`);
-
-            // ================= 新增：静默更新所有外层列表该帖子的评论数显示 =================
-            document.querySelectorAll(`.forum-post-action-btn[onclick="openForumPostDetail(${currentForumPostData.id})"] span, .forum-post-action-btn[onclick="if(!isMyPostsManageMode) openForumPostDetail(${currentForumPostData.id})"] span, .forum-post-action-btn[onclick="event.stopPropagation(); openForumPostDetail(${currentForumPostData.id})"] span`).forEach(span => {
-                span.innerText = currentForumPostData.comments.length;
-            });
+            openForumPostDetail(currentForumPostData.id);
+            showToast(`已生成 ${newComments.length} 条新评论`);
 
         } catch (e) {
             console.error('Comment generation failed:', e);
@@ -14844,8 +14747,6 @@ ${rolesContext ? rolesContext : '无常驻角色。'}
             btn.style.animation = '';
         }
     };
-
-
 
     // =================== 新增：收藏列表管理与渲染逻辑 ===================
     let isFavPostsManageMode = false;
@@ -15131,13 +15032,12 @@ ${rolesContext ? rolesContext : '无常驻角色。'}
             // 优先读取论坛专属昵称
             const name = contact.forumNickname || contact.alias || contact.name || '未知用户';
             const avatar = contact.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-                   const item = document.createElement('div');
+            
+            const item = document.createElement('div');
             item.className = 'forum-following-item';
-            item.onclick = () => openForumUserProfilePage(contact.id); // 新增点击事件
             
             item.innerHTML = `
                 <img src="${avatar}" class="forum-following-avatar">
-
                 <div class="forum-following-info">
                     <div class="forum-following-name">${escapeHtml(name)}</div>
                 </div>
@@ -15148,107 +15048,6 @@ ${rolesContext ? rolesContext : '无常驻角色。'}
                 </div>
             `;
             container.appendChild(item);
-        });
-    };
-    let currentForumUserProfileId = null;
-
-    window.openForumUserProfilePage = (contactId) => {
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contact = contacts.find(c => c.id === contactId);
-        if (!contact) return;
-
-        currentForumUserProfileId = contactId;
-        const name = contact.forumNickname || contact.alias || contact.name || '未知用户';
-        const avatar = contact.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        const signature = contact.signature || '这个人很懒，什么都没留下~';
-
-        // 渲染顶部资料
-        document.getElementById('forum-user-profile-avatar').src = avatar;
-        document.getElementById('forum-user-profile-name').textContent = name;
-        document.getElementById('forum-user-profile-signature').textContent = signature;
-
-        // 渲染该角色的帖子
-        renderForumUserPosts(contactId);
-
-        document.getElementById('forum-user-profile-page').classList.add('active');
-        document.getElementById('forum-user-profile-page').style.transform = 'translateX(0)';
-    };
-
-    window.closeForumUserProfilePage = () => {
-        document.getElementById('forum-user-profile-page').classList.remove('active');
-        document.getElementById('forum-user-profile-page').style.transform = 'translateX(100%)';
-        currentForumUserProfileId = null;
-    };
-
-    window.renderForumUserPosts = (contactId) => {
-        const container = document.getElementById('forum-user-posts-area');
-        container.innerHTML = '';
-
-        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
-        const allForums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
-        const mainProfile = getUserProfile();
-
-        // 过滤出该角色的帖子，按时间倒序
-        const userPosts = allPosts.filter(p => p.authorId === contactId).sort((a,b) => b.timestamp - a.timestamp);
-
-        if (userPosts.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:50px 20px;">Ta还没有发布过帖子哦~</div>';
-            return;
-        }
-
-        userPosts.forEach(post => {
-            const forum = allForums.find(f => f.id === post.forumId);
-            const forumName = forum ? forum.name : '未知论坛';
-
-            let imgHtml = '';
-            if (post.images && post.images.length > 0) {
-                let gridClass = 'single-img';
-                if (post.images.length === 2 || post.images.length === 4) gridClass = `grid-${post.images.length}`; 
-                else if (post.images.length > 1) gridClass = `grid-${post.images.length > 9 ? 9 : post.images.length}`; 
-                
-                imgHtml = `<div class="moments-img-grid ${gridClass}" style="margin-bottom:10px;">` +
-                    post.images.slice(0, 9).map(src => `<img src="${src}" class="moment-grid-img">`).join('') +
-                    `</div>`;
-            }
-            
-            const dateStr = formatTimestamp(post.timestamp);
-            const userHasLiked = post.likes && post.likes.includes(mainProfile.qqId);
-            const likeIcon = userHasLiked ? "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png" : "https://img.heliar.top/file/1770582828275_赞_thumbs-up_3.png";
-
-            const tagsHtml = (post.tags && post.tags.length > 0) 
-                ? `<div class="forum-post-tags">${post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join(' ')}</div>` 
-                : '';
-
-            const card = document.createElement('div');
-            card.className = 'forum-post-card';
-            // 点击卡片进入详情页
-            card.onclick = () => openForumPostDetail(post.id);
-
-            // 修改为不包含头像和昵称的极简头部
-            card.innerHTML = `
-                <div class="forum-post-simple-header">
-                    <span class="forum-post-simple-forum-name">${escapeHtml(forumName)}</span>
-                    <span>${dateStr}</span>
-                </div>
-                ${post.content ? `<div class="forum-post-content">${escapeHtml(post.content)}</div>` : ''}
-                ${imgHtml}
-                ${tagsHtml}
-                <div class="forum-post-actions">
-                    <div class="forum-post-action-btn" onclick="event.stopPropagation(); shareForumPost(${post.id})">
-                        <img src="https://img.heliar.top/file/1770582835252_分享_share.png">
-                        <span>分享</span>
-                    </div>
-                    <div class="forum-post-action-btn" onclick="event.stopPropagation(); openForumPostDetail(${post.id})">
-                        <img src="https://img.heliar.top/file/1770582828238_未读消息_message-unread.png">
-                        <span>${post.comments ? post.comments.length : 0}</span>
-                    </div>
-                    <div class="forum-post-action-btn" onclick="event.stopPropagation(); toggleForumPostLike(${post.id})">
-                        <img src="${likeIcon}">
-                        <span>${(post.baseLikes || 0) + (post.likes ? post.likes.length : 0)}</span>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
         });
     };
 
@@ -15399,7 +15198,7 @@ ${rolesContext ? rolesContext : '无常驻角色。'}
         });
     };
 
-    window.toggleForumPostLike = (postId) => {
+       window.toggleForumPostLike = (postId) => {
         let posts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
         const postIndex = posts.findIndex(p => p.id === postId);
         if (postIndex === -1) return;
@@ -15437,12 +15236,43 @@ ${rolesContext ? rolesContext : '无常驻角色。'}
         if (likedPage && likedPage.classList.contains('active')) {
             renderAllLikedPosts();
         }
-    };
-        // 新增：如果角色个人主页开着，同步刷新里面的帖子状态
-        const userProfilePage = document.getElementById('forum-user-profile-page');
-        if (userProfilePage && userProfilePage.classList.contains('active') && currentForumUserProfileId) {
-            window.renderForumUserPosts(currentForumUserProfileId);
+
+        // --- 修复：全面刷新可能包含该帖子的页面，确保点赞UI实时变化 ---
+        const homePage = document.getElementById('forum-page-home');
+        if (homePage && homePage.classList.contains('active')) {
+            const hotTab = document.querySelector('.forum-home-tab.active');
+            if (hotTab && hotTab.innerText.includes('热门')) {
+                window.renderHotForumPosts();
+            }
         }
+
+        const favPostsPage = document.getElementById('forum-favorite-posts-page');
+        if (favPostsPage && favPostsPage.classList.contains('active')) {
+            window.renderFavoriteForumPosts();
+        }
+
+        const postDetailPage = document.getElementById('forum-post-detail-page');
+        if (postDetailPage && postDetailPage.classList.contains('active') && typeof currentForumPostData !== 'undefined' && currentForumPostData && currentForumPostData.id === postId) {
+            window.openForumPostDetail(postId);
+        }
+
+        // 万能保险：直接寻找DOM中所有对应的点赞按钮进行局部无感刷新 (兼容任何额外的页面)
+        document.querySelectorAll('.forum-post-action-btn').forEach(btn => {
+            const onclickStr = btn.getAttribute('onclick');
+            if (onclickStr && onclickStr.includes(`toggleForumPostLike(${postId})`)) {
+                const img = btn.querySelector('img');
+                const span = btn.querySelector('span');
+                if (img && span) {
+                    const currentUserHasLiked = posts[postIndex].likes.includes(mainProfile.qqId);
+                    img.src = currentUserHasLiked 
+                        ? "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png" 
+                        : "https://img.heliar.top/file/1770582828275_赞_thumbs-up_3.png";
+                    span.innerText = (posts[postIndex].baseLikes || 0) + (posts[postIndex].likes ? posts[postIndex].likes.length : 0);
+                }
+            }
+        });
+    };
+
 
 
     // --- Chat App Logic ---
@@ -17239,6 +17069,7 @@ ${actionInstruction}
 
             
             if (isMultiSelectMode) {
+
                 row.onclick = (e) => { e.stopPropagation(); toggleMsgSelection(msg.id); };
             }
             
@@ -17251,42 +17082,7 @@ ${actionInstruction}
                 row.appendChild(contentElement);
             }
             
-            // --- 核心修改：使用包裹器让转文字显示在整行下方，从此不再影响原有气泡和头像的位置对齐 ---
-            const rowWrapper = document.createElement('div');
-            rowWrapper.style.display = 'flex';
-            rowWrapper.style.flexDirection = 'column';
-            rowWrapper.style.width = '100%';
-            rowWrapper.style.alignItems = msg.type === 'sent' ? 'flex-end' : 'flex-start';
-            rowWrapper.appendChild(row);
-
-            if (msg.isVoice && msg.showTranslation) {
-                const transDiv = document.createElement('div');
-                transDiv.className = 'voice-translated-text';
-                // 完美模仿原生微信转文字的样式表现
-                transDiv.style.marginTop = '8px';
-                transDiv.style.marginBottom = '10px';
-                transDiv.style.backgroundColor = '#ffffff';
-                transDiv.style.borderRadius = '8px';
-                transDiv.style.padding = '10px 14px';
-                transDiv.style.fontSize = '15px';
-                transDiv.style.color = '#333';
-                transDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
-                transDiv.style.border = '1px solid #eee';
-                transDiv.style.wordBreak = 'break-all';
-                transDiv.style.whiteSpace = 'pre-wrap';
-                transDiv.style.width = 'fit-content';
-                transDiv.style.maxWidth = '80%';
-                
-                // 动态计算边距，使其精准对齐语音气泡的边缘（让出头像的空间）
-                transDiv.style.marginLeft = msg.type === 'received' ? '55px' : '0';
-                transDiv.style.marginRight = msg.type === 'sent' ? '55px' : '0';
-                
-                transDiv.innerHTML = escapeHtml(msg.text);
-                rowWrapper.appendChild(transDiv);
-            }
-
-            fragment.appendChild(rowWrapper);
-
+            fragment.appendChild(row);
         });
 
         container.appendChild(fragment);
@@ -17367,34 +17163,20 @@ ${actionInstruction}
     }
     // ========================= 新增结束 =========================
     // ========================= 新增：生成聊天里的虚拟语音条卡片及逻辑 =========================
-       // ========================= 优化：生成聊天里的动态声波语音条及逻辑 =========================
     function createVoiceCard(msg) {
         const textLength = msg.text ? msg.text.length : 0;
         // 根据字数模拟时长：按每秒4个字算，最多60秒
         const duration = Math.max(1, Math.min(60, Math.ceil(textLength / 4)));
-        // 宽度随语音长度生长
-        const minWidth = 85;
-        const maxWidth = 250;
+        // 宽度随语音长度生长，微信风格
+        const minWidth = 75;
+        const maxWidth = 230;
         const width = Math.min(maxWidth, minWidth + duration * 3);
+        const isTranslated = msg.showTranslation ? 'block' : 'none';
         
-        const flexDirection = msg.type === 'sent' ? 'row-reverse' : 'row';
-        const marginDuration = msg.type === 'sent' ? 'margin-right: 12px;' : 'margin-left: 12px;';
-        
-        // 根据宽度动态计算能放多少根声波柱子 (每根宽3px+间距3px=6px)
-        const barCount = Math.min(30, Math.max(5, Math.floor((width - 60) / 6)));
-        let barsHtml = '';
-        for(let i = 0; i < barCount; i++) {
-            // 静态状态下，给柱子随机的高低错落感
-            const initialScale = (0.3 + Math.random() * 0.7).toFixed(2);
-            // 播放状态下，给每根柱子随机的动画延迟，形成杂乱无章但真实的波浪感
-            const delay = (Math.random() * 0.8).toFixed(2);
-            barsHtml += `<div class="voice-bar" style="transform: scaleY(${initialScale}); animation-delay: ${delay}s;"></div>`;
-        }
-
         return `
             <div class="voice-message-container" style="display: flex; flex-direction: column; align-items: flex-start; max-width: 100%;">
-                <div class="voice-bubble-content" id="voice-bubble-${msg.id}"
-                     style="width: ${width}px; flex-direction: ${flexDirection}; justify-content: space-between;"
+                <div class="voice-bubble-content" 
+                     style="width: ${width}px;"
                      onmousedown="startVoiceLongPress(event, '${msg.id}')" 
                      onmouseleave="endVoiceTouch()" 
                      onmouseup="endVoiceTouch()" 
@@ -17403,10 +17185,19 @@ ${actionInstruction}
                      ontouchcancel="endVoiceTouch()"
                      onclick="handleVoiceBubbleClick(event, '${msg.id}', ${duration})">
                     
-                    <div class="voice-wave-container" style="justify-content: ${msg.type === 'sent' ? 'flex-end' : 'flex-start'};">
-                        ${barsHtml}
+                    <div style="display: flex; align-items: center;">
+                        <!-- 纯正的微信语音SVG -->
+                        <svg class="voice-icon-svg" id="voice-svg-${msg.id}" viewBox="0 0 24 24">
+                            <path class="voice-wave-1" d="M8.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                            <path class="voice-wave-2" d="M12 7.5a4.5 4.5 0 0 1 0 9v-1.5a3 3 0 0 0 0-6v-1.5z"/>
+                            <path class="voice-wave-3" d="M15 4a8 8 0 0 1 0 16v-1.5a6.5 6.5 0 0 0 0-13V4z"/>
+                        </svg>
                     </div>
-                    <div class="voice-duration" style="font-size: 15px; font-weight: 500; ${marginDuration}">${duration}"</div>
+                    <div class="voice-duration" style="font-size: 15px; margin-left: 8px; color: #999;">${duration}"</div>
+                </div>
+
+                <div class="voice-translated-text" id="voice-trans-${msg.id}" style="display: ${isTranslated}; margin-top: 5px; background: #ffffff; border-radius: 8px; padding: 10px 14px; font-size: 15px; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee; word-break: break-all; white-space: pre-wrap; width: fit-content; max-width: 100%; position: relative;">
+                    ${escapeHtml(msg.text)}
                 </div>
             </div>
         `;
@@ -17414,19 +17205,24 @@ ${actionInstruction}
 
     let voiceLongPressTimer = null;
     let isVoiceLongPress = false;
-    let voiceTargetEl = null;
-
-    // 全局音频播放计时器库，防止互相干扰
-    window.voicePlayTimers = window.voicePlayTimers || {};
+    let voiceTouchX = 0;
+    let voiceTouchY = 0;
 
     window.startVoiceLongPress = (e, msgId) => {
         isVoiceLongPress = false;
-        voiceTargetEl = e.currentTarget; 
+        
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            voiceTouchX = e.changedTouches[0].clientX;
+            voiceTouchY = e.changedTouches[0].clientY;
+        } else {
+            voiceTouchX = e.clientX;
+            voiceTouchY = e.clientY;
+        }
 
         voiceLongPressTimer = setTimeout(() => {
             isVoiceLongPress = true;
-            showVoiceMenu(msgId, voiceTargetEl); 
-        }, 550); 
+            showVoiceMenu(msgId, voiceTouchX, voiceTouchY);
+        }, 550); // 长按触发阀值
     };
 
     window.endVoiceTouch = () => {
@@ -17435,212 +17231,40 @@ ${actionInstruction}
             voiceLongPressTimer = null;
         }
     };
-    window.handleVoiceBubbleClick = async (e, msgId, duration) => {
-        e.stopPropagation(); 
+
+    window.handleVoiceBubbleClick = (e, msgId, duration) => {
+        e.stopPropagation(); // 【拦截关键】防止冒泡，避免菜单被外层事件误杀关闭
         
         if (isVoiceLongPress) {
             isVoiceLongPress = false; 
             return;
         }
 
-        const bubbleEl = document.getElementById(`voice-bubble-${msgId}`);
-        if (!bubbleEl) return;
-
-        // 如果当前这首语音正在播放，再次点击则停止播放
-        if (window.currentAudioPlayer && window.currentPlayingMsgId === msgId) {
-            window.currentAudioPlayer.pause();
-            bubbleEl.classList.remove('playing');
-            window.currentAudioPlayer = null;
-            window.currentPlayingMsgId = null;
-            return;
-        }
-
-        // 如果有别的语音在播放，先把别的全停掉
-        if (window.currentAudioPlayer) {
-            window.currentAudioPlayer.pause();
-            document.querySelectorAll('.voice-bubble-content.playing').forEach(el => el.classList.remove('playing'));
-            window.currentAudioPlayer = null;
-        }
-
-        // 提取该条消息内容
-        const key = getMessagesKey(currentChatContactId);
-        let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
-        if (msgIndex === -1) return;
-        const msg = messages[msgIndex];
-
-        // 核心播放解码函数 (Minimax 传回的是十六进制流，需转码)
-        const playHexAudio = (hexString) => {
-            try {
-                const bytes = new Uint8Array(hexString.length / 2);
-                for (let i = 0; i < hexString.length; i += 2) {
-                    bytes[i / 2] = parseInt(hexString.substring(i, i + 2), 16);
-                }
-                const blob = new Blob([bytes], { type: 'audio/mp3' });
-                const url = URL.createObjectURL(blob);
-                
-                const audio = new Audio(url);
-                window.currentAudioPlayer = audio;
-                window.currentPlayingMsgId = msgId;
-
-                audio.onplay = () => bubbleEl.classList.add('playing');
-                audio.onended = () => {
-                    bubbleEl.classList.remove('playing');
-                    window.currentAudioPlayer = null;
-                    window.currentPlayingMsgId = null;
-                };
-                audio.onerror = () => {
-                    showToast("音频播放出错");
-                    bubbleEl.classList.remove('playing');
-                };
-                audio.play().catch(err => {
-                    console.error(err);
-                    showToast("浏览器阻止了自动播放，请重试");
-                    bubbleEl.classList.remove('playing');
-                });
-            } catch(e) {
-                console.error("音频解码失败:", e);
-                showToast("音频解码失败");
-                bubbleEl.classList.remove('playing');
-            }
-        };
-
-        // 如果之前已经请求并缓存过了，直接秒开播放！
-        if (msg.audioCache) {
-            playHexAudio(msg.audioCache);
-            return;
-        }
-
-        // --- 没有缓存，去调 Minimax 接口合成 ---
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-        const mmSettings = settings.minimax;
-        if (!mmSettings || !mmSettings.apiKey || !mmSettings.model) {
-            showToast("请先在主页左下角设置中配置 Minimax 的语音参数");
-            return;
-        }
-
-        // 获取该角色的专属音色ID
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contact = contacts.find(c => c.id === currentChatContactId);
-        const voiceId = (contact && contact.voiceId) ? contact.voiceId.trim() : "male-qn-qingse";
-
-        // 清理文字，保证读的是纯净的“转文字”文本
-        let textToRead = msg.text || "";
-        textToRead = textToRead.replace(/<[^>]+>/g, '').trim();
-        if (!textToRead) {
-            textToRead = "未识别到文字内容";
-        }
-
-        // 开始请求时让波纹动起来，作为 Loading 提示
-        bubbleEl.classList.add('playing'); 
-
-        try {
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${mmSettings.apiKey.trim()}`
-            };
-            
-            // 修复跨域预检拦截：将 GroupId 移到 URL 后面作为参数，而不要放在 Header 里
-            let apiUrl = 'https://api.minimax.chat/v1/t2a_v2';
-            if (mmSettings.groupId && mmSettings.groupId.trim()) {
-                apiUrl += `?GroupId=${mmSettings.groupId.trim()}`;
-            }
-
-            const payload = {
-                model: mmSettings.model,
-                text: textToRead,
-                stream: false,
-                voice_setting: {
-                    voice_id: voiceId,
-                    speed: 1,
-                    vol: 1,
-                    pitch: 0
-                },
-                audio_setting: {
-                    sample_rate: 32000,
-                    bitrate: 128000,
-                    format: "mp3"
-                }
-            };
-
-            const res = await fetch(apiUrl, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(payload)
-            });
-
-            if (!res.ok) {
-                let errMsg = `状态码异常: ${res.status}`;
-                try {
-                    const errData = await res.json();
-                    errMsg = errData.base_resp?.status_msg || errData.message || errMsg;
-                } catch(e){}
-                throw new Error(errMsg);
-            }
-            
-            const data = await res.json();
-            
-            if (data.base_resp && data.base_resp.status_code !== 0) {
-                throw new Error(data.base_resp.status_msg);
-            }
-
-            const hexString = data.data?.audio;
-            if (!hexString) throw new Error("API未返回有效音频");
-
-            // 保存到聊天记录中，以后点它就不用再请求接口了
-            messages[msgIndex].audioCache = hexString;
-            localStorage.setItem(key, JSON.stringify(messages));
-            
-            // 开始播放
-            playHexAudio(hexString);
-
-        } catch (err) {
-            console.error("合成语音失败:", err);
-            if (err.message.includes('Failed to fetch')) {
-                showToast("生成失败: 请求被拦截或网络异常");
-            } else {
-                showToast("生成语音失败: " + err.message);
-            }
-            bubbleEl.classList.remove('playing');
+        const svgEl = document.getElementById(`voice-svg-${msgId}`);
+        if (svgEl) {
+            svgEl.classList.add('playing');
+            setTimeout(() => {
+                svgEl.classList.remove('playing');
+            }, duration * 1000);
         }
     };
 
-
-    window.showVoiceMenu = (msgId, targetEl) => {
+    window.showVoiceMenu = (msgId, x, y) => {
         closeBubbleMenu(); 
         
-        // 查询当前消息是否已经是“转文字”状态
-        let isTranslated = false;
-        if (currentChatContactId) {
-            const key = getMessagesKey(currentChatContactId);
-            const messages = JSON.parse(localStorage.getItem(key) || '[]');
-            const msg = messages.find(m => String(m.id) === String(msgId));
-            if (msg && msg.showTranslation) {
-                isTranslated = true;
-            }
-        }
-
-        // 动态切换转文字与收起
-        const translateLabel = isTranslated ? "收起" : "转文字";
-        const translateAction = isTranslated ? `hideTranslation('${msgId}')` : `translateVoice('${msgId}')`;
-
         const menu = document.createElement('div');
         menu.className = 'bubble-context-menu';
         menu.innerHTML = `
-            <div class="bubble-menu-item" onclick="event.stopPropagation(); ${translateAction}">${translateLabel}</div>
+            <div class="bubble-menu-item" onclick="event.stopPropagation(); translateVoice('${msgId}')">转文字</div>
             <div class="bubble-menu-item" style="color:#F44336;" onclick="event.stopPropagation(); deleteMsg('${msgId}')">删除</div>
         `;
         
         document.body.appendChild(menu);
 
-        // 根据语音条实体精准计算绝对正上方的位置
-        const rect = targetEl.getBoundingClientRect();
-        let top = rect.top - menu.offsetHeight - 10; 
-        if (top < 0) top = rect.bottom + 10; 
-        let left = rect.left + (rect.width / 2) - (menu.offsetWidth / 2);
-        
+        let top = y - 50; 
+        if (top < 0) top = y + 20;
+        let left = x - 40;
         if (left < 10) left = 10;
-        if (left + menu.offsetWidth > window.innerWidth - 10) left = window.innerWidth - menu.offsetWidth - 10;
         
         menu.style.top = top + 'px';
         menu.style.left = left + 'px';
@@ -17658,25 +17282,15 @@ ${actionInstruction}
             if (msgIndex !== -1) {
                 messages[msgIndex].showTranslation = true;
                 localStorage.setItem(key, JSON.stringify(messages));
-                renderConversationMessages(); 
             }
         }
-    };
-
-    window.hideTranslation = (msgId) => {
-        closeBubbleMenu();
-        if (currentChatContactId) {
-            const key = getMessagesKey(currentChatContactId);
-            let messages = JSON.parse(localStorage.getItem(key) || '[]');
-            const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
-            if (msgIndex !== -1) {
-                messages[msgIndex].showTranslation = false;
-                localStorage.setItem(key, JSON.stringify(messages));
-                renderConversationMessages(); 
-            }
+        const transDiv = document.getElementById(`voice-trans-${msgId}`);
+        if (transDiv) {
+            transDiv.style.display = 'block';
         }
     };
     // ========================= 虚拟语音逻辑结束 =========================
+
 
     window.openGiftDetailModal = (msg) => {
 
@@ -17930,7 +17544,7 @@ ${actionInstruction}
         setTimeout(() => textarea.focus(), 100);
     };
 
-        window.executeEditMsg = () => {
+    window.executeEditMsg = () => {
         if (!pendingEditMsgId || !currentChatContactId) return;
         const newText = document.getElementById('edit-msg-textarea').value.trim();
         
@@ -17940,13 +17554,6 @@ ${actionInstruction}
             const msgIndex = messages.findIndex(m => String(m.id) === String(pendingEditMsgId));
             if (msgIndex !== -1) {
                 messages[msgIndex].text = newText;
-                
-                // --- 修复：如果文字被编辑了，清空原有的语音缓存，强制重新生成！ ---
-                if (messages[msgIndex].audioCache) {
-                    delete messages[msgIndex].audioCache;
-                }
-                // --- 修复结束 ---
-
                 localStorage.setItem(key, JSON.stringify(messages));
                 
                 updateContactLastMsg(currentChatContactId); // 新增：更新最新消息
@@ -18465,34 +18072,13 @@ window.openTransferConfirmPopup = (amount) => {
         // --- 新增：读取撤回设置 ---
 
         document.getElementById('role-recall-amount').value = contact.recallAmount || '1';
-              document.getElementById('role-auto-recall-switch').checked = contact.autoRecallEnabled || false;
+        document.getElementById('role-auto-recall-switch').checked = contact.autoRecallEnabled || false;
         document.getElementById('role-recall-min').value = contact.autoRecallMin || 20;
         document.getElementById('role-recall-max').value = contact.autoRecallMax || 50;
         document.getElementById('recall-freq-settings').style.display = contact.autoRecallEnabled ? 'flex' : 'none';
         // --- 新增结束 ---
-        
-             // 读取语音ID
-        document.getElementById('role-voice-id').value = contact.voiceId || '';
-
-        // 新增：读取并回显绑定的表情包相册
-        const albumDisplay = document.getElementById('role-album-display');
-        const albumClearBtn = document.getElementById('role-album-clear-btn');
-           if (contact.boundAlbums && contact.boundAlbums.length > 0) {
-            albumDisplay.textContent = `已绑定: ${contact.boundAlbums.length}个相册`;
-            albumDisplay.className = 'bound';
-            albumClearBtn.style.display = 'block';
-        } else {
-            albumDisplay.textContent = '未绑定相册';
-            albumDisplay.className = 'unbound';
-            albumClearBtn.style.display = 'none';
-        }
-        
-        // 新增：回显表情包频率
-        document.getElementById('role-emotion-freq').value = contact.emotionFrequency || 'none';
 
         const globalProfile = getUserProfile();
-
-
 
         document.getElementById('role-user-avatar').src = contact.userAvatar || globalProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
         document.getElementById('role-user-name').value = contact.userName || globalProfile.nickname || '';
@@ -18547,24 +18133,16 @@ window.openTransferConfirmPopup = (amount) => {
         if (isNaN(autoReplyDelay)) autoReplyDelay = 0;
 
         // --- 新增：获取撤回设置参数 ---
-           const recallAmount = document.getElementById('role-recall-amount').value;
+        const recallAmount = document.getElementById('role-recall-amount').value;
         const autoRecallEnabled = document.getElementById('role-auto-recall-switch').checked;
         let autoRecallMin = parseInt(document.getElementById('role-recall-min').value);
         let autoRecallMax = parseInt(document.getElementById('role-recall-max').value);
         if (isNaN(autoRecallMin)) autoRecallMin = 20;
         if (isNaN(autoRecallMax)) autoRecallMax = 50;
         if (autoRecallMin > autoRecallMax) { let temp = autoRecallMin; autoRecallMin = autoRecallMax; autoRecallMax = temp; }
-        
-        // 获取语音ID
-            const voiceId = document.getElementById('role-voice-id').value.trim();
-        
-        // 获取表情包频率
-        const emotionFreq = document.getElementById('role-emotion-freq').value;
         // --- 新增结束 ---
 
         let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-
-
         const idx = contacts.findIndex(c => c.id === currentChatContactId);
         if (idx > -1) {
             // 【修复】把丢失的保存字段全部补回来
@@ -18592,30 +18170,14 @@ window.openTransferConfirmPopup = (amount) => {
             contacts[idx].autoRecallEnabled = autoRecallEnabled;
             contacts[idx].autoRecallMin = autoRecallMin;
             contacts[idx].autoRecallMax = autoRecallMax;
-                  if (autoRecallEnabled) {
+            if (autoRecallEnabled) {
                 // 修改：只要保存设置就重置计数并重新生成随机目标轮数，确保新区间立刻精准生效
                 contacts[idx].turnCount = 0;
                 contacts[idx].targetRecallTurn = Math.floor(Math.random() * (autoRecallMax - autoRecallMin + 1)) + autoRecallMin;
             }
-            
-               // 保存语音ID
-            contacts[idx].voiceId = voiceId;
-            
-            // 保存表情包频率并初始化轮数
-            contacts[idx].emotionFrequency = emotionFreq;
-            if (!contacts[idx].emotionTurnCount) contacts[idx].emotionTurnCount = 0;
-            if (emotionFreq === 'medium') {
-                contacts[idx].targetEmotionTurn = Math.floor(Math.random() * (8 - 4 + 1)) + 4;
-            } else if (emotionFreq === 'low') {
-                contacts[idx].targetEmotionTurn = Math.floor(Math.random() * (15 - 10 + 1)) + 10;
-            } else {
-                contacts[idx].targetEmotionTurn = 1; 
-            }
             // --- 新增结束 ---
 
             localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-
-
 
             showToast("角色设置已保存");
             
@@ -18822,54 +18384,13 @@ window.openTransferConfirmPopup = (amount) => {
             };
             listContainer.appendChild(item);
         });
-            // 同步一下，确保 tempSelectedWorldBookIds 是最新的
+        // 同步一下，确保 tempSelectedWorldBookIds 是最新的
         if (modalTitle.includes('论坛')) tempSelectedWorldBookIds = tempForumBoundRoleIds;
         else if (modalTitle.includes('种类')) tempSelectedWorldBookIds = tempMallCategoryRoleIds;
         else if (modalTitle.includes('外卖店铺')) tempSelectedWorldBookIds = tempTakeoutShopRoleIds;
-        
-    } else if (type === 'albums') { // 新增：支持图库相册类型的多选列表
-        const galleryData = JSON.parse(localStorage.getItem('galleryApp_data_v1') || '[]');
-        if (galleryData.length === 0) { listContainer.innerHTML = '<div class="wb-bind-list-empty">暂无相册，请前往图库添加</div>'; }
-
-        galleryData.forEach((album, index) => {
-            const item = document.createElement('div');
-            item.className = 'wb-bind-list-item multi';
-            const isSelected = tempSelectedAlbumCovers.includes(album.cover);
-            
-            item.innerHTML = `
-                <div class="wb-bind-checkbox ${isSelected ? 'checked' : ''}"></div>
-                <div style="display:flex; align-items:center; margin-left:10px;">
-                    <img src="${album.cover}" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; margin-right: 10px; border: 1px solid #eee;">
-                    <span>相册 ${index + 1} (共 ${album.items ? album.items.length : 0} 张)</span>
-                </div>
-            `;
-            if (isSelected) {
-                item.style.backgroundColor = '#FFF0F5';
-                item.style.fontWeight = 'bold';
-            }
-            
-            item.onclick = () => {
-                const checkbox = item.querySelector('.wb-bind-checkbox');
-                if (checkbox.classList.contains('checked')) {
-                    checkbox.classList.remove('checked');
-                    item.style.backgroundColor = '';
-                    item.style.fontWeight = 'normal';
-                    tempSelectedAlbumCovers = tempSelectedAlbumCovers.filter(cov => cov !== album.cover);
-                } else {
-                    checkbox.classList.add('checked');
-                    item.style.backgroundColor = '#FFF0F5';
-                    item.style.fontWeight = 'bold';
-                    tempSelectedAlbumCovers.push(album.cover);
-                }
-                tempSelectedWorldBookIds = tempSelectedAlbumCovers; 
-            };
-            listContainer.appendChild(item);
-        });
-        tempSelectedWorldBookIds = tempSelectedAlbumCovers;
     }
     
     // 根据是否是多选模式，决定是否显示“确定”按钮
-
     const modalCard = document.querySelector('#worldbook-bind-modal .wb-bind-modal-card');
     if (wbBindMultiSelect) {
         modalCard.classList.add('multi-select-mode');
@@ -18901,53 +18422,7 @@ window.openTransferConfirmPopup = (amount) => {
             showToast('已清除世界书绑定');
         }
     };
-    window.clearWorldBookBinding = () => {
-       // ... 原有的清除世界书代码 ...
-    };
     
-    // 新增：打开表情包选择弹窗与清除绑定
-    window.openRoleAlbumBindModal = () => {
-        wbBindMultiSelect = true;
-        document.getElementById('wb-bind-modal-title').textContent = '选择绑定的表情包库';
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contact = contacts.find(c => c.id === currentChatContactId);
-        tempSelectedAlbumCovers = contact.boundAlbums ? [...contact.boundAlbums] : [];
-        
-        wbBindCallback = (selectedCovers) => {
-            const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-            const idx = contacts.findIndex(c => c.id === currentChatContactId);
-            if (idx > -1) {
-                contacts[idx].boundAlbums = selectedCovers;
-                localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-                const albumDisplay = document.getElementById('role-album-display');
-                const clearBtn = document.getElementById('role-album-clear-btn');
-                if (selectedCovers.length > 0) {
-                    albumDisplay.textContent = `已绑定: ${selectedCovers.length}个相册`;
-                    albumDisplay.className = 'bound';
-                    clearBtn.style.display = 'block';
-                } else {
-                    albumDisplay.textContent = '未绑定相册';
-                    albumDisplay.className = 'unbound';
-                    clearBtn.style.display = 'none';
-                }
-            }
-        };
-        openWorldBookBindModal('albums');
-    };
-
-    window.clearAlbumBinding = () => {
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const idx = contacts.findIndex(c => c.id === currentChatContactId);
-        if (idx > -1) {
-            contacts[idx].boundAlbums = [];
-            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-            document.getElementById('role-album-display').textContent = '未绑定相册';
-            document.getElementById('role-album-display').className = 'unbound';
-            document.getElementById('role-album-clear-btn').style.display = 'none';
-            showToast('已清除表情包绑定');
-        }
-    };
-
     window.triggerRoleBgUpload = () => { document.getElementById('input-role-chat-bg').click(); };
     window.handleRoleChatBgUpload = (event) => { compressImage(event.target.files[0], 800, (base64) => { tempRoleBgUrl = base64; document.getElementById('role-bg-url-input').value = ""; document.getElementById('role-bg-preview').style.backgroundImage = `url(${base64})`; }); };
     window.setRoleBgByUrl = () => { const url = document.getElementById('role-bg-url-input').value.trim(); if(url){ tempRoleBgUrl = url; document.getElementById('role-bg-preview').style.backgroundImage = `url(${url})`; showToast('已应用URL背景'); } };
@@ -19091,7 +18566,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         document.getElementById('phone-case-color-input').value = localStorage.getItem(PHONE_CASE_COLOR_KEY) || '#ffffff';
         document.getElementById('cat-ear-color-input').value = localStorage.getItem(CAT_EAR_COLOR_KEY) || '#ffffff';
         
-             if(settings.api) {
+        if(settings.api) {
             document.getElementById('api-url-input').value = settings.api.url || '';
             document.getElementById('api-key-input').value = settings.api.key || '';
             document.getElementById('temp-slider').value = settings.api.temp || 0.8;
@@ -19105,20 +18580,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
                 document.getElementById('api-status').className = 'api-status connected';
             }
         }
-        
-        if(settings.minimax) {
-            document.getElementById('minimax-group-id-input').value = settings.minimax.groupId || '';
-            document.getElementById('minimax-api-key-input').value = settings.minimax.apiKey || '';
-            if(settings.minimax.model) {
-                const sel = document.getElementById('minimax-model-select');
-                sel.innerHTML = `<option value="${settings.minimax.model}">${settings.minimax.model}</option>`;
-                sel.value = settings.minimax.model;
-                document.getElementById('minimax-model-select-wrapper').style.display = 'block';
-            }
-        }
-
                         if(settings.visual) {
-
             document.getElementById('wallpaper-url').value = settings.visual.wallpaper || '';
             if(settings.visual.wallpaper) document.getElementById('wallpaper-preview').style.backgroundImage = `url(${settings.visual.wallpaper})`;
             document.getElementById('main-avatar1-url').value = settings.visual.mainAvatar1 || '';
@@ -19177,7 +18639,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         }
     };
 
-       document.getElementById('save-settings-btn').addEventListener('click', () => {
+    document.getElementById('save-settings-btn').addEventListener('click', () => {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
         settings.api = {
             url: document.getElementById('api-url-input').value.trim(),
@@ -19185,15 +18647,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             model: document.getElementById('model-select').value,
             temp: parseFloat(document.getElementById('temp-slider').value)
         };
-        
-        settings.minimax = {
-            groupId: document.getElementById('minimax-group-id-input').value.trim(),
-            apiKey: document.getElementById('minimax-api-key-input').value.trim(),
-            model: document.getElementById('minimax-model-select').value || ''
-        };
-
                         settings.visual = settings.visual || {};
-
             settings.visual.wallpaper = document.getElementById('wallpaper-url').value.trim();
         settings.visual.mainAvatar1 = document.getElementById('main-avatar1-url').value.trim();
         settings.visual.mainAvatar2 = document.getElementById('main-avatar2-url').value.trim();
@@ -19517,89 +18971,55 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         const url = document.getElementById('api-url-input').value.trim();
         const key = document.getElementById('api-key-input').value.trim();
         if(!url || !key) { showToast('请填写API地址和Key'); return; }
-        try {
-            let fetchUrl = url.endsWith('/v1') ? url + '/models' : url + '/v1/models';
-            let isGemini = url.includes('generativelanguage');
-            if(isGemini) fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
-            const res = await fetch(fetchUrl, { headers: { 'Authorization': `Bearer ${key}` } });
-            const data = await res.json();
-            const select = document.getElementById('model-select');
-            select.innerHTML = '';
-            let models = isGemini ? (data.models || []).map(m=>m.name.replace('models/','')) : (data.data || []).map(m => m.id);
-            if(models.length === 0) { showToast('未获取到模型列表'); return; }
-            models.sort().forEach(m => {
+
+        const select = document.getElementById('model-select');
+        select.innerHTML = '';
+
+        // 🚨 新增：Minimax 语音模型与常规模型兜底全集，彻底解决跨域拦截和模型名称错误问题
+        const fallbackModels = [
+            // 用户指定的正确的 Minimax 语音模型
+            "Speech-01 Turbo", "Speech-01 HD",
+            "Speech-02 Turbo", "Speech-02 HD",
+            "Speech-2.5 HD", "Speech-2.6 Turbo", "Speech-2.6 HD",
+            // Minimax 文本大模型
+            "abab6.5g-chat", "abab6.5-chat", "abab6.5s-chat",
+            // 常见的通用大模型兜底
+            "gpt-3.5-turbo", "gpt-4o", "gpt-4-turbo", "claude-3-opus", "claude-3-sonnet",
+            "glm-4", "moonshot-v1-8k"
+        ];
+
+        const renderModels = (modelsArray, isSuccess) => {
+            // 去重并渲染
+            const uniqueModels = [...new Set(modelsArray)];
+            uniqueModels.sort().forEach(m => {
                 const opt = document.createElement('option');
                 opt.value = m; opt.innerText = m;
                 select.appendChild(opt);
             });
             document.getElementById('model-select-wrapper').style.display = 'block';
-            showToast('模型获取成功');
-        } catch (e) { showToast('获取模型失败'); }
-    });
-
-        document.getElementById('fetch-minimax-models-btn').addEventListener('click', async () => {
-        const apiKey = document.getElementById('minimax-api-key-input').value.trim();
-        if (!apiKey) { showToast('请填写 Minimax 的 API Key'); return; }
-        
-        const select = document.getElementById('minimax-model-select');
-        const wrapper = document.getElementById('minimax-model-select-wrapper');
-        const groupId = document.getElementById('minimax-group-id-input').value.trim();
-
-        // 预设 Minimax 官方常用的语音模型作为兜底
-        const defaultMinimaxVoiceModels = [
-            "speech-01-turbo",
-            "speech-01-turbo-240228",
-            "speech-01",
-            "speech-01-240228"
-        ];
+            showToast(isSuccess ? '模型获取成功（已补充完整列表）' : '跨域受限，已展示完整备选列表');
+        };
 
         try {
-            const headers = { 'Authorization': `Bearer ${apiKey}` };
-            if (groupId) headers['GroupId'] = groupId;
+            let fetchUrl = url.endsWith('/v1') ? url + '/models' : url + '/v1/models';
+            let isGemini = url.includes('generativelanguage');
+            if(isGemini) fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
 
-            // 尝试拉取接口
-            const res = await fetch('https://api.minimax.chat/v1/models', {
-                method: 'GET',
-                headers: headers
-            });
-            
-            if(!res.ok) throw new Error(res.status);
+            const res = await fetch(fetchUrl, { headers: { 'Authorization': `Bearer ${key}` } });
             const data = await res.json();
             
-            select.innerHTML = '';
-            let models = (data.data || []).map(m => m.id);
-            if(models.length === 0) throw new Error("获取列表为空");
+            let models = isGemini ? (data.models || []).map(m=>m.name.replace('models/','')) : (data.data || []).map(m => m.id);
             
-            // 过滤语音相关模型
-            const speechModels = models.filter(m => m.toLowerCase().includes('speech') || m.toLowerCase().includes('audio') || m.toLowerCase().includes('t2a'));
-            const displayModels = speechModels.length > 0 ? speechModels : models;
-
-            displayModels.sort().forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m; opt.innerText = m;
-                select.appendChild(opt);
-            });
-            wrapper.style.display = 'block';
-            showToast('Minimax 语音模型拉取成功');
-            
+            // 将拉取到的模型和正确的兜底模型合并，覆盖错误的旧模型
+            renderModels([...models, ...fallbackModels], true);
         } catch (e) {
-            console.warn("Minimax 接口跨域拦截，启用默认模型列表:", e);
-            // 如果触发浏览器跨域拦截报错，就直接展示兜底的官方模型列表
-            select.innerHTML = '';
-            defaultMinimaxVoiceModels.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m; opt.innerText = m;
-                select.appendChild(opt);
-            });
-            wrapper.style.display = 'block';
-            showToast('由于跨域限制，已为您加载官方默认语音模型');
+            console.warn('拉取模型触发跨域或错误，启用兜底列表:', e);
+            // 发生跨域报错时，不再提示失败，而是直接展示预设的完整列表
+            renderModels(fallbackModels, false);
         }
     });
 
     // --- AI Auto Reply Logic ---
-
-    // --- AI Auto Reply Logic ---
-
                 // 【修改后】的 triggerAIAutoReply 函数
         window.triggerAIAutoReply = async () => {
         if (!currentChatContactId) return;
@@ -19643,7 +19063,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         const recollectionData = getRecollections(currentChatContactId);
         const recollectionContext = recollectionData.items.map(item => item.text).join('\n');
 
-           let worldbookContext = "";
+        let worldbookContext = "";
         if (contact.worldbookIds && contact.worldbookIds.length > 0) {
             const allWb = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
             const activeWbs = allWb.filter(b => contact.worldbookIds.includes(b.id));
@@ -19653,43 +19073,7 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             });
         }
 
-           // 提取频率设定
-        let emotionFreq = contact.emotionFrequency || 'none';
-        if (!contact.boundAlbums || contact.boundAlbums.length === 0) emotionFreq = 'none';
-
-        // 判断当前轮次是否该发表情包
-        let isForceEmotionTurn = false;
-        if (emotionFreq === 'high') {
-            isForceEmotionTurn = true;
-        } else if (emotionFreq === 'medium' || emotionFreq === 'low') {
-            if (((contact.emotionTurnCount || 0) + 1) >= (contact.targetEmotionTurn || 1)) {
-                isForceEmotionTurn = true;
-            }
-        }
-
-        // 新增：提取该角色绑定的专属图库数据喂给AI（只在频率不为none时喂给AI）
-        let albumContext = "";
-        if (emotionFreq !== 'none' && contact.boundAlbums && contact.boundAlbums.length > 0) {
-            const galleryData = JSON.parse(localStorage.getItem('galleryApp_data_v1') || '[]');
-            const activeAlbums = galleryData.filter(a => contact.boundAlbums.includes(a.cover));
-
-            let emojiList = [];
-            activeAlbums.forEach(album => {
-                if (album.items) {
-                    album.items.forEach(item => {
-                        emojiList.push(`[画面描述: ${item.desc}] 发送代码: <EMOJI:${item.url}>`);
-                    });
-                }
-            });
-                   if (emojiList.length > 0) {
-                // 【加强暗示】：让AI明确知道这是用来表达情绪的工具
-                albumContext = `\n【你的专属表情包库】(这是你用来表达情绪、撒娇、发脾气或斗图的工具)：\n${emojiList.join('\n')}\n`;
-            }
-
-        }
-
         let timeContext = "";
-
         if (contact.timePerceptionEnabled) {
             const now = new Date();
             timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
@@ -19752,14 +19136,12 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         // --- 新增结束 ---
 
 
-          let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
+        let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
 ${worldbookContext ? `\n背景设定(世界书)：\n${worldbookContext}\n` : ''}
 ${recollectionContext ? `\n回忆总结(曾发生过的事)：\n${recollectionContext}\n` : ''}
-${albumContext}
 
 与你对话的用户是：${uName}
-
 用户的设定：${uPersona}
 ${timeContext}
 
@@ -19773,19 +19155,16 @@ ${timeContext}
 7.  根据对话的自然节奏，将你的完整回复拆分成2到8个句子或短语，放入数组中。
 8.  **如果聊天记录中有[系统提示：${uName} 刚刚撤回了一条消息]，代表对方撤回了话。你可以利用提示中“被撤回的真实内容”，结合你的人设和回忆，选择假装没看见、好奇追问、或者故意点破嘲笑等真实的反应。**
 9.  **如果聊天记录中出现对方发送的【表情包】，请务必明白这是一种网络互动方式。你要根据表情包的描述做出文字反应，比如嘲笑、反击、斗图式的挑衅、或者表示无语等，绝不能死板地把它当作正在发生的事！**
-${emotionFreq !== 'none' ? (isForceEmotionTurn 
-    ? `10. **【极度重要：本轮必须发表情包】系统已经为你绑定了表情包库。结合刚才的聊天，你此刻**必须**在回复数组中，挑选一张最符合你当前情绪的表情包，作为独立的字符串输出它的“发送代码”（如 <EMOJI:https://...>）。不要只打字，用图砸向用户！**` 
-    : `10. **【禁止发表情包】虽然你有表情包库，但本轮聊天请你克制情绪，绝对不要发送任何表情包代码，只能用纯文字回复！**`) : ''}
 
 **输出格式示例**:
 
 {
   "reply": [
-    "你到底在干嘛呀！",
-    "<EMOJI:https://example.com/angry-cat.jpg>",
-    "气死我了，快哄我！",
+    "今天好烦啊！",
     "<RECALL>",
-    "算啦，原谅你了~"
+    "对不起，我刚才情绪不好撤回了。",
+    "<SEND_TRANSFER:520>",
+    "这是补偿你的，拿去买点好吃的好好犒劳一下自己吧！"
   ]
 }`;
 
@@ -19920,14 +19299,11 @@ ${emotionFreq !== 'none' ? (isForceEmotionTurn
                     handleTransferResponse(transferId, action === 'accept');
                 }
 
-                   // 标记本次循环是否有撤回发生
+                // 标记本次循环是否有撤回发生
                 let hasRecallHappened = false;
-                // 标记本次循环是否发了表情包
-                let hasEmotionHappened = false;
 
                 // 循环发送每一句话
                 for (let sentence of sentences) {
-
                     let trimmedSentence = sentence.trim();
                     if (!trimmedSentence) continue;
 
@@ -19950,25 +19326,14 @@ ${emotionFreq !== 'none' ? (isForceEmotionTurn
                         trimmedSentence = trimmedSentence.replace(/<RECALL>/g, '').trim();
                     }
 
-                       // --- 新增：截取语音标签 ---
+                    // --- 新增：截取语音标签 ---
                     let isVoice = false;
                     if (trimmedSentence.includes("<VOICE>")) {
                         isVoice = true;
                         trimmedSentence = trimmedSentence.replace(/<VOICE>/g, "").replace(/<\/VOICE>/g, "").trim();
                     }
-                    
-                    // 新增：截取表情包标签并转换
-                    let isAiEmotion = false;
-                    let emotionUrl = "";
-                    const emotionMatch = trimmedSentence.match(/<EMOJI:\s*([^>]+)\s*>/);
-                    if (emotionMatch) {
-                        isAiEmotion = true;
-                        emotionUrl = emotionMatch[1];
-                        trimmedSentence = trimmedSentence.replace(emotionMatch[0], '').trim();
-                    }
 
                     let hasUpdate = false;
-
 
 
                     if (isAiRecall) {
@@ -19994,20 +19359,8 @@ ${emotionFreq !== 'none' ? (isForceEmotionTurn
                             if (recalledCount >= targetCount) break; 
                         }
                     }
-                    if (isAiEmotion && emotionUrl) {
-                        // AI 成功发送了表情包
-                        hasEmotionHappened = true; // 记录状态
-                        messages.push({
 
-                            id: Date.now() + Math.random(),
-                            type: 'received',
-                            isEmotionImage: true,
-                            emotionUrl: emotionUrl,
-                            text: trimmedSentence || '发送了一张表情', 
-                            timestamp: Date.now()
-                        });
-                        hasUpdate = true;
-                    } else if (trimmedSentence) {
+                               if (trimmedSentence) {
                         messages.push({
                             id: Date.now() + Math.random(),
                             type: 'received',
@@ -20017,7 +19370,6 @@ ${emotionFreq !== 'none' ? (isForceEmotionTurn
                         });
                         hasUpdate = true;
                     }
-
 
 
                     if (isAiTransfer && aiTransferAmount > 0) {
@@ -20062,12 +19414,12 @@ ${emotionFreq !== 'none' ? (isForceEmotionTurn
                     }
                 }
                 
-                     // --- 新增：在对话发送完后，处理轮数记录 (同时防异步覆盖) ---
+                // --- 新增：在对话发送完后，处理轮数记录 (同时防异步覆盖) ---
                 let endContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
                 let endIdx = endContacts.findIndex(c => c.id === currentChatContactId);
                 if (endIdx > -1) {
-                    // 处理撤回轮数
                     endContacts[endIdx].turnCount = (endContacts[endIdx].turnCount || 0) + 1;
+                    // 如果本轮触发了撤回，重置计数器，并生成下次的目标轮数
                     if (hasRecallHappened) {
                         endContacts[endIdx].turnCount = 0;
                         if (endContacts[endIdx].autoRecallEnabled) {
@@ -20076,25 +19428,9 @@ ${emotionFreq !== 'none' ? (isForceEmotionTurn
                             endContacts[endIdx].targetRecallTurn = Math.floor(Math.random() * (max - min + 1)) + min;
                         }
                     }
-                    
-                    // 处理表情包轮数
-                    if (emotionFreq !== 'none') {
-                        endContacts[endIdx].emotionTurnCount = (endContacts[endIdx].emotionTurnCount || 0) + 1;
-                        if (hasEmotionHappened || isForceEmotionTurn) {
-                            // 如果真的发了，或者即使没发但已经是强制轮（说明AI没听话，但也得重置防死锁）
-                            endContacts[endIdx].emotionTurnCount = 0;
-                            if (emotionFreq === 'medium') {
-                                endContacts[endIdx].targetEmotionTurn = Math.floor(Math.random() * (8 - 4 + 1)) + 4;
-                            } else if (emotionFreq === 'low') {
-                                endContacts[endIdx].targetEmotionTurn = Math.floor(Math.random() * (15 - 10 + 1)) + 10;
-                            }
-                        }
-                    }
-
                     localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(endContacts));
                 }
                 // --- 新增结束 ---
-
 
             }
 
@@ -20323,12 +19659,135 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
                 showToast("备份文件格式错误"); 
             }
         };
-        reader.readAsText(file);
+             reader.readAsText(file);
         e.target.value = '';
     };
 
+       // ========================= hushhh App JS 逻辑 =========================
+    window.openHushhhApp = () => {
+        document.body.classList.add('hushhh-active');
+        document.getElementById('hushhh-view-list').style.display = 'flex';
+        document.getElementById('hushhh-view-target').style.display = 'none';
+        
+        const container = document.getElementById('hushhh-friend-list');
+        container.innerHTML = '';
+        
+        // 读取创建的好友
+        let contacts = [];
+        try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e){}
+        
+        // 读取背景色缓存
+        let savedColors = {};
+        try { savedColors = JSON.parse(localStorage.getItem('hushhhCardColors_v1') || '{}'); } catch(e){}
+
+        // 如果没有好友
+        if(contacts.length === 0) {
+            container.innerHTML = '<div style="color:#999; text-align:center; width: 100%;">还没有创建角色哦，去首页添加一个吧~</div>';
+            return;
+        }
+
+        // 占位块，确保第一张和最后一张卡片能滑动到正中间
+        const paddingBlockStart = document.createElement('div');
+        paddingBlockStart.style.minWidth = '5vw';
+        paddingBlockStart.style.flexShrink = '0';
+        const paddingBlockEnd = document.createElement('div');
+        paddingBlockEnd.style.minWidth = '5vw';
+        paddingBlockEnd.style.flexShrink = '0';
+
+        container.appendChild(paddingBlockStart);
+
+        contacts.forEach(c => {
+            const item = document.createElement('div');
+            item.className = 'hushhh-card';
+            
+            const bgColor = savedColors[c.id] || '#FDCEDF'; // 默认粉色
+
+            item.innerHTML = `
+                <!-- 可点击修改颜色的背景区 -->
+                <div class="hushhh-card-bg" id="hushhh-bg-${c.id}" style="background-color: ${bgColor};" onclick="document.getElementById('hushhh-color-${c.id}').click()">
+                    <input type="color" id="hushhh-color-${c.id}" value="${bgColor}" style="visibility:hidden; position:absolute;" oninput="document.getElementById('hushhh-bg-${c.id}').style.backgroundColor = this.value;" onchange="saveHushhhCardColor('${c.id}', this.value)">
+                </div>
+                
+                <div class="hushhh-card-content">
+                    <img src="${c.avatar}" class="hushhh-card-avatar">
+                    <div class="hushhh-card-name">${escapeHtml(c.alias || c.name)}</div>
+                    
+                    <!-- 底部眼睛图标 -->
+                    <div class="hushhh-card-eye-btn" onclick="openEyeAndTarget('${c.id}')">
+                        <!-- 闭眼状态 SVG -->
+                        <svg id="eye-closed-${c.id}" viewBox="0 0 24 24" width="36" height="36" stroke="#ff8fb3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12c-2.66 4.66-6 7-10 7s-7.34-2.34-10-7"/>
+                            <path d="M12 16v3"/>
+                            <path d="M16 15l2 2"/>
+                            <path d="M8 15l-2 2"/>
+                        </svg>
+                        <!-- 睁眼状态 SVG (默认隐藏) -->
+                        <svg id="eye-open-${c.id}" style="display:none;" viewBox="0 0 24 24" width="36" height="36" stroke="#ff8fb3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+
+        container.appendChild(paddingBlockEnd);
+        
+        // 重置滑动位置
+        setTimeout(() => { container.scrollLeft = 0; }, 50);
+    };
+
+    window.saveHushhhCardColor = (contactId, color) => {
+        let savedColors = {};
+        try { savedColors = JSON.parse(localStorage.getItem('hushhhCardColors_v1') || '{}'); } catch(e){}
+        savedColors[contactId] = color;
+        localStorage.setItem('hushhhCardColors_v1', JSON.stringify(savedColors));
+    };
+
+    window.openEyeAndTarget = (contactId) => {
+        // 切换为睁眼状态
+        document.getElementById(`eye-closed-${contactId}`).style.display = 'none';
+        document.getElementById(`eye-open-${contactId}`).style.display = 'block';
+        
+        let contacts = [];
+        try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e){}
+        const contact = contacts.find(c => c.id == contactId);
+
+        // 延迟 400ms，让人看清睁眼动画后进入目标手机
+        setTimeout(() => {
+            if (!contact) return;
+            document.getElementById('hushhh-view-list').style.display = 'none';
+            document.getElementById('hushhh-view-target').style.display = 'flex';
+            
+            const wallpaper = document.getElementById('hushhh-target-wallpaper');
+            if (contact.backgroundImage) {
+                wallpaper.style.backgroundImage = `url(${contact.backgroundImage})`;
+            } else {
+                wallpaper.style.backgroundImage = 'none';
+            }
+        }, 400);
+    };
+
+    window.closeHushhhApp = () => {
+        document.body.classList.remove('hushhh-active');
+    };
+
+    window.backToHushhhList = () => {
+        document.getElementById('hushhh-view-target').style.display = 'none';
+        document.getElementById('hushhh-view-list').style.display = 'flex';
+        
+        // 把所有的眼睛恢复成闭眼状态
+        document.querySelectorAll('.hushhh-card-eye-btn svg').forEach(svg => {
+            if (svg.id.startsWith('eye-closed')) svg.style.display = 'block';
+            if (svg.id.startsWith('eye-open')) svg.style.display = 'none';
+        });
+    };
+    // ========================= hushhh JS 逻辑结束 =========================
+
     // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
+
         const userProfile = getUserProfile();
         if (!userProfile.qqId) { userProfile.qqId = "20261314520"; saveUserProfile(userProfile); }
         if (!userProfile.nickname) { userProfile.nickname = "User Name"; saveUserProfile(userProfile); }
@@ -21144,303 +20603,8 @@ window.executeDisableLock = () => {
     showToast("已成功关闭锁屏及密码功能");
 };
 // ========================= 新增结束 =========================
-    // =================== 新增：帖子评论与回复核心逻辑 ===================
-    let currentForumReplyTarget = null; // 用于记录当前正在回复谁
-
-    // 功能：准备回复某人
-    window.prepareForumReply = (nickname) => {
-        const mainProfile = getUserProfile();
-        const forumProfile = getForumUserData();
-        const myName = forumProfile.nickname || mainProfile.nickname || "你";
-        
-        // 不能回复自己
-        if (nickname === myName) {
-            return;
-        }
-
-        currentForumReplyTarget = nickname;
-        const input = document.getElementById('forum-comment-input');
-        input.placeholder = `回复 @${nickname}:`;
-        input.focus(); // 让输入框自动获得焦点，方便输入
-    };
-
-       // 功能：提交评论
-    window.submitForumComment = () => {
-        if (!currentForumPostData) return;
-
-        const input = document.getElementById('forum-comment-input');
-        const text = input.value.trim();
-
-        if (!text) {
-            showToast("评论内容不能为空哦");
-            return;
-        }
-
-        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
-        const postIndex = allPosts.findIndex(p => p.id === currentForumPostData.id);
-        if (postIndex === -1) {
-            showToast("帖子不存在，无法评论");
-            return;
-        }
-
-        const mainProfile = getUserProfile();
-        const forumProfile = getForumUserData();
-
-        const newComment = {
-            author_nickname: forumProfile.nickname || mainProfile.nickname || "你",
-            userId: mainProfile.qqId, // 记录是谁发的
-            author_avatar: forumProfile.avatar || mainProfile.avatar,
-            text: text,
-            timestamp: Date.now(),
-            reply_to_nickname: currentForumReplyTarget // 如果是回复，记录回复对象
-        };
-
-        if (!allPosts[postIndex].comments) {
-            allPosts[postIndex].comments = [];
-        }
-        allPosts[postIndex].comments.push(newComment);
-
-        // 保存到手机缓存里
-        localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allPosts));
-        
-        // 如果这篇帖子在收藏夹里，也要同步更新收藏夹里的评论
-        const favs = getForumFavoritePosts();
-        const favIndex = favs.findIndex(p => p.id === currentForumPostData.id);
-        if (favIndex > -1) {
-            if (!favs[favIndex].comments) favs[favIndex].comments = [];
-            favs[favIndex].comments.push(newComment);
-            saveForumFavoritePosts(favs);
-        }
-
-        // 清空输入框和回复目标
-        input.value = '';
-        input.placeholder = '留下你的精彩评论吧~';
-        currentForumReplyTarget = null;
-        
-        // 【关键】：更新内存里的当前帖子数据，防止 AI 拿不到最新的情况
-        currentForumPostData = allPosts[postIndex];
-
-        // 重新渲染帖子详情，显示新评论
-        openForumPostDetail(currentForumPostData.id);
-        
-        // 自动滚动到评论区底部，方便看到自己的评论
-        setTimeout(() => {
-            const scrollContainer = document.getElementById('forum-post-detail-content');
-            if (scrollContainer) {
-                 scrollContainer.scrollTop = scrollContainer.scrollHeight;
-            }
-        }, 200);
-
-            // ================= 新增：触发 AI 自动回复 =================
-        setTimeout(() => {
-            window.autoReplyToForumPost(currentForumPostData.id, newComment);
-        }, 500); 
-
-        // ================= 新增：静默更新所有外层列表该帖子的评论数显示 =================
-        document.querySelectorAll(`.forum-post-action-btn[onclick="openForumPostDetail(${currentForumPostData.id})"] span, .forum-post-action-btn[onclick="if(!isMyPostsManageMode) openForumPostDetail(${currentForumPostData.id})"] span, .forum-post-action-btn[onclick="event.stopPropagation(); openForumPostDetail(${currentForumPostData.id})"] span`).forEach(span => {
-            span.innerText = currentForumPostData.comments.length;
-        });
-    };
-
-    // =================== 新增：AI自动判断并回复论坛评论逻辑 ===================
-    window.autoReplyToForumPost = async (postId, userComment) => {
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
-            return; // 没配置API则不自动回复
-        }
-
-        const allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
-        const postIndex = allPosts.findIndex(p => p.id === postId);
-        if (postIndex === -1) return;
-        const post = allPosts[postIndex];
-
-        // 确定应该谁来回复：如果你@了某人，那个人就回复你；如果你没@人直接评论，那帖子作者就回复你。
-        let responderName = userComment.reply_to_nickname || post.authorName;
-        
-        const mainProfile = getUserProfile();
-        const forumProfile = getForumUserData();
-        const myName = forumProfile.nickname || mainProfile.nickname || "你";
-
-        // 如果识别到在回复自己，则打断，防止自己跟自己聊起来
-        if (responderName === myName) return;
-
-        // 找一下这个即将回复你的人，是不是你在通讯录里加过的真实“角色”
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const roleContact = contacts.find(c => (c.forumNickname || c.alias || c.name) === responderName);
-
-        // 获取论坛信息
-        const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
-        const forum = forums.find(f => f.id === post.forumId) || { name: '未知论坛', worldview: '' };
-
-        let sysPrompt = `你现在扮演论坛“${forum.name}”中的一个用户。你的昵称是：${responderName}。`;
-        
-        if (roleContact) {
-            sysPrompt += `\n这是你的人设：${roleContact.persona}`;
-            // 携带角色的世界书设定
-            let worldbookContext = "";
-            if (roleContact.worldbookIds && roleContact.worldbookIds.length > 0) {
-                const allWb = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-                const activeWbs = allWb.filter(b => roleContact.worldbookIds.includes(b.id));
-                activeWbs.forEach(wb => {
-                    worldbookContext += `\n[世界书: ${wb.title}]\n`;
-                    wb.entries.forEach(e => { worldbookContext += `${e.key ? e.key+': ' : ''}${e.content}\n`; });
-                });
-            }
-            if (worldbookContext) {
-                sysPrompt += `\n相关背景设定(世界书)：\n${worldbookContext}`;
-            }
-        } else {
-            // 如果不是已有角色，就告诉AI扮演一个随机路人
-            sysPrompt += `\n你是一个普通的网络路人，请用真实、口语化、随意的网友语气发言。可以带点网络热梗或颜文字。`;
-        }
-
-        sysPrompt += `\n\n【论坛背景】\n论坛名称：${forum.name}\n世界观/简介：${forum.worldview || '无'}
-【当前帖子内容】
-帖子作者：${post.authorName}
-帖子内容：${post.content || '纯图片分享'}
-标签：${(post.tags || []).join(' ')}
-
-【当前评论区上下文】
-`;
-        // 把最后几条评论喂给AI看，让它知道大家在聊什么
-        if (post.comments && post.comments.length > 0) {
-            const recentComments = post.comments.slice(-8); 
-            recentComments.forEach(c => {
-                sysPrompt += `${c.author_nickname}${c.reply_to_nickname ? ' 回复 ' + c.reply_to_nickname : ''}: ${c.text}\n`;
-            });
-        }
-
-        sysPrompt += `
--------------------
-现在，网友“${userComment.author_nickname}”刚刚对你说了：“${userComment.text}”。
-请你立刻给“${userComment.author_nickname}”写一条回复。
-
-【要求】：
-1. 语气极度口语化，像在贴吧、小红书、微博的评论区对线或聊天。
-2. 字数尽量简短，通常在 5 到 40 个字之间。
-3. 严格输出 JSON 格式，包含 "replyText" 字段，没有任何 markdown 标记。
-示例：
-{
-  "replyText": "哈哈哈哈笑死我了，确实！"
-}
-`;
-
-        try {
-            let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
-            const isGemini = settings.api.url.includes('generativelanguage');
-            let bodyData, headers = { 'Content-Type': 'application/json' };
-
-            if (isGemini) {
-                fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
-                bodyData = JSON.stringify({ contents: [{ parts: [{ text: sysPrompt }] }], generationConfig: { temperature: 0.8, response_mime_type: "application/json" } });
-            } else {
-                headers['Authorization'] = `Bearer ${settings.api.key}`;
-                bodyData = JSON.stringify({ model: settings.api.model, messages: [{ role: "user", content: sysPrompt }], temperature: 0.8, response_format: { "type": "json_object" } });
-            }
-
-            const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
-            if (!res.ok) throw new Error(`API Error`);
-            const data = await res.json();
-            
-            let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-            reply = reply.trim();
-            const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-            if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
-
-            const jsonReply = JSON.parse(reply);
-            if (jsonReply.replyText) {
-                // 构造新评论
-                let avatarToUse = "";
-                if (roleContact && roleContact.avatar) {
-                    avatarToUse = roleContact.avatar;
-                } else {
-                    // 如果是发帖的路人，保持他的发帖头像
-                    if (responderName === post.authorName && post.authorAvatar) {
-                        avatarToUse = post.authorAvatar;
-                    } else {
-                        // 尝试从现有评论中找它的旧头像，找不到就随机生成一个
-                        const existingComment = post.comments.find(c => c.author_nickname === responderName && c.author_avatar);
-                        if (existingComment && existingComment.author_avatar) {
-                            avatarToUse = existingComment.author_avatar;
-                        } else {
-                            avatarToUse = getRandomCustomAvatar(post.forumId);
-                        }
-                    }
-                }
-
-                const newAiComment = {
-                    author_nickname: responderName,
-                    userId: roleContact ? roleContact.id : `npc_${Date.now()}`,
-                    author_avatar: avatarToUse,
-                    text: jsonReply.replyText,
-                    timestamp: Date.now(),
-                    reply_to_nickname: userComment.author_nickname
-                };
-
-                // 重新读取一次，防止在这个几秒钟的生成过程中，别人也发了评论导致数据覆盖
-                const freshPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
-                const freshPostIndex = freshPosts.findIndex(p => p.id === postId);
-                if (freshPostIndex > -1) {
-                    if (!freshPosts[freshPostIndex].comments) freshPosts[freshPostIndex].comments = [];
-                    freshPosts[freshPostIndex].comments.push(newAiComment);
-                    localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(freshPosts));
-
-                    // 同步到收藏夹
-                    const favs = getForumFavoritePosts();
-                    const favIndex = favs.findIndex(p => p.id === postId);
-                    if (favIndex > -1) {
-                        if (!favs[favIndex].comments) favs[favIndex].comments = [];
-                        favs[favIndex].comments.push(newAiComment);
-                        saveForumFavoritePosts(favs);
-                    }
-
-                    // 如果用户当前还在该帖子页面，就立刻把 AI 的回复刷新出来！
-                    if (document.getElementById('forum-post-detail-page').classList.contains('active') && currentForumPostData && currentForumPostData.id === postId) {
-                        currentForumPostData = freshPosts[freshPostIndex];
-                        openForumPostDetail(postId);
-                        setTimeout(() => {
-                            const scrollContainer = document.getElementById('forum-post-detail-content');
-                            if (scrollContainer) {
-                                scrollContainer.scrollTop = scrollContainer.scrollHeight;
-                            }
-                        }, 200);
-                        showToast(`${responderName} 回复了你`);
-                    }
-                }
-            }
-
-        } catch (e) {
-            console.error("Auto reply to forum comment failed:", e);
-        }
-    };
-
-
-    // 修改：打开帖子详情时，清空之前的回复状态
-    const originalOpenForumPostDetail = window.openForumPostDetail;
-    window.openForumPostDetail = (postId) => {
-        // 先执行原来的函数
-        originalOpenForumPostDetail(postId);
-        // 然后重置回复状态
-        currentForumReplyTarget = null;
-        const input = document.getElementById('forum-comment-input');
-        if (input) {
-            input.placeholder = '留下你的精彩评论吧~';
-        }
-    };
-    
-    // 修改：关闭帖子详情时，清空输入框内容
-    const originalCloseForumPostDetail = window.closeForumPostDetail;
-    window.closeForumPostDetail = () => {
-        // 先执行原来的函数
-        originalCloseForumPostDetail();
-        // 然后清空
-        const input = document.getElementById('forum-comment-input');
-        if (input) {
-            input.value = '';
-        }
-        currentForumReplyTarget = null;
-    };
 
 </script>
 </body>
 </html>
+
