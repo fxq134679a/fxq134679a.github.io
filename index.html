@@ -6437,11 +6437,82 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
         /* ========================= hushhh App 样式结束 ========================= */
 
+    <        /* ========================================================= */
+        /* 🤖 安卓专版终极修复补丁 (Android Ultimate Fix) 🤖 */
+        /* ========================================================= */
+        
+        /* 1. 禁用导致安卓底层渲染引擎崩溃的毛玻璃效果和3D透视 */
+        * {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            transform-style: flat !important;
+        }
+
+        /* 2. 约束最外层容器，杜绝任何意外撑开造成的页面空条白块和拖拽错位 */
+        html, body, #app-wrapper {
+            position: absolute !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100% !important; height: 100% !important;
+            overflow: hidden !important;
+            overscroll-behavior: none !important;
+            transform: none !important; 
+            perspective: none !important;
+        }
+
+        /* 3. 补充不透明背景，防止失去毛玻璃后文字重叠看不清 */
+        .chat-app-header, .chat-conv-header, .chat-conv-footer, 
+        .chat-multiselect-footer, .chat-emotion-panel, 
+        .bubble-context-menu, #chat-extra-menu,
+        .takeout-cart-footer, #forum-bottom-nav, 
+        .gallery-albums-capsule, .gallery-main-capsule,
+        #moments-action-sheet, #recollection-action-sheet {
+            background-color: rgba(255, 255, 255, 0.98) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+        }
+        .lock-pwd-overlay, #transfer-confirm-overlay, #moments-action-sheet-overlay, #recollection-action-sheet-overlay {
+            background-color: rgba(20, 20, 20, 0.85) !important;
+        }
+
+        /* 4. 彻底修复 vw/vh 视口单位在安卓浏览器中引起的尺寸错乱及重叠 Bug */
+        #chat-app-page, #wallet-app-page, #wallet-details-page, #worldbook-app-page, 
+        #worldbook-color-page, #forum-app-page, #takeout-app-page, #takeout-profile-page, 
+        #takeout-favorite-page, #takeout-all-orders-page, #gallery-app-page, #hushhh-app-page,
+        #forum-my-posts-page, #forum-all-forums-page, #forum-favorite-posts-page, 
+        #forum-all-liked-posts-page, #forum-following-page, #forum-post-detail-page, 
+        #edit-forum-page, #mall-app-page, #mall-detail-page, #mall-favorite-page, 
+        #mall-purchased-page, #mall-sent-gifts-page, #takeout-shop-detail-page, 
+        #worldbook-entry-fullscreen-page, #recollection-app-page, #recollection-detail-page,
+        #recollection-color-page, #transfer-page, #chat-conversation-view,
+        #lock-screen, #home-screen, #role-settings-page, #settings-page {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        /* 5. 修复输入法键盘弹起时导致 fixed 底栏被顶飞的 Bug */
+        .chat-bottom-bar-container,
+        #forum-bottom-nav,
+        .mall-detail-footer,
+        .takeout-cart-footer,
+        #moments-comment-modal {
+            position: absolute !important;
+        }
+
+        /* 6. 移除安卓点击时的诡异高亮闪烁 */
+        * {
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
     </style>
 
 </head>
 <body>
 <div id="app-wrapper">
+
 <!-- 新增：锁屏页面 -->
 
 <div id="lock-screen">
