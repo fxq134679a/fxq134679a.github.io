@@ -2596,10 +2596,10 @@
         body.ios-mode-active .forum-home-header {
             padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important;
         }
-        body.phone-frame-active .forum-home-header {
+        body.phone-frame-active .forum-home-header, 
+        body.tablet-mode-active .forum-home-header {
             padding-top: calc(15px + var(--status-bar-height)) !important;
         }
-
 
         .forum-home-tabs {
             display: flex;
@@ -4312,7 +4312,61 @@
             width: 100%;
             height: 100%;
         }
-     
+                /* ========================= 新增：平板模式的防遮挡排版 ========================= */
+        body.tablet-mode-active #home-screen {
+            padding-top: var(--status-bar-height);
+        }
+        body.tablet-mode-active .chat-app-header,
+        body.tablet-mode-active .wallet-header,
+        body.tablet-mode-active .wb-header,
+        body.tablet-mode-active .mall-header,
+        body.tablet-mode-active .forum-header-home,
+        body.tablet-mode-active #forum-detail-header,
+        body.tablet-mode-active .forum-post-top-bar,
+        body.tablet-mode-active #settings-page > .settings-header,
+        body.tablet-mode-active #me-settings-modal > .me-settings-header-bar,
+        body.tablet-mode-active #worldbook-detail-modal > .wb-detail-header,
+        body.tablet-mode-active #worldbook-entry-fullscreen-page > .wb-detail-header,
+        body.tablet-mode-active #worldbook-color-page > .wb-color-header,
+        body.tablet-mode-active #add-moment-modal > .add-moment-header,
+        body.tablet-mode-active #role-settings-page > .role-setting-close-area,
+        body.tablet-mode-active #recollection-app-page .recollection-header,
+        body.tablet-mode-active #recollection-detail-page .recollection-detail-header,
+        body.tablet-mode-active #chat-conversation-view > .chat-conv-header,
+        body.tablet-mode-active .takeout-header { 
+            padding-top: calc(15px + var(--status-bar-height));
+        }
+        
+        body.tablet-mode-active #app-wrapper > div[id*="-page"],
+        body.tablet-mode-active #app-wrapper > div[id*="-modal"],
+        body.tablet-mode-active #app-wrapper > div[id*="-overlay"],
+        body.tablet-mode-active #app-wrapper > .delete-confirm-modal {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        /* 平板外观与尺寸 */
+        body.tablet-mode-active .phone-container {
+            display: flex;
+        }
+        body.tablet-mode-active .phone {
+            width: 640px;  /* 宽度缩短 1/6 */
+            height: 675px; /* 高度缩短 1/4 */
+            border-radius: 32px; 
+            border: 14px solid var(--phone-case-color); 
+            /* 限制最大占屏幕的 75%，确保四周留有足够缝隙，绝对碰不到边缘 */
+            transform: scale(min(calc(75vw / 640), calc(75vh / 675)));
+            transform-origin: center center;
+            overflow: hidden; /* 新增：强制裁剪一切溢出外框的元素，消除尖角 */
+        }
+        /* 新增：匹配外壳缩小后的屏幕内圆角，防止黑边 */
+        body.tablet-mode-active .screen {
+            border-radius: 20px; 
+        }
+        /* 平板尺寸调整后，内部主页图标间距适配 */
+        body.tablet-mode-active #grid-area { max-width: 550px; }
+        body.tablet-mode-active .dock-container { max-width: 400px; }
+
 
         .phone-container {
           position: fixed;
@@ -5136,9 +5190,9 @@
         body.ios-mode-active #takeout-profile-page .takeout-profile-header {
             padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
         }
-            body.phone-frame-active #takeout-profile-page .takeout-profile-header {
-
-        padding-top: calc(15px + var(--status-bar-height));
+        body.phone-frame-active #takeout-profile-page .takeout-profile-header,
+        body.tablet-mode-active #takeout-profile-page .takeout-profile-header {
+            padding-top: calc(15px + var(--status-bar-height));
         }
         .takeout-profile-header .back-btn { width: 30px; height: 30px; object-fit: contain; cursor: pointer; }
         .takeout-profile-title { font-size: 18px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
@@ -5261,7 +5315,8 @@
         }
         #takeout-all-orders-page.active { transform: translateX(0); }
         body.ios-mode-active #takeout-all-orders-page .takeout-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-            body.phone-frame-active #takeout-all-orders-page .takeout-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
+        body.phone-frame-active #takeout-all-orders-page .takeout-detail-header,
+        body.tablet-mode-active #takeout-all-orders-page .takeout-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
 
         /* 外卖底部购物车结算栏 */
 
@@ -5750,9 +5805,9 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         body.ios-mode-active #takeout-shop-detail-page .takeout-detail-header {
             padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
         }
-           body.phone-frame-active #takeout-shop-detail-page .takeout-detail-header {
-
-        padding-top: calc(15px + var(--status-bar-height));
+        body.phone-frame-active #takeout-shop-detail-page .takeout-detail-header,
+        body.tablet-mode-active #takeout-shop-detail-page .takeout-detail-header {
+            padding-top: calc(15px + var(--status-bar-height));
         }
         .takeout-detail-header .back-btn {
             width: 30px; height: 30px; object-fit: contain; cursor: pointer;
@@ -5920,11 +5975,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             color: white; font-size: 15px; cursor: pointer; font-weight: 500; padding: 10px;
         }
 
-          /* 手机框模式下的顶部间距适配 */
-        body.phone-frame-active #lock-screen .lock-top-status {
+        /* 手机框模式下的顶部间距适配 */
+        body.phone-frame-active #lock-screen .lock-top-status,
+        body.tablet-mode-active #lock-screen .lock-top-status {
             margin-top: calc(30px + var(--status-bar-height));
         }
-
         /* ========================= 新增：帖子详情与评论页 ========================= */
         #forum-post-detail-page {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -5941,8 +5996,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             position: relative;
         }
         body.ios-mode-active .forum-post-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-           body.phone-frame-active .forum-post-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
-   
+        body.phone-frame-active .forum-post-detail-header, body.tablet-mode-active .forum-post-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
+        
               .forum-post-detail-title { font-size: 17px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
         .forum-detail-main-scroll { flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
         .post-detail-comments-title { font-size: 15px; font-weight: bold; color: #333; padding-left: 5px; border-left: 4px solid var(--theme-pink-btn); margin-top: 5px; margin-bottom: 5px; }
@@ -6097,7 +6152,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
         /* 适配各种手机框和刘海屏 */
         body.ios-mode-active .gallery-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-            body.phone-frame-active .gallery-header { padding-top: calc(15px + var(--status-bar-height)); }
+        body.phone-frame-active .gallery-header, body.tablet-mode-active .gallery-header { padding-top: calc(15px + var(--status-bar-height)); }
 
         .gallery-back-btn { width: 30px; height: 30px; object-fit: contain; cursor: pointer; }
         .gallery-title { font-size: 22px; font-weight: bold; color: var(--theme-pink-text); letter-spacing: 2px; }
@@ -6227,6 +6282,44 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .gallery-albums-capsule.manage-mode .gallery-photo-delete-btn { display: flex; }
         .gallery-albums-capsule.manage-mode .gallery-album-wrapper { animation: jiggle 0.3s infinite; }
         /* ========================= 图库样式结束 ========================= */
+        /* ================= 安卓端兼容性与底部白边修复代码 ================= */
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            width: 100% !important;
+            height: 100% !important;
+            position: fixed !important; /* 锁死页面框架，阻止安卓浏览器由于地址栏导致的布局闪跳错乱 */
+            top: 0;
+            left: 0;
+        }
+        /* 修复所有主要页面的 100vh 问题，统一改为 100% */
+        #chat-app-page, #role-settings-page, #wallet-app-page, #wallet-details-page,
+        #worldbook-app-page, #worldbook-color-page, #takeout-app-page, #takeout-profile-page,
+        #takeout-favorite-page, #takeout-all-orders-page, #takeout-shop-detail-page,
+        #gallery-app-page, #forum-app-page, #forum-post-detail-page, #forum-my-posts-page,
+        #forum-all-forums-page, #forum-favorite-posts-page, #forum-all-liked-posts-page,
+        #forum-following-page, #edit-forum-page, #mall-app-page, #mall-detail-page,
+        #mall-favorite-page, #mall-sent-gifts-page, #mall-purchased-page, #transfer-page,
+        #transfer-confirm-overlay, #receive-transfer-overlay, #recollection-app-page,
+        #recollection-detail-page, #worldbook-entry-fullscreen-page, .me-mode {
+            height: 100% !important;
+            width: 100% !important;
+        }
+
+        /* 修复底部莫名的空条区块 (将预留给苹果的 20px 默认值强行改为 0px) */
+        #home-screen { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
+        .chat-bottom-bar-container { bottom: calc(env(safe-area-inset-bottom, 0px) + 15px) !important; }
+        #forum-bottom-nav { bottom: calc(env(safe-area-inset-bottom, 0px) + 15px) !important; }
+        #settings-page { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
+        .lock-bottom-actions { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px) !important; }
+        .lock-pwd-footer { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 30px) !important; }
+        .receive-actions-footer { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 30px) !important; }
+        #forum-my-posts-area, #forum-favorite-posts-area, #forum-all-liked-posts-area, 
+        #forum-following-list-container { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
+        /* ========================================================= */
 
     </style>
 
@@ -7496,7 +7589,14 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                     <span class="slider round"></span>
                 </label>
             </div>
-
+            <!-- 新增平板模式开关 -->
+            <div class="settings-row-with-switch" style="margin-top: 10px;">
+                <label for="tablet-mode-switch">平板模式</label>
+                <label class="ios-switch">
+                    <input type="checkbox" id="tablet-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
 
         
@@ -8011,12 +8111,12 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 <style>
       /* 适配顶部安全距离 */
     body.ios-mode-active #forum-my-posts-header, body.ios-mode-active #forum-all-forums-header, body.ios-mode-active #forum-favorite-posts-header, body.ios-mode-active #forum-all-liked-posts-header, body.ios-mode-active #forum-following-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important; }
-     body.phone-frame-active #forum-my-posts-header,
-    body.phone-frame-active #forum-all-forums-header,
-    body.phone-frame-active #forum-favorite-posts-header,
-    body.phone-frame-active #forum-all-liked-posts-header,
-    body.phone-frame-active #forum-following-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
-
+    body.phone-frame-active #forum-my-posts-header, body.tablet-mode-active #forum-my-posts-header,
+    body.phone-frame-active #forum-all-forums-header, body.tablet-mode-active #forum-all-forums-header,
+    body.phone-frame-active #forum-favorite-posts-header, body.tablet-mode-active #forum-favorite-posts-header,
+    body.phone-frame-active #forum-all-liked-posts-header, body.tablet-mode-active #forum-all-liked-posts-header,
+    body.phone-frame-active #forum-following-header, body.tablet-mode-active #forum-following-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
+    
     /* like的帖子 长方形预览区样式 (双列精简版) */
     .forum-liked-post-card {
         background-color: #fff;
@@ -8786,7 +8886,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     const IOS_MODE_KEY = 'iosModeEnabled_v1';
     const PHONE_FRAME_KEY = 'phoneFrameEnabled_v2'; 
     const PHONE_CASE_COLOR_KEY = 'phoneCaseColor_v1';
-   const CAT_EARS_KEY = 'catEarsEnabled_v1';
+    const TABLET_MODE_KEY = 'tabletModeEnabled_v1'; // 新增：平板模式的缓存 Key
+    const CAT_EARS_KEY = 'catEarsEnabled_v1';
     const CAT_EAR_COLOR_KEY = 'catEarColor_v1';
     const MOMENTS_DATA_KEY = 'momentsData_v4_private';
     const MOMENTS_PROFILE_KEY = 'momentsProfile_v2';
@@ -8969,6 +9070,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
         }; img.src = e.target.result; }; reader.readAsDataURL(file);
     }
+    
+    // --- 手机框、平板模式与猫耳朵功能 ---
     function applyPhoneFrame(enabled) {
       const appWrapper = document.getElementById('app-wrapper');
       const phoneScreen = document.getElementById('phone-screen-content');
@@ -8992,7 +9095,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
       } else {
         if (wasActive) {
             bodyEl.classList.remove('phone-frame-active');
-            if (appWrapper && bodyEl && phoneContainer && !bodyEl.contains(appWrapper)) {
+            // 【关键】：只有平板模式也没开启时，才把页面内容从框里拿回主体
+            if (!bodyEl.classList.contains('tablet-mode-active') && appWrapper && bodyEl && phoneContainer && !bodyEl.contains(appWrapper)) {
                 bodyEl.insertBefore(appWrapper, phoneContainer);
                 const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
                 const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
@@ -9000,7 +9104,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 phoneScreen.style.backgroundImage = 'none';
             }
         }
-        if (frameSettingsModule) {
+        // 如果平板也没开，隐藏外壳设置
+        if (!bodyEl.classList.contains('tablet-mode-active') && frameSettingsModule) {
             frameSettingsModule.style.display = 'none';
         }
         applyCatEars(false); 
@@ -9008,16 +9113,60 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
       localStorage.setItem(PHONE_FRAME_KEY, enabled);
     }
 
+    function applyTabletMode(enabled) {
+      const appWrapper = document.getElementById('app-wrapper');
+      const phoneScreen = document.getElementById('phone-screen-content');
+      const bodyEl = document.body;
+      const phoneContainer = document.getElementById('phone-container');
+      const frameSettingsModule = document.getElementById('phone-frame-settings-module');
+      const wasActive = bodyEl.classList.contains('tablet-mode-active');
+      
+      if (enabled) {
+        if (!wasActive) {
+            bodyEl.classList.add('tablet-mode-active');
+            if (appWrapper && phoneScreen && !phoneScreen.contains(appWrapper)) {
+                phoneScreen.appendChild(appWrapper);
+            }
+        }
+        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
+        const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
+        phoneScreen.style.backgroundImage = `url(${wp})`;
+        bodyEl.style.backgroundImage = 'none';
+        if (frameSettingsModule) frameSettingsModule.style.display = 'block';
+      } else {
+        if (wasActive) {
+            bodyEl.classList.remove('tablet-mode-active');
+            // 【关键】：只有手机模式也没开启时，才把页面内容拿出来
+            if (!bodyEl.classList.contains('phone-frame-active') && appWrapper && bodyEl && phoneContainer && !bodyEl.contains(appWrapper)) {
+                bodyEl.insertBefore(appWrapper, phoneContainer);
+                const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
+                const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
+                bodyEl.style.backgroundImage = `url(${wp})`;
+                phoneScreen.style.backgroundImage = 'none';
+            }
+        }
+        if (!bodyEl.classList.contains('phone-frame-active') && frameSettingsModule) {
+            frameSettingsModule.style.display = 'none';
+        }
+      }
+      localStorage.setItem(TABLET_MODE_KEY, enabled);
+      // 新增：每次切换平板模式时，重新应用一次猫耳朵状态
+      const catEars = document.getElementById('cat-ears-switch').checked;
+      applyCatEars(catEars);
+    }
+
+    
     function applyCatEars(enabled) {
         const isPhoneFrameActive = document.body.classList.contains('phone-frame-active');
-        if (enabled && isPhoneFrameActive) {
+        const isTabletModeActive = document.body.classList.contains('tablet-mode-active');
+        // 修改：现在无论是手机框还是平板模式，只要开启都可以显示猫耳朵
+        if (enabled && (isPhoneFrameActive || isTabletModeActive)) {
             document.body.classList.add('cat-ears-active');
         } else {
             document.body.classList.remove('cat-ears-active');
         }
         localStorage.setItem(CAT_EARS_KEY, enabled);
     }
-
     
     function setPhoneCaseColor(color) {
         document.documentElement.style.setProperty('--phone-case-color', color);
@@ -18264,7 +18413,8 @@ window.openTransferConfirmPopup = (amount) => {
         });
 document.getElementById('ios-mode-switch').checked = localStorage.getItem(IOS_MODE_KEY) === 'true';
 document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
-       document.getElementById('cat-ears-switch').checked = localStorage.getItem(CAT_EARS_KEY) === 'true';
+        document.getElementById('tablet-mode-switch').checked = localStorage.getItem(TABLET_MODE_KEY) === 'true'; // 新增：回显平板模式开关状态
+        document.getElementById('cat-ears-switch').checked = localStorage.getItem(CAT_EARS_KEY) === 'true';
 
         /* --- 新增的代码 --- */
         document.getElementById('icon-font-color-switch').checked = localStorage.getItem(ICON_FONT_LIGHT_MODE_KEY) === 'true';
@@ -18380,13 +18530,36 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         const phoneFrame = document.getElementById('phone-frame-switch').checked;
         applyPhoneFrame(phoneFrame);
 
-    
+        const tabletMode = document.getElementById('tablet-mode-switch').checked;
+        applyTabletMode(tabletMode); // 调用真正的开启平板模式函数
+        
         const catEars = document.getElementById('cat-ears-switch').checked;
         applyCatEars(catEars);
         
         applyVisualSettings();
         hideSettingsPage();
         showToast('设置已保存');
+    });
+
+    // 手机框与平板模式的互斥监听
+    document.getElementById('phone-frame-switch').addEventListener('change', (e) => {
+        const frameSettingsModule = document.getElementById('phone-frame-settings-module');
+        if (e.target.checked) {
+            frameSettingsModule.style.display = 'block';
+            document.getElementById('tablet-mode-switch').checked = false; // 互斥：自动关掉平板模式
+        } else if (!document.getElementById('tablet-mode-switch').checked) {
+            frameSettingsModule.style.display = 'none';
+        }
+    });
+
+    document.getElementById('tablet-mode-switch').addEventListener('change', (e) => {
+        const frameSettingsModule = document.getElementById('phone-frame-settings-module');
+        if (e.target.checked) {
+            frameSettingsModule.style.display = 'block'; // 平板模式也允许修改颜色
+            document.getElementById('phone-frame-switch').checked = false; // 互斥：自动关掉手机模式
+        } else if (!document.getElementById('phone-frame-switch').checked) {
+            frameSettingsModule.style.display = 'none';
+        }
     });
 
 
@@ -18452,14 +18625,14 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         const phoneScreen = document.getElementById('phone-screen-content');
         const wp = settings.visual?.wallpaper || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
         
-         if (document.body.classList.contains('phone-frame-active')) {
+        // 【关键修改】：加上平板模式的判断，只要开启了其中一个框，壁纸就要贴在屏幕内
+                if (document.body.classList.contains('phone-frame-active') || document.body.classList.contains('tablet-mode-active')) {
             phoneScreen.style.backgroundImage = `url(${wp})`;
             document.body.style.backgroundImage = 'none';
         } else {
             document.body.style.backgroundImage = `url(${wp})`;
             phoneScreen.style.backgroundImage = 'none';
         }
-
         
                 // 新增：如果有独立锁屏壁纸则优先使用，否则同步主屏壁纸
         const lockWp = settings.visual?.lockWallpaper || wp;
@@ -19331,7 +19504,10 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
         const isPhoneFrame = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
         applyPhoneFrame(isPhoneFrame);
 
-    
+        // 新增：自动读取平板模式状态并应用
+        const isTabletMode = localStorage.getItem(TABLET_MODE_KEY) === 'true';
+        applyTabletMode(isTabletMode);
+
         const caseColor = localStorage.getItem(PHONE_CASE_COLOR_KEY);
         if (caseColor) setPhoneCaseColor(caseColor);
 
