@@ -228,15 +228,17 @@
              -webkit-tap-highlight-color: transparent;
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
-        body {
-             width: 100vw;
-             height: 100vh;
-             overflow: hidden;
-             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
-             position: relative;
-             transition: background-image 0.3s ease-in-out;
-            z-index: -2;
-        }
+       body {
+     width: 100vw;
+     /* height: 100vh;  我们不再使用这个不稳定的单位 */
+     height: var(--app-height); /* 我们改用下面JS代码计算出的固定高度 */
+     overflow: hidden;
+     background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+     position: relative;
+     transition: background-image 0.3s ease-in-out;
+    z-index: -2;
+}
+
         #home-screen {
              width: 100%;
              height: 100%;
@@ -6282,44 +6284,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .gallery-albums-capsule.manage-mode .gallery-photo-delete-btn { display: flex; }
         .gallery-albums-capsule.manage-mode .gallery-album-wrapper { animation: jiggle 0.3s infinite; }
         /* ========================= 图库样式结束 ========================= */
-        /* ================= 安卓端兼容性与底部白边修复代码 ================= */
-        html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        body {
-            width: 100% !important;
-            height: 100% !important;
-            position: fixed !important; /* 锁死页面框架，阻止安卓浏览器由于地址栏导致的布局闪跳错乱 */
-            top: 0;
-            left: 0;
-        }
-        /* 修复所有主要页面的 100vh 问题，统一改为 100% */
-        #chat-app-page, #role-settings-page, #wallet-app-page, #wallet-details-page,
-        #worldbook-app-page, #worldbook-color-page, #takeout-app-page, #takeout-profile-page,
-        #takeout-favorite-page, #takeout-all-orders-page, #takeout-shop-detail-page,
-        #gallery-app-page, #forum-app-page, #forum-post-detail-page, #forum-my-posts-page,
-        #forum-all-forums-page, #forum-favorite-posts-page, #forum-all-liked-posts-page,
-        #forum-following-page, #edit-forum-page, #mall-app-page, #mall-detail-page,
-        #mall-favorite-page, #mall-sent-gifts-page, #mall-purchased-page, #transfer-page,
-        #transfer-confirm-overlay, #receive-transfer-overlay, #recollection-app-page,
-        #recollection-detail-page, #worldbook-entry-fullscreen-page, .me-mode {
-            height: 100% !important;
-            width: 100% !important;
-        }
-
-        /* 修复底部莫名的空条区块 (将预留给苹果的 20px 默认值强行改为 0px) */
-        #home-screen { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
-        .chat-bottom-bar-container { bottom: calc(env(safe-area-inset-bottom, 0px) + 15px) !important; }
-        #forum-bottom-nav { bottom: calc(env(safe-area-inset-bottom, 0px) + 15px) !important; }
-        #settings-page { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
-        .lock-bottom-actions { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px) !important; }
-        .lock-pwd-footer { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 30px) !important; }
-        .receive-actions-footer { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 30px) !important; }
-        #forum-my-posts-area, #forum-favorite-posts-area, #forum-all-liked-posts-area, 
-        #forum-following-list-container { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
-        /* ========================================================= */
 
     </style>
 
@@ -20311,5 +20275,22 @@ window.executeDisableLock = () => {
 // ========================= 新增结束 =========================
 
 </script>
+<!-- ↓↓↓ 把这段新代码加在 </body> 标签前面 ↓↓↓ -->
+<script>
+  // 这个函数的作用是获取当前窗口的实际高度，并将其设置为一个CSS变量
+  function setAppHeight() {
+    const doc = document.documentElement;
+    // --app-height 是我们给这个高度起的名字，和上面CSS里用的一致
+    doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+  }
+
+  // 当屏幕大小变化（比如手机横竖屏切换）时，重新计算高度
+  window.addEventListener('resize', setAppHeight);
+  
+  // 页面一加载就立即执行一次，确保初始高度是正确的
+  setAppHeight();
+</script>
+<!-- ↑↑↑ 把这段新代码加在 </body> 标签前面 ↑↑↑ -->
+
 </body>
 </html>
