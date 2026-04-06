@@ -221,24 +221,24 @@
             --takeout-border-radius-l: 20px;
             --takeout-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
-                html {
-             width: 100vw;
-             height: 100vh;
-             overflow: hidden;
-             overscroll-behavior: none; /* 彻底禁止安卓边缘回弹/下拉刷新 */
-        }
-        body {
-             width: 100vw;
-             height: 100vh; /* 兜底方案 */
-             height: 100dvh; /* 适配动态导航栏 */
-             position: fixed; /* 绝杀技：彻底锁死 body，防止安卓滑动时整个页面产生位移、白框 */
-             top: 0;
-             left: 0;
+         html, body {
+             width: 100%;
+             height: 100%;
              overflow: hidden;
              margin: 0;
              padding: 0;
-             background-color: #000; /* 去除原来的 #f7f7f7，解决 iOS 底部暴露出灰色/白色的底块 */
-             overscroll-behavior: none;
+             background-color: #000; /* 去除白底，完美融合 iOS 底部安全区 */
+             overscroll-behavior: none; /* 彻底禁止安卓边缘回弹/下拉刷新 */
+        }
+
+        body {
+             position: absolute;
+             top: 0;
+             left: 0;
+             right: 0;
+             bottom: 0;
+             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+             transition: background-image 0.3s ease-in-out;
         }
 
         * {
@@ -248,7 +248,6 @@
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
 
-        /* ========================= 彻底解决安卓滚动穿透、布局错乱、留白问题 ========================= */
         /* 针对所有可能滚动的容器，加这个属性能阻断安卓系统底层的过度滚动(Overscroll)，让页面稳如泰山 */
         .chat-app-content, .chat-conv-messages, .contact-list-container, #role-settings-page, 
         #settings-page, .wb-content, .wallet-details-content, .forum-home-content, 
@@ -256,29 +255,10 @@
         #forum-detail-posts-area, .mall-content, #mall-detail-content, .takeout-content-wrapper, 
         .takeout-shop-sidebar, .takeout-shop-menu-main, .takeout-review-list, .cart-item-list,
         .gallery-main-capsule, .wb-modal-scroll-area, #recollection-detail-content, .chat-emotion-grid {
-            overscroll-behavior-y: contain; /* 关键：阻止滚动事件冒泡引起外层框架被拖拽位移 */
+            overscroll-behavior-y: contain;
             -webkit-overflow-scrolling: touch;
         }
 
-
-        /* ========================= 彻底解决安卓滚动穿透、布局错乱、留白问题 ========================= */
-        /* 针对所有可能滚动的容器，加这个属性能阻断安卓系统底层的过度滚动(Overscroll)，让页面稳如泰山 */
-        .chat-app-content, .chat-conv-messages, .contact-list-container, #role-settings-page, 
-        #settings-page, .wb-content, .wallet-details-content, .forum-home-content, 
-        .forum-page, .forum-detail-main-scroll, #forum-list-container, #forum-posts-area, 
-        #forum-detail-posts-area, .mall-content, #mall-detail-content, .takeout-content-wrapper, 
-        .takeout-shop-sidebar, .takeout-shop-menu-main, .takeout-review-list, .cart-item-list,
-        .gallery-main-capsule, .wb-modal-scroll-area, #recollection-detail-content, .chat-emotion-grid {
-            overscroll-behavior-y: contain; /* 关键：阻止滚动事件冒泡引起外层框架被拖拽位移 */
-            -webkit-overflow-scrolling: touch;
-        }
-
-        body {
-             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
-             position: relative;
-             transition: background-image 0.3s ease-in-out;
-             /* 🚨 移除有毒的 z-index: -2，解决安卓大面积内容展示不全的问题 */
-        }
 
         #home-screen {
              width: 100%;
@@ -4324,18 +4304,18 @@
         }
         
               /* --- 手机外框 - 新增与修改 --- */
-               #app-wrapper {
-          width: 100vw;
-          height: 100vh;
-          height: 100dvh;
+         #app-wrapper {
+          width: 100%;
+          height: 100%;
           position: absolute; 
           top: 0;
           left: 0;
           background-size: cover;
           background-position: center;
           overflow: hidden;
-          overscroll-behavior: none; /* 彻底防止内部穿透拖拽 */
+          overscroll-behavior: none;
         }
+
 
         
         body.phone-frame-active #home-screen {
