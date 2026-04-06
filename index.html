@@ -221,58 +221,36 @@
             --takeout-border-radius-l: 20px;
             --takeout-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
-         html, body {
+            html, body {
              width: 100%;
-             height: 100%;
+             height: 100vh; /* 兜底方案 */
+             height: 100dvh; /* 适配安卓动态导航栏，解决高度截断跳动 */
              overflow: hidden;
              margin: 0;
              padding: 0;
-             background-color: #000; /* 去除白底，完美融合 iOS 底部安全区 */
-             overscroll-behavior: none; /* 彻底禁止安卓边缘回弹/下拉刷新 */
+             background-color: #000; /* 防止滚动漏底导致闪屏 */
         }
-
-        body {
-             position: absolute;
-             top: 0;
-             left: 0;
-             right: 0;
-             bottom: 0;
-             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
-             transition: background-image 0.3s ease-in-out;
-        }
-
         * {
              box-sizing: border-box;
              user-select: none;
              -webkit-tap-highlight-color: transparent;
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
-
-        /* 针对所有可能滚动的容器，加这个属性能阻断安卓系统底层的过度滚动(Overscroll)，让页面稳如泰山 */
-        .chat-app-content, .chat-conv-messages, .contact-list-container, #role-settings-page, 
-        #settings-page, .wb-content, .wallet-details-content, .forum-home-content, 
-        .forum-page, .forum-detail-main-scroll, #forum-list-container, #forum-posts-area, 
-        #forum-detail-posts-area, .mall-content, #mall-detail-content, .takeout-content-wrapper, 
-        .takeout-shop-sidebar, .takeout-shop-menu-main, .takeout-review-list, .cart-item-list,
-        .gallery-main-capsule, .wb-modal-scroll-area, #recollection-detail-content, .chat-emotion-grid {
-            overscroll-behavior-y: contain;
-            -webkit-overflow-scrolling: touch;
+        body {
+             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+             position: relative;
+             transition: background-image 0.3s ease-in-out;
+             /* 🚨 移除有毒的 z-index: -2，解决安卓大面积内容展示不全的问题 */
         }
-
 
         #home-screen {
              width: 100%;
              height: 100%;
-             position: absolute; /* 紧紧吸附在容器内 */
-             top: 0;
-             left: 0;
              display: flex;
              flex-direction: column;
-             padding: 0; /* 【关键修复】删掉底部的 padding，将安全区空间转移，彻底消除 iOS 底部的白块，实现真全屏 */
+             padding: 0 0 env(safe-area-inset-bottom, 20px) 0;
              transition: opacity 0.3s ease, transform 0.3s ease;
          }
-
-
                 body.settings-active #home-screen,
         body.chat-active #home-screen,
         body.wallet-active #home-screen,
@@ -461,15 +439,12 @@
             text-shadow: none;
         }
         /* --- 新增结束 --- */
-             /* 底栏样式 */
+                
+        /* 底栏样式 */
         #dock-area {
-             /* 将原本在 home-screen 的底部安全区转移到这里，让 dock 完美向下填充空白区域 */
-             height: calc(95px + env(safe-area-inset-bottom, 20px)); 
-             width: 100%; display: flex; justify-content: center; align-items: flex-start; /* 靠上对齐，避开底部黑条 */
-             padding: 10px 15px env(safe-area-inset-bottom, 20px) 15px; flex-shrink: 0;
+             height: 95px; width: 100%; display: flex; justify-content: center; align-items: center;
+             padding: 0 15px 10px 15px; flex-shrink: 0;
          }
-
-
         .dock-container {
              width: 100%; max-width: 350px; height: 100%;
              background: rgba(255, 255, 255, 0.2);
@@ -4303,7 +4278,7 @@
             transform: translateY(0);
         }
         
-              /* --- 手机外框 - 新增与修改 --- */
+            /* --- 手机外框 - 新增与修改 --- */
          #app-wrapper {
           width: 100%;
           height: 100%;
@@ -4312,8 +4287,8 @@
           left: 0;
           background-size: cover;
           background-position: center;
-          overflow: hidden;
-          overscroll-behavior: none;
+          /* 【重要修复】使用 will-change 替代 transform 来触发硬件加速，解决安卓 position:fixed 布局错乱问题 */
+          will-change: transform, opacity;
         }
 
 
@@ -6322,10 +6297,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .gallery-albums-capsule.manage-mode .gallery-album-wrapper { animation: jiggle 0.3s infinite; }
         /* ========================= 图库样式结束 ========================= */
 
-        /* ========================= hushhh App 样式 (大卡片画廊版) ========================= */
+        /* ========================= hushhh App 样式 (可爱粉白滑动版) ========================= */
         #hushhh-app-page {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #FFF8FA; /* 极浅的可爱粉色背景 */
+            background-color: #FFF0F5; /* 可爱的浅粉色背景 */
             z-index: 650;
             display: flex; flex-direction: column;
             transform: translateY(100%);
@@ -6334,105 +6309,124 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
         body.hushhh-active #hushhh-app-page { transform: translateY(0); }
         
-        /* 悬浮返回按钮，取代传统顶栏 */
-        .hushhh-float-back-btn {
-            position: absolute; top: 15px; left: 20px;
-            width: 36px; height: 36px; background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.2);
-            z-index: 100; cursor: pointer;
+        /* 顶部导航栏 */
+        .hushhh-header {
+            padding: 45px 20px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fff; flex-shrink: 0;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.15);
+            position: relative;
         }
-        body.ios-mode-active .hushhh-float-back-btn { top: calc(env(safe-area-inset-top, 20px) + 15px); }
-        body.phone-frame-active .hushhh-float-back-btn, 
-        body.tablet-mode-active .hushhh-float-back-btn { top: calc(15px + var(--status-bar-height)); }
+        body.ios-mode-active .hushhh-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
+        body.phone-frame-active .hushhh-header { padding-top: calc(15px + var(--status-bar-height)); }
+        
+        .hushhh-title {
+            font-size: 18px; font-weight: 600; color: #F5B3C9;
+            position: absolute; left: 50%; transform: translateX(-50%);
+        }
+        .hushhh-back-btn {
+            width: 30px; height: 30px; object-fit: contain; cursor: pointer;
+        }
 
-        /* 发光提示文字 */
+        /* 提示文字：发光效果 */
         .hushhh-glow-text {
-            text-align: center; font-size: 19px; font-weight: bold; color: #ff8fb3;
-            margin-top: calc(env(safe-area-inset-top, 20px) + 70px);
-            text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.3);
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff8fb3;
+            margin: 40px 20px 10px;
+            text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.4);
             animation: pulse-glow 2s infinite ease-in-out;
-            flex-shrink: 0;
         }
-        body.phone-frame-active .hushhh-glow-text, 
-        body.tablet-mode-active .hushhh-glow-text { margin-top: calc(80px + var(--status-bar-height)); }
-
         @keyframes pulse-glow {
-            0%, 100% { text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.3); transform: scale(1); }
-            50% { text-shadow: 0 0 15px rgba(255, 143, 179, 0.8), 0 0 30px rgba(255, 143, 179, 0.5); transform: scale(1.02); }
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.4); transform: scale(1); }
+            50% { text-shadow: 0 0 15px rgba(255, 143, 179, 0.8), 0 0 30px rgba(255, 143, 179, 0.6); transform: scale(1.02); }
         }
 
-        /* 横向滑动的大卡片画廊 */
+        /* 横向滑动的卡片容器 */
         .hushhh-slider-container {
-            flex: 1; display: flex; align-items: center; overflow-x: auto;
-            scroll-snap-type: x mandatory; padding: 0 15vw; gap: 20px;
-            scrollbar-width: none;
+            flex: 1;
+            display: flex;
+            align-items: center; /* 垂直居中 */
+            overflow-x: auto;
+            scroll-snap-type: x mandatory; /* 让卡片滚动时自动吸附居中 */
+            padding: 20px;
+            gap: 20px; /* 卡片间距 */
+            scrollbar-width: none; /* 隐藏滚动条 */
         }
         .hushhh-slider-container::-webkit-scrollbar { display: none; }
 
         .hushhh-card {
-            min-width: 75vw; max-width: 320px; height: 60vh; max-height: 500px;
-            background: #fff; border-radius: 35px; scroll-snap-align: center;
-            position: relative; overflow: hidden; flex-shrink: 0;
-            box-shadow: 0 15px 35px rgba(229, 138, 171, 0.25);
+            min-width: 65%; /* 占据屏幕大部分，左右露出一角 */
+            max-width: 280px;
+            aspect-ratio: 3 / 4; /* 长方形漂亮卡片 */
+            background: #fff;
+            border-radius: 24px;
+            scroll-snap-align: center; /* 强制居中吸附 */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(229, 138, 171, 0.2);
+            cursor: pointer; transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
         }
+        .hushhh-card:active { transform: scale(0.95); }
         
         .hushhh-card-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 40%;
-            transition: background-color 0.3s; cursor: pointer;
-        }
-        .hushhh-card-content {
-            position: absolute; top: 40%; left: 0; width: 100%; height: 60%;
-            display: flex; flex-direction: column; align-items: center; padding-top: 10px;
+            background: linear-gradient(135deg, #FDCEDF, #F5B3C9);
+            z-index: 0;
         }
         
         .hushhh-card-avatar {
-            width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
-            border: 6px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-top: -65px; background: #eee; z-index: 10;
+            width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1; margin-bottom: 15px; background: #eee;
         }
         .hushhh-card-name {
-            font-size: 22px; font-weight: bold; color: #333; margin-top: 15px;
+            font-size: 20px; font-weight: bold; color: #333; z-index: 1;
         }
-        .hushhh-card-eye-btn {
-            margin-top: auto; margin-bottom: 25px; cursor: pointer;
-            padding: 10px; border-radius: 50%;
-            transition: transform 0.2s, background 0.2s;
+        .hushhh-card-btn {
+            margin-top: 25px; padding: 10px 25px; border-radius: 20px;
+            background: #fff0f5; color: #ff8fb3; font-weight: bold; font-size: 14px;
+            z-index: 1; pointer-events: none; border: 1px solid #ffeff4;
         }
-        .hushhh-card-eye-btn:active { transform: scale(0.9); background: #fff0f5; }
 
-        /* 放大版假手机界面容器 */
+        /* 假手机界面容器 */
         .hushhh-fake-phone-container {
-            flex: 1; display: flex; justify-content: center; align-items: center; 
-            padding: 20px; position: relative;
+            flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px;
         }
-        /* 放大的手机外壳 */
+        /* 可爱圆滑的假手机外壳 */
         .hushhh-fake-phone {
-            width: 90vw; max-width: 420px; height: 85vh; max-height: 850px;
-            background: #fff; border: 12px solid #ffe6ee; 
-            border-radius: 50px; 
-            padding: 90px 25px 20px; /* 顶部距离加大到 90px，远远避开刘海 */
-            box-shadow: 0 15px 40px rgba(229, 138, 171, 0.4);
+            width: 100%; max-width: 320px; height: 600px;
+            background: #fff; border: 10px solid #ffe6ee; /* 粉色粗外壳 */
+            border-radius: 40px; padding: 30px 20px;
+            box-shadow: 0 15px 40px rgba(229, 138, 171, 0.3);
             display: grid; grid-template-columns: repeat(4, 1fr);
-            grid-auto-rows: 80px; gap: 15px; align-content: start;
+            grid-auto-rows: 75px; gap: 15px; align-content: start;
             position: relative; overflow: hidden;
         }
         /* 手机上的刘海 */
         .hushhh-fake-phone::before {
-            content: ''; position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-            width: 120px; height: 30px; background: #ffe6ee; border-radius: 15px; z-index: 10;
+            content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            width: 80px; height: 20px; background: #ffe6ee; border-radius: 10px; z-index: 10;
         }
-        
-        .hushhh-fake-app { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; z-index: 5; }
+        /* 手机上的App图标 (可爱风) */
+        .hushhh-fake-app {
+            display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; z-index: 5;
+        }
         .hushhh-fake-app-icon {
-            width: 55px; height: 55px; border-radius: 18px;
+            width: 50px; height: 50px; border-radius: 16px;
             background: #fdfafb; border: 1px solid #ffeff4;
             display: flex; justify-content: center; align-items: center;
-            font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             transition: transform 0.2s;
         }
         .hushhh-fake-app:active .hushhh-fake-app-icon { transform: scale(0.9); }
-        .hushhh-fake-app-name { font-size: 12px; color: #555; font-weight: 500; }
+        .hushhh-fake-app-name {
+            font-size: 11px; color: #555; font-weight: 500;
+        }
         /* ========================= hushhh App 样式结束 ========================= */
 
     </style>
@@ -7861,27 +7855,28 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 <!-- ========================= hushhh App HTML ========================= -->
 <div id="hushhh-app-page">
     <!-- 视图1：滑动选择好友卡片 -->
-    <div id="hushhh-view-list" style="display: flex; flex-direction: column; height: 100%; position: relative;">
-        <!-- 悬浮返回按钮，去掉原来占位置的顶栏 -->
-        <div class="hushhh-float-back-btn" onclick="closeHushhhApp()">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" style="width: 20px; height: 20px; object-fit: contain;">
+    <div id="hushhh-view-list" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="hushhh-header">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="hushhh-back-btn" onclick="closeHushhhApp()">
+            <span class="hushhh-title">HUshhh</span>
+            <span style="width: 30px;"></span>
         </div>
         
-        <!-- 发光文字移到了这里 -->
         <div class="hushhh-glow-text">选择查看哪位好友的手机？</div>
         
-        <!-- 横向滑动的大卡片画廊容器 -->
+        <!-- 横向滑动的相册/卡片容器 -->
         <div class="hushhh-slider-container" id="hushhh-friend-list">
             <!-- 好友卡片会由JS生成到这里 -->
         </div>
     </div>
 
     <!-- 视图2：目标的手机界面 -->
-    <div id="hushhh-view-target" style="display: none; flex-direction: column; height: 100%; position: relative;">
-        <div class="hushhh-float-back-btn" onclick="backToHushhhList()">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" style="width: 20px; height: 20px; object-fit: contain;">
+    <div id="hushhh-view-target" style="display: none; flex-direction: column; height: 100%;">
+        <div class="hushhh-header">
+            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="hushhh-back-btn" onclick="backToHushhhList()">
+            <span class="hushhh-title" id="hushhh-target-title">TA的手机</span>
+            <span style="width: 30px;"></span>
         </div>
-        
         <div class="hushhh-fake-phone-container">
             <div class="hushhh-fake-phone" id="hushhh-fake-phone-screen">
                 <!-- 模拟对方的手机壁纸层 -->
@@ -19684,7 +19679,7 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
         e.target.value = '';
     };
 
-       // ========================= hushhh App JS 逻辑 =========================
+    // ========================= hushhh App JS 逻辑 =========================
     window.openHushhhApp = () => {
         document.body.classList.add('hushhh-active');
         document.getElementById('hushhh-view-list').style.display = 'flex';
@@ -19697,112 +19692,68 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
         let contacts = [];
         try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e){}
         
-        // 读取背景色缓存
-        let savedColors = {};
-        try { savedColors = JSON.parse(localStorage.getItem('hushhhCardColors_v1') || '{}'); } catch(e){}
+        // 加入占位块，确保第一张和最后一张卡片也能滑动到正中间
+        const paddingBlockStart = document.createElement('div');
+        paddingBlockStart.style.minWidth = '10%';
+        paddingBlockStart.style.flexShrink = '0';
+        
+        const paddingBlockEnd = document.createElement('div');
+        paddingBlockEnd.style.minWidth = '10%';
+        paddingBlockEnd.style.flexShrink = '0';
 
-        // 如果没有好友
         if(contacts.length === 0) {
             container.innerHTML = '<div style="color:#999; text-align:center; width: 100%;">还没有创建角色哦，去首页添加一个吧~</div>';
             return;
         }
-
-        // 占位块，确保第一张和最后一张卡片能滑动到正中间
-        const paddingBlockStart = document.createElement('div');
-        paddingBlockStart.style.minWidth = '5vw';
-        paddingBlockStart.style.flexShrink = '0';
-        const paddingBlockEnd = document.createElement('div');
-        paddingBlockEnd.style.minWidth = '5vw';
-        paddingBlockEnd.style.flexShrink = '0';
 
         container.appendChild(paddingBlockStart);
 
         contacts.forEach(c => {
             const item = document.createElement('div');
             item.className = 'hushhh-card';
-            
-            const bgColor = savedColors[c.id] || '#FDCEDF'; // 默认粉色
-
+            item.onclick = () => openHushhhTargetPhone(c);
             item.innerHTML = `
-                <!-- 可点击修改颜色的背景区 -->
-                <div class="hushhh-card-bg" id="hushhh-bg-${c.id}" style="background-color: ${bgColor};" onclick="document.getElementById('hushhh-color-${c.id}').click()">
-                    <input type="color" id="hushhh-color-${c.id}" value="${bgColor}" style="visibility:hidden; position:absolute;" oninput="document.getElementById('hushhh-bg-${c.id}').style.backgroundColor = this.value;" onchange="saveHushhhCardColor('${c.id}', this.value)">
-                </div>
-                
-                <div class="hushhh-card-content">
-                    <img src="${c.avatar}" class="hushhh-card-avatar">
-                    <div class="hushhh-card-name">${escapeHtml(c.alias || c.name)}</div>
-                    
-                    <!-- 底部眼睛图标 -->
-                    <div class="hushhh-card-eye-btn" onclick="openEyeAndTarget('${c.id}')">
-                        <!-- 闭眼状态 SVG -->
-                        <svg id="eye-closed-${c.id}" viewBox="0 0 24 24" width="36" height="36" stroke="#ff8fb3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 12c-2.66 4.66-6 7-10 7s-7.34-2.34-10-7"/>
-                            <path d="M12 16v3"/>
-                            <path d="M16 15l2 2"/>
-                            <path d="M8 15l-2 2"/>
-                        </svg>
-                        <!-- 睁眼状态 SVG (默认隐藏) -->
-                        <svg id="eye-open-${c.id}" style="display:none;" viewBox="0 0 24 24" width="36" height="36" stroke="#ff8fb3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                    </div>
-                </div>
+                <div class="hushhh-card-bg"></div>
+                <img src="${c.avatar}" class="hushhh-card-avatar">
+                <div class="hushhh-card-name">${escapeHtml(c.alias || c.name)}</div>
+                <div class="hushhh-card-btn">一键查看</div>
             `;
             container.appendChild(item);
         });
 
         container.appendChild(paddingBlockEnd);
         
-        // 重置滑动位置
-        setTimeout(() => { container.scrollLeft = 0; }, 50);
-    };
-
-    window.saveHushhhCardColor = (contactId, color) => {
-        let savedColors = {};
-        try { savedColors = JSON.parse(localStorage.getItem('hushhhCardColors_v1') || '{}'); } catch(e){}
-        savedColors[contactId] = color;
-        localStorage.setItem('hushhhCardColors_v1', JSON.stringify(savedColors));
-    };
-
-    window.openEyeAndTarget = (contactId) => {
-        // 切换为睁眼状态
-        document.getElementById(`eye-closed-${contactId}`).style.display = 'none';
-        document.getElementById(`eye-open-${contactId}`).style.display = 'block';
-        
-        let contacts = [];
-        try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e){}
-        const contact = contacts.find(c => c.id == contactId);
-
-        // 延迟 400ms，让人看清睁眼动画后进入目标手机
+        // 每次打开重置滑动条位置到最左边
         setTimeout(() => {
-            if (!contact) return;
-            document.getElementById('hushhh-view-list').style.display = 'none';
-            document.getElementById('hushhh-view-target').style.display = 'flex';
-            
-            const wallpaper = document.getElementById('hushhh-target-wallpaper');
-            if (contact.backgroundImage) {
-                wallpaper.style.backgroundImage = `url(${contact.backgroundImage})`;
-            } else {
-                wallpaper.style.backgroundImage = 'none';
-            }
-        }, 400);
+            container.scrollLeft = 0;
+        }, 50);
     };
 
     window.closeHushhhApp = () => {
         document.body.classList.remove('hushhh-active');
     };
 
+    window.openHushhhTargetPhone = (contact) => {
+        // 切换到第二页手机视图
+        document.getElementById('hushhh-view-list').style.display = 'none';
+        document.getElementById('hushhh-view-target').style.display = 'flex';
+        
+        // 设置顶部的名字为好友的名字
+        document.getElementById('hushhh-target-title').innerText = escapeHtml(contact.alias || contact.name) + "的手机";
+        
+        // 【彩蛋】如果该好友在聊天里设置了“聊天背景图”，就把它当作ta的手机壁纸！
+        const wallpaper = document.getElementById('hushhh-target-wallpaper');
+        if (contact.backgroundImage) {
+            wallpaper.style.backgroundImage = `url(${contact.backgroundImage})`;
+        } else {
+            wallpaper.style.backgroundImage = 'none';
+        }
+    };
+
     window.backToHushhhList = () => {
+        // 返回卡片列表视图
         document.getElementById('hushhh-view-target').style.display = 'none';
         document.getElementById('hushhh-view-list').style.display = 'flex';
-        
-        // 把所有的眼睛恢复成闭眼状态
-        document.querySelectorAll('.hushhh-card-eye-btn svg').forEach(svg => {
-            if (svg.id.startsWith('eye-closed')) svg.style.display = 'block';
-            if (svg.id.startsWith('eye-open')) svg.style.display = 'none';
-        });
     };
     // ========================= hushhh JS 逻辑结束 =========================
 
