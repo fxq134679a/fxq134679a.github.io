@@ -221,15 +221,16 @@
             --takeout-border-radius-l: 20px;
             --takeout-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
-            html, body {
+          html, body {
              width: 100%;
              height: 100vh; /* 兜底方案 */
              height: 100dvh; /* 适配安卓动态导航栏，解决高度截断跳动 */
              overflow: hidden;
              margin: 0;
              padding: 0;
-             background-color: #000; /* 防止滚动漏底导致闪屏 */
+             background-color: #f7f7f7; /* 修复：去除黑色背景，解决苹果底部黑边 */
         }
+
         * {
              box-sizing: border-box;
              user-select: none;
@@ -4278,23 +4279,19 @@
             transform: translateY(0);
         }
         
-            /* --- 手机外框 - 新增与修改 --- */
+              /* --- 手机外框 - 新增与修改 --- */
         #app-wrapper {
           width: 100%;
           height: 100%;
-          position: absolute; /* 改为绝对定位，彻底脱离文档流更稳定 */
+          position: absolute; 
           top: 0;
           left: 0;
           background-size: cover;
           background-position: center;
-          /* 🚨 强制开启 GPU 硬件加速，彻底解决安卓因毛玻璃和动画引起的闪屏黑屏问题 */
-          transform: translateZ(0); 
-          -webkit-transform: translateZ(0);
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
-          perspective: 1000;
-          -webkit-perspective: 1000;
+          overflow: hidden;
+          /* 修复：移除有毒的 transform 和 perspective，否则会导致内部所有的 fixed 定位降级，造成安卓排版毁灭性错位 */
         }
+
 
         
         body.phone-frame-active #home-screen {
