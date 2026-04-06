@@ -6,14 +6,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-      <!-- 修改应用名称 -->
+    <!-- 修改应用名称 -->
     <meta name="apple-mobile-web-app-title" content="圈圈机">
     <title>圈圈机</title>
     
-    <!-- 设置主屏幕图标和浏览器图标（已去除） -->
+    <!-- 设置主屏幕图标和浏览器图标 -->
+    <link rel="apple-touch-icon" href="https://img.heliar.top/file/1773263760361_IMG_4342.jpeg">
+    <link rel="icon" href="https://img.heliar.top/file/1773263760361_IMG_4342.jpeg">
     
     <style>
-
         /* ========================= 外卖订单历史页面美化 ========================= */
         .takeout-order-card {
             background-color: #fff;
@@ -228,17 +229,15 @@
              -webkit-tap-highlight-color: transparent;
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
-       body {
-     width: 100vw;
-     /* height: 100vh;  我们不再使用这个不稳定的单位 */
-     height: var(--app-height); /* 我们改用下面JS代码计算出的固定高度 */
-     overflow: hidden;
-     background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
-     position: relative;
-     transition: background-image 0.3s ease-in-out;
-    z-index: -2;
-}
-
+        body {
+             width: 100vw;
+             height: 100vh;
+             overflow: hidden;
+             background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+             position: relative;
+             transition: background-image 0.3s ease-in-out;
+            z-index: -2;
+        }
         #home-screen {
              width: 100%;
              height: 100%;
@@ -247,15 +246,14 @@
              padding: 0 0 env(safe-area-inset-bottom, 20px) 0;
              transition: opacity 0.3s ease, transform 0.3s ease;
          }
-                body.settings-active #home-screen,
+        body.settings-active #home-screen,
         body.chat-active #home-screen,
         body.wallet-active #home-screen,
         body.worldbook-active #home-screen,
         body.forum-active #home-screen,
         body.recollection-active #home-screen,
         body.mall-active #home-screen,
-        body.takeout-active #home-screen,
-        body.gallery-active #home-screen { /* <-- 新增图库App */
+        body.takeout-active #home-screen { /* <-- 新增外卖App */
              opacity: 0;
              transform: scale(0.95);
              pointer-events: none;
@@ -297,42 +295,11 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
-              /* --- 网格区域与滑动主屏 --- */
-        .home-swiper-container {
-            flex: 1;
-            display: flex;
-            width: 100%;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        .home-swiper-container::-webkit-scrollbar {
-            display: none;
-        }
-        .home-page-slide {
-            width: 100%;
-            height: 100%;
-            flex-shrink: 0;
-            scroll-snap-align: start;
-            display: flex;
-            flex-direction: column;
-        }
-        .second-page-grid {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 25px 10px 25px; 
-            display: flex;
-            justify-content: flex-start;
-            gap: 20px;
-        }
-
+        /* --- 网格区域 --- */
         #grid-area {
              flex: 1;
              display: grid;
              grid-template-columns: 1fr 1fr;
-
              grid-template-rows: 1fr 1fr;
              padding: 0 15px 10px 15px;
              gap: 15px;
@@ -816,7 +783,7 @@
             margin-top: 4px;
             opacity: 0.9;
         }
-                     .transfer-footer-text {
+        .transfer-footer-text {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
             background: transparent;
@@ -824,40 +791,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-              /* ========================= 微信同款语音条样式 ========================= */
-        .voice-bubble-content {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            background: #FFFFFF;
-            color: #333;
-            border-radius: 18px 18px 18px 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            position: relative;
-        }
-        .voice-icon-svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-            margin-right: 6px;
-        }
-        .voice-icon-svg.playing .voice-wave-2 {
-            animation: wxVoice2 1s infinite step-start;
-        }
-        .voice-icon-svg.playing .voice-wave-3 {
-            animation: wxVoice3 1s infinite step-start;
-        }
-        @keyframes wxVoice2 { 0% { opacity: 0; } 33% { opacity: 1; } 100% { opacity: 1; } }
-        @keyframes wxVoice3 { 0% { opacity: 0; } 66% { opacity: 1; } 100% { opacity: 1; } }
-        /* ========================= 微信语音样式结束 ========================= */
-
         /* --- 美化后的气泡菜单 (粉白圆滑风格) --- */
-
-
         .bubble-context-menu {
             position: absolute;
             background-color: rgba(255, 255, 255, 0.95); /* 半透明白色背景 */
@@ -984,125 +918,10 @@
             padding: 0 20px; font-size: 16px; color: #333;
             transition: background-color 0.2s;
         }
-             .chat-conv-input:focus { background-color: #F5F5F7; border: 1px solid rgba(229, 138, 171, 0.3); }
-
-        /* --- 新增：底部爱心/表情延伸面板样式 --- */
-        .chat-emotion-panel {
-            height: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            transition: height 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-            overflow: hidden;
-            width: 100%;
-            flex-shrink: 0;
-            box-sizing: border-box;
-            border-top: 1px solid rgba(255, 240, 245, 0.8);
-        }
-        .chat-emotion-panel.active {
-            height: 33vh; /* 弹出三分之一的高度 */
-            padding-bottom: env(safe-area-inset-bottom, 0px); /* 让内容不被底边挡住 */
-        }
-             /* 面板展开时，取消底栏自带的安全区补偿，将底部距离转交给面板 */
-        .chat-conv-footer.panel-open {
-            padding-bottom: 10px;
-        }
-
-        /* 表情面板顶部导航栏 */
-        .emotion-panel-top {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            background: #fdfafb;
-            border-bottom: 1px solid rgba(255, 240, 245, 0.8);
-            width: 100%;
-            overflow-x: auto;
-            flex-shrink: 0;
-        }
-        .emotion-panel-top::-webkit-scrollbar {
-            display: none; /* 隐藏滚动条但保留滑动功能 */
-        }
-        
-        /* 最左侧固定的爱心图标底座 */
-        .emotion-default-icon {
-            width: 40px;
-            height: 40px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #fff;
-            border-radius: 10px;
-            margin-right: 12px;
-            box-shadow: 0 2px 5px rgba(229, 138, 171, 0.15);
-            cursor: pointer;
-            border: 1px solid #ffeff4;
-        }
-        .emotion-default-icon img {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-        }
-
-        /* 右侧排列正方形图片的容器 */
-        .emotion-square-list {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-        }
-        /* 预设未来添加的正方形图片样式 */
-        .emotion-square-item {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: #fff;
-            object-fit: cover;
-            flex-shrink: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            cursor: pointer;
-            border: 1px solid #eee;
-        }
-
-              /* 表情面板下方的内容主体区 */
-        .emotion-panel-content {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ccc;
-            font-size: 13px;
-            overflow: hidden;
-        }
-        /* 新增：聊天表情包网格排版 */
-        .chat-emotion-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            padding: 15px;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            align-content: start;
-        }
-        .chat-emotion-grid::-webkit-scrollbar { display: none; }
-        .chat-emotion-item {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 12px;
-            object-fit: cover;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(229, 138, 171, 0.2);
-            border: 1px solid #ffeff4;
-            transition: transform 0.1s;
-        }
-        .chat-emotion-item:active { transform: scale(0.9); }
-        /* --- 新增结束 --- */
-
+        .chat-conv-input:focus { background-color: #F5F5F7; border: 1px solid rgba(229, 138, 171, 0.3); }
 
         /* Chat Extra Menu (功能集弹窗) */
         #chat-extra-menu {
-
             position: absolute;
             bottom: 75px;
             left: 10px;
@@ -2229,19 +2048,14 @@
             gap: 30px 15px; align-content: start;
             perspective: 1000px; 
         }
-             .wb-book-item {
+        .wb-book-item {
             display: flex; flex-direction: column; align-items: center; cursor: pointer;
             width: 100%;
             transform-style: preserve-3d; 
             /* 恢复正面摆放 */
             transform: rotateY(0deg) rotateX(0deg); 
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* --- 新增：禁止长按出现系统拷贝框或选中文字 --- */
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
         }
-
              /* 长按时，沿另外的对角线翻转 */
         .wb-book-item:active { 
             transform: rotateY(30deg) rotateX(-10deg) scale(0.95); 
@@ -3380,16 +3194,16 @@
             transform: translateY(0);
         }
 
-              .mall-header {
+        .mall-header {
             padding: 35px 20px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #fff; 
+            background-color: #fff; /* 纯白色背景 */
             flex-shrink: 0;
-            border-bottom: none; 
+            border-bottom: 1px solid var(--text-light-gray, #f0f0f0);
             transition: padding-top 0.3s ease;
-            position: relative; 
+            position: relative; /* For title centering */
             z-index: 10;
         }
         .mall-header .back-btn {
@@ -3401,7 +3215,7 @@
         .mall-header-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--theme-pink-title); 
+            color: var(--theme-pink-title); /* 浅粉色 #f5b3c9 */
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
@@ -3420,10 +3234,10 @@
         .mall-add-btn {
             width: 32px;
             height: 32px;
-            background-color: var(--theme-pink-btn); 
+            background-color: var(--theme-pink-btn); /* 粉色背景 #F5B3C9 */
             border: none;
             border-radius: 50%;
-            color: white; 
+            color: white; /* 白色图标 */
             font-size: 22px;
             font-weight: bold;
             display: flex;
@@ -3431,22 +3245,18 @@
             align-items: center;
             cursor: pointer;
             line-height: 1;
-            padding-bottom: 2px; 
+            padding-bottom: 2px; /* Visual centering for '+' */
         }
 
         .mall-category-nav {
             display: flex;
             overflow-x: auto;
             background-color: #fff;
-            padding: 0 15px 12px 15px; 
+            padding: 0 15px;
             flex-shrink: 0;
-            border-bottom: none; 
-            border-radius: 0 0 24px 24px; 
-            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.08); 
-            margin-bottom: 8px; 
-            position: relative;
-            z-index: 9;
+            border-bottom: 1px solid #f0f0f0; /* 浅灰色分割线 */
         }
+        /* Hide scrollbar */
         .mall-category-nav::-webkit-scrollbar { display: none; }
         .mall-category-nav { scrollbar-width: none; }
 
@@ -3454,13 +3264,13 @@
             padding: 12px 10px;
             font-size: 15px;
             font-weight: 500;
-            color: var(--theme-pink-text); 
+            color: var(--theme-pink-text); /* 未选中：浅粉色文字 #E58AAB */
             cursor: pointer;
             white-space: nowrap;
             position: relative;
             flex-shrink: 0;
             margin: 0 5px;
-            user-select: text; 
+            user-select: text; /* Allow text selection for double click */
         }
         .mall-category-item.active {
             font-weight: 700;
@@ -3481,12 +3291,13 @@
         .mall-content {
             flex: 1;
             overflow-y: auto;
-            background-color: var(--theme-pink-bg-soft); 
+            background-color: var(--theme-pink-bg-soft); /* 柔和粉色系背景 */
             padding: 20px;
-            color: #333; 
+            color: #333; /* 深灰色常规文字 */
             padding-bottom: 80px;
         }
         
+        /* NEW: Mall Product Grid */
         .mall-product-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -3507,7 +3318,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 50px; 
+            font-size: 50px; /* For Emoji */
         }
         .product-details {
             padding: 10px;
@@ -3517,12 +3328,13 @@
             color: #333;
             font-weight: 500;
             margin-bottom: 8px;
+            /* MODIFIED FOR TAOBAO STYLE */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            height: 2.8em; 
+            height: 2.8em; /* 1.4em * 2 lines */
             line-height: 1.4em;
             white-space: normal;
         }
@@ -3555,6 +3367,7 @@
             color: #a19f9b;
         }
 
+        /* NEW: Mall Modals */
         #mall-category-modal .wb-entry-input.val,
         #mall-category-desc-input {
             background-color: #ffffff;
@@ -3571,7 +3384,7 @@
             color: #aaa;
             font-style: italic;
         }
-        
+                 /* --- NEW: Mall Detail Page Styles --- */
         #mall-detail-page {
             position: fixed;
             top: 0;
@@ -3579,7 +3392,7 @@
             width: 100%;
             height: 100%;
             background-color: #f7f7f7;
-            z-index: 558; 
+            z-index: 558; /* [提升层级，防止被收藏页遮挡] */
             display: flex;
             flex-direction: column;
             transform: translateX(100%);
@@ -3595,11 +3408,8 @@
             align-items: center;
             background-color: #fff;
             flex-shrink: 0;
-            border-bottom: none; 
-            border-radius: 0 0 24px 24px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            border-bottom: 1px solid #f0f0f0;
             position: relative;
-            z-index: 10;
         }
         body.ios-mode-active #mall-detail-page .mall-detail-header {
              padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
@@ -3613,21 +3423,18 @@
         .mall-detail-content {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 80px; 
+            padding-bottom: 80px; /* 为底部按钮留出空间 */
         }
         .mall-detail-img-container {
             background-color: #fff;
             padding: 40px 20px;
             text-align: center;
             font-size: 120px;
-            border-radius: 16px;
-            margin: 10px 10px 0 10px;
         }
         .mall-detail-info-card {
             background-color: #fff;
             padding: 20px;
-            margin: 10px 10px 0 10px;
-            border-radius: 16px;
+            margin-top: 10px;
         }
         .mall-detail-price {
             color: #ff5000;
@@ -3654,8 +3461,7 @@
         .mall-detail-reviews-card {
             background-color: #fff;
             padding: 20px;
-            margin: 10px 10px 0 10px;
-            border-radius: 16px;
+            margin-top: 10px;
         }
         .mall-detail-reviews-card h3 {
             font-size: 16px;
@@ -3682,7 +3488,7 @@
         }
         .review-stars {
             font-size: 14px;
-            color: #ffd700; 
+            color: #ffd700; /* 星星颜色 */
         }
         .review-content {
             font-size: 14px;
@@ -3697,9 +3503,7 @@
             height: calc(60px + env(safe-area-inset-bottom, 0));
             padding-bottom: env(safe-area-inset-bottom, 0);
             background-color: #fff;
-            border-top: none; 
-            border-radius: 24px 24px 0 0; 
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.05); 
+            border-top: 1px solid #f0f0f0;
             display: flex;
             align-items: flex-start;
             padding-top: 5px;
@@ -3713,8 +3517,8 @@
             cursor: pointer;
             width: 60px;
         }
-        .mall-detail-footer .footer-btn.favorite img,
-        .mall-detail-footer .footer-btn.cart img { 
+                .mall-detail-footer .footer-btn.favorite img,
+        .mall-detail-footer .footer-btn.cart img { /* <-- 新增这一行 */
             width: 24px;
             height: 24px;
             margin-top: 4px;
@@ -3742,15 +3546,11 @@
         }
         .mall-bottom-nav {
             background-color: #ffffff;
-            border-top: none; 
-            border-radius: 30px 30px 0 0; 
-            box-shadow: 0 -4px 20px rgba(229, 138, 171, 0.08); 
+            border-top: 1px solid #f0f0f0;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0));
+            padding: 5px 0 calc(5px + env(safe-area-inset-bottom, 0));
             flex-shrink: 0;
-            position: relative;
-            z-index: 20;
         }
         .mall-nav-item {
             display: flex;
@@ -3760,10 +3560,6 @@
             cursor: pointer;
             flex: 1;
             padding: 5px 0;
-            transition: transform 0.2s;
-        }
-        .mall-nav-item:active {
-            transform: scale(0.9);
         }
         .mall-nav-icon {
             width: 24px;
@@ -3777,9 +3573,7 @@
         }
         .mall-nav-item.active .mall-nav-text {
             color: var(--theme-pink-text);
-            font-weight: bold;
         }
-
         
 /* ========================= 新增：商品购买弹窗样式 ========================= */
 #mall-purchase-overlay {
@@ -4807,11 +4601,11 @@
             animation-duration: 2s;
         }
         
-               .crystal-ball-name {
+        .crystal-ball-name {
             color: white;
             font-size: 14px;
             font-weight: 600;
-            /* 删除字体阴影 */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
             z-index: 5;
             position: absolute;
             top: 40%; /* Adjust vertical position inside sphere */
@@ -4821,7 +4615,6 @@
             text-align: center;
             width: 100%;
         }
-
         
         /* --- NEW: Recollection Detail Page (MODIFIED) --- */
         #recollection-detail-page {
@@ -5256,33 +5049,11 @@
         .takeout-me-profile span {
             font-size: 18px; font-weight: 600; color: #333; flex: 1;
         }
-               .takeout-me-setting-icon {
+        .takeout-me-setting-icon {
             width: 24px !important; height: 24px !important; border: none !important; border-radius: 0 !important; object-fit: contain; cursor: pointer;
         }
 
-        /* --- 新增：外卖订单区块样式 --- */
-        .takeout-me-orders-section {
-            background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-        .takeout-me-orders-title {
-            font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px;
-        }
-        .takeout-me-orders-grid {
-            display: flex; justify-content: space-between; align-items: center; padding: 0 5px;
-        }
-        .takeout-me-order-item {
-            display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s;
-        }
-        .takeout-me-order-item:active { transform: scale(0.95); }
-        .takeout-me-order-item img {
-            width: 32px; height: 32px; object-fit: contain;
-        }
-        .takeout-me-order-item span {
-            font-size: 12px; color: #555; font-weight: 500;
-        }
-
         .takeout-me-fav-section {
-
             background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         .takeout-me-fav-header {
@@ -5303,7 +5074,7 @@
         .takeout-me-fav-item:active { transform: scale(0.95); }
         .takeout-me-fav-item img { width: 100%; height: 100%; object-fit: cover; }
 
-               /* 外卖收藏列表页 */
+        /* 外卖收藏列表页 */
         #takeout-favorite-page {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #f7f8fa; z-index: 556; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
         }
@@ -5311,17 +5082,7 @@
         body.ios-mode-active #takeout-favorite-page .takeout-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.phone-frame-active #takeout-favorite-page .takeout-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
 
-        /* 外卖全部订单独立页 */
-        #takeout-all-orders-page {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #f7f8fa; z-index: 556; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-        }
-        #takeout-all-orders-page.active { transform: translateX(0); }
-        body.ios-mode-active #takeout-all-orders-page .takeout-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-        body.phone-frame-active #takeout-all-orders-page .takeout-detail-header,
-        body.tablet-mode-active #takeout-all-orders-page .takeout-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
-
         /* 外卖底部购物车结算栏 */
-
         .takeout-cart-footer {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 65px;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
@@ -5580,17 +5341,13 @@
 .mall-cart-footer {
     flex-shrink: 0;
     background-color: white;
-    border-top: none; 
-    border-radius: 24px 24px 0 0; 
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.04); 
-    padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0));
+    border-top: 1px solid #f0f0f0;
+    padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 0));
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative;
-    z-index: 10;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
 }
-
 .cart-footer-select-all {
     display: flex;
     align-items: center;
@@ -5709,12 +5466,8 @@
     padding: 35px 20px 15px;
     display: flex; align-items: center; justify-content: space-between;
     background-color: #fff; flex-shrink: 0; position: relative;
-    border-bottom: none; 
-    border-radius: 0 0 24px 24px; 
-    box-shadow: 0 4px 15px rgba(229, 138, 171, 0.08); 
-    margin-bottom: 5px; 
+    border-bottom: 1px solid #f0f0f0;
 }
-
 body.ios-mode-active #mall-favorite-page .mall-favorite-header {
     padding-top: calc(env(safe-area-inset-top, 20px) + 15px);
 }
@@ -5876,11 +5629,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             letter-spacing: 0.5px;
         }
 
-                        .lock-big-time {
+                .lock-big-time {
             font-size: 110px;
             font-weight: 900;
-            color: #ffcee1; /* 改成你需要的粉色 */
-            text-shadow: none; /* 去除阴影 */
+            color: rgba(255, 255, 255, 0.9); /* 提高不透明度到90%，非常清晰 */
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); /* 增加柔和阴影，防止在浅色壁纸上看不清 */
             margin-top: 10px;
             line-height: 1;
             text-align: center;
@@ -5894,25 +5647,24 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             justify-content: space-between;
             padding: 0 45px;
         }
-               .lock-action-btn {
-    width: 50px; 
-    height: 50px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.08); /* 白色 8% 透明度 */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
-}
-.lock-action-btn:active {
-    transform: scale(0.9);
-    background-color: rgba(255, 255, 255, 0.2); /* 按下变白一点 */
-}
+        .lock-action-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3); /* 半透明白色背景 */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+                .lock-action-btn:active {
+            transform: scale(0.9);
+            background-color: rgba(255, 255, 255, 0.5);
+        }
         
         /* 锁屏密码页样式 */
         .lock-pwd-overlay {
@@ -5927,13 +5679,14 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             opacity: 1; pointer-events: auto;
         }
         
-                .lock-pwd-main-area {
+        .lock-pwd-main-area {
             display: flex; flex-direction: column; align-items: center;
-            transform: scale(1.3); /* 将1.7缩小到1.3，整体按键和密码点就会等比缩小 */
+            transform: scale(1.7); /* 整体放大，1.7倍适应普通手机屏幕宽度最大值 */
             transform-origin: top center;
             margin-top: 25vh; /* 整体往下移动 */
             margin-bottom: auto; /* 将底部的取消和紧急按钮挤到底部 */
         }
+
         .lock-pwd-title {
             color: white; font-size: 20px; margin-bottom: 25px; letter-spacing: 1px; font-weight: 500;
         }
@@ -5955,13 +5708,12 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         }
         .shake-anim { animation: shakePwd 0.4s ease-in-out; }
         
-                .lock-pwd-keypad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 20px; /* 把30px改成了20px，缩小左右间距 */
+        .lock-pwd-keypad {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 30px; 
         }
 
         .lock-key {
-            width: 65px; height: 65px; /* 把75px改成了65px，让按键圈圈变小一点 */
-            border-radius: 50%;
+            width: 75px; height: 75px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: white; cursor: pointer; transition: background 0.2s;
             user-select: none; -webkit-tap-highlight-color: transparent;
@@ -6000,293 +5752,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         body.ios-mode-active .forum-post-detail-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
         body.phone-frame-active .forum-post-detail-header, body.tablet-mode-active .forum-post-detail-header { padding-top: calc(15px + var(--status-bar-height)); }
         
-              .forum-post-detail-title { font-size: 17px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
+        .forum-post-detail-title { font-size: 17px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%); }
         .forum-detail-main-scroll { flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
         .post-detail-comments-title { font-size: 15px; font-weight: bold; color: #333; padding-left: 5px; border-left: 4px solid var(--theme-pink-btn); margin-top: 5px; margin-bottom: 5px; }
 
-              /* ========================= 新增：外卖订单发送到聊天的卡片样式 ========================= */
-        .takeout-chat-card {
-            width: 240px;
-            background-color: #ffffff;
-            border-radius: 16px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-        .takeout-chat-card-header {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #f0f0f0;
-            margin-bottom: 10px;
-        }
-        .takeout-chat-card-icon {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
-        }
-        .takeout-chat-card-title {
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-        }
-        .takeout-chat-shop-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .takeout-chat-shop-emoji {
-            width: 40px;
-            height: 40px;
-            background-color: #f7f7f7;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            flex-shrink: 0;
-            border: 1px solid #eee;
-        }
-        .takeout-chat-shop-text {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-        .takeout-chat-shop-name {
-            font-size: 15px;
-            font-weight: bold;
-            color: #333;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .takeout-chat-price {
-            font-size: 14px;
-            color: #ff5000;
-            font-weight: bold;
-            margin-top: 2px;
-        }
-        .takeout-chat-dishes-wrapper {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-        }
-        .takeout-chat-card.expanded .takeout-chat-dishes-wrapper {
-            max-height: 600px;
-            margin-top: 10px;
-        }
-        .takeout-chat-dish-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 6px;
-            background: #fdfafb;
-            padding: 8px 10px;
-            border-radius: 8px;
-        }
-        .takeout-chat-dish-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .takeout-chat-dish-qty {
-            margin-left: 10px;
-            font-weight: bold;
-        }
-        .takeout-chat-expand-hint {
-            font-size: 11px;
-            color: #ccc;
-            text-align: center;
-            margin-top: 8px;
-        }
-        .takeout-chat-card.expanded .takeout-chat-expand-hint {
-            display: none;
-        }
-
-        /* 给他下单按钮样式 */
-
-        .takeout-send-to-friend-btn {
-            background-color: var(--takeout-primary-color);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 15px;
-            font-size: 13px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(255,182,193,0.4);
-            display: none; /* 默认隐藏 */
-            transition: all 0.2s;
-        }
-        .takeout-send-to-friend-btn.active {
-            background-color: #ff8fb3;
-            transform: scale(0.95);
-        }
-     
-       /* ========================= 新增结束 ========================= */
-              /* ========================= 新增：图库 App 样式 ========================= */
-        #gallery-app-page {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: var(--theme-pink-bg-light); /* 使用可爱的浅粉色背景 */
-            z-index: 600; /* 保证盖在主屏幕上面 */
-            display: flex; flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        body.gallery-active #gallery-app-page {
-            transform: translateY(0); /* 激活时向上滑出 */
-        }
-
-        /* 顶部导航栏 */
-        .gallery-header {
-            padding: 35px 20px 10px; /* 底部间距调小一点，让下面的胶囊更贴近文字 */
-            display: flex; align-items: center; justify-content: space-between;
-            flex-shrink: 0; transition: padding-top 0.3s ease;
-        }
-        /* 适配各种手机框和刘海屏 */
-        body.ios-mode-active .gallery-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-        body.phone-frame-active .gallery-header, body.tablet-mode-active .gallery-header { padding-top: calc(15px + var(--status-bar-height)); }
-
-        .gallery-back-btn { width: 30px; height: 30px; object-fit: contain; cursor: pointer; }
-        .gallery-title { font-size: 22px; font-weight: bold; color: var(--theme-pink-text); letter-spacing: 2px; }
-
-        /* 右上角的小胶囊按钮 */
-        .gallery-top-capsule {
-            background-color: #fff;
-            border-radius: 20px; /* 胶囊圆滑形状 */
-            display: flex; align-items: center; gap: 12px;
-            padding: 6px 14px;
-            box-shadow: 0 4px 12px rgba(229, 138, 171, 0.2); /* 浅粉色发光阴影 */
-        }
-        .gallery-top-capsule-plus { font-size: 22px; color: var(--theme-pink-text); font-weight: 300; line-height: 1; cursor: pointer; padding-bottom: 2px; }
-        .gallery-top-capsule-dots { width: 20px; height: 20px; object-fit: contain; cursor: pointer; }
-
-        /* 新增：顶栏文字下方的横向相册种类长胶囊 */
-        .gallery-albums-capsule {
-            display: flex; align-items: center; gap: 12px;
-            background-color: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            margin: 5px 25px 15px 25px; /* 紧贴上方文字，左右和下方对齐 */
-            padding: 10px 15px;
-            border-radius: 999px; /* 极度圆滑，形成长胶囊 */
-            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.1);
-            border: 2px solid #fff;
-            overflow-x: auto; /* 支持横向滑动 */
-            flex-shrink: 0;
-        }
-        .gallery-albums-capsule::-webkit-scrollbar { display: none; }
-
-        /* 种类胶囊里的正方形图片(相册封面) */
-        .gallery-album-item {
-            width: 45px; height: 45px; border-radius: 14px; 
-            object-fit: cover; flex-shrink: 0;
-            background-color: #fff;
-            border: 2px solid transparent;
-            cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            /* 用于占位符的居中排版 */
-            display: flex; justify-content: center; align-items: center; font-size: 20px; color: #ffcce0;
-        }
-        .gallery-album-item.active {
-            border-color: var(--theme-pink-btn); /* 选中态外框变粉 */
-            transform: scale(1.05);
-        }
-        .gallery-album-item:active { transform: scale(0.95); }
-
-        /* 居中大长胶囊内容区 */
-        .gallery-main-capsule {
-            flex: 1;
-            background-color: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            margin: 0 25px 30px 25px; 
-            border-radius: 30px; /* 稍微收敛一点的圆角 */
-            box-shadow: 0 8px 30px rgba(229, 138, 171, 0.15);
-            border: 2px solid #fff;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .gallery-main-capsule::-webkit-scrollbar { display: none; }
-
-              /* 新增：图片网格容器，一排3个 */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 12px 10px; /* 垂直间距12px，水平间距10px */
-            width: 100%;
-        }
-
-        /* 图片与文字的包裹器 */
-        .gallery-photo-wrapper {
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-        }
-
-        /* 网格内的一张张具体小照片 */
-        .gallery-photo-item {
-            width: 100%;
-            aspect-ratio: 1 / 1; /* 保证绝对正方形 */
-            border-radius: 16px; 
-            object-fit: cover;
-            box-shadow: 0 4px 10px rgba(229, 138, 171, 0.15);
-            border: 2px solid #fff;
-            cursor: pointer; transition: transform 0.2s;
-        }
-        .gallery-photo-item:active { transform: scale(0.95); }
-
-               /* 图片下方的描述文字 */
-        .gallery-photo-desc {
-            font-size: 11px; color: #888;
-            text-align: center; width: 100%;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* 文字过长变省略号 */
-        }
-
-             /* 新增：图库管理模式下的删除按钮（通用） */
-        .gallery-photo-delete-btn {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            width: 24px;
-            height: 24px;
-            background-color: #F44336;
-            color: white;
-            border-radius: 50%;
-            display: none; /* 默认隐藏 */
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
-        
-        /* 管理模式下，给元素加个微微抖动的动画提示 */
-        @keyframes jiggle {
-            0% { transform: rotate(-1deg); }
-            50% { transform: rotate(1deg); }
-            100% { transform: rotate(-1deg); }
-        }
-
-        /* 1. 下方图片网格的管理模式样式 */
-        .gallery-grid.manage-mode .gallery-photo-delete-btn { display: flex; }
-        .gallery-grid.manage-mode .gallery-photo-wrapper { animation: jiggle 0.3s infinite; }
-        .gallery-grid.manage-mode .gallery-photo-item { border: 2px solid #F44336; }
-
-        /* 2. 顶部相册种类的管理模式样式 */
-        .gallery-albums-capsule.manage-mode .gallery-photo-delete-btn { display: flex; }
-        .gallery-albums-capsule.manage-mode .gallery-album-wrapper { animation: jiggle 0.3s infinite; }
-        /* ========================= 图库样式结束 ========================= */
-
     </style>
-
 </head>
 <body>
 <div id="app-wrapper">
@@ -6349,85 +5819,66 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 </div>
 
 <div id="home-screen">
-    <!-- 新增滑动容器包裹网格 -->
-    <div class="home-swiper-container" id="home-swiper-container">
-        <!-- 第一页 (原有页面) -->
-        <div class="home-page-slide">
-            <div id="time-section">
-                <div id="time-container" onclick="handleTimeBgClick(event)">
-                    <div id="clock-time">12:00</div>
-                    <div id="clock-date" onclick="handleDateEdit(event)">2026年02月27日 星期五</div>
-                </div>
-            </div>
-            <div id="grid-area">
 
-                <div class="grid-quadrant" id="avatar-quadrant-1">
-                    <div id="chat-dual-container">
-                        <div class="chat-row left">
-                            <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-1')">
-                                <div class="avatar-ring">
-                                    <div class="avatar-img-circle" id="chat-avatar-1" style="background-image: url('https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');"></div>
-                                </div>
-                            </div>
-                            <input type="text" id="home-chat-bubble-1" class="chat-bubble-input left-bubble" value="Say Hi~" oninput="adjustInputWidth(this); saveHomeBubble(1, this.value)">
-                        </div>
-                        <div class="chat-row right">
-                            <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-2')">
-                                <div class="avatar-ring">
-                                    <div class="avatar-img-circle" id="chat-avatar-2" style="background-image: url('https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png');"></div>
-                                </div>
-                            </div>
-                            <input type="text" id="home-chat-bubble-2" class="chat-bubble-input right-bubble" value="Hello!" oninput="adjustInputWidth(this); saveHomeBubble(2, this.value)">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid-quadrant">
-                    <div class="app-group-2x2">
-                        <div class="app-item" onclick="openChatApp()">
-                            <div class="app-icon" id="icon-app1">☁️</div>
-                            <span class="app-name" data-app-name="Chat">Chat</span>
-                        </div>
-                        <div class="app-item" onclick="openWorldBookApp()"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
-                        <div class="app-item" onclick="openForumApp()"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="论坛">论坛</span></div>
-                        <div class="app-item" onclick="openRecollectionApp()"><div class="app-icon" id="icon-app4">🔮</div><span class="app-name" data-app-name="备忘录">备忘录</span></div>
-                    </div>
-                </div>
-                <div class="grid-quadrant">
-                    <div class="app-group-2x2">
-                        <div class="app-item"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
-                        <div class="app-item" onclick="openMallApp()"><div class="app-icon" id="icon-app6">🎮</div><span class="app-name" data-app-name="商城">商城</span></div>
-                        <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
-                        <div class="app-item" onclick="openWalletApp()"><div class="app-icon" id="icon-app8">💰</div><span class="app-name" data-app-name="Wallet">Wallet</span></div>
-                    </div>
-                </div>
-
-                <div class="grid-quadrant" id="photo-widget-quadrant">
-                    <div class="photo-widget-container" onclick="triggerPhotoWidgetUpload()">
-                        <div id="photo-widget-placeholder" class="photo-widget-placeholder">
-                            <div class="photo-widget-icon">📷</div>
-                            <div class="photo-widget-text">Add Photo</div>
-                        </div>
-                        <img id="photo-widget-img" class="photo-widget-img" src="">
-                    </div>
-                </div>
-            </div>
+    <div id="time-section">
+        <div id="time-container" onclick="handleTimeBgClick(event)">
+            <div id="clock-time">12:00</div>
+            <div id="clock-date" onclick="handleDateEdit(event)">2026年02月27日 星期五</div>
         </div>
-        
-               <!-- 第二页 (新增页面，存放图库等) -->
-        <div class="home-page-slide">
-            <div class="second-page-grid">
-                <!-- 这里添加了图库App -->
-                <div class="app-item" onclick="openGalleryApp()">
-                    <div class="app-icon" id="icon-app9" style="width: 60px; height: 60px; border-radius: 16px; margin-bottom: 5px; display: flex; justify-content: center; align-items: center; font-size: 28px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: rgba(255, 255, 255, 0.2);">🖼️</div>
-                    <span class="app-name" data-app-name="图库" style="font-size: 11px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.4); white-space: nowrap;">图库</span>
-                </div>
-            </div>
-        </div>
-
     </div>
+    <div id="grid-area">
+        <div class="grid-quadrant" id="avatar-quadrant-1">
+            <div id="chat-dual-container">
+                <div class="chat-row left">
+                    <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-1')">
+                        <div class="avatar-ring">
+                            <div class="avatar-img-circle" id="chat-avatar-1" style="background-image: url('https://img.heliar.top/file/1770068438490_添加人群_people-plus.png');"></div>
+                        </div>
+                    </div>
+                    <input type="text" id="home-chat-bubble-1" class="chat-bubble-input left-bubble" value="Say Hi~" oninput="adjustInputWidth(this); saveHomeBubble(1, this.value)">
+                </div>
+                <div class="chat-row right">
+                    <div class="avatar-container" onclick="editChatAvatarUrl('chat-avatar-2')">
+                        <div class="avatar-ring">
+                            <div class="avatar-img-circle" id="chat-avatar-2" style="background-image: url('https://img.heliar.top/file/1770068137566_收藏好友_personal-collection_2.png');"></div>
+                        </div>
+                    </div>
+                    <input type="text" id="home-chat-bubble-2" class="chat-bubble-input right-bubble" value="Hello!" oninput="adjustInputWidth(this); saveHomeBubble(2, this.value)">
+                </div>
+            </div>
+        </div>
 
-        <div id="dock-area">
+        <div class="grid-quadrant">
+            <div class="app-group-2x2">
+                <div class="app-item" onclick="openChatApp()">
+                    <div class="app-icon" id="icon-app1">☁️</div>
+                    <span class="app-name" data-app-name="Chat">Chat</span>
+                </div>
+                <div class="app-item" onclick="openWorldBookApp()"><div class="app-icon" id="icon-app2">🎵</div><span class="app-name" data-app-name="世界书">世界书</span></div>
+                <div class="app-item" onclick="openForumApp()"><div class="app-icon" id="icon-app3">💬</div><span class="app-name" data-app-name="论坛">论坛</span></div>
+                <div class="app-item" onclick="openRecollectionApp()"><div class="app-icon" id="icon-app4">🔮</div><span class="app-name" data-app-name="备忘录">备忘录</span></div>
+            </div>
+        </div>
+        <div class="grid-quadrant">
+            <div class="app-group-2x2">
+                <div class="app-item"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
+                <div class="app-item" onclick="openMallApp()"><div class="app-icon" id="icon-app6">🎮</div><span class="app-name" data-app-name="商城">商城</span></div>
+                <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
+                <div class="app-item" onclick="openWalletApp()"><div class="app-icon" id="icon-app8">💰</div><span class="app-name" data-app-name="Wallet">Wallet</span></div>
+            </div>
+        </div>
+
+        <div class="grid-quadrant" id="photo-widget-quadrant">
+            <div class="photo-widget-container" onclick="triggerPhotoWidgetUpload()">
+                <div id="photo-widget-placeholder" class="photo-widget-placeholder">
+                    <div class="photo-widget-icon">📷</div>
+                    <div class="photo-widget-text">Add Photo</div>
+                </div>
+                <img id="photo-widget-img" class="photo-widget-img" src="">
+            </div>
+        </div>
+    </div>
+    <div id="dock-area">
         <div class="dock-container">
             <div class="app-item" onclick="showSettingsPage()"><div class="app-icon dock-icon" id="icon-dock-settings">⚙️</div></div>
             <div class="app-item" onclick="openAIChat()"><div class="app-icon dock-icon" id="icon-dock-ai">🤖</div></div>
@@ -6436,8 +5887,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
-
-<!-- Chat App 页面 -->
 
 <!-- Chat App 页面 -->
 <div id="chat-app-page">
@@ -6546,18 +5995,14 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 <span class="chat-menu-text">钱包</span>
             </div>
             
-                      <!-- 第二行 -->
+            <!-- 第二行 -->
             <div class="chat-menu-item" onclick="retryLastAiReply()">
                 <img src="https://img.heliar.top/file/1773078710555_重新_redo_5.png" class="chat-menu-icon">
                 <span class="chat-menu-text">重说</span>
             </div>
-            <div class="chat-menu-item" onclick="openTakeoutAppFromChat()">
-                <img src="https://img.heliar.top/file/1773415285038_叉子勺子_fork-spoon.png" class="chat-menu-icon">
-                <span class="chat-menu-text">外卖</span>
-            </div>
             <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
             <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
-
+            <div class="chat-menu-item"><div class="chat-menu-icon" style="background:#f0f0f0;"></div></div>
         </div>
     
    
@@ -6569,43 +6014,16 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </div>
             <img class="chat-conv-right-icon" src="https://img.heliar.top/file/1770241189848_更多_more.png" onclick="openRoleSettings()">
         </div>
-             <!-- 新增 onclick="closeChatEmotionPanel()" 点击消息区时自动收起面板 -->
-        <div class="chat-conv-messages" id="chat-conv-messages" onclick="closeChatEmotionPanel()"></div>
+        <div class="chat-conv-messages" id="chat-conv-messages"></div>
         <div class="chat-conv-footer">
             <button class="chat-conv-btn" onclick="toggleChatExtraMenu()"><img src="https://img.heliar.top/file/1770239041392_开关_power.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
             <div class="chat-conv-input-wrapper">
-                <!-- 新增 onfocus="closeChatEmotionPanel()" 准备打字时自动收起面板 -->
-                <input type="text" class="chat-conv-input" id="chat-conv-input" placeholder="输入消息..." onkeydown="handleChatInputKey(event)" onfocus="closeChatEmotionPanel()">
+                <input type="text" class="chat-conv-input" id="chat-conv-input" placeholder="输入消息..." onkeydown="handleChatInputKey(event)">
             </div>
-            <!-- 新增 onclick="toggleChatEmotionPanel()" 点击爱心弹出/收回 -->
-            <button class="chat-conv-btn" style="margin-right: 0;" onclick="toggleChatEmotionPanel()"><img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
+            <button class="chat-conv-btn" style="margin-right: 0;"><img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
             <button class="chat-conv-btn send ai-trigger" onclick="triggerAIAutoReply()"><img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;"></button>
         </div>
-        
-             <!-- 新增：被挤出来的隐藏面板 (表情包容器) -->
-        <div id="chat-emotion-panel" class="chat-emotion-panel" style="display: flex; flex-direction: column;">
-            <!-- 顶部栏 -->
-            <div class="emotion-panel-top">
-                <!-- 最左边指定的图标 -->
-                <div class="emotion-default-icon">
-                    <img src="https://img.heliar.top/file/1773432424246_喜欢_like_6.png">
-                </div>
-                <!-- 图标右边排列正方形图片的空间（默认没图片） -->
-                <div class="emotion-square-list" id="emotion-square-list">
-                    <!-- 以后如果要加图片，可以通过 JS 动态插入类似下面这行代码 -->
-                    <!-- <img class="emotion-square-item" src="图片链接"> -->
-                </div>
-            </div>
-            
-            <!-- 面板下方剩下的空间主体 -->
-            <div class="emotion-panel-content">
-                请从主屏幕第二页的相册app添加表情包
-            </div>
-        </div>
-
-        
                 <!-- Multiselect Footer -->
-
         <div class="chat-multiselect-footer" id="chat-multiselect-footer">
              <button class="chat-multiselect-cancel-btn" onclick="cancelMultiSelectMode()">取消</button>
              <button class="chat-multiselect-delete-btn" onclick="executeBatchDelete()">删除</button>
@@ -7008,41 +6426,15 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </div>
         </div>
         <div id="takeout-page-menu" class="page"><div id="takeout-menu-list"></div></div>
-               <div id="takeout-page-my" class="page">
+        <div id="takeout-page-my" class="page">
             <div class="takeout-me-profile">
                 <img id="takeout-my-avatar" src="https://img.heliar.top/file/1770068438490_添加人群_people-plus.png">
                 <span id="takeout-my-nickname">外卖吃货</span>
                 <img src="https://img.heliar.top/file/1772475392914_设置_setting-two_2.png" class="takeout-me-setting-icon" onclick="openTakeoutProfileModal()">
             </div>
             
-            <!-- 新增：订单功能区块 -->
-            <div class="takeout-me-orders-section">
-                <div class="takeout-me-orders-title">订单</div>
-                <div class="takeout-me-orders-grid">
-                                    <!-- 点击全部订单，打开新的全部订单页面 -->
-                    <div class="takeout-me-order-item" onclick="openTakeoutAllOrdersPage()">
-                        <img src="https://img.heliar.top/file/1773415978468_订单_order.png">
-                        <span>全部订单</span>
-                    </div>
-
-                    <div class="takeout-me-order-item" onclick="showToast('代付功能待开发~')">
-                        <img src="https://img.heliar.top/file/1773415976557_支付码_pay-code-two.png">
-                        <span>我的代付</span>
-                    </div>
-                    <div class="takeout-me-order-item" onclick="showToast('投喂功能待开发~')">
-                        <img src="https://img.heliar.top/file/1773416114859_鸡腿_chicken-leg.png">
-                        <span>投喂</span>
-                    </div>
-                    <div class="takeout-me-order-item" onclick="showToast('待评价功能待开发~')">
-                        <img src="https://img.heliar.top/file/1773416088120_未读消息_message-unread_2.png">
-                        <span>待评价</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="takeout-me-fav-section">
                 <div class="takeout-me-fav-header">
-
                     <div class="takeout-me-fav-title">我的收藏</div>
                     <div class="takeout-me-fav-more" onclick="openTakeoutFavPage()">查看更多 ></div>
                 </div>
@@ -7093,12 +6485,12 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                 <input type="text" id="takeout-create-avatar-url" placeholder="封面图URL (可选)" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 14px; outline: none; transition: all 0.2s;" oninput="updateTakeoutShopAvatarPreview(this.value)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
                 <input type="text" id="takeout-create-name" placeholder="店铺名称" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 14px; outline: none; font-weight: bold; transition: all 0.2s;" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
                 
-                                <!-- 4个小数据网格 -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; width: 100%;">
-                    <input type="number" id="takeout-create-rating" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="评分(4.8)" step="0.1" max="5" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-                    <input type="number" id="takeout-create-sales" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="月售(2000)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-                    <input type="number" id="takeout-create-time" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="配送(分钟)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-                    <input type="number" id="takeout-create-distance" style="width: 100%; min-width: 0; padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="距离(km)" step="0.1" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                <!-- 4个小数据网格 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <input type="number" id="takeout-create-rating" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="评分(如 4.8)" step="0.1" max="5" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-sales" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="月售(如 2000)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-time" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="配送(分钟)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
+                    <input type="number" id="takeout-create-distance" style="padding: 10px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 12px; font-size: 13px; outline: none; text-align: center; transition: all 0.2s;" placeholder="距离(km)" step="0.1" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
                 </div>
 
                 <!-- 店铺内容 -->
@@ -7198,97 +6590,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <!-- 渲染收藏的店铺列表 -->
         </div>
     </div>
-
-       <!-- 新增：全部订单独立页面 -->
-    <div id="takeout-all-orders-page">
-        <div class="takeout-detail-header">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="back-btn" onclick="closeTakeoutAllOrdersPage()">
-            <div class="takeout-title" style="font-size: 18px; font-weight: 600; color: #333; position: absolute; left: 50%; transform: translateX(-50%);">全部订单</div>
-            <!-- 修改：添加给他下单按钮 -->
-            <button id="takeout-send-friend-btn" class="takeout-send-to-friend-btn" onclick="toggleTakeoutSendMode()">给他下单</button>
-        </div>
-        <div style="flex: 1; overflow-y: auto; padding: 15px;" id="takeout-all-orders-list-container">
-            <!-- 渲染全部订单列表 -->
-        </div>
-    </div>
-<!-- ========================= 新增：图库 App 页面 ========================= -->
-<div id="gallery-app-page">
-    <div class="gallery-header">
-        <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="gallery-back-btn" onclick="closeGalleryApp()">
-        <div class="gallery-title">相簿</div>
-              <div class="gallery-top-capsule">
-            <span class="gallery-top-capsule-plus" onclick="openGalleryAddModal()">+</span>
-            <img src="https://img.heliar.top/file/1770241189848_更多_more.png" class="gallery-top-capsule-dots" id="gallery-manage-icon" onclick="toggleGalleryManageMode()">
-            <!-- 新增：管理模式下的“完成”文字按钮 -->
-            <span id="gallery-manage-text" style="display: none; font-size: 14px; color: var(--theme-pink-text); font-weight: bold; cursor: pointer; margin-left: 2px;" onclick="toggleGalleryManageMode()">完成</span>
-        </div>
-
-    </div>
-
-       <!-- 顶栏文字下方：横向滑动的相册种类长胶囊 (将由 JS 动态生成) -->
-    <div class="gallery-albums-capsule" id="gallery-albums-container">
-    </div>
-
-    <!-- 下方巨大的内容展示区 (用来展示当前种类里的具体图片) -->
-    <div class="gallery-main-capsule">
-        <div class="gallery-grid" id="gallery-grid-container">
-        </div>
-    </div>
-
-</div>
-
-<!-- 新增：图库添加图片弹窗 -->
-<div id="gallery-add-modal" class="delete-confirm-modal" style="z-index: 1000;">
-    <div class="wb-modal-card" style="background: #ffffff; border-radius: 28px; padding: 25px 20px; box-shadow: 0 10px 40px rgba(255, 182, 193, 0.3);" onclick="event.stopPropagation()">
-        <div class="wb-modal-header" style="color: var(--takeout-primary-color); font-size: 18px; font-weight: bold; border-bottom: none; margin-bottom: 15px; padding-bottom: 0;">🎀 添加表情包 🎀</div>
-        
-        <div class="wb-modal-scroll-area" style="padding: 0 5px; margin-bottom: 0;">
-            <!-- 顶部的正方形图片预览区 -->
-            <div style="margin: 0 auto 15px; width: 90px; height: 90px; border-radius: 20px; background: #fffafb; border: 2px dashed #ffcce0; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-                <span id="gallery-add-preview-placeholder" style="color:#ffb3c6; font-size:12px; font-weight: 500;">图片预览</span>
-                <img id="gallery-add-preview-img" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
-            </div>
-            
-            <!-- 单个图片 URL 的输入框 -->
-            <input type="text" id="gallery-add-url-input" placeholder="输入图片 URL (可选填以预览)" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 13px; outline: none; transition: all 0.2s;" oninput="updateGalleryPreview(this.value)" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-            
-            <!-- 大文本框，指定了多行提示格式 -->
-            <textarea id="gallery-add-batch-input" style="width: 100%; min-height: 140px; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 5px; font-size: 13px; outline: none; resize: none; transition: all 0.2s; line-height: 1.6; white-space: pre;" placeholder="请按此格式批量填入：&#10;描述：图片URL&#10;描述：图片URL&#10;描述：图片URL" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'"></textarea>
-            <div style="font-size: 11px; color: #aaa; text-align: left; margin-bottom: 10px; margin-left: 4px;">注意：请严格按照“描述：URL”换行填写哦！</div>
-        </div>
-        
-        <!-- 底部两个按钮 -->
-        <div class="wb-modal-actions" style="margin-top: 10px; display: flex; gap: 10px;">
-            <button style="flex: 1; padding: 12px; border-radius: 20px; background: #f5f5f5; color: #888; border: none; font-size: 14px; font-weight: bold; cursor: pointer;" onclick="closeGalleryAddModal()">取消</button>
-            <button style="flex: 1; padding: 12px; border-radius: 20px; background: var(--takeout-primary-color); color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);" onclick="saveGalleryAlbum()">保存</button>
-        </div>
-    </div>
-</div>
-<!-- ========================= 图库页面结束 ========================= -->
-
 <!-- *** END: Takeout App *** -->
-<!-- 新增：图库单张图片编辑弹窗 -->
-<div id="gallery-edit-photo-modal" class="delete-confirm-modal" style="z-index: 1050;">
-    <div class="wb-modal-card" style="background: #ffffff; border-radius: 24px; padding: 25px 20px; box-shadow: 0 10px 40px rgba(255, 182, 193, 0.3);" onclick="event.stopPropagation()">
-        <div class="wb-modal-header" style="color: var(--takeout-primary-color); font-size: 18px; font-weight: bold; border-bottom: none; margin-bottom: 15px; padding-bottom: 0;">✏️ 编辑图片信息 ✏️</div>
-        
-        <div class="wb-modal-scroll-area" style="padding: 0 5px; margin-bottom: 0;">
-            <input type="hidden" id="gallery-edit-photo-index">
-            
-            <div style="font-size: 13px; color: #666; margin-bottom: 6px; padding-left: 5px;">图片 URL</div>
-            <input type="text" id="gallery-edit-photo-url" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 12px; font-size: 13px; outline: none;" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-            
-            <div style="font-size: 13px; color: #666; margin-bottom: 6px; padding-left: 5px;">图片描述</div>
-            <input type="text" id="gallery-edit-photo-desc" style="width: 100%; padding: 12px 15px; border: 1px solid #ffeff4; background: #fffcfd; border-radius: 16px; margin-bottom: 5px; font-size: 13px; outline: none;" onfocus="this.style.borderColor='#ffb3c6'" onblur="this.style.borderColor='#ffeff4'">
-        </div>
-        
-        <div class="wb-modal-actions" style="margin-top: 15px; display: flex; gap: 10px;">
-            <button style="flex: 1; padding: 12px; border-radius: 20px; background: #f5f5f5; color: #888; border: none; font-size: 14px; font-weight: bold; cursor: pointer;" onclick="closeGalleryEditPhotoModal()">取消</button>
-            <button style="flex: 1; padding: 12px; border-radius: 20px; background: var(--takeout-primary-color); color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);" onclick="saveGalleryPhotoEdit()">保存修改</button>
-        </div>
-    </div>
-</div>
-
 
 <!-- ========================= 新增：外卖商家详情页 ========================= -->
 <div id="takeout-shop-detail-page">
@@ -7944,11 +7246,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                     </div>
 
 
-                        <div class="forum-me-menu-item" onclick="openForumFollowingPage()">
-        <span class="menu-item-left">关注的人</span>
-        <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
-    </div>
-
+                    <div class="forum-me-menu-item">
+                        <span class="menu-item-left">关注的人</span>
+                        <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
+                    </div>
                      <div class="forum-me-menu-item" onclick="openForumMeSettings()">
                         <span class="menu-item-left">设置</span>
                         <img class="arrow" src="https://img.heliar.top/file/1770589908494_右_right.png">
@@ -8043,18 +7344,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     </div>
 
 </div>
-    <!-- 新增：关注列表页面 -->
-    <div id="forum-following-page" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #FFF5F7; z-index: 800; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);">
-        <div class="forum-header-home" id="forum-following-header" style="border-radius: 0 0 24px 24px; position: relative;">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="forum-header-back-btn" onclick="closeForumFollowingPage()">
-            <h1 class="forum-header-title" style="position:absolute; left:50%; transform:translateX(-50%);">我的关注</h1>
-            <div style="width:30px;"></div>
-        </div>
-        <div id="forum-following-list-container" style="flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: env(safe-area-inset-bottom, 20px);">
-            <!-- 关注列表渲染在这里 -->
-        </div>
-    </div>
-
     <!-- 新增：帖子详情与评论页 -->
 
     <div id="forum-post-detail-page">
@@ -8073,14 +7362,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 
 <!-- 新增：为我的帖子页单独添加顶部安全区适配 -->
 <style>
-      /* 适配顶部安全距离 */
-    body.ios-mode-active #forum-my-posts-header, body.ios-mode-active #forum-all-forums-header, body.ios-mode-active #forum-favorite-posts-header, body.ios-mode-active #forum-all-liked-posts-header, body.ios-mode-active #forum-following-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important; }
+    body.ios-mode-active #forum-my-posts-header, body.ios-mode-active #forum-all-forums-header, body.ios-mode-active #forum-favorite-posts-header, body.ios-mode-active #forum-all-liked-posts-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important; }
     body.phone-frame-active #forum-my-posts-header, body.tablet-mode-active #forum-my-posts-header,
     body.phone-frame-active #forum-all-forums-header, body.tablet-mode-active #forum-all-forums-header,
     body.phone-frame-active #forum-favorite-posts-header, body.tablet-mode-active #forum-favorite-posts-header,
-    body.phone-frame-active #forum-all-liked-posts-header, body.tablet-mode-active #forum-all-liked-posts-header,
-    body.phone-frame-active #forum-following-header, body.tablet-mode-active #forum-following-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
-    
+    body.phone-frame-active #forum-all-liked-posts-header, body.tablet-mode-active #forum-all-liked-posts-header { padding-top: calc(15px + var(--status-bar-height)) !important; }
     /* like的帖子 长方形预览区样式 (双列精简版) */
     .forum-liked-post-card {
         background-color: #fff;
@@ -8095,86 +7381,59 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         min-width: 0;
     }
     .forum-liked-post-card:active { transform: scale(0.96); }
-    .forum-liked-post-header { display: flex; align-items: center; gap: 6px; overflow: hidden; }
-    .forum-liked-post-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-    .forum-liked-post-info { display: flex; flex-direction: column; min-width: 0; }
-    .forum-liked-post-nickname { font-size: 12px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .forum-liked-post-forum-name { font-size: 10px; color: #999; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .forum-liked-post-content { font-size: 11px; color: #444; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; }
-    .forum-liked-post-image-preview { width: 100%; height: 70px; border-radius: 8px; object-fit: cover; }
-
-    /* 新增：关注列表条目样式 */
-    .forum-following-item {
+    .forum-liked-post-header {
         display: flex;
         align-items: center;
-        background: #fff;
-        padding: 15px;
-        border-radius: 16px;
-        box-shadow: 0 2px 10px rgba(200, 150, 160, 0.04);
-        gap: 12px;
+        gap: 6px;
+        overflow: hidden;
     }
-    .forum-following-avatar {
-        width: 48px;
-        height: 48px;
+    .forum-liked-post-avatar {
+        width: 24px; /* 头像大幅缩小 */
+        height: 24px;
         border-radius: 50%;
         object-fit: cover;
         flex-shrink: 0;
-        border: 1px solid #f0f0f0;
     }
-    .forum-following-info {
-        flex: 1;
-        min-width: 0;
+    .forum-liked-post-info {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        min-width: 0; /* 关键：防止名字过长撑破卡片 */
     }
-    .forum-following-name {
-        font-size: 16px;
-        font-weight: bold;
+    .forum-liked-post-nickname {
+        font-size: 12px; /* 字号缩小 */
+        font-weight: 600;
         color: #333;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .forum-following-right-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+    .forum-liked-post-forum-name {
+        font-size: 10px; /* 字号极小 */
+        color: #999; 
+        margin-top: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .forum-following-btn {
-        background-color: #f0f2f5; /* 浅灰色 */
-        color: #888;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 6px 14px;
-        border-radius: 20px;
-        border: none;
-        cursor: default; /* 无点击反馈 */
+    .forum-liked-post-content {
+        font-size: 11px; /* 内容字号缩小 */
+        color: #444;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
     }
-    .forum-following-dots {
-        font-size: 20px;
-        color: #999;
-        font-weight: bold;
-        line-height: 1;
-        letter-spacing: 1px;
-        cursor: pointer;
-        padding-bottom: 5px;
+    .forum-liked-post-image-preview {
+        width: 100%;
+        height: 70px; /* 图片高度砍半 */
+        border-radius: 8px;
+        object-fit: cover;
     }
 
 </style>
 
-<!-- 修改论坛好友昵称弹窗 -->
-<div id="edit-forum-nickname-modal" class="delete-confirm-modal" style="z-index: 10050;">
-    <div class="delete-card" onclick="event.stopPropagation()" style="width: 85%; max-width: 320px; padding: 25px;">
-        <div class="delete-card-title" style="margin-bottom: 15px; color: var(--theme-pink-text); font-weight: 600;">设置论坛昵称</div>
-        <input type="hidden" id="edit-forum-nickname-contact-id">
-        <input type="text" id="edit-forum-nickname-input" class="create-forum-input" placeholder="输入新的论坛昵称" style="margin-bottom: 20px;">
-        <div class="delete-card-actions">
-            <button class="delete-card-btn btn-cancel" onclick="closeEditForumNicknameModal()">取消</button>
-            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="saveForumNickname()">确定</button>
-        </div>
-    </div>
-</div>
 
 <!-- 创建论坛弹窗 -->
 
@@ -8182,13 +7441,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     <div id="create-forum-modal-card">
         <h2 class="create-forum-title">创建新论坛</h2>
         <div class="create-forum-content">
-                                  <div class="create-forum-avatar-upload" onclick="triggerForumAvatarUpload()">
+                        <div class="create-forum-avatar-upload" onclick="triggerForumAvatarUpload()">
                 <span id="forum-avatar-placeholder">+</span>
                 <img id="new-forum-avatar-preview" src="">
             </div>
-            <input type="text" id="new-forum-avatar-url-input" class="create-forum-input" placeholder="或输入头像图片 URL" oninput="handleNewForumAvatarUrl(this.value)">
             <input type="text" id="new-forum-name-input" class="create-forum-input" placeholder="论坛名称">
-
             <textarea id="new-forum-worldview-input" class="create-forum-textarea" placeholder="论坛世界观... (可选)"></textarea>
             <div id="new-forum-wb-selection-display">未绑定世界书</div>
             <button class="create-forum-wb-btn" onclick="openForumWbBindModal()">绑定世界书 (可选)</button>
@@ -8216,14 +7473,12 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </select>
         </div>
 
-            <div id="edit-forum-content" style="display: none; flex-direction: column; align-items: center; gap: 15px; background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);">
+        <div id="edit-forum-content" style="display: none; flex-direction: column; align-items: center; gap: 15px; background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(200, 150, 160, 0.08);">
             <div class="create-forum-avatar-upload" onclick="triggerEditForumAvatarUpload()">
                 <span id="edit-forum-avatar-placeholder" style="display:none;">+</span>
                 <img id="edit-forum-avatar-preview" src="" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
-            <input type="text" id="edit-forum-avatar-url-input" class="create-forum-input" placeholder="或输入头像图片 URL" oninput="handleEditForumAvatarUrl(this.value)">
             <input type="text" id="edit-forum-name-input" class="create-forum-input" placeholder="论坛名称">
-
             <textarea id="edit-forum-worldview-input" class="create-forum-textarea" placeholder="论坛世界观... (可选)"></textarea>
             <div id="edit-forum-wb-selection-display" style="width: 100%; padding: 10px; font-size: 13px; color: #999; background-color: #f9f9f9; border-radius: 8px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">未绑定世界书</div>
             <button class="create-forum-wb-btn" onclick="openEditForumWbBindModal()">重新绑定世界书</button>
@@ -8871,41 +8126,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     const LOCK_PWD_ENABLED_KEY = 'lockPwdEnabled_v1'; // 锁屏密码开关
     const LOCK_PWD_VALUE_KEY = 'lockPwdValue_v1'; // 锁屏密码内容
     /* --- 新增结束 --- */
-        /* ========================= 新增：修复电脑端鼠标拖拽滑动主屏幕 ========================= */
-        const swiper = document.getElementById('home-swiper-container');
-        if (swiper) {
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-
-            // 鼠标按下
-            swiper.addEventListener('mousedown', (e) => {
-                isDown = true;
-                swiper.style.cursor = 'grabbing'; // 变成抓取的小手
-                startX = e.pageX - swiper.offsetLeft;
-                scrollLeft = swiper.scrollLeft;
-            });
-            // 鼠标离开区域
-            swiper.addEventListener('mouseleave', () => {
-                isDown = false;
-                swiper.style.cursor = 'default';
-            });
-            // 鼠标松开
-            swiper.addEventListener('mouseup', () => {
-                isDown = false;
-                swiper.style.cursor = 'default';
-            });
-            // 鼠标拖拽移动
-            swiper.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault(); // 阻止默认的选中文本行为
-                const x = e.pageX - swiper.offsetLeft;
-                const walk = (x - startX) * 2; // 乘2是为了滑动得更快更顺手
-                swiper.scrollLeft = scrollLeft - walk;
-            });
-        }
-        /* ========================= 拖拽修复结束 ========================= */
-
     // 下面这些是被不小心删掉的重要变量，现在全部补回来啦！
     let customDateText = ""; 
     let tempAvatarUrl = ""; 
@@ -8955,19 +8175,10 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     let autoPostTimers = {}; 
 
     // --- Utility Functions ---
+
     const showToast = (message, duration = 2000) => { toast.innerHTML = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), duration); };
     function escapeHtml(text) { if(typeof text !== 'string') return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
     
-    // --- 新增：全局 Emoji 随机头像生成器 ---
-    window.generateEmojiAvatarUrl = () => {
-        const emojis = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🐣','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🐢','🐍','🦎','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🐈','🐓','🦃','🦚','🦜','🦢','🕊️','🐇','🦝','🦡','🐁','🐀','🐿️','🦔','🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🥝','🍅','🥥','🥑','🍆','🥔','🥕','🌽','🌶️','🥒','🥬','🥦','🍄','🥜','🌰','🍞','🥐','🥖','🥨','🥯','🥞','🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🍲','🥣','🥗','🍿','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜','🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠','🥡','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🍵','🍶','🍾','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤','🧃','🧉','🧊'];
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-        const bgColors = ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff', '#F5B3C9', '#FDCEDF'];
-        const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${randomBg}"/><text x="50" y="55" font-size="50" text-anchor="middle" dominant-baseline="central">${randomEmoji}</text></svg>`;
-        return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
-    };
-
     // --- 新增：更新角色最后一条消息预览 ---
     function updateContactLastMsg(contactId) {
         const key = `chat_msgs_${contactId}`;
@@ -9683,39 +8894,17 @@ function renderPurchasedProducts() {
             
             if (generatedShops.length === 0) throw new Error("解析到的店铺为空");
 
-                     // --- 【修改：刷新时仅保留用户自定义店铺和最新生成的店铺，去除旧的AI店铺】 ---
+            // --- 【修改：刷新时仅保留用户自定义店铺和最新生成的店铺，去除旧的AI店铺】 ---
             let existingShops = [];
             try { existingShops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]'); } catch(e) { existingShops = []; }
             
             let customShops = existingShops.filter(s => s.isCustom === true); // 提取自定义的店铺，永久保留
             
+            // 只取本次新生成的店铺，丢弃旧的AI店铺，防止列表越来越长
             let mergedAiShops = [...generatedShops];
-            
-            // 【核心修复：检查新生成的店铺，如果它在旧店铺或收藏中曾经生成过菜单，则把旧菜单和评价继承过来，避免重复生成】
-            let favShops = [];
-            try { favShops = JSON.parse(localStorage.getItem('takeoutFavoritesData_v1') || '[]'); } catch(e) { favShops = []; }
-
-            mergedAiShops.forEach(newShop => {
-                // 优先从历史生成的同名店铺里找（必须要有菜单）
-                let oldShop = existingShops.find(s => s.name === newShop.name && s.menu && Array.isArray(s.menu) && s.menu.length > 0);
-                if (!oldShop) {
-                    // 如果找不到了再去收藏库里捞一下
-                    oldShop = favShops.find(s => s.name === newShop.name && s.menu && Array.isArray(s.menu) && s.menu.length > 0);
-                }
-                
-                if (oldShop) {
-                    newShop.menu = oldShop.menu;
-                    newShop.reviews = oldShop.reviews;
-                    // 同步保留它之前的星级和销量信息，保持一致性
-                    if (oldShop.rating) newShop.rating = oldShop.rating;
-                    if (oldShop.sales) newShop.sales = oldShop.sales;
-                    if (oldShop.time) newShop.time = oldShop.time;
-                }
-            });
             
             // 最终顺序：自定义始终置顶 -> 本次最新生成的店铺
             let finalShops = [...customShops, ...mergedAiShops]; 
-
 
             try {
                 localStorage.setItem('takeoutShopsCache_v1', JSON.stringify(finalShops));
@@ -10170,41 +9359,15 @@ function renderCategories() {
         container.innerHTML = html;
     };
 
-           // --- 新增：从聊天扩展菜单直接打开外卖的全部订单页面 ---
-    window.openTakeoutAppFromChat = () => {
-        document.getElementById('chat-extra-menu').classList.remove('active');
-        
-        // 1. 正常唤起外卖App大框架
-        openTakeoutApp();
-        
-        // 2. 增加一点延迟，强行覆盖掉App默认跳转“商家”的行为，万无一失
-        setTimeout(() => {
-            const takeoutAppContainer = document.getElementById('takeout-app-page');
-            if (takeoutAppContainer) {
-                // 强制切到底部的“我的”页面，作为垫底
-                const myTabBtn = takeoutAppContainer.querySelector('.nav-item[data-page="takeout-page-my"]');
-                if (myTabBtn) myTabBtn.click();
-            }
-            
-            // 弹起独立的“全部订单”页面
-            if (document.getElementById('takeout-all-orders-page')) {
-                openTakeoutAllOrdersPage();
-            } else {
-                showToast("未找到全部订单页面，请确认已添加对应HTML");
-            }
-        }, 80); // 80毫秒的延迟足以避开冲突，视觉上依然是秒开
-    };
-
-
-      window.openTakeoutApp = (startPage = 'takeout-page-order') => {
+    window.openTakeoutApp = () => {
         body.classList.add('takeout-active');
         initializeTakeoutApp();
-
-        // 【优化】：根据传入的参数，直接锁定到底部对应的Tab
+        
+        // 【关键防御】：强制模拟点击底部“商家”Tab，确保每次点开App，界面都百分百归位到商家列表，防止停留在空白页
         const takeoutAppContainer = document.getElementById('takeout-app-page');
         if (takeoutAppContainer) {
-            const targetTabBtn = takeoutAppContainer.querySelector(`.nav-item[data-page="${startPage}"]`);
-            if (targetTabBtn) targetTabBtn.click();
+            const orderTabBtn = takeoutAppContainer.querySelector('.nav-item[data-page="takeout-page-order"]');
+            if (orderTabBtn) orderTabBtn.click();
         }
 
         // 强力从缓存中读取并渲染店铺列表
@@ -10219,336 +9382,10 @@ function renderCategories() {
             renderTakeoutShopList([]); 
         }
     };
-
     window.closeTakeoutApp = () => {
         body.classList.remove('takeout-active');
     };
     // --- *** END: Takeout App Logic *** ---
-    // ========================= 图库 App 控制逻辑 =========================
-    window.openGalleryApp = () => {
-        body.classList.add('gallery-active');
-    };
-
-    window.closeGalleryApp = () => {
-        body.classList.remove('gallery-active');
-    };
-    // ========================= 图库弹窗逻辑 =========================
-    // 打开弹窗，顺便把里面的内容清空还原
-    window.openGalleryAddModal = () => {
-        document.getElementById('gallery-add-url-input').value = '';
-        document.getElementById('gallery-add-batch-input').value = '';
-        document.getElementById('gallery-add-preview-img').src = '';
-        document.getElementById('gallery-add-preview-img').style.display = 'none';
-        document.getElementById('gallery-add-preview-placeholder').style.display = 'block';
-        document.getElementById('gallery-add-modal').classList.add('active');
-    };
-
-    // 关闭弹窗
-    window.closeGalleryAddModal = () => {
-        document.getElementById('gallery-add-modal').classList.remove('active');
-    };
-
-    // 实时更新单张图片预览
-    window.updateGalleryPreview = (url) => {
-        const previewImg = document.getElementById('gallery-add-preview-img');
-        const placeholder = document.getElementById('gallery-add-preview-placeholder');
-        if (url && url.trim() !== '') {
-            previewImg.src = url.trim();
-            previewImg.style.display = 'block';
-            placeholder.style.display = 'none';
-        } else {
-            previewImg.src = '';
-            previewImg.style.display = 'none';
-            placeholder.style.display = 'block';
-        }
-    };
-
-         // ========================= 图库核心数据与持久化 =========================
-    const GALLERY_DATA_KEY = 'galleryApp_data_v1';
-    
-    // 初始化时从本地缓存读取数据
-    function loadGalleryData() {
-        try {
-            const data = localStorage.getItem(GALLERY_DATA_KEY);
-            if (data) {
-                window.galleryData = JSON.parse(data);
-            } else {
-                window.galleryData = [{ cover: 'https://img.heliar.top/file/1773432424246_喜欢_like_6.png', items: [] }];
-            }
-        } catch(e) {
-            window.galleryData = [{ cover: 'https://img.heliar.top/file/1773432424246_喜欢_like_6.png', items: [] }];
-        }
-    }
-    
-    // 每次发生增删改，必须调用这个保存到手机
-    function saveGalleryData() {
-        localStorage.setItem(GALLERY_DATA_KEY, JSON.stringify(window.galleryData));
-    }
-
-    window.currentAlbumIndex = 0; // 当前选中的分类索引
-
-    // 页面加载完成后，立刻读取数据并渲染
-    document.addEventListener('DOMContentLoaded', () => {
-        loadGalleryData();
-        setTimeout(() => {
-            window.renderGalleryAlbums();
-            window.renderGalleryGrid();
-        }, 500);
-    });
-
-    // 渲染顶部的长胶囊分类图标
-    window.renderGalleryAlbums = () => {
-        const container = document.getElementById('gallery-albums-container');
-        container.innerHTML = '';
-        window.galleryData.forEach((album, index) => {
-            // 给每个图标外面套一个 wrapper，为了能放红叉按钮和做动画
-            const wrapper = document.createElement('div');
-            wrapper.className = 'gallery-album-wrapper';
-            wrapper.style.position = 'relative';
-            wrapper.style.flexShrink = '0';
-
-            const img = document.createElement('img');
-            img.className = 'gallery-album-item ' + (index === window.currentAlbumIndex ? 'active' : '');
-            img.src = album.cover;
-            // 点击图标切换分类
-            img.onclick = () => window.selectGalleryAlbum(index);
-            wrapper.appendChild(img);
-
-            // 只有第1个及以后的相册才允许删除（第0个是系统默认的基础相册）
-            if (index > 0) {
-                const delBtn = document.createElement('div');
-                delBtn.className = 'gallery-photo-delete-btn';
-                delBtn.style.top = '-4px'; 
-                delBtn.style.right = '-4px'; 
-                delBtn.style.width = '20px'; 
-                delBtn.style.height = '20px'; 
-                delBtn.style.fontSize = '12px';
-                delBtn.innerText = '✕';
-                delBtn.onclick = (e) => {
-                    e.stopPropagation(); // 防止触发点击图片切换相册
-                    window.deleteGalleryAlbum(index);
-                };
-                wrapper.appendChild(delBtn);
-            }
-
-            container.appendChild(wrapper);
-        });
-    };
-
-    // 选中某个相册时的动作
-    window.selectGalleryAlbum = (index) => {
-        window.currentAlbumIndex = index;
-        window.renderGalleryAlbums();
-        window.renderGalleryGrid();
-    };
-
-    // 核心保存逻辑：点击弹窗【保存】时触发（新增相册分类）
-    window.saveGalleryAlbum = () => {
-        const coverUrl = document.getElementById('gallery-add-url-input').value.trim();
-        const batchText = document.getElementById('gallery-add-batch-input').value.trim();
-        
-        if (!coverUrl) {
-            showToast('请先填写一张封面 URL 哦！');
-            return;
-        }
-
-        const lines = batchText.split('\n');
-        const items = [];
-        lines.forEach(line => {
-            const parts = line.split(/[:：]/); 
-            if (parts.length >= 2) {
-                const desc = parts[0].trim();
-                const url = parts.slice(1).join(':').trim(); 
-                if (desc && url) items.push({ desc, url });
-            }
-        });
-
-        window.galleryData.push({ cover: coverUrl, items: items });
-        saveGalleryData(); // 【关键】保存到本地
-
-        window.currentAlbumIndex = window.galleryData.length - 1;
-        
-        window.closeGalleryAddModal();
-        window.renderGalleryAlbums();
-        window.renderGalleryGrid();
-        showToast('保存成功！');
-        
-        setTimeout(() => {
-            const container = document.getElementById('gallery-albums-container');
-            container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-        }, 100);
-    };
-
-    // ========================= 图库编辑与管理逻辑 =========================
-    window.isGalleryManageMode = false;
-
-    // 切换管理模式
-    window.toggleGalleryManageMode = () => {
-        const currentAlbum = window.galleryData[window.currentAlbumIndex];
-        // 去掉了为空时不许进管理模式的限制，因为现在可能要删空的“种类”
-        window.isGalleryManageMode = !window.isGalleryManageMode;
-        
-        const iconBtn = document.getElementById('gallery-manage-icon');
-        const textBtn = document.getElementById('gallery-manage-text');
-        const gridContainer = document.getElementById('gallery-grid-container');
-        const albumsContainer = document.getElementById('gallery-albums-container'); // 顶部种类胶囊
-
-        if (window.isGalleryManageMode) {
-            iconBtn.style.display = 'none';
-            textBtn.style.display = 'inline-block';
-            gridContainer.classList.add('manage-mode');
-            albumsContainer.classList.add('manage-mode'); // 顶部也进入编辑态
-            showToast("进入编辑模式");
-        } else {
-            iconBtn.style.display = 'inline-block';
-            textBtn.style.display = 'none';
-            gridContainer.classList.remove('manage-mode');
-            albumsContainer.classList.remove('manage-mode'); // 顶部退出编辑态
-        }
-        
-        window.renderGalleryAlbums();
-        window.renderGalleryGrid();
-    };
-
-    // 渲染下方具体正方形图片+描述
-    window.renderGalleryGrid = () => {
-        const container = document.getElementById('gallery-grid-container');
-        container.innerHTML = '';
-        const currentAlbum = window.galleryData[window.currentAlbumIndex];
-        
-        if (!currentAlbum || currentAlbum.items.length === 0) {
-            container.innerHTML = `<div style="grid-column: span 3; text-align: center; color: #ccc; font-size: 13px; padding-top: 80px;">当前相册还是空的<br><br>点击右上角 + 添加吧</div>`;
-            return;
-        }
-
-        currentAlbum.items.forEach((item, index) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'gallery-photo-wrapper';
-            wrapper.style.position = 'relative';
-            
-            const img = document.createElement('img');
-            img.className = 'gallery-photo-item';
-            img.src = item.url;
-            
-            img.onclick = () => {
-                if (window.isGalleryManageMode) {
-                    window.openGalleryEditPhotoModal(index);
-                } else {
-                    showToast(item.desc);
-                }
-            };
-            
-            const desc = document.createElement('div');
-            desc.className = 'gallery-photo-desc';
-            desc.innerText = item.desc;
-            
-            const delBtn = document.createElement('div');
-            delBtn.className = 'gallery-photo-delete-btn';
-            delBtn.innerText = '✕';
-            delBtn.onclick = (e) => {
-                e.stopPropagation();
-                window.deleteGalleryPhoto(index);
-            };
-            
-            wrapper.appendChild(img);
-            wrapper.appendChild(desc);
-            wrapper.appendChild(delBtn);
-            container.appendChild(wrapper);
-        });
-    };
-
-       // 删除单张图片
-    window.deleteGalleryPhoto = (index) => {
-        document.getElementById('wb-delete-confirm-title').innerText = "确定要删除这张图片吗？";
-        const confirmModal = document.getElementById('wb-delete-confirm-modal');
-        confirmModal.style.zIndex = "10200"; 
-        
-        pendingWbDeleteCallback = () => {
-            window.galleryData[window.currentAlbumIndex].items.splice(index, 1);
-            saveGalleryData(); // 【关键】持久化
-            showToast("图片已删除");
-            window.renderGalleryGrid();
-            confirmModal.style.zIndex = "900";
-        };
-
-        const cancelBtn = confirmModal.querySelector('.btn-cancel');
-        const oldCancel = cancelBtn.onclick;
-        cancelBtn.onclick = (e) => {
-            if (oldCancel) oldCancel(e);
-            confirmModal.style.zIndex = "900";
-        };
-        confirmModal.classList.add('active');
-    };
-
-    // 删除整个表情包种类（相册）
-    window.deleteGalleryAlbum = (index) => {
-        document.getElementById('wb-delete-confirm-title').innerText = "确定要删除这个表情包种类及里面的所有图片吗？";
-        const confirmModal = document.getElementById('wb-delete-confirm-modal');
-        confirmModal.style.zIndex = "10200";
-
-        pendingWbDeleteCallback = () => {
-            window.galleryData.splice(index, 1);
-            
-            // 如果删除了当前正看着的相册，或者删除了前面的相册，要把选中索引往前移
-            if (window.currentAlbumIndex >= index) {
-                window.currentAlbumIndex = Math.max(0, window.currentAlbumIndex - 1);
-            }
-            
-            saveGalleryData(); // 【关键】持久化
-            showToast("种类已删除");
-            
-            // 删完之后，如果没别的了，退出管理模式
-            if (window.galleryData.length <= 1 && window.galleryData[0].items.length === 0) {
-                window.isGalleryManageMode = false;
-                document.getElementById('gallery-manage-icon').style.display = 'inline-block';
-                document.getElementById('gallery-manage-text').style.display = 'none';
-                document.getElementById('gallery-grid-container').classList.remove('manage-mode');
-                document.getElementById('gallery-albums-container').classList.remove('manage-mode');
-            }
-            
-            window.renderGalleryAlbums();
-            window.renderGalleryGrid();
-            confirmModal.style.zIndex = "900";
-        };
-
-        const cancelBtn = confirmModal.querySelector('.btn-cancel');
-        const oldCancel = cancelBtn.onclick;
-        cancelBtn.onclick = (e) => {
-            if (oldCancel) oldCancel(e);
-            confirmModal.style.zIndex = "900";
-        };
-        confirmModal.classList.add('active');
-    };
-
-    window.openGalleryEditPhotoModal = (index) => {
-        const currentAlbum = window.galleryData[window.currentAlbumIndex];
-        const item = currentAlbum.items[index];
-        document.getElementById('gallery-edit-photo-index').value = index;
-        document.getElementById('gallery-edit-photo-url').value = item.url;
-        document.getElementById('gallery-edit-photo-desc').value = item.desc;
-        document.getElementById('gallery-edit-photo-modal').classList.add('active');
-    };
-
-    window.closeGalleryEditPhotoModal = () => {
-        document.getElementById('gallery-edit-photo-modal').classList.remove('active');
-    };
-
-    window.saveGalleryPhotoEdit = () => {
-        const index = parseInt(document.getElementById('gallery-edit-photo-index').value);
-        const newUrl = document.getElementById('gallery-edit-photo-url').value.trim();
-        const newDesc = document.getElementById('gallery-edit-photo-desc').value.trim();
-        if (!newUrl) { showToast("图片 URL 不能为空哦"); return; }
-        
-        window.galleryData[window.currentAlbumIndex].items[index] = {
-            url: newUrl,
-            desc: newDesc || "无描述"
-        };
-        saveGalleryData(); // 【关键】持久化
-        
-        showToast("修改成功！");
-        window.closeGalleryEditPhotoModal();
-        window.renderGalleryGrid();
-    };
     // --- 新增：店铺详情 Tabs 切换 ---
     window.switchTakeoutShopTab = (tabName) => {
         document.querySelectorAll('.takeout-shop-tab').forEach(el => el.classList.remove('active'));
@@ -10660,176 +9497,12 @@ function renderCategories() {
         document.getElementById('takeout-favorite-page').classList.add('active');
     };
 
-      window.closeTakeoutFavPage = () => {
+    window.closeTakeoutFavPage = () => {
         document.getElementById('takeout-favorite-page').classList.remove('active');
     };
-    // --- 新增：全部订单独立页面逻辑 ---
-    let isTakeoutSendMode = false; // 新增全局状态
-
-    window.openTakeoutAllOrdersPage = () => {
-        document.getElementById('takeout-all-orders-page').classList.add('active');
-        
-        // 新增：判断是否从聊天窗口点进来，如果是，显示右上角的“给他下单”
-        const sendBtn = document.getElementById('takeout-send-friend-btn');
-        if (currentChatContactId) {
-            sendBtn.style.display = 'block';
-            sendBtn.textContent = '给他下单';
-            sendBtn.classList.remove('active');
-        } else {
-            sendBtn.style.display = 'none';
-        }
-        isTakeoutSendMode = false; // 每次打开重置状态
-
-        renderTakeoutAllOrders();
-    };
-
-    window.closeTakeoutAllOrdersPage = () => {
-        document.getElementById('takeout-all-orders-page').classList.remove('active');
-        isTakeoutSendMode = false; // 关闭时重置
-    };
-
-    // 新增：切换选择发送模式
-    window.toggleTakeoutSendMode = () => {
-        isTakeoutSendMode = !isTakeoutSendMode;
-        const btn = document.getElementById('takeout-send-friend-btn');
-        if (isTakeoutSendMode) {
-            btn.textContent = '取消下单';
-            btn.classList.add('active');
-            showToast('请点击下方你想发送给ta的外卖记录~');
-        } else {
-            btn.textContent = '给他下单';
-            btn.classList.remove('active');
-        }
-    };
-
-
-    window.renderTakeoutAllOrders = () => {
-        const container = document.getElementById('takeout-all-orders-list-container');
-        const freshData = JSON.parse(localStorage.getItem(TAKEOUT_APP_DATA_KEY) || '{"menus":[]}');
-        const menus = freshData.menus || [];
-
-        if (menus.length === 0) {
-            container.innerHTML = `
-                <div style="text-align: center; padding-top: 100px; color: #ccc;">
-                    <div style="font-size: 60px; margin-bottom: 10px;">🧾</div>
-                    <p>还没有下过单哦，快去挑点好吃的吧！</p>
-                </div>`;
-            return;
-        }
-        container.innerHTML = '';
-
-        [...menus].reverse().forEach(menu => {
-            const totalDishes = menu.dishes.reduce((sum, dish) => sum + dish.quantity, 0);
-            const card = document.createElement('div');
-            card.className = 'takeout-order-card';
-
-            const avatarHtml = menu.shopEmoji
-                ? `<div class="takeout-order-shop-icon">${menu.shopEmoji}</div>`
-                : `<img src="${menu.avatar}" class="takeout-order-shop-icon" style="object-fit:cover;">`;
-
-            const displayName = escapeHtml(menu.shopName || menu.name);
-            const dateObj = new Date(menu.timestamp);
-            const timeStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
-
-            const dishesHtml = menu.dishes.map(d => `
-                <div class="takeout-order-dish-item">
-                    <span class="takeout-order-dish-name">${escapeHtml(d.name)}</span>
-                    <span class="takeout-order-dish-qty">x ${d.quantity}</span>
-                    ${d.price !== undefined ? `<span class="takeout-order-dish-price">¥${(d.price * d.quantity).toFixed(2)}</span>` : ''}
-                </div>
-            `).join('');
-
-            card.innerHTML = `
-                <div class="takeout-order-header">
-                    ${avatarHtml}
-                    <div class="takeout-order-shop-info">
-                        <div class="takeout-order-shop-name">${displayName} <span style="color:#ccc; font-size:14px; margin-left:6px;">></span></div>
-                        <div class="takeout-order-time">${timeStr}</div>
-                    </div>
-                    <div class="takeout-order-status">订单已完成</div>
-                </div>
-                <div class="takeout-order-dishes-wrapper expanded">
-                    <div class="takeout-order-dishes-inner">
-                        ${dishesHtml}
-                    </div>
-                    <div class="takeout-order-footer">
-                        <span class="takeout-order-total-text">共 ${totalDishes} 件商品</span>
-                        ${menu.totalPrice ? `<span class="takeout-order-total-price">¥${parseFloat(menu.totalPrice).toFixed(2)}</span>` : ''}
-                    </div>
-                </div>`;
-
-                     card.querySelector('.takeout-order-header').addEventListener('click', (e) => {
-                // 修改：如果处于发送模式，则执行发送动作；否则正常展开/折叠
-                if (typeof isTakeoutSendMode !== 'undefined' && isTakeoutSendMode) {
-                    sendTakeoutOrderToFriend(menu);
-                } else {
-                    e.currentTarget.nextElementSibling.classList.toggle('expanded');
-                }
-            });
-
-
-            card.addEventListener('dblclick', () => {
-                if (confirm('确定要删除这条外卖订单记录吗？')) {
-                    const menuId = parseInt(menu.id);
-                    let appState = JSON.parse(localStorage.getItem(TAKEOUT_APP_DATA_KEY) || '{"menus":[]}');
-                    appState.menus = appState.menus.filter(m => m.id !== menuId);
-                    localStorage.setItem(TAKEOUT_APP_DATA_KEY, JSON.stringify(appState));
-                    renderTakeoutAllOrders();
-                    if (window.forceRenderTakeoutMenus) window.forceRenderTakeoutMenus();
-                }
-            });
-            container.appendChild(card);
-        });
-    };
-       // 新增：发送外卖记录给好友
-    window.sendTakeoutOrderToFriend = (menu) => {
-        if (!currentChatContactId) return;
-
-        const key = getMessagesKey(currentChatContactId);
-        let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        
-        messages.push({
-            id: Date.now(),
-            type: 'sent',
-            isTakeoutOrder: true,  // 核心标识
-            takeoutData: menu,
-            text: `[外卖订单：${menu.shopName || '美味外卖'}]`,
-            timestamp: Date.now()
-        });
-        
-        localStorage.setItem(key, JSON.stringify(messages));
-        
-        // 更新联系人列表最新消息
-        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const idx = contacts.findIndex(c => c.id === currentChatContactId);
-        if (idx > -1) {
-            contacts[idx].lastMsg = `[外卖订单]`;
-            contacts[idx].timestamp = Date.now();
-            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-        }
-        
-        showToast("外卖订单已发送给好友！");
-        
-        // 关闭全部订单页
-        isTakeoutSendMode = false;
-        closeTakeoutAllOrdersPage();
-        
-        // 【核心修复】：彻底关闭外卖App大框架，直接弹回聊天界面
-        closeTakeoutApp();
-        
-        // 【核心修复】：立刻重新渲染聊天消息，让刚发出的订单秒出现！
-        if (document.getElementById('chat-conversation-view').classList.contains('active')) {
-            renderConversationMessages();
-        }
-    }; 
-
-    // ↑↑↑ 就是补上这个缺失的括号和分号 ↑↑↑
-        
 
             // 设置资料与编辑店铺
-
     window.openTakeoutProfileModal = () => {
-
         const profile = JSON.parse(localStorage.getItem('takeoutProfile_v1') || '{"nickname":"外卖吃货", "avatar":"https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"}');
         document.getElementById('takeout-my-nickname-input').value = profile.nickname;
         document.getElementById('takeout-my-avatar-preview').src = profile.avatar;
@@ -11006,7 +9679,7 @@ function renderCategories() {
         closeTakeoutShopEditModal();
     };
 
-        // 5. 点击删除 (使用自定义确认弹窗防止被系统拦截)
+    // 5. 点击删除 (使用自定义确认弹窗防止被系统拦截)
     window.deleteTakeoutShopFromModal = () => {
         // 利用系统内已有的确认组件进行拦截
         document.getElementById('wb-delete-confirm-title').innerText = "确定要永久删除该自定义店铺吗？";
@@ -11015,7 +9688,7 @@ function renderCategories() {
         const confirmModal = document.getElementById('wb-delete-confirm-modal');
         confirmModal.style.zIndex = "10200"; 
         
-        pendingWbDeleteCallback = () => {  /* 👈 去掉了这里的 window. */
+        window.pendingWbDeleteCallback = () => {
             const originalIndex = parseInt(document.getElementById('takeout-edit-shop-index').value);
             let shops = JSON.parse(localStorage.getItem('takeoutShopsCache_v1') || '[]');
             let shopName = shops[originalIndex] ? shops[originalIndex].name : null;
@@ -11340,11 +10013,17 @@ ${roleDetails}\n`;
         if (displayReviews.length === 0) {
             html += '<div style="text-align:center; padding-top:40px; color:#ccc;">暂无此类评价</div>';
         } else {
-                     // 获取所有角色数据，用于匹配专属评价者的头像
+            // 用户指定的随机路人头像
+            const avatars = [
+                "https://img.heliar.top/file/1773259046416_IMG_5032.jpeg",
+                "https://img.heliar.top/file/1773259051603_IMG_5031.jpeg",
+                "https://img.heliar.top/file/1773259053273_IMG_5030.jpeg"
+            ];
+            
+            // 获取所有角色数据，用于匹配专属评价者的头像
             const allContacts = JSON.parse(localStorage.getItem('chatData_v5_final') || '[]');
             displayReviews.forEach(r => {
-                let randomAvatar = window.generateEmojiAvatarUrl();
-
+                let randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
                 
                 // --- 新增：如果评价昵称和某个角色匹配，直接使用该角色的真实头像 ---
                 let matchedContact = allContacts.find(c => (c.alias || c.name) === r.nickname);
@@ -13219,19 +11898,15 @@ window.toggleMallProductFavorite = (productId) => {
         if (contactCountEl) contactCountEl.textContent = contacts.length;
     }
 
-       window.openCreateForumModal = () => {
+    window.openCreateForumModal = () => {
         tempForumAvatarUrl = '';
         tempForumWbIds = [];
         tempForumBoundRoleIds = []; 
-        const preview = document.getElementById('new-forum-avatar-preview');
-        preview.removeAttribute('data-loaded');
-        preview.src = '';
-        preview.style.display = 'none';
+        document.getElementById('new-forum-avatar-preview').src = '';
+        document.getElementById('new-forum-avatar-preview').style.display = 'none';
         document.getElementById('forum-avatar-placeholder').style.display = 'flex';
 
-        document.getElementById('new-forum-avatar-url-input').value = '';
         document.getElementById('new-forum-name-input').value = '';
-
         document.getElementById('new-forum-worldview-input').value = '';
         document.getElementById('new-forum-wb-selection-display').textContent = '未绑定世界书';
         document.getElementById('new-forum-role-selection-display').textContent = '未绑定角色'; 
@@ -13246,32 +11921,17 @@ window.toggleMallProductFavorite = (productId) => {
         document.getElementById('input-forum-avatar').click();
     };
 
-       window.handleForumAvatarUpload = (event) => {
+    window.handleForumAvatarUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
         compressImage(file, 300, (base64) => {
             tempForumAvatarUrl = base64;
             const preview = document.getElementById('new-forum-avatar-preview');
-            preview.removeAttribute('data-loaded');
             preview.src = base64;
             preview.style.display = 'block';
             document.getElementById('forum-avatar-placeholder').style.display = 'none';
-            document.getElementById('new-forum-avatar-url-input').value = ''; // 如果上传本地图，清空URL
         });
     };
-
-    window.handleNewForumAvatarUrl = (url) => {
-        const trimmed = url.trim();
-        if (trimmed) {
-            tempForumAvatarUrl = trimmed;
-            const preview = document.getElementById('new-forum-avatar-preview');
-            preview.removeAttribute('data-loaded');
-            preview.src = trimmed;
-            preview.style.display = 'block';
-            document.getElementById('forum-avatar-placeholder').style.display = 'none';
-        }
-    };
-
 
     window.openForumWbBindModal = () => {
         wbBindMultiSelect = true;
@@ -13455,17 +12115,9 @@ window.toggleMallProductFavorite = (productId) => {
         tempEditForumRoleIds = forum.boundRoleIds || [];
         tempEditForumPasserbyAvatars = forum.passerbyAvatars || []; 
 
-             const preview = document.getElementById('edit-forum-avatar-preview');
-        preview.removeAttribute('data-loaded'); // 同步修复这里可能会卡没图片的bug
-        preview.src = tempEditForumAvatarUrl;
-        preview.style.display = 'block';
-        
-        // 如果是外部网络链接，回显到输入框中
-        const urlInput = document.getElementById('edit-forum-avatar-url-input');
-        urlInput.value = tempEditForumAvatarUrl.startsWith('http') ? tempEditForumAvatarUrl : '';
-        
+        document.getElementById('edit-forum-avatar-preview').src = tempEditForumAvatarUrl;
+        document.getElementById('edit-forum-avatar-preview').style.display = 'block';
         document.getElementById('edit-forum-name-input').value = forum.name || '';
-
         document.getElementById('edit-forum-worldview-input').value = forum.worldview || '';
 
         updateEditForumWbDisplay();
@@ -13538,30 +12190,14 @@ window.toggleMallProductFavorite = (productId) => {
     }
 
     window.triggerEditForumAvatarUpload = () => { document.getElementById('input-edit-forum-avatar').click(); };
-      window.handleEditForumAvatarUpload = (event) => {
+    window.handleEditForumAvatarUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
         compressImage(file, 300, (base64) => {
             tempEditForumAvatarUrl = base64;
-            const preview = document.getElementById('edit-forum-avatar-preview');
-            preview.removeAttribute('data-loaded');
-            preview.src = base64;
-            document.getElementById('edit-forum-avatar-url-input').value = ''; // 如果上传了本地图，清空URL框
+            document.getElementById('edit-forum-avatar-preview').src = base64;
         });
     };
-
-    window.handleEditForumAvatarUrl = (url) => {
-        const trimmed = url.trim();
-        if (trimmed) {
-            tempEditForumAvatarUrl = trimmed;
-            const preview = document.getElementById('edit-forum-avatar-preview');
-            preview.removeAttribute('data-loaded');
-            preview.src = trimmed;
-            preview.style.display = 'block';
-            document.getElementById('edit-forum-avatar-placeholder').style.display = 'none';
-        }
-    };
-
 
     window.openEditForumWbBindModal = () => {
         wbBindMultiSelect = true;
@@ -13663,19 +12299,14 @@ window.toggleMallProductFavorite = (productId) => {
         document.querySelector('#forum-detail-level-display').style.display = 'flex';
     }
 
-      window.openForumDetail = (forumId) => {
+    window.openForumDetail = (forumId) => {
         currentForumDetailId = forumId;
         const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
         const forum = forums.find(f => f.id === forumId);
         if (!forum) return;
 
         document.getElementById('forum-detail-header-name').textContent = forum.name;
-        
-        // 【核心修复】：强行移除已加载标记，让底层引擎重新接管并渲染图片
-        const detailAvatar = document.getElementById('forum-detail-header-avatar');
-        detailAvatar.removeAttribute('data-loaded');
-        detailAvatar.src = forum.avatar || '';
-
+        document.getElementById('forum-detail-header-avatar').src = forum.avatar || '';
         
         const signinBtn = document.getElementById('forum-detail-signin-btn');
         signinBtn.onclick = () => handleForumSignIn(forumId);
@@ -14016,8 +12647,15 @@ window.toggleMallProductFavorite = (productId) => {
         document.getElementById('forum-posts-area').innerHTML = ''; 
     };
 
-       const getRandomCustomAvatar = (forumId) => {
-        let avatarList = [];
+    const customAvatarList = [
+        "https://img.heliar.top/file/1770618803521_IMG_4118.jpeg", 
+        "https://img.heliar.top/file/1770618839439_IMG_4156.jpeg",
+        "https://img.heliar.top/file/1770618963468_IMG_4157.jpeg",
+        "https://img.heliar.top/file/1770619023973_IMG_4158.jpeg",
+    ];
+
+    const getRandomCustomAvatar = (forumId) => {
+        let avatarList = customAvatarList;
         if (forumId) {
             const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
             const currentForum = forums.find(f => f.id === forumId);
@@ -14025,13 +12663,9 @@ window.toggleMallProductFavorite = (productId) => {
                 avatarList = currentForum.passerbyAvatars; 
             }
         }
-        // 如果没有设置自定义路人头像库，就生成带有马卡龙背景色的emoji随机头像
-        if (avatarList.length === 0) {
-            return window.generateEmojiAvatarUrl();
-        } 
+        if (avatarList.length === 0) return "https://img.heliar.top/file/1770068438490_添加人群_people-plus.png"; 
         return avatarList[Math.floor(Math.random() * avatarList.length)];
     };
-
 
 
     window.renderForumDetailPosts = (forumId) => {
@@ -14103,253 +12737,10 @@ window.toggleMallProductFavorite = (productId) => {
         });
     };
 
-      window.shareForumPost = (postId) => { showToast("分享功能待开发"); };
-
-    // =================== 新增：论坛详情页点击刷新生成 AI 帖子逻辑 ===================
-    window.handleForumRefresh = async (forumId) => {
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
-            showToast('请先在主页左下角设置中配置 API');
-            return;
-        }
-
-        const forums = JSON.parse(localStorage.getItem(FORUMS_DATA_KEY) || '[]');
-        const forum = forums.find(f => f.id === forumId);
-        if (!forum) return;
-
-        const refreshBtn = document.getElementById('forum-detail-refresh-btn');
-        if (refreshBtn) refreshBtn.style.animation = 'spin 1s linear infinite';
-        showToast('正在搜寻时空电波，生成新帖子...', 3000);
-
-        // 整理世界书和绑定角色的上下文
-        let worldbookContext = "";
-        if (forum.worldbookIds && forum.worldbookIds.length > 0) {
-            const allWb = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-            const activeWbs = allWb.filter(b => forum.worldbookIds.includes(b.id));
-            activeWbs.forEach(wb => {
-                worldbookContext += `\n[世界书: ${wb.title}]\n`;
-                wb.entries.forEach(e => { worldbookContext += `${e.key ? e.key+': ' : ''}${e.content}\n`; });
-            });
-        }
-        
-              let rolesContext = "";
-        let roleNames = [];
-        if (forum.boundRoleIds && forum.boundRoleIds.length > 0) {
-            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-            const activeRoles = allContacts.filter(c => forum.boundRoleIds.includes(c.id));
-            activeRoles.forEach(r => {
-                // 优先使用专属论坛昵称喂给AI
-                const fname = r.forumNickname || r.alias || r.name;
-                roleNames.push(fname);
-                rolesContext += `- 角色: ${fname} (人设: ${r.persona})\n`;
-            });
-        }
-
-
-        const prompt = `你是一个论坛帖子生成器。当前论坛名称是“${forum.name}”。
-论坛简介/世界观：${forum.worldview || '无'}
-${worldbookContext ? `【相关世界书设定作为隐性背景，绝对不要生硬照搬或像说明书一样复述，要自然融入日常闲聊中！】：\n${worldbookContext}` : ''}
-${rolesContext ? `关注了该论坛的常驻角色：\n${rolesContext}\n请让这几个角色中的一两个人自然地参与发帖或在评论区互动！` : ''}
-
-请生成 8 到 15 条符合该论坛氛围的全新帖子，严格以 JSON 格式返回，包含在一个 "posts" 数组中。
-【极度重要】：
-1. 帖子必须像真实人类在贴吧、小红书或微博上发的，短小精悍（几十个字为主，最长不超过150字），极其口语化。可以是吐槽、求助、发疯、分享日常或开玩笑！
-2. 绝对禁止像写小说、写设定集一样长篇大论！世界书只是决定他们讨论的话题范围，而不是直接念出的台词！
-
-字段要求：
-- authorName: 发帖人昵称 (如果是常驻角色，请务必使用上方给出的名字；如果不是，随机编一个符合该论坛风格的网友昵称)
-- content: 帖子文字内容 (必须口语化、接地气，绝不要生硬复述世界观！)
-- tags: 字符串数组，包含1到3个标签 (如 ["日常", "吐槽", "无语"])
-- baseLikes: 随机初始点赞数 (0 到 100)
-- comments: 评论数组。每条包含 author_nickname (评论人昵称) 和 text (评论内容，同样要简短口语化，像网友对线或附和)。随机生成 0 到 5 条评论。
-
-严格输出纯 JSON，不要带 Markdown 标记，示例：
-{
-  "posts": [
-    {
-
-      "authorName": "用户A",
-      "content": "今天天气真好！",
-      "tags": ["日常"],
-      "baseLikes": 12,
-      "comments": [ {"author_nickname": "用户B", "text": "确实！"} ]
-    }
-  ]
-}`;
-
-        try {
-            let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
-            const isGemini = settings.api.url.includes('generativelanguage');
-            let bodyData, headers = { 'Content-Type': 'application/json' };
-
-            if (isGemini) {
-                fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
-                bodyData = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.9, response_mime_type: "application/json" } });
-            } else {
-                headers['Authorization'] = `Bearer ${settings.api.key}`;
-                bodyData = JSON.stringify({ model: settings.api.model, messages: [{ role: "user", content: prompt }], temperature: 0.9, response_format: { "type": "json_object" } });
-            }
-
-            const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
-            if (!res.ok) throw new Error(`API Error: ${res.status}`);
-            const data = await res.json();
-            
-            let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-            reply = reply.trim();
-            const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-            if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
-
-                      const jsonReply = JSON.parse(reply);
-            const newPosts = jsonReply.posts || [];
-            if (newPosts.length === 0) throw new Error("返回帖子为空");
-
-                      let allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
-            const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-            const mainProfile = getUserProfile(); // 获取主人的信息
-            
-            // --- 修改：每次刷新时，直接清空该论坛下之前AI生成的所有旧帖子，只保留真人的 ---
-            allPosts = allPosts.filter(p => {
-                if (p.forumId !== forumId) return true; // 不是当前论坛的帖子，保留
-                // 核心修复：只要发帖人ID是你自己的QQ号，就保留；除此之外（不管是NPC还是你的好友角色）全算作旧的AI帖子，统统删掉！
-                if (String(p.authorId) === String(mainProfile.qqId)) return true; 
-                return false; 
-            });
-            // --- 清理结束 ---
-
-
-            newPosts.forEach((p, i) => {
-                let avatarToUse = "";
-                               const matchedContact = allContacts.find(c => (c.forumNickname || c.alias || c.name) === p.authorName);
-                if (matchedContact && matchedContact.avatar) {
-                    avatarToUse = matchedContact.avatar;
-                } else {
-                    avatarToUse = getRandomCustomAvatar(forumId);
-                }
-
-                let processedComments = [];
-                if (p.comments && Array.isArray(p.comments)) {
-                    processedComments = p.comments.map(c => {
-                        let cAvatar = "";
-                         const cMatched = allContacts.find(contact => (contact.forumNickname || contact.alias || contact.name) === c.author_nickname);
-                        if (cMatched && cMatched.avatar) {
-                            cAvatar = cMatched.avatar;
-                        } else {
-                            cAvatar = getRandomCustomAvatar(forumId);
-                        }
-                        return { ...c, author_avatar: cAvatar };
-                    });
-                }
-
-                allPosts.unshift({
-                    id: Date.now() + i,
-                    forumId: forumId,
-                    content: p.content || '',
-                    images: [], 
-                    authorId: matchedContact ? matchedContact.id : `npc_${Date.now()}_${i}`,
-                    authorName: p.authorName || '匿名用户',
-                    authorAvatar: avatarToUse,
-                    authorXP: Math.floor(Math.random() * 50) + 10,
-                    timestamp: Date.now(),
-                    likes: [],
-                    baseLikes: parseInt(p.baseLikes) || 0,
-                    tags: p.tags || [],
-                    comments: processedComments,
-                    // 打上AI生成标记
-                    isAiGenerated: true
-                });
-            });
-
-            localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allPosts));
-            renderForumDetailPosts(forumId);
-            showToast("成功获取新帖子！");
-
-
-
-        } catch (e) {
-            console.error("生成帖子失败:", e);
-            showToast("获取新帖子失败，网络或AI罢工了~");
-        } finally {
-            if (refreshBtn) refreshBtn.style.animation = '';
-        }
-    };
-
-
-    // =================== 新增：论坛“我的”主页设置逻辑 ===================
-    window.openForumMeSettings = () => {
-        const forumProfile = getForumUserData();
-        document.getElementById('forum-me-settings-nickname').value = forumProfile.nickname || '';
-        document.getElementById('forum-me-settings-fans').value = forumProfile.fans || '9.8k';
-        document.getElementById('forum-me-settings-avatar-preview').src = forumProfile.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-        document.getElementById('forum-me-settings-bg-preview').src = forumProfile.backgroundUrl || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1000&q=80';
-        tempForumMeAvatarUrl = forumProfile.avatar || '';
-        tempForumMeBgUrl = forumProfile.backgroundUrl || '';
-        
-        document.getElementById('forum-me-settings-modal').style.display = 'flex';
-        setTimeout(() => document.getElementById('forum-me-settings-modal').classList.add('active'), 10);
-    };
-
-    window.closeForumMeSettings = () => {
-        document.getElementById('forum-me-settings-modal').classList.remove('active');
-        setTimeout(() => document.getElementById('forum-me-settings-modal').style.display = 'none', 300);
-    };
-
-    window.saveForumMeSettings = () => {
-        const forumProfile = getForumUserData();
-        forumProfile.nickname = document.getElementById('forum-me-settings-nickname').value.trim();
-        forumProfile.fans = document.getElementById('forum-me-settings-fans').value.trim();
-        
-        // 如果输入框里有URL，优先采用URL
-        const manualAvatarUrl = document.getElementById('forum-me-settings-avatar-url').value.trim();
-        if (manualAvatarUrl) {
-            forumProfile.avatar = manualAvatarUrl;
-        } else {
-            forumProfile.avatar = tempForumMeAvatarUrl;
-        }
-
-        const manualBgUrl = document.getElementById('forum-me-settings-bg-url').value.trim();
-        if (manualBgUrl) {
-            forumProfile.backgroundUrl = manualBgUrl;
-        } else {
-            forumProfile.backgroundUrl = tempForumMeBgUrl;
-        }
-        
-        saveForumUserData(forumProfile);
-        showToast("论坛个人资料已保存");
-        closeForumMeSettings();
-        // 刷新论坛“我的”页面显示
-        if (document.getElementById('forum-page-me').classList.contains('active')) {
-            renderForumMePage();
-        }
-    };
-
-    // 绑定头像和背景点击上传
-    window.triggerForumMeAvatarUpload = () => { document.getElementById('input-forum-me-avatar').click(); };
-    window.handleForumMeAvatarUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        compressImage(file, 300, (base64) => {
-            tempForumMeAvatarUrl = base64;
-            document.getElementById('forum-me-settings-avatar-preview').src = base64;
-            document.getElementById('forum-me-settings-avatar-url').value = ''; // 清空URL框
-        });
-        event.target.value = '';
-    };
-
-    window.triggerForumMeBgUpload = () => { document.getElementById('input-forum-me-bg').click(); };
-    window.handleForumMeBgUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        compressImage(file, 800, (base64) => {
-            tempForumMeBgUrl = base64;
-            document.getElementById('forum-me-settings-bg-preview').src = base64;
-            document.getElementById('forum-me-settings-bg-url').value = ''; // 清空URL框
-        });
-        event.target.value = '';
-    };
+    window.shareForumPost = (postId) => { showToast("分享功能待开发"); };
 
     // =================== 新增：帖子收藏与动态交互逻辑 ===================
     const FORUM_FAVORITES_KEY = 'forumFavoritePosts_v1';
-
 
     function getForumFavoritePosts() {
         try { return JSON.parse(localStorage.getItem(FORUM_FAVORITES_KEY) || '[]'); } catch(e) { return []; }
@@ -14753,7 +13144,7 @@ ${postContext}
     };
 
        // =================== 新增：点赞的帖子预览与全屏逻辑 ===================
-      window.renderLikedPostsPreview = () => {
+    window.renderLikedPostsPreview = () => {
         const container = document.getElementById('forum-liked-posts-preview-container');
         if (!container) return;
         container.innerHTML = '';
@@ -14769,9 +13160,8 @@ ${postContext}
             return;
         }
         
-        // 限制展示最多8个，点击“全部”按钮才会跳转查看所有
-        const previewPosts = likedPosts.slice(0, 8);
-
+        // 限制展示前4个
+        const previewPosts = likedPosts.slice(0, 4);
         
         previewPosts.forEach(post => {
             // 获取该帖子所属的论坛名称
@@ -14814,141 +13204,6 @@ ${postContext}
         document.getElementById('forum-all-liked-posts-page').classList.remove('active');
         document.getElementById('forum-all-liked-posts-page').style.transform = 'translateX(100%)';
     };
-    // =================== 新增：论坛“关注的人”页面逻辑 ===================
-    window.openForumFollowingPage = () => {
-        document.getElementById('forum-following-page').classList.add('active');
-        document.getElementById('forum-following-page').style.transform = 'translateX(0)';
-        renderForumFollowingList();
-    };
-
-    window.closeForumFollowingPage = () => {
-        document.getElementById('forum-following-page').classList.remove('active');
-        document.getElementById('forum-following-page').style.transform = 'translateX(100%)';
-    };
-
-       // =================== 论坛“关注的人”与专属昵称逻辑 ===================
-    window.openForumFollowingPage = () => {
-        document.getElementById('forum-following-page').classList.add('active');
-        document.getElementById('forum-following-page').style.transform = 'translateX(0)';
-        renderForumFollowingList();
-    };
-
-    window.closeForumFollowingPage = () => {
-        document.getElementById('forum-following-page').classList.remove('active');
-        document.getElementById('forum-following-page').style.transform = 'translateX(100%)';
-    };
-
-    window.renderForumFollowingList = () => {
-        const container = document.getElementById('forum-following-list-container');
-        container.innerHTML = '';
-        
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        
-        if (contacts.length === 0) {
-            container.innerHTML = '<div style="text-align: center; color: #999; padding: 50px 20px; font-size: 14px;">暂无关注的人</div>';
-            return;
-        }
-
-        contacts.forEach(contact => {
-            // 优先读取论坛专属昵称
-            const name = contact.forumNickname || contact.alias || contact.name || '未知用户';
-            const avatar = contact.avatar || 'https://img.heliar.top/file/1770068438490_添加人群_people-plus.png';
-            
-            const item = document.createElement('div');
-            item.className = 'forum-following-item';
-            
-            item.innerHTML = `
-                <img src="${avatar}" class="forum-following-avatar">
-                <div class="forum-following-info">
-                    <div class="forum-following-name">${escapeHtml(name)}</div>
-                </div>
-                <div class="forum-following-right-actions">
-                    <button class="forum-following-btn" onclick="event.stopPropagation();">已关注</button>
-                    <!-- 点击三个点触发修改弹窗 -->
-                    <div class="forum-following-dots" onclick="event.stopPropagation(); openEditForumNicknameModal(${contact.id}, '${escapeHtml(name)}')">···</div>
-                </div>
-            `;
-            container.appendChild(item);
-        });
-    };
-
-    window.openEditForumNicknameModal = (contactId, currentName) => {
-        document.getElementById('edit-forum-nickname-contact-id').value = contactId;
-        document.getElementById('edit-forum-nickname-input').value = currentName;
-        document.getElementById('edit-forum-nickname-modal').classList.add('active');
-        setTimeout(() => document.getElementById('edit-forum-nickname-input').focus(), 100);
-    };
-
-    window.closeEditForumNicknameModal = () => {
-        document.getElementById('edit-forum-nickname-modal').classList.remove('active');
-    };
-
-    // 保存论坛专属昵称，并全局同步历史帖子与评论
-    window.saveForumNickname = () => {
-        const contactId = parseInt(document.getElementById('edit-forum-nickname-contact-id').value);
-        const newName = document.getElementById('edit-forum-nickname-input').value.trim();
-        if (!newName) {
-            showToast("昵称不能为空");
-            return;
-        }
-
-        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const contactIndex = contacts.findIndex(c => c.id === contactId);
-        if (contactIndex === -1) return;
-        
-        const oldName = contacts[contactIndex].forumNickname || contacts[contactIndex].alias || contacts[contactIndex].name;
-        
-        // 1. 修改通讯录中的论坛专属昵称
-        contacts[contactIndex].forumNickname = newName;
-        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-        
-        // 2. 遍历并修改大厅所有历史帖子和评论
-        let allPosts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
-        allPosts.forEach(p => {
-            if (p.authorId === contactId) {
-                p.authorName = newName;
-            }
-            if (p.comments && Array.isArray(p.comments)) {
-                p.comments.forEach(c => {
-                    if (c.author_nickname === oldName || c.userId === contactId) {
-                        c.author_nickname = newName;
-                    }
-                });
-            }
-        });
-        localStorage.setItem(FORUM_POSTS_DATA_KEY, JSON.stringify(allPosts));
-        
-        // 3. 遍历并修改收藏库里的帖子和评论
-        const FORUM_FAVORITES_KEY = 'forumFavoritePosts_v1';
-        let favPosts = JSON.parse(localStorage.getItem(FORUM_FAVORITES_KEY) || '[]');
-        favPosts.forEach(p => {
-            if (p.authorId === contactId) {
-                p.authorName = newName;
-            }
-            if (p.comments && Array.isArray(p.comments)) {
-                p.comments.forEach(c => {
-                    if (c.author_nickname === oldName || c.userId === contactId) {
-                        c.author_nickname = newName;
-                    }
-                });
-            }
-        });
-        localStorage.setItem(FORUM_FAVORITES_KEY, JSON.stringify(favPosts));
-
-        showToast("修改成功！历史发帖及评论已同步");
-        closeEditForumNicknameModal();
-        renderForumFollowingList(); // 刷新关注列表UI
-        
-        // 如果当时其他页面恰好开着，顺手静默刷新它们
-        if (document.getElementById('forum-page-planet').classList.contains('active')) {
-            renderAllForumPosts();
-            renderLikedPostsPreview();
-        }
-        if (typeof currentForumDetailId !== 'undefined' && currentForumDetailId) {
-            renderForumDetailPosts(currentForumDetailId);
-        }
-    };
-
 
     window.renderAllLikedPosts = () => {
         const container = document.getElementById('forum-all-liked-posts-area');
@@ -15019,7 +13274,7 @@ ${postContext}
         });
     };
 
-     window.toggleForumPostLike = (postId) => {
+    window.toggleForumPostLike = (postId) => {
         let posts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
         const postIndex = posts.findIndex(p => p.id === postId);
         if (postIndex === -1) return;
@@ -15057,43 +13312,7 @@ ${postContext}
         if (likedPage && likedPage.classList.contains('active')) {
             renderAllLikedPosts();
         }
-
-        // --- 修复：全面刷新可能包含该帖子的页面，确保点赞UI实时变化 ---
-        const homePage = document.getElementById('forum-page-home');
-        if (homePage && homePage.classList.contains('active')) {
-            const hotTab = document.querySelector('.forum-home-tab.active');
-            if (hotTab && hotTab.innerText.includes('热门')) {
-                window.renderHotForumPosts();
-            }
-        }
-
-        const favPostsPage = document.getElementById('forum-favorite-posts-page');
-        if (favPostsPage && favPostsPage.classList.contains('active')) {
-            window.renderFavoriteForumPosts();
-        }
-
-        const postDetailPage = document.getElementById('forum-post-detail-page');
-        if (postDetailPage && postDetailPage.classList.contains('active') && typeof currentForumPostData !== 'undefined' && currentForumPostData && currentForumPostData.id === postId) {
-            window.openForumPostDetail(postId);
-        }
-
-        // 万能保险：直接寻找DOM中所有对应的点赞按钮进行局部无感刷新 (兼容任何额外的页面)
-        document.querySelectorAll('.forum-post-action-btn').forEach(btn => {
-            const onclickStr = btn.getAttribute('onclick');
-            if (onclickStr && onclickStr.includes(`toggleForumPostLike(${postId})`)) {
-                const img = btn.querySelector('img');
-                const span = btn.querySelector('span');
-                if (img && span) {
-                    const currentUserHasLiked = posts[postIndex].likes.includes(mainProfile.qqId);
-                    img.src = currentUserHasLiked 
-                        ? "https://img.heliar.top/file/1770582836150_赞_thumbs-up_4.png" 
-                        : "https://img.heliar.top/file/1770582828275_赞_thumbs-up_3.png";
-                    span.innerText = (posts[postIndex].baseLikes || 0) + (posts[postIndex].likes ? posts[postIndex].likes.length : 0);
-                }
-            }
-        });
     };
-
 
 
     // --- Chat App Logic ---
@@ -16582,162 +14801,9 @@ ${actionInstruction}
         renderConversationMessages(); 
     };
     
-       window.closeChatConversation = () => { 
-        document.getElementById('chat-conversation-view').classList.remove('active'); 
-        currentChatContactId = null; 
-        const styleTag = document.getElementById('custom-chat-style'); 
-        if (styleTag) styleTag.innerHTML = ''; 
-        closeChatEmotionPanel(); // 退出聊天框时强制重置面板状态
-        renderChatList(); 
-    };
-    // ========================= 新增：聊天表情面板同步图库逻辑 =========================
-    let currentChatEmotionAlbumIndex = 0; // 记录当前在聊天界面的表情栏里，选中的是哪个相册
-
-    function renderEmotionPanelCategories() {
-        const container = document.getElementById('emotion-square-list');
-        if (!container) return;
-        container.innerHTML = '';
-        
-        // 如果系统刚启动还没加载图库数据，主动去本地拉取一次
-        if (!window.galleryData || window.galleryData.length === 0) {
-            try {
-                const data = localStorage.getItem('galleryApp_data_v1');
-                window.galleryData = data ? JSON.parse(data) : [{ cover: 'https://img.heliar.top/file/1773432424246_喜欢_like_6.png', items: [] }];
-            } catch(e) { window.galleryData = []; }
-        }
-
-        // 默认爱心图标的点击逻辑（绑定为第0个基础相册）
-        const defaultIcon = document.querySelector('.emotion-default-icon');
-        if (defaultIcon) {
-            defaultIcon.style.borderColor = currentChatEmotionAlbumIndex === 0 ? 'var(--theme-pink-btn)' : '#ffeff4';
-            defaultIcon.onclick = () => {
-                currentChatEmotionAlbumIndex = 0;
-                renderEmotionPanelCategories();
-                renderEmotionPanelItems(0);
-            };
-        }
-
-        // 渲染图库里后续建立的所有相册图标（从索引 1 开始）
-        if (window.galleryData && Array.isArray(window.galleryData)) {
-            window.galleryData.slice(1).forEach((album, sliceIndex) => {
-                const realIndex = sliceIndex + 1; // 恢复其在 galleryData 里的真实索引
-                const img = document.createElement('img');
-                img.className = 'emotion-square-item';
-                img.src = album.cover;
-                
-                if (currentChatEmotionAlbumIndex === realIndex) {
-                    img.style.borderColor = 'var(--theme-pink-btn)';
-                    img.style.transform = 'scale(1.05)';
-                }
-                
-                img.onclick = () => {
-                    currentChatEmotionAlbumIndex = realIndex;
-                    renderEmotionPanelCategories();
-                    renderEmotionPanelItems(realIndex);
-                };
-                container.appendChild(img);
-            });
-        }
-    }
-
-    function renderEmotionPanelItems(albumIndex) {
-        const contentArea = document.querySelector('.emotion-panel-content');
-        if (!contentArea) return;
-        
-        contentArea.innerHTML = ''; // 清空内容
-        
-        const album = window.galleryData[albumIndex];
-        if (!album || !album.items || album.items.length === 0) {
-            contentArea.style.display = 'flex';
-            contentArea.innerHTML = '此分类下还没有表情包哦~<br>去主屏幕“图库”App添加吧！';
-            return;
-        }
-
-        contentArea.style.display = 'block'; // 取消原来的居中flex布局，改用网格
-        
-        const grid = document.createElement('div');
-        grid.className = 'chat-emotion-grid';
-        
-        album.items.forEach(item => {
-            const img = document.createElement('img');
-            img.className = 'chat-emotion-item';
-            img.src = item.url;
-            img.onclick = () => {
-                sendEmotionImage(item.url, item.desc);
-            };
-            grid.appendChild(img);
-        });
-        
-        contentArea.appendChild(grid);
-    }
-
-    function sendEmotionImage(url, desc) {
-        if (!currentChatContactId) return;
-        
-        const key = getMessagesKey(currentChatContactId);
-        let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        
-        messages.push({
-            id: Date.now(),
-            type: 'sent',
-            isEmotionImage: true,
-            emotionUrl: url,
-            text: desc || '一张表情包', // 描述作为文本保存，给 AI 看的，也是列表预览文本
-            timestamp: Date.now()
-        });
-        
-        localStorage.setItem(key, JSON.stringify(messages));
-        
-        // 更新联系人列表最新消息
-        updateContactLastMsg(currentChatContactId);
-        
-               // 渲染聊天界面并收起面板
-        renderConversationMessages();
-        closeChatEmotionPanel();
-    }
-
-
-    // --- 弹出/收起延伸面板逻辑 ---
-    window.toggleChatEmotionPanel = () => {
-        const panel = document.getElementById('chat-emotion-panel');
-        const footer = document.querySelector('.chat-conv-footer');
-        const msgs = document.getElementById('chat-conv-messages');
-        
-        // 互斥：关掉左侧可能开着的“+”号转账菜单
-        document.getElementById('chat-extra-menu').classList.remove('active');
-
-        if (panel.classList.contains('active')) {
-            panel.classList.remove('active');
-            footer.classList.remove('panel-open');
-        } else {
-            panel.classList.add('active');
-            footer.classList.add('panel-open');
-            
-            // 打开面板时，同步渲染顶部相册图标和当前选中的图片列表
-            renderEmotionPanelCategories(); 
-            renderEmotionPanelItems(currentChatEmotionAlbumIndex); 
-            
-            // 让聊天消息区域顺滑滚到底部，模拟键盘顶起的效果
-            setTimeout(() => {
-                msgs.scrollTop = msgs.scrollHeight;
-            }, 150);
-        }
-    };
-    // ========================= 新增代码结束 =========================
-
-
-    window.closeChatEmotionPanel = () => {
-        const panel = document.getElementById('chat-emotion-panel');
-        const footer = document.querySelector('.chat-conv-footer');
-        if (panel && panel.classList.contains('active')) {
-            panel.classList.remove('active');
-            footer.classList.remove('panel-open');
-        }
-    };
-    // --- 新增结束 ---
-
+    window.closeChatConversation = () => { document.getElementById('chat-conversation-view').classList.remove('active'); currentChatContactId = null; const styleTag = document.getElementById('custom-chat-style'); if (styleTag) styleTag.innerHTML = ''; renderChatList(); };
     function getMessagesKey(contactId) { return `chat_msgs_${contactId}`; }
-
+    
     function formatChatTime(ts) {
         const now = new Date();
         const date = new Date(ts);
@@ -16841,37 +14907,24 @@ ${actionInstruction}
             const avatar = document.createElement('img');
             avatar.src = msg.type === 'sent' ? meAvatar : themAvatar;
             avatar.className = 'msg-bubble-avatar';
-            let contentHtml;
-                    if (msg.isTransfer) {
+
+                        let contentHtml;
+            if (msg.isTransfer) {
                 contentHtml = createTransferCard(msg);
             } else if (msg.isGift) {
                 // 如果是礼物，渲染我们刚加的粉色盒子
                 contentHtml = createGiftCard(msg);
-            } else if (msg.isTakeoutOrder) {
-                // 新增：如果是外卖订单，渲染外卖卡片
-                contentHtml = createTakeoutMessageCard(msg);
-                     } else if (msg.isEmotionImage) {
-                // 新增：如果是表情包/图片（强制正方形展示）
-                contentHtml = `<div class="msg-bubble-content" style="padding: 0; background: transparent; box-shadow: none;"><img src="${msg.emotionUrl}" style="width: 130px; height: 130px; border-radius: 12px; object-fit: cover; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 8px rgba(0,0,0,0.05);" onclick="showEmojiImageDesc('🖼️', '${escapeHtml(msg.text)}')"></div>`;
-            } else if (msg.isVoice) {
-                // 只有打上语音标记的消息才渲染为语音条
-                contentHtml = createVoiceCard(msg);
             } else {
-
-
                 contentHtml = `<div class="msg-bubble-content">${escapeHtml(msg.text)}</div>`;
             }
-
             
             const contentElement = document.createRange().createContextualFragment(contentHtml).firstElementChild;
-
             contentElement.ondblclick = (e) => { 
                 e.stopPropagation(); 
-                // 防止外卖卡片被意外编辑导致乱码
-                showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer || msg.isGift || msg.isTakeoutOrder); 
+                // 添加 isGift 参数，让礼物和转账一样不能被编辑文字
+                showBubbleMenu(e, msg.id, msg.text, msg.type, msg.isTransfer || msg.isGift); 
             };
-
-                     // --- 新增：给礼物卡片加单击弹出详情的事件 ---
+            // --- 新增：给礼物卡片加单击弹出详情的事件 ---
             if (msg.isGift) {
                 contentElement.onclick = (e) => {
                     e.stopPropagation();
@@ -16880,17 +14933,8 @@ ${actionInstruction}
                 contentElement.style.cursor = 'pointer';
             }
 
-            // --- 新增：外卖订单卡片点击展开/收起 ---
-            if (msg.isTakeoutOrder) {
-                contentElement.onclick = (e) => {
-                    e.stopPropagation();
-                    contentElement.classList.toggle('expanded');
-                };
-            }
-
             
             if (isMultiSelectMode) {
-
                 row.onclick = (e) => { e.stopPropagation(); toggleMsgSelection(msg.id); };
             }
             
@@ -16916,7 +14960,7 @@ ${actionInstruction}
         }
     };
 
-       function createGiftCard(msg) {
+    function createGiftCard(msg) {
         const item = msg.giftData;
         const name = item.name || '神秘礼物';
         const emoji = item.emoji || '🎁';
@@ -16939,183 +14983,7 @@ ${actionInstruction}
             </div>
         `;
     }
-
-       // ========================= 新增：生成聊天里的外卖卡片 =========================
-    function createTakeoutMessageCard(msg) {
-        const order = msg.takeoutData;
-        const shopName = order.shopName || '美味外卖';
-        const emoji = order.shopEmoji || '🥡';
-        const price = order.totalPrice ? parseFloat(order.totalPrice).toFixed(2) : '0.00';
-        
-        let titleText = msg.type === 'sent' ? '给他下单' : '收到外卖';
-        
-        let dishesHtml = '';
-        let totalItems = 0;
-        if (order.dishes && order.dishes.length > 0) {
-            dishesHtml = order.dishes.map(d => {
-                totalItems += d.quantity;
-                return `
-                <div class="takeout-chat-dish-item">
-                    <span class="takeout-chat-dish-name">${escapeHtml(d.name)}</span>
-                    <span class="takeout-chat-dish-qty">x${d.quantity}</span>
-                </div>`;
-            }).join('');
-        }
-
-            return `
-            <div class="takeout-chat-card">
-                <div class="takeout-chat-card-header">
-                    <img src="https://img.heliar.top/file/1773415285038_叉子勺子_fork-spoon.png" class="takeout-chat-card-icon">
-                    <span class="takeout-chat-card-title">${titleText}</span>
-                </div>
-                <div class="takeout-chat-shop-info">
-                    <div class="takeout-chat-shop-emoji">${emoji}</div>
-                    <div class="takeout-chat-shop-text">
-                        <span class="takeout-chat-shop-name">${escapeHtml(shopName)}</span>
-                        <span class="takeout-chat-price">¥${price}</span>
-                    </div>
-                </div>
-                <div class="takeout-chat-dishes-wrapper">
-                    ${dishesHtml}
-                </div>
-                <div class="takeout-chat-expand-hint">点击展开共 ${totalItems} 件菜品 ▼</div>
-            </div>
-        `;
-    }
-    // ========================= 新增结束 =========================
-    // ========================= 新增：生成聊天里的虚拟语音条卡片及逻辑 =========================
-    function createVoiceCard(msg) {
-        const textLength = msg.text ? msg.text.length : 0;
-        // 根据字数模拟时长：按每秒4个字算，最多60秒
-        const duration = Math.max(1, Math.min(60, Math.ceil(textLength / 4)));
-        // 宽度随语音长度生长，微信风格
-        const minWidth = 75;
-        const maxWidth = 230;
-        const width = Math.min(maxWidth, minWidth + duration * 3);
-        const isTranslated = msg.showTranslation ? 'block' : 'none';
-        
-        return `
-            <div class="voice-message-container" style="display: flex; flex-direction: column; align-items: flex-start; max-width: 100%;">
-                <div class="voice-bubble-content" 
-                     style="width: ${width}px;"
-                     onmousedown="startVoiceLongPress(event, '${msg.id}')" 
-                     onmouseleave="endVoiceTouch()" 
-                     onmouseup="endVoiceTouch()" 
-                     ontouchstart="startVoiceLongPress(event, '${msg.id}')" 
-                     ontouchend="endVoiceTouch()" 
-                     ontouchcancel="endVoiceTouch()"
-                     onclick="handleVoiceBubbleClick(event, '${msg.id}', ${duration})">
-                    
-                    <div style="display: flex; align-items: center;">
-                        <!-- 纯正的微信语音SVG -->
-                        <svg class="voice-icon-svg" id="voice-svg-${msg.id}" viewBox="0 0 24 24">
-                            <path class="voice-wave-1" d="M8.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                            <path class="voice-wave-2" d="M12 7.5a4.5 4.5 0 0 1 0 9v-1.5a3 3 0 0 0 0-6v-1.5z"/>
-                            <path class="voice-wave-3" d="M15 4a8 8 0 0 1 0 16v-1.5a6.5 6.5 0 0 0 0-13V4z"/>
-                        </svg>
-                    </div>
-                    <div class="voice-duration" style="font-size: 15px; margin-left: 8px; color: #999;">${duration}"</div>
-                </div>
-
-                <div class="voice-translated-text" id="voice-trans-${msg.id}" style="display: ${isTranslated}; margin-top: 5px; background: #ffffff; border-radius: 8px; padding: 10px 14px; font-size: 15px; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee; word-break: break-all; white-space: pre-wrap; width: fit-content; max-width: 100%; position: relative;">
-                    ${escapeHtml(msg.text)}
-                </div>
-            </div>
-        `;
-    }
-
-    let voiceLongPressTimer = null;
-    let isVoiceLongPress = false;
-    let voiceTouchX = 0;
-    let voiceTouchY = 0;
-
-    window.startVoiceLongPress = (e, msgId) => {
-        isVoiceLongPress = false;
-        
-        if (e.changedTouches && e.changedTouches.length > 0) {
-            voiceTouchX = e.changedTouches[0].clientX;
-            voiceTouchY = e.changedTouches[0].clientY;
-        } else {
-            voiceTouchX = e.clientX;
-            voiceTouchY = e.clientY;
-        }
-
-        voiceLongPressTimer = setTimeout(() => {
-            isVoiceLongPress = true;
-            showVoiceMenu(msgId, voiceTouchX, voiceTouchY);
-        }, 550); // 长按触发阀值
-    };
-
-    window.endVoiceTouch = () => {
-        if (voiceLongPressTimer) {
-            clearTimeout(voiceLongPressTimer);
-            voiceLongPressTimer = null;
-        }
-    };
-
-    window.handleVoiceBubbleClick = (e, msgId, duration) => {
-        e.stopPropagation(); // 【拦截关键】防止冒泡，避免菜单被外层事件误杀关闭
-        
-        if (isVoiceLongPress) {
-            isVoiceLongPress = false; 
-            return;
-        }
-
-        const svgEl = document.getElementById(`voice-svg-${msgId}`);
-        if (svgEl) {
-            svgEl.classList.add('playing');
-            setTimeout(() => {
-                svgEl.classList.remove('playing');
-            }, duration * 1000);
-        }
-    };
-
-    window.showVoiceMenu = (msgId, x, y) => {
-        closeBubbleMenu(); 
-        
-        const menu = document.createElement('div');
-        menu.className = 'bubble-context-menu';
-        menu.innerHTML = `
-            <div class="bubble-menu-item" onclick="event.stopPropagation(); translateVoice('${msgId}')">转文字</div>
-            <div class="bubble-menu-item" style="color:#F44336;" onclick="event.stopPropagation(); deleteMsg('${msgId}')">删除</div>
-        `;
-        
-        document.body.appendChild(menu);
-
-        let top = y - 50; 
-        if (top < 0) top = y + 20;
-        let left = x - 40;
-        if (left < 10) left = 10;
-        
-        menu.style.top = top + 'px';
-        menu.style.left = left + 'px';
-        menu.classList.add('active');
-        
-        activeMsgIdForMenu = msgId;
-    };
-
-    window.translateVoice = (msgId) => {
-        closeBubbleMenu();
-        if (currentChatContactId) {
-            const key = getMessagesKey(currentChatContactId);
-            let messages = JSON.parse(localStorage.getItem(key) || '[]');
-            const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
-            if (msgIndex !== -1) {
-                messages[msgIndex].showTranslation = true;
-                localStorage.setItem(key, JSON.stringify(messages));
-            }
-        }
-        const transDiv = document.getElementById(`voice-trans-${msgId}`);
-        if (transDiv) {
-            transDiv.style.display = 'block';
-        }
-    };
-    // ========================= 虚拟语音逻辑结束 =========================
-
-
     window.openGiftDetailModal = (msg) => {
-
-
         const item = msg.giftData;
         const titleText = msg.type === 'sent' ? '送给好友的礼物' : '收到的礼物';
         
@@ -17485,12 +15353,10 @@ ${actionInstruction}
     };
 
 
-      window.toggleChatExtraMenu = () => {
-        closeChatEmotionPanel(); // 新增：点击左侧功能时，如果右侧面板开着，自动把它关掉
+    window.toggleChatExtraMenu = () => {
         const menu = document.getElementById('chat-extra-menu');
         menu.classList.toggle('active');
     };
-
 
     window.handleChatInputKey = (e) => {
         if (e.key === 'Enter') {
@@ -18619,10 +16485,9 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             avatar2.style.backgroundImage = `url(${settings.visual.mainAvatar2})`;
         }
         
-               const apps = document.querySelectorAll('.app-item');
-        // [修改] 将第二页的App也纳入管理范围
-        const screenApps = document.querySelectorAll('#grid-area .app-item, .second-page-grid .app-item, #dock-area .app-item'); 
-
+        const apps = document.querySelectorAll('.app-item');
+        // [修改] 使用 document.querySelectorAll('.app-item:not(.dock-container .app-item)') 来排除dock栏图标，防止索引错乱
+        const screenApps = document.querySelectorAll('#grid-area .app-item, #dock-area .app-item'); 
         
         screenApps.forEach((app, index) => {
             const nameEl = app.querySelector('.app-name');
@@ -18654,13 +16519,11 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
                     // 如果只设置了名字没设置图标，需要恢复默认图标内容
                     iconEl.style.backgroundImage = '';
                     // 这里需要一种方式恢复默认的emoji，我们假设ID和默认内容有映射
-                                    const defaultIcons = {
+                    const defaultIcons = {
                         'icon-app1': '☁️', 'icon-app2': '🎵', 'icon-app3': '💬', 'icon-app4': '🔮',
                         'icon-app5': '🧭', 'icon-app6': '🎮', 'icon-app7': '🥡', 'icon-app8': '💰',
-                        'icon-app9': '🖼️', /* 新增：图库的默认图标 */
                         'icon-dock-settings': '⚙️', 'icon-dock-ai': '🤖', 'icon-dock-safari': '🧭', 'icon-dock-messages': '✉️'
                     };
-
                     if (defaultIcons[appId]) iconEl.innerHTML = defaultIcons[appId];
                 }
             } else {
@@ -18730,11 +16593,12 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
     };
 
 
-            function renderSettingsAppList(appSettings) {
+        // [修改] 同时更新 renderSettingsAppList 和 resetAppSetting 以使用图标ID
+    function renderSettingsAppList(appSettings) {
         const container = document.getElementById('settings-app-list-container');
         container.innerHTML = '';
-        // [修改] 囊括第二页的 app-item
-        const screenApps = document.querySelectorAll('#grid-area .app-item, .second-page-grid .app-item, #dock-area .app-item');
+        // [修改] 使用更稳定的选择器
+        const screenApps = document.querySelectorAll('#grid-area .app-item, #dock-area .app-item');
 
         screenApps.forEach((app) => {
             const nameEl = app.querySelector('.app-name');
@@ -18872,33 +16736,11 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
             timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
         }
 
-                              let historyStr = recentMsgs.map(m => {
+        let historyStr = recentMsgs.map(m => {
             let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
-            
-                      // --- 新增：让 AI 看到表情包图片描述 ---
-            if (m.isEmotionImage) {
-                return `[系统提示：${sender} 发送了一张【表情包】。这张表情包的画面内容/配字描述是：“${m.text}”。(注意：这是表情包，不是真实的物理场景，而是对方在网络聊天中斗图或表达某种情绪)]`;
-            }
-
             if (m.isTransfer) {
                 if (m.type === 'sent') return `[${sender}向${contact.alias || contact.name}转账了 ¥${m.transferData.amount}]`;
                 else return `[${contact.alias || contact.name}向${uName}转账了 ¥${m.transferData.amount}]`;
-            }
-            // --- 新增：让 AI 也能清楚看到你给ta点的外卖订单详情 ---
-            if (m.isTakeoutOrder) {
-
-                const order = m.takeoutData || {};
-                const shopName = order.shopName || '美味外卖';
-                const price = order.totalPrice ? parseFloat(order.totalPrice).toFixed(2) : '未知';
-                let dishesDesc = '';
-                if (order.dishes && order.dishes.length > 0) {
-                    dishesDesc = order.dishes.map(d => `${d.name} x${d.quantity}`).join('，');
-                }
-                if (m.type === 'sent') {
-                    return `[系统提示：${sender} 给 ${contact.alias || contact.name} 点了一份外卖投喂！店铺：${shopName}，总价：¥${price}，菜品包含：${dishesDesc}]`;
-                } else {
-                    return `[系统提示：${contact.alias || contact.name} 给 ${uName} 点了一份外卖投喂！店铺：${shopName}，总价：¥${price}，菜品包含：${dishesDesc}]`;
-                }
             }
             // --- 新增：让 AI 也能清楚看到你送的礼物具体是什么 ---
             if (m.isGift) {
@@ -18943,14 +16785,11 @@ ${timeContext}
 2.  **你的回复必须被分割成多个小的、自然的对话气泡。**
 3.  **如果符合剧情和你的角色性格，你想要主动给用户转账（例如给零花钱、买礼物、赔偿等），请在某个气泡中加入特殊标记 <SEND_TRANSFER:金额>，金额为纯数字。**
 4.  **如果你觉得刚才说错了话，或者想要撤回自己发出的上一条消息，请发一个内容仅为 <RECALL> 的独立气泡，系统会自动将你的上一条消息变成撤回状态。注意：撤回后，你**必须**在下一个气泡中重新发送你要说的正确内容！绝对不能只撤回不补发。**
-5.  **如果你想发一条语音（频率一定要低，通常在你正在撒娇、情绪非常激动、生病、或者非常简短懒得打字时使用），请把你这句想说的话用 <VOICE> 和 </VOICE> 标签包裹起来。例如: "<VOICE>我好想你呀，快回我消息！</VOICE>"。**
-6.  **最终输出格式必须是一个JSON对象**，其中包含一个名为 "reply" 的键，其值是一个字符串数组。数组中的每个字符串都将成为一个独立的聊天气泡。
-7.  根据对话的自然节奏，将你的完整回复拆分成2到8个句子或短语，放入数组中。
-8.  **如果聊天记录中有[系统提示：${uName} 刚刚撤回了一条消息]，代表对方撤回了话。你可以利用提示中“被撤回的真实内容”，结合你的人设和回忆，选择假装没看见、好奇追问、或者故意点破嘲笑等真实的反应。**
-9.  **如果聊天记录中出现对方发送的【表情包】，请务必明白这是一种网络互动方式。你要根据表情包的描述做出文字反应，比如嘲笑、反击、斗图式的挑衅、或者表示无语等，绝不能死板地把它当作正在发生的事！**
+5.  **最终输出格式必须是一个JSON对象**，其中包含一个名为 "reply" 的键，其值是一个字符串数组。数组中的每个字符串都将成为一个独立的聊天气泡。
+6.  根据对话的自然节奏，将你的完整回复拆分成2到8个句子或短语，放入数组中。
+7.  **如果聊天记录中有[系统提示：${uName} 刚刚撤回了一条消息]，代表对方撤回了话。你可以利用提示中“被撤回的真实内容”，结合你的人设和回忆，选择假装没看见、好奇追问、或者故意点破嘲笑等真实的反应。**
 
 **输出格式示例**:
-
 {
   "reply": [
     "今天好烦啊！",
@@ -19112,22 +16951,14 @@ ${timeContext}
                         trimmedSentence = trimmedSentence.replace(transferMatch[0], '').trim();
                     }
 
-                       let isAiRecall = false;
+                    let isAiRecall = false;
                     if (trimmedSentence.includes("<RECALL>")) {
                         isAiRecall = true;
                         hasRecallHappened = true; 
                         trimmedSentence = trimmedSentence.replace(/<RECALL>/g, '').trim();
                     }
 
-                    // --- 新增：截取语音标签 ---
-                    let isVoice = false;
-                    if (trimmedSentence.includes("<VOICE>")) {
-                        isVoice = true;
-                        trimmedSentence = trimmedSentence.replace(/<VOICE>/g, "").replace(/<\/VOICE>/g, "").trim();
-                    }
-
                     let hasUpdate = false;
-
 
                     if (isAiRecall) {
                         let amountToRecall = contact.recallAmount || '1';
@@ -19153,17 +16984,15 @@ ${timeContext}
                         }
                     }
 
-                               if (trimmedSentence) {
+                    if (trimmedSentence) {
                         messages.push({
                             id: Date.now() + Math.random(),
                             type: 'received',
                             text: trimmedSentence,
-                            isVoice: isVoice, // 写入语音状态
                             timestamp: Date.now()
                         });
                         hasUpdate = true;
                     }
-
 
                     if (isAiTransfer && aiTransferAmount > 0) {
                         const newTransferId = Date.now().toString() + Math.floor(Math.random() * 1000);
@@ -19263,15 +17092,13 @@ ${timeContext}
         const globalProfile = getUserProfile();
         const uName = contact.userName || globalProfile.nickname || "User";
 
-              let historyStr = recentMsgs.map(m => {
+        let historyStr = recentMsgs.map(m => {
             let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
             if (m.type === 'recalled') return `[系统提示：撤回了一条消息]`;
             if (m.isTransfer) return `[系统提示：一笔转账]`;
             if (m.isGift) return `[系统提示：送出或收到了一件礼物]`;
-            if (m.isTakeoutOrder) return `[系统提示：送出或收到了一份外卖投喂]`;
             return `${sender}: ${m.text}`;
         }).join('\n');
-
         // --- 新增结束 ---
         
         const sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
@@ -19533,15 +17360,14 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
             lockScreen.style.transition = 'none'; // 拖动时去掉过渡，跟手
         });
 
-                lockScreen.addEventListener('touchmove', (e) => {
+        lockScreen.addEventListener('touchmove', (e) => {
             if (!isDraggingLs) return;
-            e.preventDefault(); // 阻止浏览器默认的网页滑动行为
             let currentY = e.touches[0].clientY;
             let diff = currentY - lsStartY;
             if (diff < 0) { // 只能往上拉
                 lockScreen.style.transform = `translateY(${diff}px)`;
             }
-        }, { passive: false }); // 确保能成功拦截滑动
+        });
 
         lockScreen.addEventListener('touchend', (e) => {
             if (!isDraggingLs) return;
@@ -20200,36 +18026,6 @@ window.deleteSelectedFavorites = () => {
         toggleFavoriteManageMode(); // 如果删空了自动退出管理模式
     }
 };
-    // ========================= 图库弹窗逻辑 =========================
-    // 打开弹窗，顺便把里面的内容清空还原
-    window.openGalleryAddModal = () => {
-        document.getElementById('gallery-add-url-input').value = '';
-        document.getElementById('gallery-add-batch-input').value = '';
-        document.getElementById('gallery-add-preview-img').src = '';
-        document.getElementById('gallery-add-preview-img').style.display = 'none';
-        document.getElementById('gallery-add-preview-placeholder').style.display = 'block';
-        document.getElementById('gallery-add-modal').classList.add('active');
-    };
-
-    // 关闭弹窗
-    window.closeGalleryAddModal = () => {
-        document.getElementById('gallery-add-modal').classList.remove('active');
-    };
-
-    // 实时更新单张图片预览
-    window.updateGalleryPreview = (url) => {
-        const previewImg = document.getElementById('gallery-add-preview-img');
-        const placeholder = document.getElementById('gallery-add-preview-placeholder');
-        if (url && url.trim() !== '') {
-            previewImg.src = url.trim();
-            previewImg.style.display = 'block';
-            placeholder.style.display = 'none';
-        } else {
-            previewImg.src = '';
-            previewImg.style.display = 'none';
-            placeholder.style.display = 'block';
-        }
-    };
 
 // ========================= 新增：手电筒快捷关闭锁屏逻辑 =========================
 window.openDisableLockModal = (e) => {
@@ -20275,22 +18071,5 @@ window.executeDisableLock = () => {
 // ========================= 新增结束 =========================
 
 </script>
-<!-- ↓↓↓ 把这段新代码加在 </body> 标签前面 ↓↓↓ -->
-<script>
-  // 这个函数的作用是获取当前窗口的实际高度，并将其设置为一个CSS变量
-  function setAppHeight() {
-    const doc = document.documentElement;
-    // --app-height 是我们给这个高度起的名字，和上面CSS里用的一致
-    doc.style.setProperty('--app-height', `${window.innerHeight}px`);
-  }
-
-  // 当屏幕大小变化（比如手机横竖屏切换）时，重新计算高度
-  window.addEventListener('resize', setAppHeight);
-  
-  // 页面一加载就立即执行一次，确保初始高度是正确的
-  setAppHeight();
-</script>
-<!-- ↑↑↑ 把这段新代码加在 </body> 标签前面 ↑↑↑ -->
-
 </body>
 </html>
