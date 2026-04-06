@@ -221,7 +221,7 @@
             --takeout-border-radius-l: 20px;
             --takeout-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
-         html {
+                html {
              width: 100vw;
              height: 100vh;
              overflow: hidden;
@@ -260,6 +260,19 @@
             -webkit-overflow-scrolling: touch;
         }
 
+
+        /* ========================= 彻底解决安卓滚动穿透、布局错乱、留白问题 ========================= */
+        /* 针对所有可能滚动的容器，加这个属性能阻断安卓系统底层的过度滚动(Overscroll)，让页面稳如泰山 */
+        .chat-app-content, .chat-conv-messages, .contact-list-container, #role-settings-page, 
+        #settings-page, .wb-content, .wallet-details-content, .forum-home-content, 
+        .forum-page, .forum-detail-main-scroll, #forum-list-container, #forum-posts-area, 
+        #forum-detail-posts-area, .mall-content, #mall-detail-content, .takeout-content-wrapper, 
+        .takeout-shop-sidebar, .takeout-shop-menu-main, .takeout-review-list, .cart-item-list,
+        .gallery-main-capsule, .wb-modal-scroll-area, #recollection-detail-content, .chat-emotion-grid {
+            overscroll-behavior-y: contain; /* 关键：阻止滚动事件冒泡引起外层框架被拖拽位移 */
+            -webkit-overflow-scrolling: touch;
+        }
+
         body {
              background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
              position: relative;
@@ -267,7 +280,7 @@
              /* 🚨 移除有毒的 z-index: -2，解决安卓大面积内容展示不全的问题 */
         }
 
-         #home-screen {
+        #home-screen {
              width: 100%;
              height: 100%;
              position: absolute; /* 紧紧吸附在容器内 */
@@ -278,6 +291,7 @@
              padding: 0; /* 【关键修复】删掉底部的 padding，将安全区空间转移，彻底消除 iOS 底部的白块，实现真全屏 */
              transition: opacity 0.3s ease, transform 0.3s ease;
          }
+
 
                 body.settings-active #home-screen,
         body.chat-active #home-screen,
@@ -467,14 +481,14 @@
             text-shadow: none;
         }
         /* --- 新增结束 --- */
-                
-        /* 底栏样式 */
+             /* 底栏样式 */
         #dock-area {
              /* 将原本在 home-screen 的底部安全区转移到这里，让 dock 完美向下填充空白区域 */
              height: calc(95px + env(safe-area-inset-bottom, 20px)); 
              width: 100%; display: flex; justify-content: center; align-items: flex-start; /* 靠上对齐，避开底部黑条 */
              padding: 10px 15px env(safe-area-inset-bottom, 20px) 15px; flex-shrink: 0;
          }
+
 
         .dock-container {
              width: 100%; max-width: 350px; height: 100%;
@@ -4310,7 +4324,7 @@
         }
         
               /* --- 手机外框 - 新增与修改 --- */
-        #app-wrapper {
+               #app-wrapper {
           width: 100vw;
           height: 100vh;
           height: 100dvh;
