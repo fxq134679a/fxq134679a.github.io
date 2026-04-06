@@ -6,15 +6,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- 修改应用名称 -->
+      <!-- 修改应用名称 -->
     <meta name="apple-mobile-web-app-title" content="圈圈机">
     <title>圈圈机</title>
     
-    <!-- 设置主屏幕图标和浏览器图标 -->
-    <link rel="apple-touch-icon" href="https://img.heliar.top/file/1773263760361_IMG_4342.jpeg">
-    <link rel="icon" href="https://img.heliar.top/file/1773263760361_IMG_4342.jpeg">
+    <!-- 设置主屏幕图标和浏览器图标（已去除） -->
     
     <style>
+
         /* ========================= 外卖订单历史页面美化 ========================= */
         .takeout-order-card {
             background-color: #fff;
@@ -221,34 +220,23 @@
             --takeout-border-radius-l: 20px;
             --takeout-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
-         html, body {
-             position: absolute;
-             top: 0;
-             left: 0;
-             right: 0;
-             bottom: 0;
-             width: 100%;
-             height: 100%;
-             overflow: hidden;
-             margin: 0;
-             padding: 0;
-             background-color: #000;
-             overscroll-behavior: none; /* 阻止页面下拉边缘反弹，彻底解决底部出现空条白块的问题 */
-        }
-
         * {
              box-sizing: border-box;
+             margin: 0;
+             padding: 0;
              user-select: none;
              -webkit-tap-highlight-color: transparent;
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
         body {
+             width: 100vw;
+             height: 100vh;
+             overflow: hidden;
              background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
              position: relative;
              transition: background-image 0.3s ease-in-out;
-             /* 🚨 移除有毒的 z-index: -2，解决安卓大面积内容展示不全的问题 */
+            z-index: -2;
         }
-
         #home-screen {
              width: 100%;
              height: 100%;
@@ -264,14 +252,12 @@
         body.forum-active #home-screen,
         body.recollection-active #home-screen,
         body.mall-active #home-screen,
-             body.takeout-active #home-screen,
-        body.gallery-active #home-screen,
-        body.hushhh-active #home-screen { /* <-- 新增神秘App */
+        body.takeout-active #home-screen,
+        body.gallery-active #home-screen { /* <-- 新增图库App */
              opacity: 0;
              transform: scale(0.95);
              pointer-events: none;
          }
-
 
         /* --- 时间区域 --- */
         #time-section {
@@ -4284,22 +4270,14 @@
             transform: translateY(0);
         }
         
-        /* --- 手机外框 - 新增与修改 --- */
+       /* --- 手机外框 - 新增与修改 --- */
         #app-wrapper {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
           width: 100%;
           height: 100%;
+          position: relative;
           background-size: cover;
           background-position: center;
-          overflow: hidden; /* 防止内部子元素不慎溢出撑开页面产生空条 */
-          /* 🚨 已彻底移除引发安卓渲染崩溃的 transform 等 3D 加速属性，防止弹窗层叠错乱 🚨 */
         }
-
-
         
         body.phone-frame-active #home-screen {
             padding-top: var(--status-bar-height);
@@ -6300,219 +6278,16 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .gallery-grid.manage-mode .gallery-photo-wrapper { animation: jiggle 0.3s infinite; }
         .gallery-grid.manage-mode .gallery-photo-item { border: 2px solid #F44336; }
 
-           /* 2. 顶部相册种类的管理模式样式 */
+        /* 2. 顶部相册种类的管理模式样式 */
         .gallery-albums-capsule.manage-mode .gallery-photo-delete-btn { display: flex; }
         .gallery-albums-capsule.manage-mode .gallery-album-wrapper { animation: jiggle 0.3s infinite; }
         /* ========================= 图库样式结束 ========================= */
-
-        /* ========================= hushhh App 样式 (可爱粉白滑动版) ========================= */
-        #hushhh-app-page {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #FFF0F5; /* 可爱的浅粉色背景 */
-            z-index: 650;
-            display: flex; flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            color: #333;
-        }
-        body.hushhh-active #hushhh-app-page { transform: translateY(0); }
-        
-        /* 顶部导航栏 */
-        .hushhh-header {
-            padding: 45px 20px 15px;
-            display: flex; align-items: center; justify-content: space-between;
-            background: #fff; flex-shrink: 0;
-            border-radius: 0 0 25px 25px;
-            box-shadow: 0 4px 15px rgba(229, 138, 171, 0.15);
-            position: relative;
-        }
-        body.ios-mode-active .hushhh-header { padding-top: calc(env(safe-area-inset-top, 20px) + 15px); }
-        body.phone-frame-active .hushhh-header { padding-top: calc(15px + var(--status-bar-height)); }
-        
-        .hushhh-title {
-            font-size: 18px; font-weight: 600; color: #F5B3C9;
-            position: absolute; left: 50%; transform: translateX(-50%);
-        }
-        .hushhh-back-btn {
-            width: 30px; height: 30px; object-fit: contain; cursor: pointer;
-        }
-
-        /* 提示文字：发光效果 */
-        .hushhh-glow-text {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff8fb3;
-            margin: 40px 20px 10px;
-            text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.4);
-            animation: pulse-glow 2s infinite ease-in-out;
-        }
-        @keyframes pulse-glow {
-            0%, 100% { text-shadow: 0 0 10px rgba(255, 143, 179, 0.6), 0 0 20px rgba(255, 143, 179, 0.4); transform: scale(1); }
-            50% { text-shadow: 0 0 15px rgba(255, 143, 179, 0.8), 0 0 30px rgba(255, 143, 179, 0.6); transform: scale(1.02); }
-        }
-
-        /* 横向滑动的卡片容器 */
-        .hushhh-slider-container {
-            flex: 1;
-            display: flex;
-            align-items: center; /* 垂直居中 */
-            overflow-x: auto;
-            scroll-snap-type: x mandatory; /* 让卡片滚动时自动吸附居中 */
-            padding: 20px;
-            gap: 20px; /* 卡片间距 */
-            scrollbar-width: none; /* 隐藏滚动条 */
-        }
-        .hushhh-slider-container::-webkit-scrollbar { display: none; }
-
-        .hushhh-card {
-            min-width: 65%; /* 占据屏幕大部分，左右露出一角 */
-            max-width: 280px;
-            aspect-ratio: 3 / 4; /* 长方形漂亮卡片 */
-            background: #fff;
-            border-radius: 24px;
-            scroll-snap-align: center; /* 强制居中吸附 */
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 10px 30px rgba(229, 138, 171, 0.2);
-            cursor: pointer; transition: transform 0.2s;
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .hushhh-card:active { transform: scale(0.95); }
-        
-        .hushhh-card-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 40%;
-            background: linear-gradient(135deg, #FDCEDF, #F5B3C9);
-            z-index: 0;
-        }
-        
-        .hushhh-card-avatar {
-            width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
-            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            z-index: 1; margin-bottom: 15px; background: #eee;
-        }
-        .hushhh-card-name {
-            font-size: 20px; font-weight: bold; color: #333; z-index: 1;
-        }
-        .hushhh-card-btn {
-            margin-top: 25px; padding: 10px 25px; border-radius: 20px;
-            background: #fff0f5; color: #ff8fb3; font-weight: bold; font-size: 14px;
-            z-index: 1; pointer-events: none; border: 1px solid #ffeff4;
-        }
-
-        /* 假手机界面容器 */
-        .hushhh-fake-phone-container {
-            flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px;
-        }
-        /* 可爱圆滑的假手机外壳 */
-        .hushhh-fake-phone {
-            width: 100%; max-width: 320px; height: 600px;
-            background: #fff; border: 10px solid #ffe6ee; /* 粉色粗外壳 */
-            border-radius: 40px; padding: 30px 20px;
-            box-shadow: 0 15px 40px rgba(229, 138, 171, 0.3);
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            grid-auto-rows: 75px; gap: 15px; align-content: start;
-            position: relative; overflow: hidden;
-        }
-        /* 手机上的刘海 */
-        .hushhh-fake-phone::before {
-            content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-            width: 80px; height: 20px; background: #ffe6ee; border-radius: 10px; z-index: 10;
-        }
-        /* 手机上的App图标 (可爱风) */
-        .hushhh-fake-app {
-            display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; z-index: 5;
-        }
-        .hushhh-fake-app-icon {
-            width: 50px; height: 50px; border-radius: 16px;
-            background: #fdfafb; border: 1px solid #ffeff4;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .hushhh-fake-app:active .hushhh-fake-app-icon { transform: scale(0.9); }
-        .hushhh-fake-app-name {
-            font-size: 11px; color: #555; font-weight: 500;
-        }
-        /* ========================= hushhh App 样式结束 ========================= */
-
-    <        /* ========================================================= */
-        /* 🤖 安卓专版终极修复补丁 (Android Ultimate Fix) 🤖 */
-        /* ========================================================= */
-        
-        /* 1. 禁用导致安卓底层渲染引擎崩溃的毛玻璃效果和3D透视 */
-        * {
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            transform-style: flat !important;
-        }
-
-        /* 2. 约束最外层容器，杜绝任何意外撑开造成的页面空条白块和拖拽错位 */
-        html, body, #app-wrapper {
-            position: absolute !important;
-            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-            width: 100% !important; height: 100% !important;
-            overflow: hidden !important;
-            overscroll-behavior: none !important;
-            transform: none !important; 
-            perspective: none !important;
-        }
-
-        /* 3. 补充不透明背景，防止失去毛玻璃后文字重叠看不清 */
-        .chat-app-header, .chat-conv-header, .chat-conv-footer, 
-        .chat-multiselect-footer, .chat-emotion-panel, 
-        .bubble-context-menu, #chat-extra-menu,
-        .takeout-cart-footer, #forum-bottom-nav, 
-        .gallery-albums-capsule, .gallery-main-capsule,
-        #moments-action-sheet, #recollection-action-sheet {
-            background-color: rgba(255, 255, 255, 0.98) !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
-        }
-        .lock-pwd-overlay, #transfer-confirm-overlay, #moments-action-sheet-overlay, #recollection-action-sheet-overlay {
-            background-color: rgba(20, 20, 20, 0.85) !important;
-        }
-
-        /* 4. 彻底修复 vw/vh 视口单位在安卓浏览器中引起的尺寸错乱及重叠 Bug */
-        #chat-app-page, #wallet-app-page, #wallet-details-page, #worldbook-app-page, 
-        #worldbook-color-page, #forum-app-page, #takeout-app-page, #takeout-profile-page, 
-        #takeout-favorite-page, #takeout-all-orders-page, #gallery-app-page, #hushhh-app-page,
-        #forum-my-posts-page, #forum-all-forums-page, #forum-favorite-posts-page, 
-        #forum-all-liked-posts-page, #forum-following-page, #forum-post-detail-page, 
-        #edit-forum-page, #mall-app-page, #mall-detail-page, #mall-favorite-page, 
-        #mall-purchased-page, #mall-sent-gifts-page, #takeout-shop-detail-page, 
-        #worldbook-entry-fullscreen-page, #recollection-app-page, #recollection-detail-page,
-        #recollection-color-page, #transfer-page, #chat-conversation-view,
-        #lock-screen, #home-screen, #role-settings-page, #settings-page {
-            width: 100% !important;
-            height: 100% !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            margin: 0 !important;
-            box-sizing: border-box !important;
-        }
-
-        /* 5. 修复输入法键盘弹起时导致 fixed 底栏被顶飞的 Bug */
-        .chat-bottom-bar-container,
-        #forum-bottom-nav,
-        .mall-detail-footer,
-        .takeout-cart-footer,
-        #moments-comment-modal {
-            position: absolute !important;
-        }
-
-        /* 6. 移除安卓点击时的诡异高亮闪烁 */
-        * {
-            -webkit-tap-highlight-color: transparent !important;
-        }
 
     </style>
 
 </head>
 <body>
 <div id="app-wrapper">
-
 <!-- 新增：锁屏页面 -->
 
 <div id="lock-screen">
@@ -6616,13 +6391,11 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                         <div class="app-item" onclick="openRecollectionApp()"><div class="app-icon" id="icon-app4">🔮</div><span class="app-name" data-app-name="备忘录">备忘录</span></div>
                     </div>
                 </div>
-                  <div class="grid-quadrant">
+                <div class="grid-quadrant">
                     <div class="app-group-2x2">
-                        <!-- 只加了 onclick="openHushhhApp()"，不改图标和颜色 -->
-                        <div class="app-item" onclick="openHushhhApp()"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
+                        <div class="app-item"><div class="app-icon" id="icon-app5">🧭</div><span class="app-name" data-app-name="HUshhh">HUshhh</span></div>
                         <div class="app-item" onclick="openMallApp()"><div class="app-icon" id="icon-app6">🎮</div><span class="app-name" data-app-name="商城">商城</span></div>
-
-                <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
+                        <div class="app-item" onclick="openTakeoutApp()"><div class="app-icon" id="icon-app7">🥡</div><span class="app-name" data-app-name="外卖">外卖</span></div>
                         <div class="app-item" onclick="openWalletApp()"><div class="app-icon" id="icon-app8">💰</div><span class="app-name" data-app-name="Wallet">Wallet</span></div>
                     </div>
                 </div>
@@ -6866,17 +6639,17 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <input type="number" id="role-memory-depth" placeholder="10" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
         </div>
 
-             <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px; margin-top: 15px;">
+        <div class="role-bg-upload-area" style="display: flex; flex-direction: column; gap: 10px; padding: 15px; margin-top: 15px;">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <span style="font-size:13px; color:#555;">聊天背景</span>
                 <div id="role-bg-preview" class="role-bg-preview"></div>
             </div>
             <input type="text" id="role-bg-url-input" placeholder="输入背景图片URL" style="width: 100%; padding: 10px; border: 1px solid #FADBE6; border-radius: 8px; font-size: 14px;">
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <div style="display: flex; gap: 10px;">
+                <button class="role-bg-btn" onclick="triggerRoleBgUpload()">上传图片</button>
                 <button class="role-bg-btn" onclick="setRoleBgByUrl()">应用URL</button>
             </div>
         </div>
-
     </div>
     <div class="settings-section-card">
         <div class="settings-card-title">角色世界书</div>
@@ -7931,58 +7704,9 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         </div>
     </div>
 </div>
-<!-- ========================= hushhh App HTML ========================= -->
-<div id="hushhh-app-page">
-    <!-- 视图1：滑动选择好友卡片 -->
-    <div id="hushhh-view-list" style="display: flex; flex-direction: column; height: 100%;">
-        <div class="hushhh-header">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="hushhh-back-btn" onclick="closeHushhhApp()">
-            <span class="hushhh-title">HUshhh</span>
-            <span style="width: 30px;"></span>
-        </div>
-        
-        <div class="hushhh-glow-text">选择查看哪位好友的手机？</div>
-        
-        <!-- 横向滑动的相册/卡片容器 -->
-        <div class="hushhh-slider-container" id="hushhh-friend-list">
-            <!-- 好友卡片会由JS生成到这里 -->
-        </div>
-    </div>
-
-    <!-- 视图2：目标的手机界面 -->
-    <div id="hushhh-view-target" style="display: none; flex-direction: column; height: 100%;">
-        <div class="hushhh-header">
-            <img src="https://img.heliar.top/file/1770068142146_骨头_bone.png" class="hushhh-back-btn" onclick="backToHushhhList()">
-            <span class="hushhh-title" id="hushhh-target-title">TA的手机</span>
-            <span style="width: 30px;"></span>
-        </div>
-        <div class="hushhh-fake-phone-container">
-            <div class="hushhh-fake-phone" id="hushhh-fake-phone-screen">
-                <!-- 模拟对方的手机壁纸层 -->
-                <div id="hushhh-target-wallpaper" style="position: absolute; top:0; left:0; width:100%; height:100%; background: #f9f9f9; background-size: cover; background-position: center; opacity: 0.3; z-index: 0;"></div>
-                
-                <!-- 假手机上面的App -->
-                <div class="hushhh-fake-app" onclick="showToast('相册已被上锁哦~')">
-                    <div class="hushhh-fake-app-icon">🖼️</div><div class="hushhh-fake-app-name">照片</div>
-                </div>
-                <div class="hushhh-fake-app" onclick="showToast('微信聊天记录需要密码')">
-                    <div class="hushhh-fake-app-icon" style="background:#e8f5e9;">💬</div><div class="hushhh-fake-app-name">微信</div>
-                </div>
-                <div class="hushhh-fake-app" onclick="showToast('备忘录空空如也')">
-                    <div class="hushhh-fake-app-icon" style="background:#fffde7;">📝</div><div class="hushhh-fake-app-name">备忘录</div>
-                </div>
-                <div class="hushhh-fake-app" onclick="showToast('浏览器历史记录被清空了')">
-                    <div class="hushhh-fake-app-icon" style="background:#e3f2fd;">🧭</div><div class="hushhh-fake-app-name">Safari</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- ========================= hushhh HTML 结束 ========================= -->
 
 <div id="toast-notification"></div>
 <!-- 礼物详情弹窗 -->
-
 <div id="gift-detail-overlay" onclick="closeGiftDetailModal()">
     <div class="gift-detail-card" onclick="event.stopPropagation()">
         <img src="https://img.heliar.top/file/1770767041294_关闭_close-one_2.png" class="gift-detail-close" onclick="closeGiftDetailModal()">
@@ -15293,7 +15017,7 @@ ${postContext}
         });
     };
 
-       window.toggleForumPostLike = (postId) => {
+     window.toggleForumPostLike = (postId) => {
         let posts = JSON.parse(localStorage.getItem(FORUM_POSTS_DATA_KEY) || '[]');
         const postIndex = posts.findIndex(p => p.id === postId);
         if (postIndex === -1) return;
@@ -19062,56 +18786,28 @@ document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHO
         }
     });
 
-       document.getElementById('fetch-models-btn').addEventListener('click', async () => {
+    document.getElementById('fetch-models-btn').addEventListener('click', async () => {
         const url = document.getElementById('api-url-input').value.trim();
         const key = document.getElementById('api-key-input').value.trim();
         if(!url || !key) { showToast('请填写API地址和Key'); return; }
-
-        const select = document.getElementById('model-select');
-        select.innerHTML = '';
-
-        // 🚨 新增：Minimax 语音模型与常规模型兜底全集，彻底解决跨域拦截和模型名称错误问题
-        const fallbackModels = [
-            // 用户指定的正确的 Minimax 语音模型
-            "Speech-01 Turbo", "Speech-01 HD",
-            "Speech-02 Turbo", "Speech-02 HD",
-            "Speech-2.5 HD", "Speech-2.6 Turbo", "Speech-2.6 HD",
-            // Minimax 文本大模型
-            "abab6.5g-chat", "abab6.5-chat", "abab6.5s-chat",
-            // 常见的通用大模型兜底
-            "gpt-3.5-turbo", "gpt-4o", "gpt-4-turbo", "claude-3-opus", "claude-3-sonnet",
-            "glm-4", "moonshot-v1-8k"
-        ];
-
-        const renderModels = (modelsArray, isSuccess) => {
-            // 去重并渲染
-            const uniqueModels = [...new Set(modelsArray)];
-            uniqueModels.sort().forEach(m => {
+        try {
+            let fetchUrl = url.endsWith('/v1') ? url + '/models' : url + '/v1/models';
+            let isGemini = url.includes('generativelanguage');
+            if(isGemini) fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
+            const res = await fetch(fetchUrl, { headers: { 'Authorization': `Bearer ${key}` } });
+            const data = await res.json();
+            const select = document.getElementById('model-select');
+            select.innerHTML = '';
+            let models = isGemini ? (data.models || []).map(m=>m.name.replace('models/','')) : (data.data || []).map(m => m.id);
+            if(models.length === 0) { showToast('未获取到模型列表'); return; }
+            models.sort().forEach(m => {
                 const opt = document.createElement('option');
                 opt.value = m; opt.innerText = m;
                 select.appendChild(opt);
             });
             document.getElementById('model-select-wrapper').style.display = 'block';
-            showToast(isSuccess ? '模型获取成功（已补充完整列表）' : '跨域受限，已展示完整备选列表');
-        };
-
-        try {
-            let fetchUrl = url.endsWith('/v1') ? url + '/models' : url + '/v1/models';
-            let isGemini = url.includes('generativelanguage');
-            if(isGemini) fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
-
-            const res = await fetch(fetchUrl, { headers: { 'Authorization': `Bearer ${key}` } });
-            const data = await res.json();
-            
-            let models = isGemini ? (data.models || []).map(m=>m.name.replace('models/','')) : (data.data || []).map(m => m.id);
-            
-            // 将拉取到的模型和正确的兜底模型合并，覆盖错误的旧模型
-            renderModels([...models, ...fallbackModels], true);
-        } catch (e) {
-            console.warn('拉取模型触发跨域或错误，启用兜底列表:', e);
-            // 发生跨域报错时，不再提示失败，而是直接展示预设的完整列表
-            renderModels(fallbackModels, false);
-        }
+            showToast('模型获取成功');
+        } catch (e) { showToast('获取模型失败'); }
     });
 
     // --- AI Auto Reply Logic ---
@@ -19754,91 +19450,12 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
                 showToast("备份文件格式错误"); 
             }
         };
-             reader.readAsText(file);
+        reader.readAsText(file);
         e.target.value = '';
     };
 
-    // ========================= hushhh App JS 逻辑 =========================
-    window.openHushhhApp = () => {
-        document.body.classList.add('hushhh-active');
-        document.getElementById('hushhh-view-list').style.display = 'flex';
-        document.getElementById('hushhh-view-target').style.display = 'none';
-        
-        const container = document.getElementById('hushhh-friend-list');
-        container.innerHTML = '';
-        
-        // 读取创建的好友
-        let contacts = [];
-        try { contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]'); } catch(e){}
-        
-        // 加入占位块，确保第一张和最后一张卡片也能滑动到正中间
-        const paddingBlockStart = document.createElement('div');
-        paddingBlockStart.style.minWidth = '10%';
-        paddingBlockStart.style.flexShrink = '0';
-        
-        const paddingBlockEnd = document.createElement('div');
-        paddingBlockEnd.style.minWidth = '10%';
-        paddingBlockEnd.style.flexShrink = '0';
-
-        if(contacts.length === 0) {
-            container.innerHTML = '<div style="color:#999; text-align:center; width: 100%;">还没有创建角色哦，去首页添加一个吧~</div>';
-            return;
-        }
-
-        container.appendChild(paddingBlockStart);
-
-        contacts.forEach(c => {
-            const item = document.createElement('div');
-            item.className = 'hushhh-card';
-            item.onclick = () => openHushhhTargetPhone(c);
-            item.innerHTML = `
-                <div class="hushhh-card-bg"></div>
-                <img src="${c.avatar}" class="hushhh-card-avatar">
-                <div class="hushhh-card-name">${escapeHtml(c.alias || c.name)}</div>
-                <div class="hushhh-card-btn">一键查看</div>
-            `;
-            container.appendChild(item);
-        });
-
-        container.appendChild(paddingBlockEnd);
-        
-        // 每次打开重置滑动条位置到最左边
-        setTimeout(() => {
-            container.scrollLeft = 0;
-        }, 50);
-    };
-
-    window.closeHushhhApp = () => {
-        document.body.classList.remove('hushhh-active');
-    };
-
-    window.openHushhhTargetPhone = (contact) => {
-        // 切换到第二页手机视图
-        document.getElementById('hushhh-view-list').style.display = 'none';
-        document.getElementById('hushhh-view-target').style.display = 'flex';
-        
-        // 设置顶部的名字为好友的名字
-        document.getElementById('hushhh-target-title').innerText = escapeHtml(contact.alias || contact.name) + "的手机";
-        
-        // 【彩蛋】如果该好友在聊天里设置了“聊天背景图”，就把它当作ta的手机壁纸！
-        const wallpaper = document.getElementById('hushhh-target-wallpaper');
-        if (contact.backgroundImage) {
-            wallpaper.style.backgroundImage = `url(${contact.backgroundImage})`;
-        } else {
-            wallpaper.style.backgroundImage = 'none';
-        }
-    };
-
-    window.backToHushhhList = () => {
-        // 返回卡片列表视图
-        document.getElementById('hushhh-view-target').style.display = 'none';
-        document.getElementById('hushhh-view-list').style.display = 'flex';
-    };
-    // ========================= hushhh JS 逻辑结束 =========================
-
     // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
-
         const userProfile = getUserProfile();
         if (!userProfile.qqId) { userProfile.qqId = "20261314520"; saveUserProfile(userProfile); }
         if (!userProfile.nickname) { userProfile.nickname = "User Name"; saveUserProfile(userProfile); }
@@ -20658,4 +20275,3 @@ window.executeDisableLock = () => {
 </script>
 </body>
 </html>
-
