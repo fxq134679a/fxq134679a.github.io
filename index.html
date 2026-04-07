@@ -655,7 +655,7 @@
             filter: drop-shadow(0 2px 2px rgba(229, 138, 171, 0.1));
         }
 
-                /* Multi-select Mode Styles */
+        /* Multi-select Mode Styles */
         .chat-conv-messages.multi-select-active .msg-bubble-row {
             padding-left: 30px; /* Space for checkbox */
         }
@@ -670,34 +670,15 @@
         .chat-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
         
         .chat-multiselect-footer {
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            /* 增加高度完全盖住输入框，并给按钮预留上移空间 */
-            height: calc(90px + env(safe-area-inset-bottom, 0px)); 
-            background: rgba(255, 255, 255, 0.98); 
-            backdrop-filter: blur(15px);
-            border-radius: 35px 35px 0 0; /* 顶部边缘变得非常圆滑 */
-            box-shadow: 0 -5px 25px rgba(229, 138, 171, 0.15); /* 添加柔和粉色阴影 */
-            z-index: 30; /* 确保层级高于输入框 */
-            display: none; 
-            justify-content: center; 
-            align-items: flex-start; /* 按钮靠上对齐 */
-            gap: 20px; /* 拉开按钮之间的距离 */
-            padding-top: 20px; /* 让按钮居中偏上显示，从而达到整体上移效果 */
-            border-top: 1px solid rgba(255, 240, 245, 0.8);
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
+            background: white; border-top: 1px solid #eee; z-index: 25;
+            display: none; justify-content: center; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom, 0);
         }
         .chat-multiselect-footer.active { display: flex; }
-
         .chat-multiselect-delete-btn {
             background: #ffebee; color: #F44336; padding: 10px 30px; border-radius: 20px;
-            border: none; font-weight: 600; font-size: 14px; cursor: pointer; flex: 1; max-width: 150px;
-        }
-        /* 新增取消按钮样式 */
-        .chat-multiselect-cancel-btn {
-            background: #f0f0f0; color: #666; padding: 10px 30px; border-radius: 20px;
-            border: none; font-weight: 600; font-size: 14px; cursor: pointer; flex: 1; max-width: 150px;
+            border: none; font-weight: 600; font-size: 14px; cursor: pointer;
         }
 
 
@@ -3624,60 +3605,7 @@
             width: 100%;
             height: 100%;
         }
-                /* ========================= 新增：平板模式的防遮挡排版 ========================= */
-        body.tablet-mode-active #home-screen {
-            padding-top: var(--status-bar-height);
-        }
-        body.tablet-mode-active .chat-app-header,
-        body.tablet-mode-active .wallet-header,
-        body.tablet-mode-active .wb-header,
-        body.tablet-mode-active .mall-header,
-        body.tablet-mode-active .forum-header-home,
-        body.tablet-mode-active #forum-detail-header,
-        body.tablet-mode-active .forum-post-top-bar,
-        body.tablet-mode-active #settings-page > .settings-header,
-        body.tablet-mode-active #me-settings-modal > .me-settings-header-bar,
-        body.tablet-mode-active #worldbook-detail-modal > .wb-detail-header,
-        body.tablet-mode-active #worldbook-entry-fullscreen-page > .wb-detail-header,
-        body.tablet-mode-active #worldbook-color-page > .wb-color-header,
-        body.tablet-mode-active #add-moment-modal > .add-moment-header,
-        body.tablet-mode-active #role-settings-page > .role-setting-close-area,
-        body.tablet-mode-active #recollection-app-page .recollection-header,
-        body.tablet-mode-active #recollection-detail-page .recollection-detail-header,
-        body.tablet-mode-active #chat-conversation-view > .chat-conv-header,
-        body.tablet-mode-active .takeout-header { 
-            padding-top: calc(15px + var(--status-bar-height));
-        }
         
-        body.tablet-mode-active #app-wrapper > div[id*="-page"],
-        body.tablet-mode-active #app-wrapper > div[id*="-modal"],
-        body.tablet-mode-active #app-wrapper > div[id*="-overlay"],
-        body.tablet-mode-active #app-wrapper > .delete-confirm-modal {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* 平板外观与尺寸 */
-        body.tablet-mode-active .phone-container {
-            display: flex;
-        }
-        body.tablet-mode-active .phone {
-            width: 768px; 
-            height: 900px; 
-            border-radius: 32px; 
-            border: 14px solid var(--phone-case-color); 
-            /* 【关键修改】：把 95vw/95vh 改成 80vw/80vh，让它在屏幕上最多只占 80% 的空间，从而实现整体缩小 */
-            transform: scale(min(calc(80vw / 768), calc(80vh / 900)));
-            transform-origin: center center;
-        }
-        /* 平板屏幕变宽了，让主页图标间距也更宽松一点 */
-        body.tablet-mode-active #grid-area { max-width: 650px; }
-        body.tablet-mode-active .dock-container { max-width: 450px; }
-        /* 平板不适合猫耳朵，强制隐藏 */
-        body.tablet-mode-active .cute-cat-ear { display: none !important; }
-        /* ========================================================================= */
-
         .phone-container {
           position: fixed;
           top: 0;
@@ -5012,9 +4940,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             <button class="chat-conv-btn" style="margin-right: 0;"><img src="https://img.heliar.top/file/1770239038945_喜欢_like.png" style="width: 24px; height: 24px; object-fit: contain;"></button>
             <button class="chat-conv-btn send ai-trigger" onclick="triggerAIAutoReply()"><img src="https://img.heliar.top/file/1770239044304_发送_send.png" style="width: 20px; height: 20px; object-fit: contain;"></button>
         </div>
-                <!-- Multiselect Footer -->
+        <!-- Multiselect Footer -->
         <div class="chat-multiselect-footer" id="chat-multiselect-footer">
-             <button class="chat-multiselect-cancel-btn" onclick="cancelMultiSelectMode()">取消</button>
              <button class="chat-multiselect-delete-btn" onclick="executeBatchDelete()">删除</button>
         </div>
     </div>
@@ -5082,7 +5009,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         <textarea id="role-user-persona" class="role-persona-input" placeholder="输入您的人设 (User Persona)..."></textarea>
     </div>
     <div class="settings-section-card">
-        <div class="settings-card-title">朋友圈互动设置</div>
+        <div class="settings-card-title">主动发动态</div>
         <div class="settings-row-with-switch" style="width:100%; padding: 10px 5px;">
             <label for="role-auto-post-switch">开启自动发动态</label>
             <label class="ios-switch">
@@ -5091,12 +5018,8 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
             </label>
         </div>
         <div class="settings-row" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-            <label for="role-auto-post-interval" style="margin-bottom:0;">自动发动态间隔 (分钟)</label>
+            <label for="role-auto-post-interval" style="margin-bottom:0;">间隔时间 (分钟)</label>
             <input type="number" id="role-auto-post-interval" placeholder="10" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
-        </div>
-        <div class="settings-row" style="width:100%; padding: 10px 5px; border-top: 1px solid #f0f0f0; margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-            <label for="role-auto-reply-delay" style="margin-bottom:0;">互动回复随机延迟 (0-999分钟)</label>
-            <input type="number" id="role-auto-reply-delay" placeholder="0" min="0" max="999" style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
         </div>
     </div>
 
@@ -5156,39 +5079,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     <button class="role-save-btn" onclick="saveRoleSettings()">保存设置</button>
     <button class="role-delete-btn" onclick="confirmDeleteFriend()">删除好友</button>
 </div>
-<!-- Emoji Image Description Modal -->
- <!-- 自定义图片描述编辑弹窗 -->
-<div id="edit-image-desc-modal" class="delete-confirm-modal" style="z-index: 2000;">
-    <div class="delete-card" onclick="event.stopPropagation()">
-        <div class="delete-card-title" style="margin-bottom: 15px; color: var(--theme-pink-text); font-weight: 600;">编辑画面描述</div>
-        <div style="font-size: 12px; color: #888; margin-bottom: 10px; text-align: left;">AI将根据此描述理解你的图片内容：</div>
-        <textarea id="image-desc-textarea" class="wb-entry-input val" style="width: 100%; min-height: 80px; margin-bottom: 20px; border: 1px solid #FADBE6; background: #fff; padding: 12px; font-size: 14px;" placeholder="例如：一张在海边看日落的自拍..."></textarea>
-        <div class="delete-card-actions">
-            <button class="delete-card-btn btn-cancel" onclick="closeImageDescModal()">取消</button>
-            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="saveImageDesc()">保存</button>
-        </div>
-    </div>
-</div>
-<div id="moment-emoji-desc-modal" class="delete-confirm-modal" onclick="closeEmojiDescModal()" style="z-index: 2000;">
-    <div class="delete-card" onclick="event.stopPropagation()">
-        <div style="font-size: 60px; margin-bottom: 15px;" id="emoji-desc-icon">🖼️</div>
-        <div class="delete-card-title" id="emoji-desc-text" style="font-weight: normal; line-height: 1.6; color: #444; font-size: 15px;">这是图片的描述</div>
-        <div class="delete-card-actions" style="margin-top: 20px;">
-            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white; width: 100%;" onclick="closeEmojiDescModal()">我知道了</button>
-        </div>
-    </div>
-</div>
-<script>
-    // 在这里先挂载上控制弹窗的函数
-    window.showEmojiImageDesc = (emoji, desc) => {
-        document.getElementById('emoji-desc-icon').textContent = emoji;
-        document.getElementById('emoji-desc-text').textContent = desc;
-        document.getElementById('moment-emoji-desc-modal').classList.add('active');
-    };
-    window.closeEmojiDescModal = () => {
-        document.getElementById('moment-emoji-desc-modal').classList.remove('active');
-    };
-</script>
 
 <!-- Add Moment Modal -->
 <div id="add-moment-modal">
@@ -5469,39 +5359,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
 </div>
 
 <!-- 删除朋友圈确认弹窗 -->
-<!-- 编辑消息自定义美化弹窗 -->
-<div id="edit-msg-modal" class="delete-confirm-modal" style="z-index: 10050;">
-    <div class="delete-card" onclick="event.stopPropagation()" style="width: 85%; max-width: 340px; padding: 25px;">
-        <div class="delete-card-title" style="margin-bottom: 15px; color: var(--theme-pink-text); font-weight: 600;">编辑消息</div>
-        <textarea id="edit-msg-textarea" class="wb-entry-input val" style="width: 100%; min-height: 100px; margin-bottom: 20px; border: 1px solid #FADBE6; background: #fff; padding: 12px; font-size: 15px;"></textarea>
-        <div class="delete-card-actions">
-            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('edit-msg-modal')">取消</button>
-            <button class="delete-card-btn wb-btn-ok" style="background:var(--theme-pink-btn); color:white;" onclick="executeEditMsg()">保存修改</button>
-        </div>
-    </div>
-</div>
-
-<!-- 单条消息删除确认弹窗 -->
-<div id="delete-msg-confirm-modal" class="delete-confirm-modal" style="z-index: 10050;">
-    <div class="delete-card" onclick="event.stopPropagation()">
-        <div class="delete-card-title">确定要永久删除这条消息吗？</div>
-        <div class="delete-card-actions">
-            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('delete-msg-confirm-modal')">取消</button>
-            <button class="delete-card-btn btn-confirm-delete" onclick="executeDeleteMsg()">删除</button>
-        </div>
-    </div>
-</div>
-
-<!-- 批量删除消息确认弹窗 -->
-<div id="batch-delete-confirm-modal" class="delete-confirm-modal" style="z-index: 10050;">
-    <div class="delete-card" onclick="event.stopPropagation()">
-        <div class="delete-card-title" id="batch-delete-title">确定要删除选中的消息吗？</div>
-        <div class="delete-card-actions">
-            <button class="delete-card-btn btn-cancel" onclick="closeDeleteModal('batch-delete-confirm-modal')">取消</button>
-            <button class="delete-card-btn btn-confirm-delete" onclick="confirmBatchDelete()">删除</button>
-        </div>
-    </div>
-</div>
 <div id="delete-moment-confirm-modal" class="delete-confirm-modal">
     <div class="delete-card">
         <div class="delete-card-title">删除该朋友圈？</div>
@@ -5574,7 +5431,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     </div>
                 
     <div class="settings-content">
-                <div class="settings-module">
+        <div class="settings-module">
             <h3>通用</h3>
             <div class="settings-row-with-switch">
                 <label for="ios-mode-switch">iOS 模式 (刘海屏适配)</label>
@@ -5590,16 +5447,7 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
                     <span class="slider round"></span>
                 </label>
             </div>
-            <!-- 新增平板模式开关 -->
-            <div class="settings-row-with-switch" style="margin-top: 10px;">
-                <label for="tablet-mode-switch">平板模式</label>
-                <label class="ios-switch">
-                    <input type="checkbox" id="tablet-mode-switch">
-                    <span class="slider round"></span>
-                </label>
-            </div>
         </div>
-
         
         <div class="settings-module" id="phone-frame-settings-module" style="display: none;">
             <h3>手机框设置</h3>
@@ -6402,7 +6250,6 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
     const IOS_MODE_KEY = 'iosModeEnabled_v1';
     const PHONE_FRAME_KEY = 'phoneFrameEnabled_v2'; 
     const PHONE_CASE_COLOR_KEY = 'phoneCaseColor_v1';
-    const TABLET_MODE_KEY = 'tabletModeEnabled_v1'; // 新增：平板模式的缓存 Key
     const CAT_EARS_KEY = 'catEarsEnabled_v1';
     const CAT_EAR_COLOR_KEY = 'catEarColor_v1';
     const MOMENTS_DATA_KEY = 'momentsData_v4_private';
@@ -6475,13 +6322,14 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         if (!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let width = img.width; let height = img.height; if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } } canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/png')); }; img.src = e.target.result; }; reader.readAsDataURL(file); // <-- 【修改】使用无损的PNG格式
     }
     
-    // --- 手机框、平板模式与猫耳朵功能 ---
+    // --- 手机框与猫耳朵功能 ---
     function applyPhoneFrame(enabled) {
       const appWrapper = document.getElementById('app-wrapper');
       const phoneScreen = document.getElementById('phone-screen-content');
       const bodyEl = document.body;
       const phoneContainer = document.getElementById('phone-container');
       const frameSettingsModule = document.getElementById('phone-frame-settings-module');
+      
       const wasActive = bodyEl.classList.contains('phone-frame-active');
       
       if (enabled) {
@@ -6495,65 +6343,25 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
         phoneScreen.style.backgroundImage = `url(${wp})`;
         bodyEl.style.backgroundImage = 'none';
+        
         if (frameSettingsModule) frameSettingsModule.style.display = 'block';
+
       } else {
         if (wasActive) {
             bodyEl.classList.remove('phone-frame-active');
-            // 【关键】：只有平板模式也没开启时，才把页面内容从框里拿回主体
-            if (!bodyEl.classList.contains('tablet-mode-active') && appWrapper && bodyEl && phoneContainer && !bodyEl.contains(appWrapper)) {
+            if (appWrapper && bodyEl && phoneContainer && !bodyEl.contains(appWrapper)) {
                 bodyEl.insertBefore(appWrapper, phoneContainer);
-                const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-                const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
-                bodyEl.style.backgroundImage = `url(${wp})`;
-                phoneScreen.style.backgroundImage = 'none';
-            }
-        }
-        // 如果平板也没开，隐藏外壳设置
-        if (!bodyEl.classList.contains('tablet-mode-active') && frameSettingsModule) {
-            frameSettingsModule.style.display = 'none';
-        }
-        applyCatEars(false); 
-      }
-      localStorage.setItem(PHONE_FRAME_KEY, enabled);
-    }
-
-    function applyTabletMode(enabled) {
-      const appWrapper = document.getElementById('app-wrapper');
-      const phoneScreen = document.getElementById('phone-screen-content');
-      const bodyEl = document.body;
-      const phoneContainer = document.getElementById('phone-container');
-      const frameSettingsModule = document.getElementById('phone-frame-settings-module');
-      const wasActive = bodyEl.classList.contains('tablet-mode-active');
-      
-      if (enabled) {
-        if (!wasActive) {
-            bodyEl.classList.add('tablet-mode-active');
-            if (appWrapper && phoneScreen && !phoneScreen.contains(appWrapper)) {
-                phoneScreen.appendChild(appWrapper);
             }
         }
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
         const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
-        phoneScreen.style.backgroundImage = `url(${wp})`;
-        bodyEl.style.backgroundImage = 'none';
-        if (frameSettingsModule) frameSettingsModule.style.display = 'block';
-      } else {
-        if (wasActive) {
-            bodyEl.classList.remove('tablet-mode-active');
-            // 【关键】：只有手机模式也没开启时，才把页面内容拿出来
-            if (!bodyEl.classList.contains('phone-frame-active') && appWrapper && bodyEl && phoneContainer && !bodyEl.contains(appWrapper)) {
-                bodyEl.insertBefore(appWrapper, phoneContainer);
-                const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
-                const wp = settings.visual && settings.visual.wallpaper ? settings.visual.wallpaper : 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
-                bodyEl.style.backgroundImage = `url(${wp})`;
-                phoneScreen.style.backgroundImage = 'none';
-            }
-        }
-        if (!bodyEl.classList.contains('phone-frame-active') && frameSettingsModule) {
-            frameSettingsModule.style.display = 'none';
-        }
+        bodyEl.style.backgroundImage = `url(${wp})`;
+        phoneScreen.style.backgroundImage = 'none';
+        
+        if (frameSettingsModule) frameSettingsModule.style.display = 'none';
+        applyCatEars(false); 
       }
-      localStorage.setItem(TABLET_MODE_KEY, enabled);
+      localStorage.setItem(PHONE_FRAME_KEY, enabled);
     }
     
     function applyCatEars(enabled) {
@@ -9340,52 +9148,31 @@ Strictly adhere to the JSON format. Example:
                 let commentsHtml = '';
                 if (moment.comments && moment.comments.length > 0) {
                     commentsHtml = `<div class="moment-comments-list">` +
-                        moment.comments.map(c => {
-                            // 新增：如果有 replyTo 字段，则渲染“ 回复 xxx”的结构，且“回复”二字为黑色常规字体
-                            let replyHtml = c.replyTo ? `<span style="color:#333; font-weight:normal; margin: 0 4px;">回复</span><span class="user">${escapeHtml(c.replyTo)}</span>` : '';
-                            return `<div class="moment-comment-item"><span class="user">${escapeHtml(c.user)}</span>${replyHtml}<span style="color:#333;">：</span><span class="text">${escapeHtml(c.text)}</span></div>`;
-                        }).join('') +
+                        moment.comments.map(c => 
+                            `<div class="moment-comment-item"><span class="user">${escapeHtml(c.user)}:</span> <span class="text">${escapeHtml(c.text)}</span></div>`
+                        ).join('') +
                     `</div>`;
                 }
-
                 
                 let imageGridHtml = '';
                 let images = moment.images || (moment.imageUrl ? [moment.imageUrl] : []);
                 
-                // 渲染用户发的老版真实图片
                 if (images.length > 0) {
                     let gridClass = 'single-img';
                     if (images.length === 1) gridClass = 'single-img';
                     else if (images.length === 2 || images.length === 4) gridClass = `grid-${images.length}`; 
                     else gridClass = `grid-${images.length}`; 
                     
-                    imageGridHtml += `<div class="moments-img-grid ${gridClass}">` + 
-                        images.map(item => {
-                            // 兼容以前的旧数据（纯字符串）和新数据（对象）
-                            let url = typeof item === 'string' ? item : item.url;
-                            let desc = typeof item === 'string' ? '没有画面描述' : (item.desc || '没有画面描述');
-                            let safeDesc = desc.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                            
-                            // 绑定我们上一次写好的 AI Emoji 描述弹窗事件，完美复用
-                            return `<img src="${url}" class="moment-grid-img" onclick="showEmojiImageDesc('📷', '${safeDesc}'); event.stopPropagation();">`;
-                        }).join('') +
+                    imageGridHtml = `<div class="moments-img-grid ${gridClass}">` + 
+                        images.map(url => `<img src="${url}" class="moment-grid-img" onclick="event.stopPropagation()">`).join('') +
                     `</div>`;
-                }
-                
-                // 渲染 AI 生成的 Emoji 图片
-                if (moment.emojiImage) {
-                    let desc = (moment.emojiDescription || '一张图片').replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                    let emoji = (moment.emojiImage).replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                    imageGridHtml += `
-                    <div class="moment-emoji-container" onclick="showEmojiImageDesc('${emoji}', '${desc}'); event.stopPropagation();" style="font-size: 60px; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; background-color: #f9f9f9; border-radius: 8px; cursor: pointer; margin-top: 8px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); border: 1px solid #eee; transition: background 0.2s;">
-                        ${moment.emojiImage}
-                    </div>`;
                 }
                 
                 const showDeleteBtn = isUserMoment || (author && author.id);
 
-                        listHtml += `
+                listHtml += `
                     <div class="moment-item" id="moment-${moment.id}">
+                        ${showDeleteBtn ? `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">` : ''}
                         <img src="${authorAvatar}" class="moment-item-avatar" alt="avatar">
                         <div class="moment-item-content">
                             <div class="moment-item-nickname">${escapeHtml(authorNickname)}</div>
@@ -9393,15 +9180,16 @@ Strictly adhere to the JSON format. Example:
                             ${imageGridHtml}
                             <div class="moment-item-meta">
                                 <div class="moment-item-meta-left">
-                                    <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
-                                    ${showDeleteBtn ? `<img src="https://img.heliar.top/file/1770357709135_删除_delete.png" class="moment-delete-btn" onclick="confirmDeleteMoment(${moment.id})">` : ''}
                                     ${privateTag}
                                 </div>
-                                <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
-                                    ··
-                                    <div class="moment-actions-popup">
-                                        <div class="moment-popup-btn" onclick="toggleLike(${moment.id})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
-                                        <div class="moment-popup-btn" onclick="openCommentInput(${moment.id})"><img src="https://img.heliar.top/file/1770353307524_评论_comment.png"> 评论</div>
+                                <div style="display:flex; align-items:center; gap: 8px;">
+                                     <span class="moment-timestamp">${formatTimestamp(moment.timestamp)}</span>
+                                    <div class="moment-actions-btn" onclick="toggleActionsPopup(${moment.id}, event)">
+                                        ··
+                                        <div class="moment-actions-popup">
+                                            <div class="moment-popup-btn" onclick="toggleLike(${moment.id})"><img src="${likeIconUrl}"> ${likeBtnText}</div>
+                                            <div class="moment-popup-btn" onclick="openCommentInput(${moment.id})"><img src="https://img.heliar.top/file/1770353307524_评论_comment.png"> 评论</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -9507,9 +9295,7 @@ Strictly adhere to the JSON format. Example:
         files.forEach(file => {
             if (tempMomentImages.length >= 9) return;
             compressImage(file, 600, (base64) => {
-                // 默认给一个基础描述，用户可以通过双击来自定义
-                tempMomentImages.push({ url: base64, desc: "一张照片" });
-                
+                tempMomentImages.push(base64);
                 processedCount++;
                 if (processedCount === files.length || tempMomentImages.length === 9) {
                      renderAddMomentGrid();
@@ -9518,43 +9304,7 @@ Strictly adhere to the JSON format. Example:
         });
         event.target.value = '';
     };
-
-    // --- 专门处理图片描述的漂亮弹窗逻辑 ---
-    let currentEditingImageIndex = null;
-
-    window.openImageDescModal = (index) => {
-        currentEditingImageIndex = index;
-        let currentItem = tempMomentImages[index];
-        // 如果之前没填过，就显示为空，让用户输入
-        let currentDesc = typeof currentItem === 'string' ? '' : (currentItem.desc === '一张照片' ? '' : currentItem.desc);
-        
-        document.getElementById('image-desc-textarea').value = currentDesc || '';
-        document.getElementById('edit-image-desc-modal').classList.add('active');
-        // 自动聚焦输入框
-        setTimeout(() => document.getElementById('image-desc-textarea').focus(), 100);
-    };
-
-    window.closeImageDescModal = () => {
-        document.getElementById('edit-image-desc-modal').classList.remove('active');
-        currentEditingImageIndex = null;
-    };
-
-    window.saveImageDesc = () => {
-        if (currentEditingImageIndex === null) return;
-        let newDesc = document.getElementById('image-desc-textarea').value.trim();
-        if (!newDesc) newDesc = "一张照片"; // 兜底描述
-        
-        let currentItem = tempMomentImages[currentEditingImageIndex];
-        if (typeof currentItem === 'string') {
-            tempMomentImages[currentEditingImageIndex] = { url: currentItem, desc: newDesc };
-        } else {
-            tempMomentImages[currentEditingImageIndex].desc = newDesc;
-        }
-        
-        showToast("描述已保存");
-        closeImageDescModal();
-    };
-
+    
     function renderAddMomentGrid() {
         const grid = document.getElementById('add-moment-grid');
         const uploadBtn = document.createElement('div');
@@ -9564,21 +9314,16 @@ Strictly adhere to the JSON format. Example:
 
         grid.innerHTML = '';
         
-        tempMomentImages.forEach((item, index) => {
-            const src = typeof item === 'string' ? item : item.url;
+        tempMomentImages.forEach((src, index) => {
             const cell = document.createElement('div');
             cell.className = 'add-moment-img-cell';
-            
-            // 左下角加上“✎ 描述”按钮，点击触发全新的漂亮弹窗
             cell.innerHTML = `
                 <img src="${src}">
                 <div class="add-moment-remove-img" onclick="removeMomentImage(${index})">✕</div>
-                <div onclick="openImageDescModal(${index}); event.stopPropagation();" style="position: absolute; bottom: 4px; left: 4px; background: rgba(229, 138, 171, 0.95); color: white; font-size: 11px; padding: 4px 8px; border-radius: 8px; cursor: pointer; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">✎ 描述</div>
             `;
-            
             grid.appendChild(cell);
         });
-
+        
         if (tempMomentImages.length < 9) {
             grid.appendChild(uploadBtn);
         }
@@ -9613,11 +9358,6 @@ Strictly adhere to the JSON format. Example:
         showToast("发布成功");
         renderMomentsPage();
         closeAddMomentModal();
-        
-        // --- 新增：触发角色自动看朋友圈并互动 ---
-        setTimeout(() => {
-            window.autoReactToMoment(newMoment.id, false);
-        }, 500);
     };
     
     window.toggleLike = (momentId) => {
@@ -9705,241 +9445,8 @@ Strictly adhere to the JSON format. Example:
         
         closeCommentInput();
         renderMomentsPage();
-
-        // --- 新增：当你在评论区发话后，触发角色围观和回复 ---
-        const targetMomentId = currentCommentMomentId; 
-        setTimeout(() => {
-            window.autoReactToMoment(targetMomentId, true);
-        }, 500);
     };
     
-
-
-    // --- 新增：AI 角色自动回复朋友圈核心机制（随机延迟 + 防并发数据覆盖版） ---
-    window.autoReactToMoment = (momentId, isReplyToComment = false) => {
-        const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
-        // 如果没配置API，直接静默退出
-        if (!settings?.api?.url || !settings?.api?.key || !settings?.api?.model) {
-            return; 
-        }
-
-        let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        if (contacts.length === 0) return;
-
-        // 为每个角色设定独立的触发定时器
-        contacts.forEach((contact, index) => {
-            // 获取该角色设置的延迟时间(分钟)，0则代表秒回
-            let maxDelayMinutes = parseInt(contact.autoReplyDelay) || 0;
-            let delayMs = 0;
-            
-            if (maxDelayMinutes > 0) {
-                // 在 0 到设定分钟数之间随机生成延迟毫秒数
-                delayMs = Math.random() * maxDelayMinutes * 60 * 1000;
-            } else {
-                // 如果是秒回，为了防止多个角色同时请求导致API并发报错，给个基础的排队错开时间
-                delayMs = index * 2000 + Math.random() * 1000;
-            }
-
-            // 利用 setTimeout 实现未来某个时间的随机异步触发
-            setTimeout(async () => {
-                try {
-                    // 每次定时器启动时，重新获取最新动态，防异步覆盖
-                    let moments = getMomentsData();
-                    let momentIndex = moments.findIndex(m => m.id === momentId);
-                    if (momentIndex === -1) return; // 找不到动态就退出
-                    let moment = moments[momentIndex];
-
-                    let momentContent = moment.text ? `文字内容: ${moment.text}\n` : '';
-                    let imgDescs = [];
-                    if (moment.images && moment.images.length > 0) {
-                        moment.images.forEach(img => {
-                            let desc = typeof img === 'string' ? '' : img.desc;
-                            if (desc && desc !== '一张照片') imgDescs.push(desc);
-                        });
-                    }
-                    if (moment.emojiImage && moment.emojiDescription) {
-                        imgDescs.push(moment.emojiDescription);
-                    }
-                    if (imgDescs.length > 0) {
-                        momentContent += `附带图片/画面描述: ${imgDescs.join('; ')}\n`;
-                    }
-
-                    let existingComments = "";
-                    if (moment.comments && moment.comments.length > 0) {
-                        existingComments = moment.comments.map(c => `${c.user}: ${c.text}`).join('\n');
-                    }
-
-                    let worldbookContext = "";
-                    if (contact.worldbookIds && contact.worldbookIds.length > 0) {
-                        const allWb = JSON.parse(localStorage.getItem(WORLDBOOK_DATA_KEY) || '[]');
-                        const activeWbs = allWb.filter(b => contact.worldbookIds.includes(b.id));
-                        activeWbs.forEach(wb => {
-                            worldbookContext += `\n[世界书: ${wb.title}]\n`;
-                            wb.entries.forEach(e => { worldbookContext += `${e.key ? e.key+': ' : ''}${e.content}\n`; });
-                        });
-                    }
-
-                    const recollectionData = getRecollections(contact.id);
-                    const recollectionContext = recollectionData.items.map(item => item.text).join('\n');
-
-                    const globalProfile = getUserProfile();
-                    const uName = contact.userName || globalProfile.nickname || "User";
-                    const uPersona = contact.userPersona || "一个普通用户";
-
-                    // 判断动态作者
-                    const isUserMoment = !moment.authorId || String(moment.authorId) === String(globalProfile.qqId);
-                    const isMyMoment = String(moment.authorId) === String(contact.id);
-                    let momentAuthorName = "其他人";
-                    if (isUserMoment) {
-                        momentAuthorName = uName;
-                    } else if (isMyMoment) {
-                        momentAuthorName = "你(你自己)";
-                    } else {
-                        // 由于 contacts 被局部变量覆盖，这里重新查一下全量联系人拿名字
-                        const allContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-                        const authorContact = allContacts.find(c => String(c.id) === String(moment.authorId));
-                        if (authorContact) momentAuthorName = authorContact.alias || authorContact.name;
-                    }
-
-                    let latestCommenter = "";
-                    let latestCommentText = "";
-                    if (isReplyToComment && moment.comments && moment.comments.length > 0) {
-                        const lastComment = moment.comments[moment.comments.length - 1];
-                        latestCommenter = lastComment.user;
-                        latestCommentText = lastComment.text;
-                    }
-
-                    let triggerReason = "";
-                    let actionInstruction = "";
-
-                    if (isReplyToComment) {
-                        triggerReason = `“${latestCommenter}”刚刚在下面发表了新评论：“${latestCommentText}”。`;
-                        if (isMyMoment) {
-                            actionInstruction = `【最高强制指令】：这是你(你自己)发布的动态，现在你的好友 ${latestCommenter} 评论了你！你作为动态主人【必须】在评论区回复ta！\n你必须在JSON中返回 "action": "comment" (或"both")，并且务必填写 "replyTo": "${latestCommenter}"。如果不回复，不符合人类社交常理！`;
-                        } else {
-                            actionInstruction = `【互动提示】：这是 ${momentAuthorName} 发布的动态，现在 ${latestCommenter} 评论了。你可以选择跟评凑热闹，或者忽略。如果决定回复某人，请提供 "replyTo": "对方昵称"。`;
-                        }
-                    } else {
-                        triggerReason = `${momentAuthorName} 刚刚发布了这条新动态。`;
-                        if (isMyMoment) {
-                            actionInstruction = `【互动提示】：这是你自己刚发的动态，没人评论前不需要自己评论自己，必须返回 "action": "ignore"。`;
-                        } else {
-                            actionInstruction = `【互动提示】：请根据你的人设和关系，决定是否要给 ${momentAuthorName} 的这条新动态点赞或评论。`;
-                        }
-                    }
-
-                    const sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
-角色设定：${contact.persona}
-${worldbookContext ? `背景设定(世界书)：\n${worldbookContext}\n` : ''}
-${recollectionContext ? `回忆总结(发生过的事)：\n${recollectionContext}\n` : ''}
-
-你的好友（用户：${uName}，设定：${uPersona}）也在这个朋友圈中。
-当前情况：${triggerReason}
-
-朋友圈动态内容如下（动态发布者：${momentAuthorName}）：
-${momentContent}
-${existingComments ? `\n当前评论区的互动情况：\n${existingComments}` : ''}
-
-${actionInstruction}
-务必保持真实，符合你的人设。
-注意：评论内容(commentText)直接写你想说的话即可，不要在前面带“回复xxx：”的前缀，系统会通过 replyTo 字段自动生成界面排版。
-
-请严格输出以下JSON格式（不要包含任何Markdown标记）：
-{
-  "action": "comment" | "like" | "both" | "ignore",
-  "commentText": "如果你决定评论，写下评论内容。否则填空字符串。",
-  "replyTo": "如果你是在回复评论区里的某个人，这里必须填ta的昵称；如果是对整条动态的普通评论，填 null"
-}`;
-
-                    let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
-                    const isGemini = settings.api.url.includes('generativelanguage');
-                    let bodyData, headers = { 'Content-Type': 'application/json' };
-
-                    if (isGemini) {
-                        fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
-                        bodyData = JSON.stringify({ 
-                            contents: [{ parts: [{ text: sysPrompt }] }], 
-                            generationConfig: { temperature: parseFloat(settings.api.temp || 0.8), response_mime_type: "application/json" } 
-                        });
-                    } else {
-                        headers['Authorization'] = `Bearer ${settings.api.key}`;
-                        bodyData = JSON.stringify({
-                            model: settings.api.model,
-                            messages: [{ role: "user", content: sysPrompt }],
-                            temperature: parseFloat(settings.api.temp || 0.8),
-                            response_format: { "type": "json_object" }
-                        });
-                    }
-
-                    const res = await fetch(fetchUrl, { method: 'POST', headers: headers, body: bodyData });
-                    if (res.ok) {
-                        const data = await res.json();
-                        let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-                        reply = reply.trim();
-
-                        const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-                        if (jsonMatch) reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
-
-                        const jsonReply = JSON.parse(reply);
-
-                        // 即使AI选了 ignore，如果是必须回复的情况，我们用兜底机制强行拉起回复（防偷懒）
-                        let finalAction = jsonReply.action;
-                        if (isReplyToComment && isMyMoment && finalAction === 'ignore') {
-                            finalAction = 'comment';
-                            jsonReply.commentText = "收到~"; 
-                        }
-
-                        let targetReplyTo = jsonReply.replyTo || null;
-                        if (isReplyToComment && isMyMoment && !targetReplyTo) {
-                            targetReplyTo = latestCommenter;
-                        }
-
-                        // --- 【防并发覆盖核心】在 API 返回后，写入前，重新拉取本地最新数据 ---
-                        let freshMoments = getMomentsData();
-                        let freshIndex = freshMoments.findIndex(m => m.id === momentId);
-                        
-                        if(freshIndex !== -1) {
-                            let freshMoment = freshMoments[freshIndex];
-                            let hasChanges = false;
-
-                            if (finalAction === 'like' || finalAction === 'both') {
-                                if (!freshMoment.likes) freshMoment.likes = [];
-                                if (!freshMoment.likes.includes(contact.id.toString())) {
-                                    freshMoment.likes.push(contact.id.toString());
-                                    hasChanges = true;
-                                }
-                            }
-
-                            if ((finalAction === 'comment' || finalAction === 'both') && jsonReply.commentText) {
-                                if (!freshMoment.comments) freshMoment.comments = [];
-                                
-                                let cleanText = jsonReply.commentText.replace(/^回复.*?[：:]\s*/, '');
-                                
-                                freshMoment.comments.push({
-                                    user: contact.alias || contact.name,
-                                    userId: contact.id.toString(),
-                                    replyTo: targetReplyTo,
-                                    text: cleanText
-                                });
-                                hasChanges = true;
-                            }
-
-                            // 增量更新保存
-                            if (hasChanges) {
-                                saveMomentsData(freshMoments);
-                                // 只有在当前页才刷新 UI
-                                if (document.getElementById('chat-tab-2').classList.contains('active')) {
-                                    renderMomentsPage();
-                                }
-                            }
-                        }
-                    }
-                } catch (e) {
-                    console.error("[AutoReact] 角色互动出错:", contact.name, e);
-                }
-            }, delayMs); 
-        });
-    };
     // --- NEW: Urge To Post Logic ---
     window.openUrgeToPostModal = () => {
         const overlay = document.getElementById('urge-post-overlay');
@@ -9982,51 +9489,13 @@ ${actionInstruction}
         setTimeout(() => overlay.style.display = 'none', 300);
     };
 
-    window.confirmUrgeToPost = async () => {
+    window.confirmUrgeToPost = () => {
         if (selectedUrgeCharIds.size === 0) {
             showToast('请至少选择一个角色');
             return;
         }
-        
-        if (isUrgeInProgress) {
-            showToast('已通知ta 请稍等');
-            return;
-        }
-        isUrgeInProgress = true;
         closeUrgeToPostModal();
-        showToast('已发送催更，正在发动态...', 3000);
-
-        const contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-        const selectedContacts = contacts.filter(c => selectedUrgeCharIds.has(c.id));
-        
-        let successCount = 0;
-        
-        // 依次为所选的好友生成动态
-        for (const contact of selectedContacts) {
-            try {
-                const newMoment = await generateMomentForCharacter(contact);
-                if (newMoment) {
-                    let moments = getMomentsData();
-                    moments.unshift(newMoment);
-                    saveMomentsData(moments);
-                    successCount++;
-                }
-            } catch (e) {
-                console.error(`生成 ${contact.alias || contact.name} 的动态失败:`, e);
-            }
-        }
-        
-        isUrgeInProgress = false;
-        
-        if (successCount > 0) {
-            showToast(`成功催更了 ${successCount} 条动态！`);
-            // 如果用户当前停留在朋友圈页面，则立刻刷新界面呈现新动态
-            if (document.getElementById('chat-tab-2').classList.contains('active')) {
-                renderMomentsPage();
-            }
-        } else {
-            showToast('催更请求已完成，但Ta们暂时不想发动态。');
-        }
+        showToast('已成功催促！');
     };
     
     // --- Auto Post Moment Logic ---
@@ -10936,7 +10405,7 @@ ${actionInstruction}
         renderConversationMessages();
     }
     
-        window.showBubbleMenu = (event, msgId, text, type, isTransfer) => {
+    window.showBubbleMenu = (event, msgId, text, type, isTransfer) => {
         event.preventDefault();
         event.stopPropagation();
         closeBubbleMenu(); 
@@ -10947,11 +10416,9 @@ ${actionInstruction}
         menu.className = 'bubble-context-menu';
         
         const recallOption = (type === 'sent') ? `<div class="bubble-menu-item" onclick="event.stopPropagation(); handleRecallMsg('${msgId}')">撤回</div>` : '';
-        
-        // 【修改】只传 msgId，避免特殊字符和引号导致报错
         const editOption = isTransfer 
-            ? `<div class="bubble-menu-item" style="color:#ccc; cursor:not-allowed;">编辑</div>`
-            : `<div class="bubble-menu-item" onclick="event.stopPropagation(); handleEditMsg('${msgId}')">编辑</div>`;
+                        ? `<div class="bubble-menu-item" style="color:#ccc; cursor:not-allowed;">编辑</div>`
+            : `<div class="bubble-menu-item" onclick="event.stopPropagation(); handleEditMsg('${msgId}', '${escapeHtml(text).replace(/'/g, "\\'")}')">编辑</div>`;
             
         const multiSelectOption = `<div class="bubble-menu-item" onclick="event.stopPropagation(); toggleMultiSelectMode()">多选</div>`;
         const deleteOption = `<div class="bubble-menu-item" style="color:#F44336;" onclick="event.stopPropagation(); deleteMsg('${msgId}')">删除</div>`;
@@ -10977,105 +10444,55 @@ ${actionInstruction}
         activeMsgIdForMenu = null;
     };
 
-    // ================== 新增的美化版编辑逻辑 ==================
-    let pendingEditMsgId = null;
-    window.handleEditMsg = (msgId) => {
+    window.handleEditMsg = (msgId, oldText) => {
         closeBubbleMenu();
-        const key = getMessagesKey(currentChatContactId);
-        let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        const msg = messages.find(m => String(m.id) === String(msgId));
-        if (!msg) return;
-
-        pendingEditMsgId = msgId;
-        const textarea = document.getElementById('edit-msg-textarea');
-        textarea.value = msg.text; // 直接从库中拿纯净数据，防乱码防报错
-        
-        document.getElementById('edit-msg-modal').classList.add('active');
-        setTimeout(() => textarea.focus(), 100);
-    };
-
-    window.executeEditMsg = () => {
-        if (!pendingEditMsgId || !currentChatContactId) return;
-        const newText = document.getElementById('edit-msg-textarea').value.trim();
-        
-        if (newText !== "") {
+        const newText = prompt("编辑消息:", oldText);
+        if (newText !== null && newText.trim() !== "") {
             const key = getMessagesKey(currentChatContactId);
             let messages = JSON.parse(localStorage.getItem(key) || '[]');
-            const msgIndex = messages.findIndex(m => String(m.id) === String(pendingEditMsgId));
+            const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
             if (msgIndex !== -1) {
-                messages[msgIndex].text = newText;
+                messages[msgIndex].text = newText.trim();
                 localStorage.setItem(key, JSON.stringify(messages));
-                
-                // 如果修改的是最后一条消息，同步更新外层列表的概览
-                if (msgIndex === messages.length - 1) {
-                    let contacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-                    const contactIdx = contacts.findIndex(c => c.id === currentChatContactId);
-                    if (contactIdx > -1) {
-                        contacts[contactIdx].lastMsg = newText;
-                        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
-                    }
-                }
-                
                 renderConversationMessages();
-                showToast("修改成功");
             }
         }
-        closeDeleteModal('edit-msg-modal');
-        pendingEditMsgId = null;
     };
 
-    // ================== 原有撤回逻辑保持不变 ==================
     window.handleRecallMsg = (msgId) => {
         closeBubbleMenu();
         const key = getMessagesKey(currentChatContactId);
         let messages = JSON.parse(localStorage.getItem(key) || '[]');
         const msgIndex = messages.findIndex(m => String(m.id) === String(msgId));
-        if (msgIndex !== -1 && messages[msgIndex].type === 'sent' && !messages[msgIndex].isTransfer) {
+            if (msgIndex !== -1 && messages[msgIndex].type === 'sent' && !messages[msgIndex].isTransfer) {
             messages[msgIndex].type = 'recalled';
-            messages[msgIndex].originalText = messages[msgIndex].text; 
+            messages[msgIndex].originalText = messages[msgIndex].text; // <--- 新增这行，保存原文
             messages[msgIndex].text = "你撤回了一条消息";
             localStorage.setItem(key, JSON.stringify(messages));
+
             renderConversationMessages();
         } else {
             showToast("只能撤回普通发送的消息");
         }
     };
 
-    // ================== 新增的美化版删除单条消息逻辑 ==================
-    let pendingDeleteMsgId = null;
     window.deleteMsg = (msgId) => {
         closeBubbleMenu();
-        pendingDeleteMsgId = msgId;
-        document.getElementById('delete-msg-confirm-modal').classList.add('active');
+        if (confirm("确定要删除这条消息吗？")) {
+            const key = getMessagesKey(currentChatContactId);
+            let messages = JSON.parse(localStorage.getItem(key) || '[]');
+            messages = messages.filter(m => String(m.id) !== String(msgId));
+            localStorage.setItem(key, JSON.stringify(messages));
+            renderConversationMessages();
+        }
     };
 
-    window.executeDeleteMsg = () => {
-        if (!pendingDeleteMsgId || !currentChatContactId) return;
-        const key = getMessagesKey(currentChatContactId);
-        let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        messages = messages.filter(m => String(m.id) !== String(pendingDeleteMsgId));
-        localStorage.setItem(key, JSON.stringify(messages));
-        
-        closeDeleteModal('delete-msg-confirm-modal');
-        renderConversationMessages();
-        showToast("消息已永久删除");
-        pendingDeleteMsgId = null;
-    };
-
-    // ================== 多选与取消逻辑 ==================
     window.toggleMultiSelectMode = () => {
         closeBubbleMenu();
         isMultiSelectMode = true;
         selectedMsgIds.clear();
         if(activeMsgIdForMenu) selectedMsgIds.add(activeMsgIdForMenu);
         document.getElementById('chat-multiselect-footer').classList.add('active');
-        renderConversationMessages();
-    };
-
-    window.cancelMultiSelectMode = () => {
-        isMultiSelectMode = false;
-        selectedMsgIds.clear();
-        document.getElementById('chat-multiselect-footer').classList.remove('active');
         renderConversationMessages();
     };
 
@@ -11089,28 +10506,23 @@ ${actionInstruction}
         renderConversationMessages();
     };
 
-    // ================== 新增的美化版批量删除逻辑 ==================
     window.executeBatchDelete = () => {
         if (selectedMsgIds.size === 0) {
-            showToast("请先在左侧勾选要删除的消息");
+            showToast("请先选择消息");
             return;
         }
-        document.getElementById('batch-delete-title').innerText = `确定要永久删除选中的 ${selectedMsgIds.size} 条消息吗？`;
-        document.getElementById('batch-delete-confirm-modal').classList.add('active');
-    };
-
-    window.confirmBatchDelete = () => {
-        const key = getMessagesKey(currentChatContactId);
-        let messages = JSON.parse(localStorage.getItem(key) || '[]');
-        messages = messages.filter(m => !selectedMsgIds.has(m.id));
-        localStorage.setItem(key, JSON.stringify(messages));
-        
-        isMultiSelectMode = false;
-        selectedMsgIds.clear();
-        document.getElementById('chat-multiselect-footer').classList.remove('active');
-        closeDeleteModal('batch-delete-confirm-modal');
-        renderConversationMessages();
-        showToast("批量删除成功");
+        if (confirm(`确定要删除选中的 ${selectedMsgIds.size} 条消息吗？`)) {
+            const key = getMessagesKey(currentChatContactId);
+            let messages = JSON.parse(localStorage.getItem(key) || '[]');
+            messages = messages.filter(m => !selectedMsgIds.has(m.id));
+            localStorage.setItem(key, JSON.stringify(messages));
+            
+            isMultiSelectMode = false;
+            selectedMsgIds.clear();
+            document.getElementById('chat-multiselect-footer').classList.remove('active');
+            renderConversationMessages();
+            showToast("批量删除成功");
+        }
     };
 
     window.toggleChatExtraMenu = () => {
@@ -11457,10 +10869,8 @@ window.openTransferConfirmPopup = (amount) => {
         
         document.getElementById('role-auto-post-switch').checked = contact.autoPostEnabled || false;
         document.getElementById('role-auto-post-interval').value = contact.autoPostInterval || 60;
-        document.getElementById('role-auto-reply-delay').value = contact.autoReplyDelay || 0;
         
         // --- 新增：读取撤回设置 ---
-
         document.getElementById('role-recall-amount').value = contact.recallAmount || '1';
         document.getElementById('role-auto-recall-switch').checked = contact.autoRecallEnabled || false;
         document.getElementById('role-recall-min').value = contact.autoRecallMin || 20;
@@ -11499,7 +10909,7 @@ window.openTransferConfirmPopup = (amount) => {
 
     window.closeRoleSettings = () => { document.getElementById('role-settings-page').classList.remove('active'); };
 
-            window.saveRoleSettings = () => {
+        window.saveRoleSettings = () => {
         if (!currentChatContactId) return;
         const alias = document.getElementById('role-setting-alias').value.trim();
         const signature = document.getElementById('role-setting-signature').value.trim();
@@ -11514,9 +10924,6 @@ window.openTransferConfirmPopup = (amount) => {
         const cssContent = document.getElementById('role-setting-css').value.trim();
         const autoPostEnabled = document.getElementById('role-auto-post-switch').checked;
         const autoPostInterval = parseInt(document.getElementById('role-auto-post-interval').value) || 60;
-        
-        let autoReplyDelay = parseInt(document.getElementById('role-auto-reply-delay').value);
-        if (isNaN(autoReplyDelay)) autoReplyDelay = 0;
 
         // --- 新增：获取撤回设置参数 ---
         const recallAmount = document.getElementById('role-recall-amount').value;
@@ -11546,15 +10953,13 @@ window.openTransferConfirmPopup = (amount) => {
             contacts[idx].customCss = cssContent;
             contacts[idx].autoPostEnabled = autoPostEnabled;
             contacts[idx].autoPostInterval = autoPostInterval;
-            contacts[idx].autoReplyDelay = autoReplyDelay;
             
             // --- 新增：保存撤回设置，并初始化随机轮数 ---
             contacts[idx].recallAmount = recallAmount;
             contacts[idx].autoRecallEnabled = autoRecallEnabled;
             contacts[idx].autoRecallMin = autoRecallMin;
             contacts[idx].autoRecallMax = autoRecallMax;
-            if (autoRecallEnabled) {
-                // 修改：只要保存设置就重置计数并重新生成随机目标轮数，确保新区间立刻精准生效
+            if (autoRecallEnabled && !contacts[idx].targetRecallTurn) {
                 contacts[idx].turnCount = 0;
                 contacts[idx].targetRecallTurn = Math.floor(Math.random() * (autoRecallMax - autoRecallMin + 1)) + autoRecallMin;
             }
@@ -11919,7 +11324,6 @@ window.openTransferConfirmPopup = (amount) => {
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY) || '{}');
         document.getElementById('ios-mode-switch').checked = localStorage.getItem(IOS_MODE_KEY) === 'true';
         document.getElementById('phone-frame-switch').checked = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
-        document.getElementById('tablet-mode-switch').checked = localStorage.getItem(TABLET_MODE_KEY) === 'true'; // 新增：回显平板模式开关状态
         document.getElementById('cat-ears-switch').checked = localStorage.getItem(CAT_EARS_KEY) === 'true';
 
         /* --- 新增的代码 --- */
@@ -12016,9 +11420,6 @@ window.openTransferConfirmPopup = (amount) => {
         
         const phoneFrame = document.getElementById('phone-frame-switch').checked;
         applyPhoneFrame(phoneFrame);
-
-        const tabletMode = document.getElementById('tablet-mode-switch').checked;
-        applyTabletMode(tabletMode); // 调用真正的开启平板模式函数
         
         const catEars = document.getElementById('cat-ears-switch').checked;
         applyCatEars(catEars);
@@ -12028,27 +11429,14 @@ window.openTransferConfirmPopup = (amount) => {
         showToast('设置已保存');
     });
 
-    // 手机框与平板模式的互斥监听
     document.getElementById('phone-frame-switch').addEventListener('change', (e) => {
         const frameSettingsModule = document.getElementById('phone-frame-settings-module');
         if (e.target.checked) {
             frameSettingsModule.style.display = 'block';
-            document.getElementById('tablet-mode-switch').checked = false; // 互斥：自动关掉平板模式
-        } else if (!document.getElementById('tablet-mode-switch').checked) {
+        } else {
             frameSettingsModule.style.display = 'none';
         }
     });
-
-    document.getElementById('tablet-mode-switch').addEventListener('change', (e) => {
-        const frameSettingsModule = document.getElementById('phone-frame-settings-module');
-        if (e.target.checked) {
-            frameSettingsModule.style.display = 'block'; // 平板模式也允许修改颜色
-            document.getElementById('phone-frame-switch').checked = false; // 互斥：自动关掉手机模式
-        } else if (!document.getElementById('phone-frame-switch').checked) {
-            frameSettingsModule.style.display = 'none';
-        }
-    });
-
 
     document.getElementById('phone-case-color-input').addEventListener('input', (e) => setPhoneCaseColor(e.target.value));
     document.getElementById('cat-ear-color-input').addEventListener('input', (e) => setCatEarColor(e.target.value));
@@ -12112,8 +11500,7 @@ window.openTransferConfirmPopup = (amount) => {
         const phoneScreen = document.getElementById('phone-screen-content');
         const wp = settings.visual?.wallpaper || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80';
         
-        // 【关键修改】：加上平板模式的判断，只要开启了其中一个框，壁纸就要贴在屏幕内
-        if (document.body.classList.contains('phone-frame-active') || document.body.classList.contains('tablet-mode-active')) {
+        if (document.body.classList.contains('phone-frame-active')) {
             phoneScreen.style.backgroundImage = `url(${wp})`;
             document.body.style.backgroundImage = 'none';
         } else {
@@ -12281,7 +11668,7 @@ window.openTransferConfirmPopup = (amount) => {
 
     // --- AI Auto Reply Logic ---
                 // 【修改后】的 triggerAIAutoReply 函数
-        window.triggerAIAutoReply = async () => {
+    window.triggerAIAutoReply = async () => {
         if (!currentChatContactId) return;
         const settings = JSON.parse(localStorage.getItem(ALL_SETTINGS_KEY));
         if (!settings?.api?.url || !settings?.api?.key) { showToast("请先配置API"); return; }
@@ -12339,7 +11726,7 @@ window.openTransferConfirmPopup = (amount) => {
             timeContext = `当前现实时间是：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${['日','一','二','三','四','五','六'][now.getDay()]} ${now.getHours()}:${now.getMinutes()}。请在对话中自然地体现出对时间的感知（如果合适的话）。`;
         }
 
-        let historyStr = recentMsgs.map(m => {
+                let historyStr = recentMsgs.map(m => {
             let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
             if (m.isTransfer) {
                 if (m.type === 'sent') return `[${sender}向${contact.alias || contact.name}转账了 ¥${m.transferData.amount}]`;
@@ -12365,16 +11752,18 @@ window.openTransferConfirmPopup = (amount) => {
         }).join('\n');
 
 
+
+
         // --- 新增：检测当前对话轮数是否达标 ---
         let isForceRecallTurn = false;
-        // 修正：当前的 turnCount 是过去已完成的轮数，当前正要进行的算是第 turnCount + 1 轮
-        if (contact.autoRecallEnabled && contact.targetRecallTurn && ((contact.turnCount || 0) + 1) >= contact.targetRecallTurn) {
+        if (contact.autoRecallEnabled && contact.targetRecallTurn && (contact.turnCount || 0) >= contact.targetRecallTurn) {
             isForceRecallTurn = true;
         }
         // --- 新增结束 ---
 
+        // ▼▼▼▼▼【 修改核心：更新给AI的指令 (Prompt) 】▼▼▼▼▼
 
-        let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
+                        let sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
 ${worldbookContext ? `\n背景设定(世界书)：\n${worldbookContext}\n` : ''}
 ${recollectionContext ? `\n回忆总结(曾发生过的事)：\n${recollectionContext}\n` : ''}
@@ -12399,52 +11788,40 @@ ${timeContext}
     "<RECALL>",
     "对不起，我刚才情绪不好撤回了。",
     "<SEND_TRANSFER:520>",
-    "这是补偿你的，拿去买点好吃的好好犒劳一下自己吧！"
+        "这是补偿你的，拿去买点好吃的好好犒劳一下自己吧！"
   ]
 }`;
 
-        // --- 新增：如果轮数达到，强制 AI 撤回并执行拟人化反悔 ---
+
+        // ▲▲▲▲▲【 指令更新结束 】▲▲▲▲▲
+
+                // --- 新增：如果轮数达到，强制 AI 撤回并执行拟人化反悔 ---
         if (isForceRecallTurn) {
             let amountToRecall = contact.recallAmount || '1';
-            let isSingleRecall = (amountToRecall === '1');
-            
             let fakeMsgInstruction = (amountToRecall === 'all') 
-                ? `连续发出 2 到 4 句“错话”` 
+                ? `发出 1 到 2 句“错话”` 
                 : `连续发出 ${amountToRecall} 句“错话”`;
 
-            if (isSingleRecall) {
-                sysPrompt += `\n\n【特殊系统指令：触发真实的单条撤回行为】
-本次回复你必须模拟人类真实的“反悔 -> 迅速撤回 -> 重新发”的过程！
+            sysPrompt += `\n\n【特殊系统指令：触发真实的撤回行为】
+本次回复你必须模拟人类真实的“手滑打错字 -> 迅速撤回 -> 重新发”的过程！
 请严格按以下 3 个步骤构造你的 "reply" JSON数组：
-第 1 步：先发出 1 句“错话”。请在以下三种情境中**随机选择一种**来生成这句错话：
-  - 情境 A (打错字)：包含明显的错别字或拼音手误。
-  - 情境 B (冲动的话)：语气比较重、带情绪、伤人或过于急躁的话。
-  - 情境 C (口是心非/害羞)：不小心吐露了真实的喜欢、关心或心里话，觉得不好意思。
+第 1 步：先${fakeMsgInstruction}。必须包含明显的**错别字**或拼音手误，让人一看就知道是打错了。
 第 2 步：放入一个单独的特殊气泡 "<RECALL>"。
-第 3 步：**必须**在 "<RECALL>" 之后补发。根据你选的情境：
-  - 如果是情境 A (打错字)：直接发正确的句子，或者说明一下“打错了”再发正确句子。
-  - 如果是情境 B (冲动的话)：发一句缓和语气的话、道歉或者傲娇地找补。
-  - 如果是情境 C (害羞)：发一句嘴硬的话、岔开话题或者掩饰尴尬的话。
+第 3 步：**必须**在 "<RECALL>" 之后补发正确内容。**请随机选择以下两种方式之一进行补发：**
+  - 【方式一（直接更正）】：没有任何多余的解释说明，直接发送修改错字后的完整正确句子，并紧跟后续想说的话。
+    （示例：{"reply": ["今天天气真不粗", "<RECALL>", "今天天气真不错", "我们出去玩吧"]}）
+  - 【方式二（解释后更正）】：先发一个很短的气泡只指出刚才打错了什么字（例如：“打错了，是xxx”或“xxx才对”），然后再发送修改错字后的完整正确句子，最后紧跟后续想说的话。
+    （示例：{"reply": ["去超市买了很逗东西", "<RECALL>", "打错了，是很多", "去超市买了很多东西", "重死了"]}）
 绝对不能只撤回不补发！`;
-            } else {
-                sysPrompt += `\n\n【特殊系统指令：触发真实的多条撤回行为】
-本次回复你必须模拟人类真实的“情绪失控连发 -> 突然清醒/害羞全部撤回 -> 找补”的过程！
-请严格按以下 3 个步骤构造你的 "reply" JSON数组：
-第 1 步：先${fakeMsgInstruction}。请在以下两种情境中**随机选择一种**来生成这些错话：
-  - 情境 A (情绪失控)：连发多句抱怨、生气、吃醋或冲动的话。
-  - 情境 B (吐露心声/碎碎念)：连发多句非常私密、害羞的心里话，或者一连串不知所云的碎碎念。
-第 2 步：放入一个单独的特殊气泡 "<RECALL>" (系统会自动根据你设置的条数撤回前面的多条消息)。
-第 3 步：**必须**在 "<RECALL>" 之后补发找补的内容。根据你选的情境：
-  - 如果是情境 A：发一句道歉、“刚才有点冲动”、“算了没事”等缓和情绪的话。
-  - 如果是情境 B：发一句“发错群了”、“啊啊啊没看清”、“刚才猫踩键盘了”等极力掩饰尴尬的话，或者强行岔开话题。
-绝对不能只撤回不补发！`;
-            }
         }
         // --- 新增结束 ---
+
+
 
         if (isTransferEvent) {
              sysPrompt += `\n\n【特殊事件】刚才 ${uName} 向你转账了 ¥${transferAmount}。根据你的性格，决定是否要收下这笔钱。如果接受转账，请在JSON的 "reply" 数组的第一个元素前加上特殊标记 <ACCEPT_TRANSFER>；如果拒绝退回，则加上 <REJECT_TRANSFER>。例如: { "reply": ["<ACCEPT_TRANSFER>谢谢你的钱！", "我正好需要呢。"] }`;
         }
+
 
         const payload = {
             model: settings.api.model || 'gpt-3.5-turbo',
@@ -12465,6 +11842,7 @@ ${timeContext}
             let bodyData, headers = { 'Content-Type': 'application/json' };
             
             if (isGemini) {
+                // Gemini 需要不同的 payload 格式
                 fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
                 bodyData = JSON.stringify({ contents: [{ parts: [{ text: sysPrompt + "\n\n历史聊天记录:\n" + historyStr + "\n\n请严格按照JSON格式要求给出你的回复:" }] }], generationConfig: { temperature: payload.temperature, response_mime_type: "application/json" } });
             } else {
@@ -12486,6 +11864,7 @@ ${timeContext}
                 replyContent = data.choices[0].message.content;
             }
 
+                        // ▼▼▼▼▼【 修改核心：解析AI返回的JSON并分句发送 】▼▼▼▼▼
             let sentences = [];
             try {
                 const parsedReply = JSON.parse(replyContent);
@@ -12503,6 +11882,7 @@ ${timeContext}
             let processedSentences = [];
             for (let s of sentences) {
                 if (typeof s === 'string' && s.includes("<RECALL>")) {
+                    // 如果AI把撤回标记写在了一句话的中间，强制把它切开成多个气泡
                     let parts = s.split("<RECALL>");
                     for (let i = 0; i < parts.length; i++) {
                         if (parts[i].trim()) processedSentences.push(parts[i].trim());
@@ -12513,12 +11893,16 @@ ${timeContext}
                 }
             }
             
+            // 兜底安全机制：如果数组的最后一个气泡是撤回指令，说明AI忘了发后续的话
             if (processedSentences.length > 0 && processedSentences[processedSentences.length - 1] === "<RECALL>") {
                 processedSentences.push("咳咳...刚才手滑打错字了，重新组织一下语言哈😅");
             }
             sentences = processedSentences;
+            // --- 预处理结束 ---
             
-            if (sentences.length > 0) {
+                       if (sentences.length > 0) {
+
+                 // 检查第一句是否包含转账指令
                 if (isTransferEvent) {
                     let firstSentence = sentences[0];
                     let action = null;
@@ -12547,34 +11931,45 @@ ${timeContext}
                     let isAiTransfer = false;
                     let aiTransferAmount = 0;
                     
+                    // 检测是否包含主动转账标记 <SEND_TRANSFER:数字>
                     const transferMatch = trimmedSentence.match(/<SEND_TRANSFER:\s*(\d+(\.\d+)?)\s*>/);
                     if (transferMatch) {
                         isAiTransfer = true;
                         aiTransferAmount = parseFloat(transferMatch[1]);
+                        // 从句子中移除这个标记
                         trimmedSentence = trimmedSentence.replace(transferMatch[0], '').trim();
                     }
 
+                    // --- 修改：检测是否包含撤回标记，并打上标识 ---
                     let isAiRecall = false;
                     if (trimmedSentence.includes("<RECALL>")) {
                         isAiRecall = true;
-                        hasRecallHappened = true; 
+                        hasRecallHappened = true; // 告诉后面的代码，撤回发生过了
                         trimmedSentence = trimmedSentence.replace(/<RECALL>/g, '').trim();
                     }
+                    // --------------------------------
 
                     let hasUpdate = false;
 
+
+                    // --- 修改：处理撤回动作 (引入撤回数量，并修复撤回全部时的误伤Bug) ---
                     if (isAiRecall) {
                         let amountToRecall = contact.recallAmount || '1';
                         let targetCount = (amountToRecall === 'all') ? Infinity : parseInt(amountToRecall);
                         let recalledCount = 0;
 
+                                                // 倒序查找并撤回最近的N条消息
                         for (let i = messages.length - 1; i >= 0; i--) {
+                            // 【关键修复】遇到用户发送的消息(sent)或已撤回的消息(recalled)，立即中断！
+                            // 这样确保撤回永远不会越界到上一轮的对话中去。
                             if (messages[i].type !== 'received') {
                                 break;
                             }
+
                             messages[i].type = 'recalled';
-                            messages[i].originalText = messages[i].text;
+                            messages[i].originalText = messages[i].text; // <--- 新增这行，保存原文
                             messages[i].text = `"${contact.alias || contact.name}" 撤回了一条消息`;
+                            // 清除可能存在的转账标记，防止渲染冲突
 
                             if (messages[i].isTransfer) {
                                 delete messages[i].isTransfer;
@@ -12583,10 +11978,12 @@ ${timeContext}
                             hasUpdate = true;
                             recalledCount++;
                             
-                            if (recalledCount >= targetCount) break; 
+                            if (recalledCount >= targetCount) break; // 数量达到则停止
                         }
                     }
+                    // --------------------------------
 
+                    // 如果去掉标记后还有文本，先发送文本气泡
                     if (trimmedSentence) {
                         messages.push({
                             id: Date.now() + Math.random(),
@@ -12597,6 +11994,7 @@ ${timeContext}
                         hasUpdate = true;
                     }
 
+                    // 接着发送转账气泡（如果有）
                     if (isAiTransfer && aiTransferAmount > 0) {
                         const newTransferId = Date.now().toString() + Math.floor(Math.random() * 1000);
                         messages.push({
@@ -12625,41 +12023,34 @@ ${timeContext}
                             displayMsg = `[撤回了一条消息]`;
                         }
                         
-                        // [修改]：即时拉取最新 contacts，防止并发覆盖其他角色的设置
-                        let liveContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-                        let liveIdx = liveContacts.findIndex(c => c.id === currentChatContactId);
-                        if (liveIdx > -1) {
-                            liveContacts[liveIdx].lastMsg = displayMsg;
-                            liveContacts[liveIdx].timestamp = Date.now();
-                            localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(liveContacts));
-                        }
+                        contacts[contactIndex].lastMsg = displayMsg;
+                        contacts[contactIndex].timestamp = Date.now();
+                        localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
 
                         renderConversationMessages();
                         await sleep(Math.random() * 600 + 800); // 随机延迟
                     }
                 }
                 
-                // --- 新增：在对话发送完后，处理轮数记录 (同时防异步覆盖) ---
-                let endContacts = JSON.parse(localStorage.getItem(CHAT_DATA_KEY) || '[]');
-                let endIdx = endContacts.findIndex(c => c.id === currentChatContactId);
-                if (endIdx > -1) {
-                    endContacts[endIdx].turnCount = (endContacts[endIdx].turnCount || 0) + 1;
-                    // 如果本轮触发了撤回，重置计数器，并生成下次的目标轮数
-                    if (hasRecallHappened) {
-                        endContacts[endIdx].turnCount = 0;
-                        if (endContacts[endIdx].autoRecallEnabled) {
-                            const min = endContacts[endIdx].autoRecallMin || 20;
-                            const max = endContacts[endIdx].autoRecallMax || 50;
-                            endContacts[endIdx].targetRecallTurn = Math.floor(Math.random() * (max - min + 1)) + min;
-                        }
+                // --- 新增：在对话发送完后，处理轮数记录 ---
+                contacts[contactIndex].turnCount = (contacts[contactIndex].turnCount || 0) + 1;
+                // 如果本轮触发了撤回，重置计数器，并生成下次的目标轮数
+                if (hasRecallHappened) {
+                    contacts[contactIndex].turnCount = 0;
+                    if (contacts[contactIndex].autoRecallEnabled) {
+                        const min = contacts[contactIndex].autoRecallMin || 20;
+                        const max = contacts[contactIndex].autoRecallMax || 50;
+                        contacts[contactIndex].targetRecallTurn = Math.floor(Math.random() * (max - min + 1)) + min;
                     }
-                    localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(endContacts));
                 }
+                localStorage.setItem(CHAT_DATA_KEY, JSON.stringify(contacts));
                 // --- 新增结束 ---
 
             }
+            // ▲▲▲▲▲【 新逻辑结束 】▲▲▲▲▲
 
         } catch (e) {
+
             showToast("AI 回复失败: " + e.message, 4000);
             console.error("AI Reply Error:", e);
         } finally {
@@ -12687,52 +12078,19 @@ ${timeContext}
             });
         }
         
-        // --- 新增：获取最近聊天记录 ---
-        const key = getMessagesKey(contact.id);
-        const messages = JSON.parse(localStorage.getItem(key) || '[]');
-        const depth = contact.memoryDepth || 15;
-        const recentMsgs = messages.slice(-depth);
-        const globalProfile = getUserProfile();
-        const uName = contact.userName || globalProfile.nickname || "User";
-
-        let historyStr = recentMsgs.map(m => {
-            let sender = m.type === 'sent' ? uName : (contact.alias || contact.name);
-            if (m.type === 'recalled') return `[系统提示：撤回了一条消息]`;
-            if (m.isTransfer) return `[系统提示：一笔转账]`;
-            if (m.isGift) return `[系统提示：送出或收到了一件礼物]`;
-            return `${sender}: ${m.text}`;
-        }).join('\n');
-        // --- 新增结束 ---
-        
         const sysPrompt = `你现在扮演角色：${contact.alias || contact.name}。
 角色设定：${contact.persona}
 ${worldbookContext ? `\n背景设定(世界书)：\n${worldbookContext}\n` : ''}
 ${recollectionContext ? `\n近期经历(回忆)：\n${recollectionContext}\n` : ''}
-${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
 
-请根据你的性格、近期经历以及最近的聊天内容，发表一条社交媒体动态（朋友圈）。内容要符合你的人设，自然真实。
-
-你有三种发动态的方式，请随机选择一种：
-1. 纯文字 (postType: 1)
-2. 文字 + 1张图片 (postType: 2)
-3. 纯图片 (postType: 3)
-
-如果是包含图片的动态，请用一个最贴切的Emoji来代替该图片，并提供这幅画面的详细文字描述（如：一张在咖啡馆喝咖啡的自拍、一张夜晚繁星的照片等）。
-
-请严格输出以下JSON格式（不要包含任何其他文字或Markdown标记，如果不想发动态，就返回 {"postType": 0}）：
-{
-  "postType": 1或2或3,
-  "text": "动态的文字内容（如果是纯图片则填空字符串）",
-  "imageEmoji": "图片的Emoji代表（仅单个Emoji，如果是纯文字则填空字符串）",
-  "imageDescription": "图片的画面文字描述（如果是纯文字则填空字符串）"
-}`;
+请根据你的性格和近期经历，发表一条简短的社交媒体动态（朋友圈）。内容要符合你的人设，自然真实。
+仅输出动态纯文本内容，不要加引号、前缀或其他格式。如果不想发任何文字，就输出[EMPTY]`;
 
         try {
             const payload = {
                 model: settings.api.model,
                 messages: [{ role: "user", content: sysPrompt }],
-                temperature: parseFloat(settings.api.temp || 0.8),
-                response_format: { "type": "json_object" }
+                temperature: parseFloat(settings.api.temp || 0.8)
             };
             
             let fetchUrl = settings.api.url.endsWith('/v1') ? settings.api.url + '/chat/completions' : settings.api.url + '/v1/chat/completions';
@@ -12741,7 +12099,7 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
             
             if (isGemini) {
                 fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${settings.api.model}:generateContent?key=${settings.api.key}`;
-                bodyData = JSON.stringify({ contents: [{ parts: [{ text: sysPrompt }] }], generationConfig: { temperature: payload.temperature, response_mime_type: "application/json" } });
+                bodyData = JSON.stringify({ contents: [{ parts: [{ text: sysPrompt }] }], generationConfig: { temperature: payload.temperature } });
             } else {
                 headers['Authorization'] = `Bearer ${settings.api.key}`;
                 bodyData = JSON.stringify(payload);
@@ -12754,28 +12112,13 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
             let reply = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
             reply = reply.trim();
 
-            const jsonMatch = reply.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-            if (jsonMatch) {
-                reply = jsonMatch[1] ? jsonMatch[1] : jsonMatch[2];
-            }
-
-            let jsonReply;
-            try {
-                jsonReply = JSON.parse(reply);
-            } catch (err) {
-                console.error("AI未能返回有效的JSON:", reply);
-                return null;
-            }
-
-            if (!jsonReply.postType || jsonReply.postType === 0) return null;
+            if (reply === '[EMPTY]') return null;
 
             return {
                 id: Date.now(),
                 authorId: contact.id, 
                 timestamp: Date.now(),
-                text: jsonReply.text || '',
-                emojiImage: jsonReply.imageEmoji || '',
-                emojiDescription: jsonReply.imageDescription || '',
+                text: reply,
                 images: [], 
                 likes: [],
                 comments: [],
@@ -12783,7 +12126,6 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
             };
 
         } catch(e) {
-
             console.error("[AutoPost] API failure:", e);
             return null;
         }
@@ -12897,10 +12239,6 @@ ${historyStr ? `\n最近聊天记录：\n${historyStr}\n` : ''}
         
         const isPhoneFrame = localStorage.getItem(PHONE_FRAME_KEY) === 'true';
         applyPhoneFrame(isPhoneFrame);
-
-        // 新增：自动读取平板模式状态并应用
-        const isTabletMode = localStorage.getItem(TABLET_MODE_KEY) === 'true';
-        applyTabletMode(isTabletMode);
 
         const caseColor = localStorage.getItem(PHONE_CASE_COLOR_KEY);
         if (caseColor) setPhoneCaseColor(caseColor);
