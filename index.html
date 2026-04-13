@@ -220,21 +220,6 @@
             --takeout-border-radius-l: 20px;
             --takeout-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
-         /* ==================== 核心修复：安卓机型防闪烁、防移位全局锁定 ==================== */
-        html, body {
-             width: 100%;
-             height: 100%;
-             margin: 0;
-             padding: 0;
-             overflow: hidden;
-             /* 核心1：绝对锁死物理视口，防止安卓出现整个页面拖拽移位 */
-             position: fixed; 
-             top: 0;
-             left: 0;
-             /* 核心2：彻底禁止安卓边缘的橡皮筋回弹效果 */
-             overscroll-behavior: none; 
-        }
-
         * {
              box-sizing: border-box;
              margin: 0;
@@ -243,22 +228,15 @@
              -webkit-tap-highlight-color: transparent;
              font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
          }
-
         body {
-             /* 核心3：弃用 100vw 和 100vh，防止安卓高度随地址栏和键盘疯狂乱跳 */
+             width: 100vw;
+             height: 100vh;
+             overflow: hidden;
              background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib-rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+             position: relative;
              transition: background-image 0.3s ease-in-out;
-             z-index: -2;
+            z-index: -2;
         }
-
-        /* 核心4：强制覆盖所有全屏页面，开启 GPU 硬件加速，根治点击时产生的闪烁问题 */
-        div[id$="-page"], div[id$="-modal"], div[id$="-overlay"], .delete-confirm-modal {
-             width: 100% !important;
-             height: 100% !important;
-             backface-visibility: hidden;
-             -webkit-backface-visibility: hidden;
-        }
-
         #home-screen {
              width: 100%;
              height: 100%;
@@ -6304,6 +6282,161 @@ body.phone-frame-active #mall-purchased-page .mall-favorite-header { padding-top
         .gallery-albums-capsule.manage-mode .gallery-photo-delete-btn { display: flex; }
         .gallery-albums-capsule.manage-mode .gallery-album-wrapper { animation: jiggle 0.3s infinite; }
         /* ========================= 图库样式结束 ========================= */
+/* ========================= 安卓兼容性修复 ========================= */
+/* 检测非苹果设备（安卓/PC等），禁用导致闪烁的高耗能特效 */
+@supports not (-webkit-touch-callout: none) {
+    /* 1. 全局禁用毛玻璃效果 - 这是安卓闪烁的最大元凶 */
+    .dock-container,
+    .photo-widget-container,
+    .chat-emotion-panel,
+    .bubble-context-menu,
+    .chat-conv-footer,
+    .chat-multiselect-footer,
+    #chat-extra-menu,
+    #forum-bottom-nav,
+    .gallery-albums-capsule,
+    .gallery-main-capsule,
+    .takeout-cart-footer,
+    #moments-comment-modal,
+    .lock-pwd-overlay,
+    #transfer-confirm-popup,
+    .chat-conv-header {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        /* 用纯色半透明背景代替毛玻璃 */
+        background-color: rgba(255, 255, 255, 0.97) !important;
+    }
+
+    /* 2. 锁屏密码遮罩层用纯色代替毛玻璃 */
+    .lock-pwd-overlay {
+        background-color: rgba(0, 0, 0, 0.85) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* 3. 减少所有全屏页面的过渡动画时长，降低重绘压力 */
+    #chat-app-page,
+    #wallet-app-page,
+    #worldbook-app-page,
+    #forum-app-page,
+    #mall-app-page,
+    #takeout-app-page,
+    #recollection-app-page,
+    #gallery-app-page,
+    #chat-conversation-view,
+    #role-settings-page,
+    #worldbook-detail-modal,
+    #worldbook-color-page,
+    #transfer-page,
+    #mall-detail-page,
+    #takeout-shop-detail-page,
+    #takeout-profile-page,
+    #takeout-favorite-page,
+    #takeout-all-orders-page,
+    #mall-favorite-page,
+    #mall-purchased-page,
+    #mall-sent-gifts-page,
+    #recollection-detail-page,
+    #forum-post-detail-page,
+    #forum-my-posts-page,
+    #forum-all-forums-page,
+    #forum-favorite-posts-page,
+    #forum-all-liked-posts-page,
+    #forum-following-page,
+    #edit-forum-page,
+    #worldbook-entry-fullscreen-page,
+    #settings-page,
+    #me-settings-modal,
+    #add-moment-modal {
+        transition-duration: 0.15s !important;
+    }
+
+    /* 4. 给所有固定定位的页面容器强制开启 GPU 加速层 */
+    #chat-app-page,
+    #wallet-app-page,
+    #worldbook-app-page,
+    #forum-app-page,
+    #mall-app-page,
+    #takeout-app-page,
+    #recollection-app-page,
+    #gallery-app-page,
+    #settings-page,
+    #lock-screen {
+        will-change: transform;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+
+    /* 5. 弹窗遮罩层禁用毛玻璃 */
+    #add-friend-modal,
+    #wallet-add-modal,
+    #worldbook-add-modal,
+    #worldbook-bind-modal,
+    #create-forum-modal-overlay,
+    #moments-action-sheet-overlay,
+    #ai-chat-modal,
+    #mall-category-modal,
+    #mall-purchase-overlay,
+    #transfer-confirm-overlay,
+    #receive-transfer-overlay,
+    #gift-detail-overlay,
+    #create-takeout-shop-modal,
+    #takeout-edit-shop-modal,
+    .delete-confirm-modal,
+    #recollection-action-sheet-overlay,
+    #forum-me-settings-modal,
+    #save-preset-modal,
+    #urge-post-overlay,
+    #gallery-add-modal,
+    #gallery-edit-photo-modal,
+    #edit-msg-modal,
+    #delete-msg-confirm-modal,
+    #batch-delete-confirm-modal,
+    #edit-image-desc-modal,
+    #moment-emoji-desc-modal,
+    #edit-forum-nickname-modal,
+    #mall-profile-setting-modal,
+    #disable-lock-confirm-modal {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* 6. 修复聊天页面底部输入栏的闪烁 */
+    .chat-conv-footer {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+    }
+
+    /* 7. 底部导航栏 */
+    #forum-bottom-nav {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    /* 8. 聊天表情面板 */
+    .chat-emotion-panel {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+    }
+
+    /* 9. 世界书封面的 3D 翻转效果在安卓上容易导致闪烁 */
+    .wb-content {
+        perspective: none !important;
+    }
+    .wb-book-item {
+        transform-style: flat !important;
+        transform: none !important;
+    }
+    .wb-book-item:active {
+        transform: scale(0.95) !important;
+    }
+
+    /* 10. 水晶球浮动动画在安卓上非常耗性能 */
+    .crystal-ball-container {
+        animation: none !important;
+    }
+    .star {
+        animation: none !important;
+    }
+}
+/* ========================= 安卓兼容性修复结束 ========================= */
 
     </style>
 
